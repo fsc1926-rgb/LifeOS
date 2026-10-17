@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1120">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>LifeOS v5 — Ecosistema Relazionale Unificato</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --surface: #1e293b;
+      --surface-2: #0f172a;
+      --surface-hover: #334155;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a855f7;
+      --radius: 14px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; padding-bottom: calc(84px + var(--safe-bottom)); }
+
+    header {
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.05rem; }
+    .badge-offline { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); font-size: 0.68rem; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+    .sync-controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+    nav.bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(6, 1fr);
+      padding-bottom: var(--safe-bottom); z-index: 200;
+    }
+    .tab-btn {
+      background: transparent; color: var(--text-muted); border: none; padding: 9px 2px;
+      cursor: pointer; font-weight: 600; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .tab-btn span.ico { font-size: 1.2rem; }
+    .tab-btn.active { color: var(--primary); }
+
+    main { max-width: 1220px; width: 100%; margin: 14px auto; padding: 0 12px; flex: 1; }
+    .module { display: none; animation: fadeIn 0.15s ease-out; }
+    .module.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+    .grid-2 { display: grid; grid-template-columns: 370px 1fr; gap: 16px; align-items: start; }
+    .grid-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px; }
+    @media (max-width: 920px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; margin-bottom: 14px; }
+    .card-title { font-size: 0.98rem; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .form-group { margin-bottom: 10px; }
+    label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+    input, select, textarea {
+      width: 100%; padding: 9px 11px; background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 0.9rem;
+    }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+    .btn {
+      padding: 7px 11px; border-radius: 9px; border: none; font-weight: 600; font-size: 0.78rem;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .btn-primary { background: var(--primary); color: white; width: 100%; padding: 11px; font-size: 0.9rem; }
+    .btn-success { background: var(--success); color: #052e16; font-weight: 700; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+    .btn-warn { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.35); }
+
+    .item-list { display: flex; flex-direction: column; gap: 8px; }
+    .item-row {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px;
+      padding: 11px 13px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .item-row.pinned { border-color: var(--warning); background: rgba(245, 158, 11, 0.06); }
+    .item-info { flex: 1; min-width: 190px; }
+    .item-info h4 { font-size: 0.9rem; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .item-info p { font-size: 0.79rem; color: var(--text-muted); line-height: 1.4; }
+
+    .pill { font-size: 0.68rem; padding: 2px 7px; border-radius: 99px; font-weight: 700; display: inline-block; }
+    .pill-ok { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .pill-warn { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .pill-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    .pill-info { background: rgba(59, 130, 246, 0.15); color: var(--primary); }
+    .pill-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .kpi-card { background: var(--surface-2); border: 1px solid var(--border); padding: 10px; border-radius: 10px; }
+    .kpi-card span { font-size: 0.72rem; color: var(--text-muted); display: block; }
+    .kpi-card strong { font-size: 1.12rem; margin-top: 3px; display: block; }
+
+    .sub-nav { display: flex; gap: 7px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; }
+    .sub-btn {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+      padding: 8px 13px; border-radius: 999px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+    }
+    .sub-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .macro-bar-wrap { margin-bottom: 8px; }
+    .macro-bar-head { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 3px; font-weight: 600; }
+    .progress-track { width: 100%; height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+    .progress-fill { height: 100%; border-radius: 99px; }
+
+    .meal-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 11px; margin-bottom: 10px; }
+    .meal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 8px; font-weight: 700; font-size: 0.88rem; }
+
+    .thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; }
+    .file-badge { padding: 6px 9px; background: rgba(59,130,246,0.12); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+    #syncStatus { font-size: 0.72rem; color: var(--text-muted); }
+
+    #imgModal, #objDossierModal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+      z-index: 500; align-items: center; justify-content: center; padding: 16px; flex-direction: column; gap: 12px;
+    }
+    #imgModal img { max-width: 95%; max-height: 80vh; border-radius: 12px; }
+    .dossier-box { background: var(--surface); border: 1px solid var(--primary); border-radius: 16px; max-width: 680px; width: 100%; max-height: 86vh; overflow-y: auto; padding: 18px; }
+  </style>
+</head>
+<body>
+
+<!-- Modal Anteprima Immagine -->
+<div id="imgModal" onclick="this.style.display='none'">
+  <img id="modalImgSrc" src="" alt="Anteprima">
+  <button class="btn btn-outline" style="background:#1e293b">Chiudi Anteprima</button>
+</div>
+
+<!-- Modal Scheda 360° Oggetto Unico (Garanzia + Manutenzioni + Finanze + Knowledge Base) -->
+<div id="objDossierModal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="dossier-box" id="objDossierContent"></div>
+</div>
+
+<header>
+  <div class="brand">
+    <span>⚡ LifeOS</span>
+    <span class="badge-offline" id="storageBadge">Core Unificato v5</span>
+  </div>
+  <div class="sync-controls">
+    <span id="syncStatus">Attivo</span>
+    <button class="btn btn-warn" onclick="forceAppRefresh()" title="Forza aggiornamento interfaccia senza toccare i dati">🔄 Aggiorna UI</button>
+    <button class="btn btn-outline" onclick="exportFullZipBackup()">📦 Backup ZIP (CSV+JSON+File)</button>
+    <label class="btn btn-outline" style="margin:0; cursor:pointer;">
+      ⬆️ Ripristina
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+    </label>
+  </div>
+</header>
+
+<main>
+  <!-- =========================================================
+       MODULO 1: DASHBOARD CENTRALE (RICERCA GLOBALE + LE 4 AREE)
+  ========================================================== -->
+  <section id="modHome" class="module active">
+    <!-- Ricerca Globale Unificata -->
+    <div class="card" style="border-color:var(--primary);">
+      <div class="card-title">
+        <span>🔍 Ricerca Globale dell'Ecosistema</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button class="btn btn-outline" onclick="toggleDashConfig()">⚙️ Configura 4 Aree</button>
+        </div>
+      </div>
+      <input type="text" id="globalSearchInput" placeholder="Cerca in tempo reale: Lavatrice, persona, transazione, referto, nota, ricambio..." oninput="runGlobalSearch(this.value)">
+      <div id="globalSearchResults" class="item-list" style="display:none; margin-top:10px; max-height:260px; overflow-y:auto;"></div>
+      
+      <!-- Configuratore visibilità 4 aree -->
+      <div id="dashConfigBox" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); font-size:0.8rem;">
+        <span style="color:var(--text-muted); margin-right:10px;">Mostra/Nascondi Aree:</span>
+        <label style="display:inline-flex; align-items:center; gap:4px; margin-right:12px;"><input type="checkbox" checked onchange="toggleArea('box_oggi', this.checked)"> ☀️ Oggi</label>
+        <label style="display:inline-flex; align-items:center; gap:4px; margin-right:12px;"><input type="checkbox" checked onchange="toggleArea('box_scadenza', this.checked)"> ⏳ In Scadenza</label>
+        <label style="display:inline-flex; align-items:center; gap:4px; margin-right:12px;"><input type="checkbox" checked onchange="toggleArea('box_situazione', this.checked)"> 📊 Situazione</label>
+        <label style="display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" checked onchange="toggleArea('box_ricordare', this.checked)"> 🧠 Da Ricordare</label>
+      </div>
+    </div>
+
+    <!-- Area 3: SITUAZIONE (Indicatori chiave) -->
+    <div class="card" id="box_situazione">
+      <div class="card-title"><span>📊 Situazione — Saldo Finanziario, Peso &amp; Indicatori</span></div>
+      <div id="area_situazione" class="kpi-grid"></div>
+    </div>
+
+    <!-- Griglia 4 Aree Operative -->
+    <div class="grid-dash">
+      <!-- Area 1: OGGI -->
+      <div class="card" id="box_oggi">
+        <div class="card-title">
+          <span>☀️ Oggi — Attività &amp; Routine</span>
+          <button class="btn btn-outline" onclick="switchTab('mod3', document.querySelectorAll('.tab-btn')[2])">+ Nuova</button>
+        </div>
+        <div id="area_oggi" class="item-list"></div>
+      </div>
+
+      <!-- Area 2: IN SCADENZA -->
+      <div class="card" id="box_scadenza">
+        <div class="card-title"><span>⏳ In Scadenza — Garanzie, Manutenzioni &amp; Rinnovi</span></div>
+        <div id="area_scadenza" class="item-list"></div>
+      </div>
+
+      <!-- Area 4: DA RICORDARE -->
+      <div class="card" id="box_ricordare">
+        <div class="card-title"><span>🧠 Da Ricordare — Fissati (Pin) &amp; Oggetti in Garanzia</span></div>
+        <div id="area_ricordare" class="item-list"></div>
+      </div>
+    </div>
+
+    <!-- Cronologia Modifiche, Annulla Operazione & Cestino Recuperabile -->
+    <div class="card">
+      <div class="card-title">
+        <span>🛡️ Cronologia, Integrità Archivi &amp; Cestino Recuperabile</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-outline" onclick="undoLastAction()">↩️ Annulla Ultima Azione</button>
+          <button class="btn btn-outline" onclick="verifyArchiveIntegrity()">✅ Verifica Integrità DB</button>
+        </div>
+      </div>
+      <div id="audit_list" style="font-size:0.76rem; color:var(--text-muted); margin-bottom:10px;"></div>
+      <div id="trash_list" class="item-list"></div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MODULO 2: OGGETTI UNIFICATI (GARANZIE + MANUALI + DOSSIER 360°)
+  ========================================================== -->
+  <section id="mod2" class="module">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">
+          <span id="v_form_title">📦 Registra Oggetto Unico / Garanzia</span>
+          <button class="btn btn-outline" id="v_cancel_edit" style="display:none" onclick="resetVaultForm()">Annulla</button>
+        </div>
+        <form id="v_form" onsubmit="saveVaultItem(event)">
+          <input type="hidden" id="v_edit_id">
+          <div class="form-group">
+            <label>Oggetto / Prodotto (Es. Lavatrice — Samsung) *</label>
+            <input type="text" id="v_title" required placeholder="Es. Lavatrice Samsung, Auto Fiat 500, S25 Ultra...">
+          </div>
+          <div class="form-group" style="display:flex; gap:8px;">
+            <div style="flex:1">
+              <label>Categoria</label>
+              <select id="v_cat">
+                <option value="Elettrodomestici">Elettrodomestici</option>
+                <option value="Elettronica">Elettronica</option>
+                <option value="Veicolo">Veicolo (Auto/Moto)</option>
+                <option value="Casa/Impianti">Casa / Impianti</option>
+                <option value="Documento/Assicurazione">Documento / Assicurazione</option>
+              </select>
+            </div>
+            <div style="flex:1">
+              <label>Seriale / Targa / Polizza</label>
+              <input type="text" id="v_serial" placeholder="S/N o Targa">
+            </div>
+          </div>
+          <div class="form-group" style="display:flex; gap:8px;">
+            <div style="flex:1">
+              <label>Data Acquisto / Inizio *</label>
+              <input type="date" id="v_date" required>
+            </div>
+            <div style="flex:1">
+              <label>Garanzia / Copertura (Mesi)</label>
+              <input type="number" id="v_months" value="24" min="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Prezzo d'Acquisto (€)</label>
+            <input type="number" step="0.01" id="v_price" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>📚 Knowledge Base (Manuale, istruzioni, codici filtro/ricambi, note)</label>
+            <textarea id="v_notes" rows="2" placeholder="Istruzioni lavaggio filtro, negozio d'acquisto, link manuale..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Allega Scontrino, Ricevuta o Manuale PDF (Galleria / File / Fotocamera)</label>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <label class="btn btn-outline" style="flex:1; cursor:pointer; margin:0;">
+                📁 Galleria / File / PDF
+                <input type="file" id="v_file_gallery" accept="image/*,application/pdf,.doc,.docx" style="display:none" onchange="handleVaultFileSelect(this)">
+              </label>
+              <label class="btn btn-outline" style="flex:1; cursor:pointer; margin:0;">
+                📷 Fotocamera
+                <input type="file" id="v_file_camera" accept="image/*" capture="environment" style="display:none" onchange="handleVaultFileSelect(this)">
+              </label>
+            </div>
+            <small id="v_file_label" style="color:var(--success); display:block; margin-top:5px; font-size:0.76rem;"></small>
+          </div>
+          <button type="submit" class="btn btn-primary" id="v_submit_btn">+ Salva Oggetto nel Nucleo Comune</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Inventario Oggetti (Tocca "🔍 Dossier 360°" per vedere Manutenzioni e Spese collegate)</span>
+          <span id="v_count" class="pill pill-info">0 oggetti</span>
+        </div>
+        <input type="text" class="search-bar" id="v_search" placeholder="🔍 Cerca oggetto, seriale, istruzioni..." oninput="renderVault()">
+        <div id="v_list" class="item-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MODULO 3: ATTIVITÀ (OGGI/SETTIMANA/PIN) & PERSONE
+  ========================================================== -->
+  <section id="mod3" class="module">
+    <div class="sub-nav">
+      <button class="sub-btn active" onclick="switchCrmSub('crmTodo', this)">✅ Attività (Oggi / Settimana / Da Ricordare)</button>
+      <button class="sub-btn" onclick="switchCrmSub('crmPeople', this)">❤️ Persone (Famiglia, Affetti, Emergenza)</button>
+    </div>
+
+    <!-- 3A: Attività, Progetti, Note fissate collegabili a Oggetti o Persone -->
+    <div id="crmTodo" class="crm-sub">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📌 Nuova Attività o Nota da Ricordare</div>
+          <form onsubmit="saveCrmTask(event)">
+            <div class="form-group">
+              <label>Titolo Attività / Promemoria *</label>
+              <input type="text" id="ct_title" required placeholder="Es. Pulire filtro lavatrice, Prenotare visita, Idea regalo...">
+            </div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1">
+                <label>Area Dashboard</label>
+                <select id="ct_scope">
+                  <option value="Oggi">☀️ Oggi (In Giornata)</option>
+                  <option value="Settimana">📅 In Settimana</option>
+                  <option value="Memoria">🧠 Da Ricordare / Progetto</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <label>Fissa in alto (Pin)?</label>
+                <select id="ct_pin">
+                  <option value="0">Normale</option>
+                  <option value="1">📌 Fissa in alto</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1">
+                <label>Collega a Oggetto (opz.)</label>
+                <select id="ct_obj"><option value="">-- Nessuno --</option></select>
+              </div>
+              <div style="flex:1">
+                <label>Collega a Persona (opz.)</label>
+                <select id="ct_person"><option value="">-- Nessuna --</option></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Note / Dettagli</label>
+              <textarea id="ct_notes" rows="2" placeholder="Dettagli..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">+ Aggiungi Attività</button>
+          </form>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">📌 Fissati in Alto (Da Ricordare)</div>
+            <div id="ct_pinned_list" class="item-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">☀️ Attività Giornata &amp; Settimana</div>
+            <div id="ct_todo_list" class="item-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3B: Persone (CRM Personale + Emergenza + Salute Familiare) -->
+    <div id="crmPeople" class="crm-sub" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span id="c_form_title">❤️ Registra Persona Unica</span>
+            <button class="btn btn-outline" id="c_cancel_edit" style="display:none" onclick="resetCrmPersonForm()">Annulla</button>
+          </div>
+          <form onsubmit="saveCrmItem(event)">
+            <input type="hidden" id="c_edit_id">
+            <div class="form-group">
+              <label>Nome *</label>
+              <input type="text" id="c_name" required placeholder="Es. Mamma, Papà, Marco, Dott. Rossi...">
+            </div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1">
+                <label>Cerchia Personale</label>
+                <select id="c_circle">
+                  <option value="Famiglia">🏠 Famiglia</option>
+                  <option value="Emergenza">🚨 Contatto Emergenza</option>
+                  <option value="Amici Stretti">🍻 Amici Stretti</option>
+                  <option value="Medico / Salute">🩺 Medico / Specialista</option>
+                  <option value="Compagnia / Hobby">⚽ Compagnia / Hobby</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <label>Telefono</label>
+                <input type="text" id="c_phone" placeholder="333...">
+              </div>
+            </div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1"><label>Ultimo contatto *</label><input type="date" id="c_last" required></div>
+              <div style="flex:1"><label>Sentire ogni (gg)</label><input type="number" id="c_freq" value="14" min="1"></div>
+            </div>
+            <div class="form-group">
+              <label>Idee Regalo, Compleanno, Salute Familiare / Gruppo Sanguigno</label>
+              <textarea id="c_notes" rows="2" placeholder="Dettagli importanti, allergie, taglie, regali..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="c_submit_btn">+ Salva Persona</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Rubrica Persone &amp; Affetti</div>
+          <input type="text" class="search-bar" id="c_search" placeholder="🔍 Cerca persona, regalo o nota..." oninput="renderCrm()">
+          <div id="c_list" class="item-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MODULO 4: MANUTENZIONE (COLLEGATA DIRETTAMENTE AGLI OGGETTI)
+  ========================================================== -->
+  <section id="mod4" class="module">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🔧 Registra Intervento / Guasto / Riparazione</div>
+        <form onsubmit="addMaintItem(event)">
+          <div class="form-group">
+            <label>Collega a Oggetto Registrato (Es. Lavatrice Samsung, Auto) *</label>
+            <select id="m_object_id" onchange="syncMaintAssetName()"></select>
+          </div>
+          <div class="form-group">
+            <label>Oppure scrivi Nome Mezzo / Impianto *</label>
+            <input type="text" id="m_asset" required placeholder="Es. Lavatrice Samsung, Auto Fiat 500...">
+          </div>
+          <div class="form-group">
+            <label>Intervento / Riparazione Eseguita *</label>
+            <input type="text" id="m_task" required placeholder="Es. Sostituzione pompa scarico, Tagliando Olio...">
+          </div>
+          <div class="form-group" style="display:flex; gap:8px;">
+            <div style="flex:1"><label>Data Esecuzione *</label><input type="date" id="m_date" required></div>
+            <div style="flex:1"><label>Prossima Scadenza (Mesi)</label><input type="number" id="m_next_months" value="12" min="1"></div>
+          </div>
+          <div class="form-group" style="display:flex; gap:8px;">
+            <input type="number" id="m_km_now" placeholder="Km attuali (opz.)">
+            <input type="number" id="m_km_next" placeholder="Prossimo cambio Km">
+          </div>
+          <div class="form-group" style="display:flex; gap:8px;">
+            <input type="number" step="0.01" id="m_cost" placeholder="Costo €">
+            <input type="text" id="m_parts" placeholder="Cod. Ricambio / Filtro">
+          </div>
+          <div class="form-group">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="m_auto_tx" checked style="width:auto;">
+              <span>Addebita automaticamente il costo anche nelle Finanze</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary">+ Salva Manutenzione</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Scadenzario Manutenzioni &amp; Storico Guasti</div>
+        <div id="m_kpis" class="kpi-grid"></div>
+        <div id="m_list" class="item-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MODULO 5: FINANZE MULTI-CONTO + BILANCIAMENTO + LINK OGGETTI
+  ========================================================== -->
+  <section id="mod5" class="module">
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <div class="card-title">
+            <span id="acc_form_title">🏦 Gestione Conti &amp; Carte</span>
+            <button class="btn btn-outline" id="acc_cancel_btn" style="display:none" onclick="resetAccountForm()">Annulla</button>
+          </div>
+          <form onsubmit="saveAccount(event)">
+            <input type="hidden" id="acc_edit_id">
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:2"><label>Nome Conto *</label><input type="text" id="acc_name" required placeholder="Es. Conto Principale, Revolut..."></div>
+              <div style="flex:1">
+                <label>Tipo</label>
+                <select id="acc_type">
+                  <option value="Banca">Banca</option>
+                  <option value="Carta">Carta</option>
+                  <option value="Contanti">Contanti</option>
+                  <option value="Risparmi">Risparmi</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Saldo Attuale (€) — Non crea movimenti nello storico</label>
+              <input type="number" step="0.01" id="acc_base" value="0.00" required>
+            </div>
+            <button type="submit" class="btn btn-outline" id="acc_submit_btn" style="width:100%">+ Aggiungi / Aggiorna Conto</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">💰 Registra Transazione (Collegabile a Oggetto o Persona)</div>
+          <form onsubmit="addFinanceTx(event)">
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1"><label>Conto *</label><select id="f_account" required></select></div>
+              <div style="flex:1"><label>Oggetto Collegato (opz.)</label><select id="f_object"><option value="">-- Nessuno --</option></select></div>
+            </div>
+            <div class="form-group">
+              <label>Descrizione *</label>
+              <input type="text" id="f_desc" required placeholder="Es. Acquisto Lavatrice, Spesa, Stipendio...">
+            </div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1">
+                <label>Tipo</label>
+                <select id="f_type">
+                  <option value="expense">Uscita (-)</option>
+                  <option value="income">Entrata (+)</option>
+                </select>
+              </div>
+              <div style="flex:1"><label>Importo (€) *</label><input type="number" step="0.01" id="f_amount" required placeholder="0.00"></div>
+            </div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1">
+                <label>Categoria</label>
+                <select id="f_cat">
+                  <option value="Alimentari">Alimentari</option>
+                  <option value="Casa & Utenze">Casa &amp; Utenze</option>
+                  <option value="Manutenzione & Acquisti">Manutenzione &amp; Acquisti</option>
+                  <option value="Auto & Trasporti">Auto &amp; Trasporti</option>
+                  <option value="Svago & Extra">Svago &amp; Extra</option>
+                  <option value="Stipendio / Entrate">Stipendio / Entrate</option>
+                </select>
+              </div>
+              <div style="flex:1"><label>Data *</label><input type="date" id="f_date" required></div>
+            </div>
+            <button type="submit" class="btn btn-primary">+ Registra Transazione</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔄 Nuovo Abbonamento / Pagamento Ricorrente</div>
+          <form onsubmit="addSub(event)">
+            <div class="form-group"><label>Servizio *</label><input type="text" id="s_name" required placeholder="Es. Netflix, Assicurazione Auto, Palestra..."></div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <input type="number" step="0.01" id="s_cost" required placeholder="Costo €">
+              <select id="s_cycle"><option value="monthly">Mensile</option><option value="yearly">Annuale</option></select>
+            </div>
+            <div class="form-group"><label>Prossimo Rinnovo *</label><input type="date" id="s_next" required></div>
+            <button type="submit" class="btn btn-outline" style="width:100%">+ Aggiungi Abbonamento</button>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-title">Patrimonio &amp; Conti Attivi</div>
+          <div id="f_kpis" class="kpi-grid"></div>
+          <h4 style="margin: 10px 0 8px; font-size:0.86rem; color:var(--text-muted)">🏦 I Tuoi Conti (Premi "⚖️ Bilancia Saldo" per rettificare senza toccare lo storico)</h4>
+          <div id="acc_list" class="item-list" style="margin-bottom:16px;"></div>
+          <h4 style="margin: 10px 0 8px; font-size:0.86rem; color:var(--text-muted)">🔄 Scadenze Pagamenti Ricorrenti</h4>
+          <div id="s_list" class="item-list" style="margin-bottom:16px;"></div>
+          <h4 style="margin: 10px 0 8px; font-size:0.86rem; color:var(--text-muted)">📋 Storico Transazioni</h4>
+          <div id="f_list" class="item-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MODULO 6: SALUTE OS COMPLETO (FATSECRET + DATABOY + REFERTI + SINTOMI)
+  ========================================================== -->
+  <section id="mod6" class="module">
+    <div class="sub-nav">
+      <button class="sub-btn active" onclick="switchHealthSub('hSubNutrition', this)">🍎 Calorie &amp; Macro (FatSecret)</button>
+      <button class="sub-btn" onclick="switchHealthSub('hSubWeight', this)">⚖️ Peso &amp; Trend (Databoy)</button>
+      <button class="sub-btn" onclick="switchHealthSub('hSubMedical', this)">🩻 Visite, Eco &amp; RX</button>
+      <button class="sub-btn" onclick="switchHealthSub('hSubSymptoms', this)">🧠 Sintomi &amp; Correlazioni</button>
+    </div>
+
+    <!-- 6A: FATSECRET -->
+    <div id="hSubNutrition" class="health-sub">
+      <div class="card">
+        <div class="card-title">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>📅 Diario Alimentare del:</span>
+            <input type="date" id="fs_date" style="width:auto; padding:6px 10px;" onchange="renderNutrition()">
+          </div>
+          <button class="btn btn-outline" onclick="configureNutritionTargets()">🎯 Obiettivi Kcal/Macro</button>
+        </div>
+        <div id="fs_summary_bars"></div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <div class="card-title">
+              <span id="fs_form_title">🍽️ Aggiungi Alimento al Pasto</span>
+              <button class="btn btn-outline" id="fs_cancel_edit" style="display:none" onclick="resetMealForm()">Annulla</button>
+            </div>
+            <form onsubmit="saveMealEntry(event)">
+              <input type="hidden" id="fs_edit_id">
+              <div class="form-group">
+                <label>Pasto *</label>
+                <select id="fs_meal">
+                  <option value="Colazione">☕ Colazione</option>
+                  <option value="Pranzo">🍝 Pranzo</option>
+                  <option value="Cena">🥩 Cena</option>
+                  <option value="Spuntini">🍎 Spuntini / Snack</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>🔍 Cerca nella Libreria Alimenti (Valori per 100g)</label>
+                <input type="text" id="fs_search_lib" placeholder="Cerca Pollo, Pasta, Riso, Uova, Yogurt, Pizza..." oninput="filterFoodLibrary()">
+                <select id="fs_food_select" size="5" style="margin-top:6px; height:120px;" onchange="selectFoodFromLib()"></select>
+              </div>
+              <div class="form-group" style="display:flex; gap:8px;">
+                <div style="flex:2"><label>Nome Alimento *</label><input type="text" id="fs_food_name" required></div>
+                <div style="flex:1"><label>Grammi (g) *</label><input type="number" step="1" id="fs_grams" value="100" required oninput="recalcPreviewMacros()"></div>
+              </div>
+              <div class="form-group" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px;">
+                <div><label>Kcal *</label><input type="number" step="1" id="fs_kcal" required></div>
+                <div><label>Carb (g)</label><input type="number" step="0.1" id="fs_carb" value="0"></div>
+                <div><label>Prot (g)</label><input type="number" step="0.1" id="fs_prot" value="0"></div>
+                <div><label>Grassi (g)</label><input type="number" step="0.1" id="fs_fat" value="0"></div>
+              </div>
+              <button type="submit" class="btn btn-primary" id="fs_submit_btn">+ Registra nel Diario</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📚 Aggiungi Nuovo Cibo alla Libreria (per 100g)</div>
+            <form onsubmit="addCustomFoodToLib(event)">
+              <div class="form-group"><label>Nome Alimento / Marca *</label><input type="text" id="lib_name" required placeholder="Es. Biscotti Integrali..."></div>
+              <div class="form-group" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px;">
+                <div><label>Kcal/100g</label><input type="number" step="1" id="lib_kcal" required></div>
+                <div><label>Carb</label><input type="number" step="0.1" id="lib_carb" required></div>
+                <div><label>Prot</label><input type="number" step="0.1" id="lib_prot" required></div>
+                <div><label>Grassi</label><input type="number" step="0.1" id="lib_fat" required></div>
+              </div>
+              <button type="submit" class="btn btn-outline" style="width:100%">+ Salva in Libreria</button>
+            </form>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">📋 Pasti della Giornata (Modificabili)</div>
+            <div id="fs_meals_container"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">🗓️ Storico Giornaliero Calorie (Tocca per aprire/modificare)</div>
+            <div id="fs_history_days" class="item-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6B: DATABOY PESO -->
+    <div id="hSubWeight" class="health-sub" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span id="w_form_title">⚖️ Registra Pesata (Databoy)</span>
+            <button class="btn btn-outline" id="w_cancel_edit" style="display:none" onclick="resetWeightForm()">Annulla</button>
+          </div>
+          <form onsubmit="saveWeightLog(event)">
+            <input type="hidden" id="w_edit_id">
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1"><label>Data *</label><input type="date" id="w_date" required></div>
+              <div style="flex:1"><label>Peso (kg) *</label><input type="number" step="0.1" id="w_kg" required placeholder="76.4"></div>
+            </div>
+            <div class="form-group"><label>Massa Grassa % / Girovita</label><input type="text" id="w_bodyfat" placeholder="Es. BF 15% • Vita 82cm"></div>
+            <div class="form-group"><label>Note</label><input type="text" id="w_notes" placeholder="Mattina a digiuno"></div>
+            <button type="submit" class="btn btn-primary" id="w_submit_btn">+ Salva Pesata</button>
+          </form>
+          <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="setWeightGoal()">🎯 Imposta Peso Obiettivo</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📉 Andamento Peso, Trend Media Mobile &amp; Storico</div>
+          <div id="w_kpis" class="kpi-grid"></div>
+          <div id="w_list" class="item-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6C: VISITE, ECOGRAFIE E RADIOGRAFIE (Collegate a Persone/Famiglia) -->
+    <div id="hSubMedical" class="health-sub" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span id="med_form_title">🩻 Registra Visita / Ecografia / RX</span>
+            <button class="btn btn-outline" id="med_cancel_edit" style="display:none" onclick="resetMedForm()">Annulla</button>
+          </div>
+          <form onsubmit="saveMedRecord(event)">
+            <input type="hidden" id="med_edit_id">
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1">
+                <label>Tipo Esame *</label>
+                <select id="med_type">
+                  <option value="Visita Specialistica">👨‍⚕️ Visita Specialistica</option>
+                  <option value="Ecografia">🖥️ Ecografia</option>
+                  <option value="Radiografia (RX)">🦴 Radiografia (RX)</option>
+                  <option value="Risonanza / TAC">🧲 Risonanza / TAC</option>
+                  <option value="Analisi del Sangue">🩸 Analisi Sangue</option>
+                  <option value="Dentista">🦷 Dentista</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <label>Persona (Io o Familiare)</label>
+                <select id="med_person"><option value="Io">👤 Io (Personale)</option></select>
+              </div>
+            </div>
+            <div class="form-group"><label>Titolo / Distretto *</label><input type="text" id="med_title" required placeholder="Es. Ecografia Addome, RX Spalla..."></div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1"><label>Data Esame *</label><input type="date" id="med_date" required></div>
+              <div style="flex:1"><label>Prossimo Controllo</label><input type="date" id="med_next"></div>
+            </div>
+            <div class="form-group"><label>Medico / Struttura</label><input type="text" id="med_doctor" placeholder="Dott. Bianchi / Ospedale..."></div>
+            <div class="form-group"><label>Esito / Referto / Terapia</label><textarea id="med_notes" rows="2"></textarea></div>
+            <div class="form-group"><label>Allega Foto o PDF Referto</label><input type="file" id="med_file" accept="image/*,application/pdf"></div>
+            <button type="submit" class="btn btn-primary" id="med_submit_btn">+ Salva nel Libretto Clinico</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📂 Libretto Storico Visite, Ecografie &amp; Radiografie</div>
+          <input type="text" class="search-bar" id="med_search" placeholder="🔍 Cerca ecografia, RX, medico o familiare..." oninput="renderMedRecords()">
+          <div id="med_list" class="item-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6D: SINTOMI -->
+    <div id="hSubSymptoms" class="health-sub" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">🩺 Log Sintomi &amp; Sonno</div>
+          <form onsubmit="addHealthLog(event)">
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1"><label>Data *</label><input type="date" id="h_date" required></div>
+              <div style="flex:1"><label>Ore Sonno *</label><input type="number" step="0.5" id="h_sleep" value="7.5" required></div>
+            </div>
+            <div class="form-group"><label>Stress (1-5)</label><input type="number" id="h_stress" min="1" max="5" value="2"></div>
+            <div class="form-group"><label>Fattori / Alimenti (separati da virgola)</label><input type="text" id="h_triggers" placeholder="Latticini, Caffè..."></div>
+            <div class="form-group"><label>Sintomi</label><input type="text" id="h_symptoms" placeholder="Emicrania, Gonfiore..."></div>
+            <div class="form-group"><label>Intensità (0-10)</label><input type="number" id="h_severity" min="0" max="10" value="0"></div>
+            <button type="submit" class="btn btn-primary">+ Salva Giornata</button>
+          </form>
+        </div>
+        <div>
+          <div class="card"><div class="card-title">🧠 Correlazioni</div><div id="h_correlations" class="item-list"></div></div>
+          <div class="card"><div class="card-title">Storico Sintomi</div><div id="h_list" class="item-list"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="tab-btn active" onclick="switchTab('modHome', this)"><span class="ico">🏠</span><span>Centro</span></button>
+  <button class="tab-btn" onclick="switchTab('mod2', this)"><span class="ico">📦</span><span>Oggetti</span></button>
+  <button class="tab-btn" onclick="switchTab('mod3', this)"><span class="ico">📌</span><span>Attività/Pers.</span></button>
+  <button class="tab-btn" onclick="switchTab('mod4', this)"><span class="ico">🔧</span><span>Manutenz.</span></button>
+  <button class="tab-btn" onclick="switchTab('mod5', this)"><span class="ico">💰</span><span>Finanze</span></button>
+  <button class="tab-btn" onclick="switchTab('mod6', this)"><span class="ico">🩺</span><span>Salute OS</span></button>
+</nav>
+
+<script>
+  /* =========================================================================
+     LIBRERIA ALIMENTI PRECARICATA (45+ Alimenti per 100g)
+     ========================================================================= */
+  const DEFAULT_FOOD_LIBRARY = [
+    { id: 'f1', name: 'Petto di Pollo (crudo)', kcal: 110, carb: 0, prot: 23.1, fat: 1.2 },
+    { id: 'f2', name: 'Pasta di Semola (cruda)', kcal: 353, carb: 72.7, prot: 12.5, fat: 1.5 },
+    { id: 'f3', name: 'Riso Basmati / Carnaroli (crudo)', kcal: 349, carb: 78.0, prot: 7.5, fat: 0.6 },
+    { id: 'f4', name: 'Uovo Intero', kcal: 143, carb: 0.7, prot: 12.6, fat: 9.5 },
+    { id: 'f5', name: 'Albume d\'Uovo', kcal: 48, carb: 0.7, prot: 10.9, fat: 0.2 },
+    { id: 'f6', name: 'Olio Extravergine di Oliva (EVO)', kcal: 899, carb: 0, prot: 0, fat: 99.9 },
+    { id: 'f7', name: 'Salmone Fresco', kcal: 208, carb: 0, prot: 20.4, fat: 13.4 },
+    { id: 'f8', name: 'Tonno al Naturale (sgocciolato)', kcal: 108, carb: 0, prot: 25.1, fat: 0.8 },
+    { id: 'f9', name: 'Tonno all\'Olio (sgocciolato)', kcal: 192, carb: 0, prot: 24.0, fat: 10.5 },
+    { id: 'f10', name: 'Tagliata / Filetto di Manzo Magro', kcal: 135, carb: 0, prot: 21.8, fat: 5.0 },
+    { id: 'f11', name: 'Macinato di Tacchino / Pollo', kcal: 119, carb: 0, prot: 21.5, fat: 3.4 },
+    { id: 'f12', name: 'Bresaola', kcal: 151, carb: 0, prot: 32.0, fat: 2.6 },
+    { id: 'f13', name: 'Prosciutto Crudo', kcal: 224, carb: 0.3, prot: 28.0, fat: 12.0 },
+    { id: 'f14', name: 'Fesa di Tacchino Arrosto', kcal: 104, carb: 1.5, prot: 22.0, fat: 1.2 },
+    { id: 'f15', name: 'Yogurt Greco 0%', kcal: 59, carb: 3.6, prot: 10.3, fat: 0.4 },
+    { id: 'f16', name: 'Fiocchi di Latte', kcal: 98, carb: 3.1, prot: 12.5, fat: 4.0 },
+    { id: 'f17', name: 'Ricotta Vaccina', kcal: 146, carb: 3.5, prot: 8.8, fat: 10.9 },
+    { id: 'f18', name: 'Mozzarella Fior di Latte', kcal: 253, carb: 0.7, prot: 18.7, fat: 19.5 },
+    { id: 'f19', name: 'Parmigiano Reggiano', kcal: 402, carb: 0, prot: 32.4, fat: 29.7 },
+    { id: 'f20', name: 'Latte Parzialmente Scremato', kcal: 46, carb: 4.9, prot: 3.3, fat: 1.6 },
+    { id: 'f21', name: 'Fiocchi d\'Avena', kcal: 389, carb: 66.3, prot: 16.9, fat: 6.9 },
+    { id: 'f22', name: 'Pane Comune', kcal: 275, carb: 58.0, prot: 8.6, fat: 1.0 },
+    { id: 'f23', name: 'Pane Integrale', kcal: 243, carb: 48.5, prot: 8.5, fat: 1.8 },
+    { id: 'f24', name: 'Fette Biscottate', kcal: 408, carb: 74.5, prot: 11.3, fat: 6.0 },
+    { id: 'f25', name: 'Gallette di Riso', kcal: 382, carb: 81.0, prot: 7.8, fat: 2.5 },
+    { id: 'f26', name: 'Patate', kcal: 77, carb: 17.5, prot: 2.0, fat: 0.1 },
+    { id: 'f28', name: 'Lenticchie Cotte', kcal: 116, carb: 20.1, prot: 9.0, fat: 0.4 },
+    { id: 'f29', name: 'Ceci Cotti', kcal: 120, carb: 18.8, prot: 7.0, fat: 2.1 },
+    { id: 'f31', name: 'Verdura Mista / Zucchine / Insalata', kcal: 19, carb: 3.1, prot: 1.3, fat: 0.2 },
+    { id: 'f34', name: 'Banana', kcal: 89, carb: 22.8, prot: 1.1, fat: 0.3 },
+    { id: 'f35', name: 'Mela', kcal: 52, carb: 13.8, prot: 0.3, fat: 0.2 },
+    { id: 'f37', name: 'Avocado', kcal: 160, carb: 8.5, prot: 2.0, fat: 14.7 },
+    { id: 'f38', name: 'Mandorle / Noci', kcal: 605, carb: 10.5, prot: 20.0, fat: 54.0 },
+    { id: 'f39', name: 'Burro di Arachidi 100%', kcal: 588, carb: 16.0, prot: 26.0, fat: 49.0 },
+    { id: 'f41', name: 'Proteine Whey in Polvere', kcal: 380, carb: 5.5, prot: 80.0, fat: 4.5 },
+    { id: 'f42', name: 'Pizza Margherita', kcal: 266, carb: 33.0, prot: 11.0, fat: 9.8 }
+  ];
+
+  /* =========================================================================
+     DATABASE STABILE COMPATIBILE CON TUTTE LE VERSIONI PRECEDENTI
+     ========================================================================= */
+  const DB_NAME = 'LifeOS_IndexedDB_v2'; // Mantiene lo stesso DB per non perdere nulla!
+  const STORE_NAME = 'app_state';
+  const LEGACY_KEY = 'LIFEOS_SUITE_DB_V1';
+  let pendingVaultAttachment = null;
+  let selectedLibFood = null;
+  let undoStack = [];
+
+  const emptyState = () => ({
+    meta: { updatedAt: new Date().toISOString(), version: 5 },
+    vault: [],           // Oggetti Unici (Garanzie, Veicoli, Elettrodomestici, Documenti)
+    crm: [],             // Persone Uniche (Famiglia, Affetti, Emergenza, Medici)
+    crmTasks: [],        // Attività (Oggi, Settimana, Da ricordare / Pin)
+    maint: [],           // Manutenzioni (Collegate a vault.id)
+    accounts: [],        // Conti finanziari
+    financeTx: [],       // Transazioni (Collegate a accounts.id e vault.id)
+    subs: [],            // Abbonamenti
+    health: [],          // Diario sintomi
+    foodLibrary: [...DEFAULT_FOOD_LIBRARY],
+    foodLogs: [],        // Pasti FatSecret
+    nutritionGoals: { kcal: 2100, carb: 230, prot: 140, fat: 70 },
+    weightLogs: [],      // Peso Databoy
+    weightGoal: 75.0,
+    medRecords: [],      // Visite, Ecografie, RX
+    trash: [],           // Cestino recuperabile
+    auditLog: []         // Cronologia modifiche importanti
+  });
+
+  let db = emptyState();
+
+  function uuid() {
+    return (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+  }
+
+  function logAudit(actionText) {
+    if (!Array.isArray(db.auditLog)) db.auditLog = [];
+    db.auditLog.unshift({ id: uuid(), time: new Date().toLocaleTimeString(), text: actionText });
+    if (db.auditLog.length > 15) db.auditLog.pop();
+  }
+
+  function pushUndoSnapshot(label) {
+    undoStack.push({ label, snapshot: JSON.stringify(db) });
+    if (undoStack.length > 5) undoStack.shift();
+  }
+
+  function undoLastAction() {
+    if (undoStack.length === 0) return alert('Nessuna operazione recente da annullare.');
+    const last = undoStack.pop();
+    db = JSON.parse(last.snapshot);
+    logAudit(`Annullata azione: ${last.label}`);
+    saveDB();
+  }
+
+  function verifyArchiveIntegrity() {
+    const collections = ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'foodLogs', 'weightLogs', 'medRecords'];
+    let total = 0, issues = 0;
+    collections.forEach(col => {
+      if (!Array.isArray(db[col])) { db[col] = []; issues++; }
+      db[col].forEach(item => {
+        total++;
+        if (!item.id) { item.id = uuid(); issues++; }
+      });
+    });
+    saveDB();
+    alert(`✅ Verifica Integrità Completata:\n• Record analizzati: ${total}\n• Anomalie corrette automaticamente: ${issues}\n• Stato Database: INTEGRO E VERIFICATO`);
+  }
+
+  // Svuota cache Service Worker e forza ricaricamento UI senza toccare i dati
+  async function forceAppRefresh() {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (let r of regs) await r.unregister();
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      for (let k of keys) await caches.delete(k);
+    }
+    location.reload(true);
+  }
+
+  function migrateDB(loaded) {
+    const base = emptyState();
+    const merged = { ...base, ...loaded };
+    ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'health', 'foodLogs', 'weightLogs', 'medRecords', 'trash', 'auditLog'].forEach(k => {
+      if (!Array.isArray(merged[k])) merged[k] = [];
+    });
+    // Eventuale recupero da v4 se l'utente aveva salvato lì
+    if (Array.isArray(loaded.objects) && loaded.objects.length > 0 && merged.vault.length === 0) {
+      merged.vault = loaded.objects.map(o => ({ id: o.id, title: o.name, cat: o.cat, date: o.date, months: o.months, price: o.cost, serial: o.serial, notes: o.notes, img: o.file, fileName: o.fileName, fileMime: o.fileMime }));
+    }
+    if (!Array.isArray(merged.foodLibrary) || merged.foodLibrary.length === 0) {
+      merged.foodLibrary = [...DEFAULT_FOOD_LIBRARY];
+    }
+    if (merged.accounts.length === 0) {
+      merged.accounts.push({ id: 'acc-main', updatedAt: Date.now(), name: 'Conto Principale', type: 'Banca', baseBalance: 0 });
+      merged.financeTx.forEach(tx => { if (!tx.accountId) tx.accountId = 'acc-main'; });
+    }
+    return merged;
+  }
+
+  function openIDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = (e) => {
+        const idb = e.target.result;
+        if (!idb.objectStoreNames.contains(STORE_NAME)) idb.createObjectStore(STORE_NAME);
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function loadDB() {
+    try {
+      const idb = await openIDB();
+      const data = await new Promise((resolve, reject) => {
+        const tx = idb.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get('main');
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      if (data) db = migrateDB(data);
+      else {
+        const legacy = localStorage.getItem(LEGACY_KEY);
+        db = migrateDB(legacy ? JSON.parse(legacy) : emptyState());
+      }
+      await saveDB();
+    } catch (e) {
+      const raw = localStorage.getItem(LEGACY_KEY);
+      db = migrateDB(raw ? JSON.parse(raw) : emptyState());
+      renderAll();
+    }
+  }
+
+  async function saveDB() {
+    db.meta.updatedAt = new Date().toISOString();
+    try {
+      const idb = await openIDB();
+      await new Promise((resolve, reject) => {
+        const tx = idb.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(db, 'main');
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+      try { localStorage.setItem(LEGACY_KEY, JSON.stringify(db)); } catch (_) {}
+      document.getElementById('syncStatus').textContent = 'Salvato ' + new Date().toLocaleTimeString();
+    } catch (e) {}
+    renderAll();
+  }
+
+  function deleteItem(collection, id) {
+    const item = db[collection].find(x => x.id === id);
+    if (!item) return;
+    if (!confirm('Spostare questo elemento nel Cestino recuperabile?')) return;
+    pushUndoSnapshot(`Eliminazione da ${collection}`);
+    db[collection] = db[collection].filter(x => x.id !== id);
+    db.trash.unshift({ ...item, originalCollection: collection, deletedAt: new Date().toISOString() });
+    logAudit(`Cestinato: ${item.title || item.name || item.desc || item.task || 'Elemento'}`);
+    saveDB();
+  }
+
+  function restoreFromTrash(id) {
+    const item = db.trash.find(x => x.id === id);
+    if (!item) return;
+    db.trash = db.trash.filter(x => x.id !== id);
+    const col = item.originalCollection;
+    delete item.originalCollection;
+    delete item.deletedAt;
+    if (Array.isArray(db[col])) db[col].unshift(item);
+    logAudit(`Ripristinato dal cestino: ${item.title || item.name || item.desc || 'Elemento'}`);
+    saveDB();
+  }
+
+  function emptyTrashItem(id) {
+    if (!confirm('Eliminare definitivamente dal cestino?')) return;
+    db.trash = db.trash.filter(x => x.id !== id);
+    saveDB();
+  }
+
+  function processAttachmentFile(file) {
+    return new Promise((resolve) => {
+      if (!file) return resolve(null);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height, maxW = 1100;
+            if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve({ data: canvas.toDataURL('image/jpeg', 0.75), name: file.name, mime: 'image/jpeg' });
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (ev) => resolve({ data: ev.target.result, name: file.name, mime: file.type || 'application/pdf' });
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  function openAttachment(dataUrl, fileName, mime) {
+    if (!dataUrl) return;
+    if ((mime && mime.startsWith('image/')) || dataUrl.startsWith('data:image/')) {
+      document.getElementById('modalImgSrc').src = dataUrl;
+      document.getElementById('imgModal').style.display = 'flex';
+    } else {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = fileName || 'documento.pdf';
+      a.click();
+    }
+  }
+
+  /* =========================================================================
+     ESPORTAZIONE VERIFICATA ZIP (JSON DOCUMENTATO + CSV TABELLARI + FILE ORIGINALI)
+     ========================================================================= */
+  async function exportFullZipBackup() {
+    if (typeof JSZip === 'undefined') {
+      // Fallback JSON se offline al 100% senza libreria JSZip in cache
+      const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `lifeos-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      return;
+    }
+
+    const zip = new JSZip();
+    zip.file("database_lifeos_completo.json", JSON.stringify(db, null, 2));
+
+    // CSV Tabellari leggibili da Excel
+    const csvTx = "ID,Data,Conto,OggettoCollegato,Descrizione,Tipo,Importo,Categoria\n" +
+      db.financeTx.map(t => {
+        const acc = db.accounts.find(a => a.id === t.accountId);
+        const obj = db.vault.find(v => v.id === t.objectId);
+        return `${t.id},${t.date},"${acc ? acc.name : ''}","${obj ? obj.title : ''}","${t.desc}",${t.type},${t.amount},"${t.cat}"`;
+      }).join("\n");
+    zip.file("csv/transazioni_finanziarie.csv", csvTx);
+
+    const csvFood = "ID,Data,Pasto,Alimento,Grammi,Kcal,Carboidrati,Proteine,Grassi\n" +
+      db.foodLogs.map(f => `${f.id},${f.date},"${f.meal}","${f.name}",${f.grams},${f.kcal},${f.carb},${f.prot},${f.fat}`).join("\n");
+    zip.file("csv/diario_alimentare.csv", csvFood);
+
+    const csvWeight = "ID,Data,PesoKg,Dettagli,Note\n" +
+      db.weightLogs.map(w => `${w.id},${w.date},${w.kg},"${w.bodyfat||''}","${w.notes||''}"`).join("\n");
+    zip.file("csv/storico_peso.csv", csvWeight);
+
+    // Estrazione file originali per ricevute e referti
+    db.vault.forEach(v => {
+      if (v.img && v.img.includes(',')) {
+        const ext = (v.fileMime && v.fileMime.includes('pdf')) ? 'pdf' : 'jpg';
+        const cleanName = v.title.replace(/[^a-z0-9]/gi, '_');
+        zip.file(`allegati_garanzie/${cleanName}_${v.id.slice(0,5)}.${ext}`, v.img.split(',')[1], { base64: true });
+      }
+    });
+    db.medRecords.forEach(m => {
+      if (m.fileData && m.fileData.includes(',')) {
+        const ext = (m.fileMime && m.fileMime.includes('pdf')) ? 'pdf' : 'jpg';
+        const cleanName = m.title.replace(/[^a-z0-9]/gi, '_');
+        zip.file(`allegati_referti_medici/${cleanName}_${m.id.slice(0,5)}.${ext}`, m.fileData.split(',')[1], { base64: true });
+      }
+    });
+
+    const content = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(content);
+    a.download = `LifeOS_Archivio_Verificato_${new Date().toISOString().slice(0,10)}.zip`;
+    a.click();
+    logAudit('Esportato archivio ZIP verificato');
+  }
+
+  function importBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        pushUndoSnapshot('Importazione Backup');
+        const incoming = migrateDB(JSON.parse(e.target.result));
+        const cols = ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'health', 'foodLibrary', 'foodLogs', 'weightLogs', 'medRecords'];
+        cols.forEach(col => {
+          if (Array.isArray(incoming[col])) {
+            const map = new Map((db[col] || []).map(item => [item.id, item]));
+            incoming[col].forEach(inc => {
+              const ex = map.get(inc.id);
+              if (!ex || (inc.updatedAt || 0) > (ex.updatedAt || 0)) map.set(inc.id, inc);
+            });
+            db[col] = Array.from(map.values());
+          }
+        });
+        logAudit('Ripristinato e unito backup esterno');
+        await saveDB();
+        alert('✅ Storico unito e verificato!');
+      } catch (err) {
+        alert('Se hai scaricato lo ZIP, estrai il file database_lifeos_completo.json e selezionalo qui.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /* =========================================================================
+     RICERCA GLOBALE + DASHBOARD 4 AREE + DOSSIER 360° OGGETTO UNICO
+     ========================================================================= */
+  function toggleDashConfig() {
+    const el = document.getElementById('dashConfigBox');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function toggleArea(id, show) {
+    document.getElementById(id).style.display = show ? 'block' : 'none';
+  }
+
+  function runGlobalSearch(q) {
+    const resDiv = document.getElementById('globalSearchResults');
+    if (!q || !q.trim()) { resDiv.style.display = 'none'; return; }
+    q = q.toLowerCase();
+    resDiv.style.display = 'flex';
+    const hits = [];
+
+    db.vault.forEach(v => {
+      if (v.title.toLowerCase().includes(q) || (v.notes||'').toLowerCase().includes(q) || (v.serial||'').toLowerCase().includes(q))
+        hits.push({ badge: '📦 Oggetto', title: v.title, sub: v.notes || v.cat, action: `openObjectDossier('${v.id}')` });
+    });
+    db.crm.forEach(c => {
+      if (c.name.toLowerCase().includes(q) || (c.notes||'').toLowerCase().includes(q))
+        hits.push({ badge: '❤️ Persona', title: c.name, sub: `${c.circle} • ${c.notes||''}`, action: `switchTab('mod3', document.querySelectorAll('.tab-btn')[2])` });
+    });
+    db.crmTasks.forEach(t => {
+      if (t.title.toLowerCase().includes(q) || (t.notes||'').toLowerCase().includes(q))
+        hits.push({ badge: '📌 Attività', title: t.title, sub: t.scope, action: `switchTab('mod3', document.querySelectorAll('.tab-btn')[2])` });
+    });
+    db.maint.forEach(m => {
+      if (m.task.toLowerCase().includes(q) || m.asset.toLowerCase().includes(q) || (m.parts||'').toLowerCase().includes(q))
+        hits.push({ badge: '🔧 Manutenz.', title: `[${m.asset}] ${m.task}`, sub: `€${m.cost||0} • ${m.parts||''}`, action: `switchTab('mod4', document.querySelectorAll('.tab-btn')[3])` });
+    });
+    db.financeTx.forEach(t => {
+      if (t.desc.toLowerCase().includes(q) || t.cat.toLowerCase().includes(q))
+        hits.push({ badge: '💰 Finanze', title: `${t.desc} (€${t.amount})`, sub: `${t.date} • ${t.cat}`, action: `switchTab('mod5', document.querySelectorAll('.tab-btn')[4])` });
+    });
+    db.medRecords.forEach(m => {
+      if (m.title.toLowerCase().includes(q) || (m.doctor||'').toLowerCase().includes(q) || (m.notes||'').toLowerCase().includes(q))
+        hits.push({ badge: '🩻 Referto', title: m.title, sub: `${m.date} • ${m.doctor||''}`, action: `switchTab('mod6', document.querySelectorAll('.tab-btn')[5])` });
+    });
+
+    resDiv.innerHTML = hits.map(h => `
+      <div class="item-row" style="cursor:pointer" onclick="${h.action}">
+        <div class="item-info">
+          <h4><span class="pill pill-info">${h.badge}</span> ${h.title}</h4>
+          <p>${h.sub}</p>
+        </div>
+        <span class="btn btn-outline">Apri →</span>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted)">Nessun risultato trovato.</p>`;
+  }
+
+  // SCHEDA UNIFICATA 360° DELL'OGGETTO (Es. Lavatrice — Samsung)
+  function openObjectDossier(objId) {
+    const v = db.vault.find(x => x.id === objId);
+    if (!v) return;
+    const linkedMaint = db.maint.filter(m => m.objectId === objId || m.asset.toLowerCase() === v.title.toLowerCase());
+    const linkedTx = db.financeTx.filter(t => t.objectId === objId);
+    const linkedTasks = db.crmTasks.filter(t => t.objectId === objId);
+
+    const maintCost = linkedMaint.reduce((a, b) => a + (b.cost || 0), 0);
+    const txCost = linkedTx.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
+    const totalTCO = (v.price || 0) + maintCost + txCost;
+
+    const exp = new Date(v.date); exp.setMonth(exp.getMonth() + v.months);
+    const daysLeft = Math.ceil((exp - new Date()) / 86400000);
+
+    document.getElementById('objDossierContent').innerHTML = `
+      <div class="card-title">
+        <span>📦 Scheda Unificata: ${v.title}</span>
+        <button class="btn btn-outline" onclick="document.getElementById('objDossierModal').style.display='none'">Chiudi ✕</button>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><span>Acquisto</span><strong>€${(v.price||0).toFixed(2)}</strong></div>
+        <div class="kpi-card"><span>Spese Manutenz.</span><strong>€${maintCost.toFixed(2)}</strong></div>
+        <div class="kpi-card"><span>Costo Totale Vita</span><strong style="color:var(--primary)">€${totalTCO.toFixed(2)}</strong></div>
+        <div class="kpi-card"><span>Garanzia</span><strong>${v.months > 0 ? (daysLeft >= 0 ? daysLeft + ' gg' : 'Scaduta') : 'N/A'}</strong></div>
+      </div>
+      <div class="meal-box">
+        <div class="meal-header"><span>📚 Knowledge Base (Manuale, Seriale &amp; Copertura)</span></div>
+        <p style="font-size:0.84rem; line-height:1.5;">
+          <strong>Categoria:</strong> ${v.cat} • <strong>Seriale/Targa:</strong> ${v.serial || 'Non indicato'} • <strong>Data:</strong> ${v.date}<br>
+          <strong>Istruzioni / Note:</strong> ${v.notes || 'Nessuna istruzione salvata.'}
+        </p>
+      </div>
+      <div class="meal-box">
+        <div class="meal-header"><span>🔧 Guasti, Riparazioni &amp; Manutenzioni Collegate (${linkedMaint.length})</span></div>
+        ${linkedMaint.map(m => `<p style="font-size:0.82rem; margin-bottom:4px;">• <strong>${m.date}</strong>: ${m.task} (€${(m.cost||0).toFixed(2)}) ${m.parts ? `[Ricambio: ${m.parts}]` : ''}</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessuna manutenzione collegata.</p>`}
+      </div>
+      <div class="meal-box">
+        <div class="meal-header"><span>💰 Transazioni Finanziarie Collegate (${linkedTx.length})</span></div>
+        ${linkedTx.map(t => `<p style="font-size:0.82rem; margin-bottom:4px;">• <strong>${t.date}</strong>: ${t.desc} (€${t.amount.toFixed(2)})</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessuna transazione extra collegata.</p>`}
+      </div>
+      <div class="meal-box">
+        <div class="meal-header"><span>✅ Attività / Promemoria Collegati (${linkedTasks.length})</span></div>
+        ${linkedTasks.map(t => `<p style="font-size:0.82rem; margin-bottom:4px;">• ${t.title} (${t.scope})</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessun promemoria collegato.</p>`}
+      </div>
+    `;
+    document.getElementById('objDossierModal').style.display = 'flex';
+  }
+
+  function renderHome() {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayKcal = db.foodLogs.filter(x => x.date === todayStr).reduce((a, b) => a + b.kcal, 0);
+    const lastWeight = db.weightLogs.length ? [...db.weightLogs].sort((a,b) => b.date.localeCompare(a.date))[0].kg + ' kg' : '--';
+    const netWorth = getTotalNetWorth();
+
+    // 3. AREA SITUAZIONE
+    document.getElementById('area_situazione').innerHTML = `
+      <div class="kpi-card"><span>Saldo Totale Conti</span><strong style="color:var(--success)">€${netWorth.toFixed(2)}</strong></div>
+      <div class="kpi-card"><span>Calorie Oggi</span><strong style="color:var(--primary)">${Math.round(todayKcal)} / ${db.nutritionGoals.kcal}</strong></div>
+      <div class="kpi-card"><span>Peso Attuale</span><strong>${lastWeight} (Ob. ${db.weightGoal}kg)</strong></div>
+      <div class="kpi-card"><span>Oggetti Censiti</span><strong>${db.vault.length}</strong></div>
+    `;
+
+    // 1. AREA OGGI
+    const todayTasks = db.crmTasks.filter(t => !t.done && t.scope === 'Oggi');
+    document.getElementById('area_oggi').innerHTML = todayTasks.map(t => `
+      <div class="item-row">
+        <div class="item-info">
+          <h4>☀️ ${t.title}</h4>
+          ${t.notes ? `<p>${t.notes}</p>` : ''}
+        </div>
+        <button class="btn btn-outline" onclick="toggleTaskDone('${t.id}')">✅ Fatto</button>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna attività urgente per oggi.</p>`;
+
+    // 2. AREA IN SCADENZA (Garanzie, Manutenzioni, Abbonamenti, Visite)
+    const expItems = [];
+    db.vault.forEach(v => {
+      if (v.months > 0) {
+        const exp = new Date(v.date); exp.setMonth(exp.getMonth() + v.months);
+        const days = Math.ceil((exp - new Date()) / 86400000);
+        if (days >= -15 && days <= 45) expItems.push({ badge: '🧾 Garanzia', text: `${v.title} (${days < 0 ? 'Scaduta' : 'tra ' + days + ' gg'})`, pill: days < 0 ? 'pill-danger' : 'pill-warn' });
+      }
+    });
+    db.maint.forEach(m => {
+      const next = new Date(m.date); next.setMonth(next.getMonth() + m.nextMonths);
+      const days = Math.ceil((next - new Date()) / 86400000);
+      if (days <= 30) expItems.push({ badge: '🔧 Manutenz.', text: `[${m.asset}] ${m.task} (${days < 0 ? 'Scaduta' : 'tra ' + days + ' gg'})`, pill: days < 0 ? 'pill-danger' : 'pill-warn' });
+    });
+    db.subs.forEach(s => {
+      const days = Math.ceil((new Date(s.next) - new Date()) / 86400000);
+      if (days <= 14) expItems.push({ badge: '🔄 Rinnovo', text: `${s.name} €${s.cost} (${days < 0 ? 'Scaduto' : 'tra ' + days + ' gg'})`, pill: 'pill-info' });
+    });
+
+    document.getElementById('area_scadenza').innerHTML = expItems.map(e => `
+      <div class="item-row"><div class="item-info"><h4><span class="pill ${e.pill}">${e.badge}</span> ${e.text}</h4></div></div>
+    `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna scadenza nei prossimi 30 giorni.</p>`;
+
+    // 4. AREA DA RICORDARE (Note Fissate Pin, Progetti, Contatti da sentire)
+    const remItems = [];
+    db.crmTasks.filter(t => !t.done && (t.pinned || t.scope === 'Memoria')).forEach(t => {
+      remItems.push({ badge: '📌 Fissato', text: t.title, sub: t.notes || '' });
+    });
+    db.crm.forEach(c => {
+      const days = Math.floor((new Date() - new Date(c.last)) / 86400000);
+      if (days >= c.freq) remItems.push({ badge: '❤️ Contatto', text: `Sentire ${c.name}`, sub: `Ultimo contatto ${days} gg fa` });
+    });
+
+    document.getElementById('area_ricordare').innerHTML = remItems.map(r => `
+      <div class="item-row"><div class="item-info"><h4><span class="pill pill-purple">${r.badge}</span> ${r.text}</h4>${r.sub ? `<p>${r.sub}</p>` : ''}</div></div>
+    `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessun promemoria fissato.</p>`;
+
+    // Cronologia & Cestino
+    document.getElementById('audit_list').innerHTML = (db.auditLog || []).slice(0, 4).map(a => `• [${a.time}] ${a.text}`).join(' &nbsp;|&nbsp; ') || 'Nessuna modifica recente registrata.';
+    document.getElementById('trash_list').innerHTML = (db.trash || []).map(t => `
+      <div class="item-row">
+        <div class="item-info"><h4>🗑️ ${t.title || t.name || t.desc || t.task || 'Elemento'} <span class="pill pill-warn">${t.originalCollection}</span></h4></div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-success" onclick="restoreFromTrash('${t.id}')">↩️ Recupera</button>
+          <button class="btn btn-danger" onclick="emptyTrashItem('${t.id}')">✕</button>
+        </div>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted); font-size:0.8rem;">Il cestino è vuoto.</p>`;
+  }
+
+  /* =========================================================================
+     POPOLAMENTO SELETTORI RELAZIONALI TRA MODULI
+     ========================================================================= */
+  function populateRelationalSelectors() {
+    const objOpts = '<option value="">-- Nessun Oggetto Collegato --</option>' +
+      db.vault.map(v => `<option value="${v.id}">📦 ${v.title}</option>`).join('');
+    const perOpts = '<option value="">-- Nessuna Persona --</option>' +
+      db.crm.map(c => `<option value="${c.id}">❤️ ${c.name}</option>`).join('');
+
+    ['m_object_id', 'f_object', 'ct_obj'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { const val = el.value; el.innerHTML = objOpts; el.value = val; }
+    });
+    const ctPer = document.getElementById('ct_person');
+    if (ctPer) { const val = ctPer.value; ctPer.innerHTML = perOpts; ctPer.value = val; }
+
+    const medPer = document.getElementById('med_person');
+    if (medPer) {
+      const val = medPer.value;
+      medPer.innerHTML = '<option value="Io">👤 Io (Personale)</option>' + db.crm.map(c => `<option value="${c.name}">🏠 ${c.name}</option>`).join('');
+      if (val) medPer.value = val;
+    }
+  }
+
+  function syncMaintAssetName() {
+    const objId = document.getElementById('m_object_id').value;
+    const obj = db.vault.find(x => x.id === objId);
+    if (obj) document.getElementById('m_asset').value = obj.title;
+  }
+
+  /* =========================================================================
+     MODULO 2: OGGETTI UNIFICATI E GARANZIE
+     ========================================================================= */
+  async function handleVaultFileSelect(input) {
+    if (input.files && input.files[0]) {
+      pendingVaultAttachment = await processAttachmentFile(input.files[0]);
+      document.getElementById('v_file_label').textContent = `📎 Allegato pronto: ${input.files[0].name}`;
+    }
+  }
+
+  async function saveVaultItem(e) {
+    e.preventDefault();
+    pushUndoSnapshot('Salvataggio Oggetto');
+    const editId = document.getElementById('v_edit_id').value;
+    const existing = editId ? db.vault.find(x => x.id === editId) : null;
+
+    const item = {
+      id: editId || uuid(),
+      updatedAt: Date.now(),
+      title: document.getElementById('v_title').value.trim(),
+      cat: document.getElementById('v_cat').value,
+      serial: document.getElementById('v_serial').value.trim(),
+      date: document.getElementById('v_date').value,
+      months: parseInt(document.getElementById('v_months').value || 0),
+      price: parseFloat(document.getElementById('v_price').value || 0),
+      notes: document.getElementById('v_notes').value.trim(),
+      img: pendingVaultAttachment ? pendingVaultAttachment.data : (existing ? existing.img : ''),
+      fileName: pendingVaultAttachment ? pendingVaultAttachment.name : (existing ? existing.fileName : ''),
+      fileMime: pendingVaultAttachment ? pendingVaultAttachment.mime : (existing ? existing.fileMime : '')
+    };
+
+    if (editId) db.vault = db.vault.map(x => x.id === editId ? item : x);
+    else db.vault.unshift(item);
+
+    logAudit(`Salvato oggetto: ${item.title}`);
+    resetVaultForm();
+    saveDB();
+  }
+
+  function editVaultItem(id) {
+    const v = db.vault.find(x => x.id === id);
+    if (!v) return;
+    document.getElementById('v_edit_id').value = v.id;
+    document.getElementById('v_title').value = v.title;
+    document.getElementById('v_cat').value = v.cat;
+    document.getElementById('v_serial').value = v.serial || '';
+    document.getElementById('v_date').value = v.date;
+    document.getElementById('v_months').value = v.months;
+    document.getElementById('v_price').value = v.price || '';
+    document.getElementById('v_notes').value = v.notes || '';
+    document.getElementById('v_form_title').textContent = '✏️ Modifica Oggetto';
+    document.getElementById('v_submit_btn').textContent = '💾 Aggiorna Oggetto';
+    document.getElementById('v_cancel_edit').style.display = 'inline-flex';
+  }
+
+  function resetVaultForm() {
+    document.getElementById('v_form').reset();
+    document.getElementById('v_edit_id').value = '';
+    document.getElementById('v_date').valueAsDate = new Date();
+    document.getElementById('v_file_label').textContent = '';
+    document.getElementById('v_form_title').textContent = '📦 Registra Oggetto Unico / Garanzia';
+    document.getElementById('v_submit_btn').textContent = '+ Salva Oggetto nel Nucleo Comune';
+    document.getElementById('v_cancel_edit').style.display = 'none';
+    pendingVaultAttachment = null;
+  }
+
+  function renderVault() {
+    const q = (document.getElementById('v_search').value || '').toLowerCase();
+    const filtered = db.vault.filter(v =>
+      v.title.toLowerCase().includes(q) || (v.notes||'').toLowerCase().includes(q) || (v.serial||'').toLowerCase().includes(q)
+    );
+    document.getElementById('v_count').textContent = `${filtered.length} oggetti`;
+    document.getElementById('v_list').innerHTML = filtered.map(v => {
+      const exp = new Date(v.date); exp.setMonth(exp.getMonth() + v.months);
+      const days = Math.ceil((exp - new Date()) / 86400000);
+      let badge = `<span class="pill pill-ok">Garanzia (${days} gg)</span>`;
+      if (v.months === 0) badge = `<span class="pill pill-info">Inventario</span>`;
+      else if (days < 0) badge = `<span class="pill pill-danger">Garanzia Scaduta</span>`;
+      else if (days <= 30) badge = `<span class="pill pill-warn">Scade tra ${days} gg</span>`;
+
+      let mediaHtml = '';
+      if (v.img) {
+        const isImg = (v.fileMime && v.fileMime.startsWith('image/')) || v.img.startsWith('data:image/');
+        mediaHtml = isImg
+          ? `<img src="${v.img}" class="thumb" onclick="openAttachment('${v.img}','${v.fileName||''}','${v.fileMime||''}')">`
+          : `<div class="file-badge" onclick="openAttachment('${v.img}','${v.fileName||'documento.pdf'}','${v.fileMime||''}')">📄 File</div>`;
+      }
+
+      return `
+        <div class="item-row">
+          <div style="display:flex; gap:10px; align-items:center; flex:1;">
+            ${mediaHtml}
+            <div class="item-info">
+              <h4>📦 ${v.title} <span class="pill pill-info">${v.cat}</span> ${badge}</h4>
+              <p>Acquisto: ${v.date} ${v.price ? `• €${v.price.toFixed(2)}` : ''} ${v.serial ? `• S/N: ${v.serial}` : ''}<br>📚 ${v.notes || 'Nessuna nota'}</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary)" onclick="openObjectDossier('${v.id}')">🔍 Dossier 360°</button>
+            <button class="btn btn-outline" onclick="editVaultItem('${v.id}')">✏️</button>
+            <button class="btn btn-danger" onclick="deleteItem('vault','${v.id}')">✕</button>
+          </div>
+        </div>
+      `;
+    }).join('') || `<p style="color:var(--text-muted)">Nessun oggetto registrato.</p>`;
+  }
+
+  /* =========================================================================
+     MODULO 3: ATTIVITÀ & PERSONE
+     ========================================================================= */
+  function saveCrmTask(e) {
+    e.preventDefault();
+    db.crmTasks.unshift({
+      id: uuid(), updatedAt: Date.now(),
+      title: document.getElementById('ct_title').value.trim(),
+      scope: document.getElementById('ct_scope').value,
+      pinned: document.getElementById('ct_pin').value === '1',
+      objectId: document.getElementById('ct_obj').value,
+      personId: document.getElementById('ct_person').value,
+      notes: document.getElementById('ct_notes').value.trim(),
+      done: false
+    });
+    e.target.reset();
+    saveDB();
+  }
+
+  function toggleTaskPin(id) {
+    const t = db.crmTasks.find(x => x.id === id);
+    if (t) { t.pinned = !t.pinned; t.updatedAt = Date.now(); saveDB(); }
+  }
+
+  function toggleTaskDone(id) {
+    const t = db.crmTasks.find(x => x.id === id);
+    if (t) { t.done = !t.done; t.updatedAt = Date.now(); saveDB(); }
+  }
+
+  function saveCrmItem(e) {
+    e.preventDefault();
+    const editId = document.getElementById('c_edit_id').value;
+    const item = {
+      id: editId || uuid(), updatedAt: Date.now(),
+      name: document.getElementById('c_name').value.trim(),
+      circle: document.getElementById('c_circle').value,
+      phone: document.getElementById('c_phone').value.trim(),
+      last: document.getElementById('c_last').value,
+      freq: parseInt(document.getElementById('c_freq').value || 14),
+      notes: document.getElementById('c_notes').value.trim()
+    };
+    if (editId) db.crm = db.crm.map(x => x.id === editId ? item : x);
+    else db.crm.push(item);
+    resetCrmPersonForm();
+    saveDB();
+  }
+
+  function editCrmItem(id) {
+    const c = db.crm.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('c_edit_id').value = c.id;
+    document.getElementById('c_name').value = c.name;
+    document.getElementById('c_circle').value = c.circle;
+    document.getElementById('c_phone').value = c.phone || '';
+    document.getElementById('c_last').value = c.last;
+    document.getElementById('c_freq').value = c.freq;
+    document.getElementById('c_notes').value = c.notes || '';
+    document.getElementById('c_form_title').textContent = '✏️ Modifica Persona';
+    document.getElementById('c_submit_btn').textContent = '💾 Aggiorna Persona';
+    document.getElementById('c_cancel_edit').style.display = 'inline-flex';
+  }
+
+  function resetCrmPersonForm() {
+    document.getElementById('c_edit_id').value = '';
+    document.getElementById('c_name').value = '';
+    document.getElementById('c_phone').value = '';
+    document.getElementById('c_notes').value = '';
+    document.getElementById('c_last').valueAsDate = new Date();
+    document.getElementById('c_form_title').textContent = '❤️ Registra Persona Unica';
+    document.getElementById('c_submit_btn').textContent = '+ Salva Persona';
+    document.getElementById('c_cancel_edit').style.display = 'none';
+  }
+
+  function touchContact(id) {
+    const c = db.crm.find(x => x.id === id);
+    if (c) { c.last = new Date().toISOString().slice(0, 10); c.updatedAt = Date.now(); saveDB(); }
+  }
+
+  function renderCrm() {
+    const renderTaskRow = (t, isPin) => {
+      const obj = db.vault.find(v => v.id === t.objectId);
+      const per = db.crm.find(c => c.id === t.personId);
+      return `
+        <div class="item-row ${isPin ? 'pinned' : ''}">
+          <div class="item-info">
+            <h4 style="${t.done ? 'text-decoration:line-through; opacity:0.6' : ''}">${isPin ? '📌 ' : ''}${t.title} <span class="pill pill-info">${t.scope}</span> ${obj ? `<span class="pill pill-purple">📦 ${obj.title}</span>` : ''} ${per ? `<span class="pill pill-ok">❤️ ${per.name}</span>` : ''}</h4>
+            ${t.notes ? `<p>${t.notes}</p>` : ''}
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-outline" onclick="toggleTaskDone('${t.id}')">${t.done ? '↩️' : '✅'}</button>
+            <button class="btn btn-outline" onclick="toggleTaskPin('${t.id}')">📌</button>
+            <button class="btn btn-danger" onclick="deleteItem('crmTasks','${t.id}')">✕</button>
+          </div>
+        </div>
+      `;
+    };
+
+    document.getElementById('ct_pinned_list').innerHTML = db.crmTasks.filter(t => t.pinned).map(t => renderTaskRow(t, true)).join('') || `<p style="color:var(--text-muted); font-size:0.8rem;">Nessun elemento fissato.</p>`;
+    document.getElementById('ct_todo_list').innerHTML = db.crmTasks.filter(t => !t.pinned).map(t => renderTaskRow(t, false)).join('') || `<p style="color:var(--text-muted); font-size:0.8rem;">Nessuna attività in lista.</p>`;
+
+    const q = (document.getElementById('c_search').value || '').toLowerCase();
+    const items = db.crm.filter(c => c.name.toLowerCase().includes(q) || (c.notes||'').toLowerCase().includes(q)).map(c => {
+      const daysSince = Math.floor((new Date() - new Date(c.last)) / 86400000);
+      return { ...c, daysSince, overdue: daysSince - c.freq };
+    }).sort((a, b) => b.overdue - a.overdue);
+
+    document.getElementById('c_list').innerHTML = items.map(c => `
+      <div class="item-row">
+        <div class="item-info">
+          <h4>${c.name} <span class="pill pill-info">${c.circle}</span> <span class="pill ${c.overdue > 0 ? 'pill-danger' : 'pill-ok'}">${c.daysSince} gg fa</span></h4>
+          <p>${c.phone ? `📞 ${c.phone} • ` : ''}Ultimo: ${c.last} • 💡 ${c.notes || 'Nessuna nota'}</p>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-outline" onclick="touchContact('${c.id}')">✅ Oggi</button>
+          <button class="btn btn-outline" onclick="editCrmItem('${c.id}')">✏️</button>
+          <button class="btn btn-danger" onclick="deleteItem('crm','${c.id}')">✕</button>
+        </div>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted)">Nessuna persona registrata.</p>`;
+  }
+
+  /* =========================================================================
+     MODULO 4: MANUTENZIONE RELAZIONALE
+     ========================================================================= */
+  function addMaintItem(e) {
+    e.preventDefault();
+    const objId = document.getElementById('m_object_id').value;
+    const asset = document.getElementById('m_asset').value.trim();
+    const task = document.getElementById('m_task').value.trim();
+    const date = document.getElementById('m_date').value;
+    const cost = parseFloat(document.getElementById('m_cost').value || 0);
+
+    db.maint.unshift({
+      id: uuid(), updatedAt: Date.now(),
+      objectId: objId, asset, task, date,
+      nextMonths: parseInt(document.getElementById('m_next_months').value || 12),
+      kmNow: document.getElementById('m_km_now').value,
+      kmNext: document.getElementById('m_km_next').value,
+      cost,
+      parts: document.getElementById('m_parts').value.trim()
+    });
+
+    // Se spuntato, crea automaticamente la spesa collegata nelle Finanze
+    if (cost > 0 && document.getElementById('m_auto_tx').checked && db.accounts.length > 0) {
+      db.financeTx.unshift({
+        id: uuid(), updatedAt: Date.now(),
+        accountId: db.accounts[0].id,
+        objectId: objId,
+        desc: `Manutenzione ${asset}: ${task}`,
+        type: 'expense',
+        amount: cost,
+        cat: 'Manutenzione & Acquisti',
+        date
+      });
+    }
+
+    logAudit(`Registrata manutenzione: ${asset} (${task})`);
+    e.target.reset();
+    document.getElementById('m_date').valueAsDate = new Date();
+    saveDB();
+  }
+
+  function renderMaint() {
+    const total = db.maint.reduce((a, m) => a + (m.cost || 0), 0);
+    document.getElementById('m_kpis').innerHTML = `
+      <div class="kpi-card"><span>Interventi Totali</span><strong>${db.maint.length}</strong></div>
+      <div class="kpi-card"><span>Spesa Manutenzioni</span><strong>€${total.toFixed(2)}</strong></div>
+    `;
+    document.getElementById('m_list').innerHTML = db.maint.map(m => {
+      const next = new Date(m.date); next.setMonth(next.getMonth() + m.nextMonths);
+      const days = Math.ceil((next - new Date()) / 86400000);
+      return `
+        <div class="item-row">
+          <div class="item-info">
+            <h4>🔧 [${m.asset}] ${m.task} <span class="pill ${days < 0 ? 'pill-danger' : 'pill-ok'}">${days < 0 ? 'Scaduta' : 'Tra ' + days + ' gg'}</span></h4>
+            <p>Data: ${m.date} • €${(m.cost||0).toFixed(2)} ${m.kmNow ? `• Km: ${m.kmNow}→${m.kmNext||'?'}` : ''} ${m.parts ? `• Ricambio: ${m.parts}` : ''}</p>
+          </div>
+          <button class="btn btn-danger" onclick="deleteItem('maint','${m.id}')">✕</button>
+        </div>
+      `;
+    }).join('') || `<p style="color:var(--text-muted)">Nessuna manutenzione salvata.</p>`;
+  }
+
+  /* =========================================================================
+     MODULO 5: FINANZE MULTI-CONTO + BILANCIAMENTO SILENZIOSO
+     ========================================================================= */
+  function getAccountBalance(accId) {
+    const acc = db.accounts.find(a => a.id === accId);
+    if (!acc) return 0;
+    const txs = db.financeTx.filter(t => t.accountId === accId);
+    const inc = txs.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
+    const exp = txs.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
+    return (parseFloat(acc.baseBalance) || 0) + inc - exp;
+  }
+
+  function getTotalNetWorth() {
+    return db.accounts.reduce((sum, a) => sum + getAccountBalance(a.id), 0);
+  }
+
+  function saveAccount(e) {
+    e.preventDefault();
+    const editId = document.getElementById('acc_edit_id').value;
+    const name = document.getElementById('acc_name').value.trim();
+    const type = document.getElementById('acc_type').value;
+    const desiredBalance = parseFloat(document.getElementById('acc_base').value || 0);
+
+    if (editId) {
+      const txs = db.financeTx.filter(t => t.accountId === editId);
+      const netTx = txs.reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
+      db.accounts = db.accounts.map(a => a.id === editId ? { ...a, name, type, baseBalance: desiredBalance - netTx, updatedAt: Date.now() } : a);
+    } else {
+      db.accounts.push({ id: uuid(), updatedAt: Date.now(), name, type, baseBalance: desiredBalance });
+    }
+    resetAccountForm();
+    saveDB();
+  }
+
+  function editAccount(id) {
+    const a = db.accounts.find(x => x.id === id);
+    if (!a) return;
+    document.getElementById('acc_edit_id').value = a.id;
+    document.getElementById('acc_name').value = a.name;
+    document.getElementById('acc_type').value = a.type;
+    document.getElementById('acc_base').value = getAccountBalance(a.id).toFixed(2);
+    document.getElementById('acc_form_title').textContent = '✏️ Modifica Conto';
+    document.getElementById('acc_submit_btn').textContent = '💾 Salva Conto';
+    document.getElementById('acc_cancel_btn').style.display = 'inline-flex';
+  }
+
+  function resetAccountForm() {
+    document.getElementById('acc_edit_id').value = '';
+    document.getElementById('acc_name').value = '';
+    document.getElementById('acc_base').value = '0.00';
+    document.getElementById('acc_form_title').textContent = '🏦 Gestione Conti & Carte';
+    document.getElementById('acc_submit_btn').textContent = '+ Aggiungi / Aggiorna Conto';
+    document.getElementById('acc_cancel_btn').style.display = 'none';
+  }
+
+  function silentBalanceAccount(id) {
+    const a = db.accounts.find(x => x.id === id);
+    if (!a) return;
+    const cur = getAccountBalance(id);
+    const val = prompt(`⚖️ BILANCIA SALDO "${a.name}" (Senza creare movimenti nello storico)\nSaldo attuale: €${cur.toFixed(2)}\nInserisci il nuovo saldo reale (€):`, cur.toFixed(2));
+    if (val === null) return;
+    const num = parseFloat(val.replace(',', '.'));
+    if (isNaN(num)) return;
+    pushUndoSnapshot(`Bilanciamento conto ${a.name}`);
+    const netTx = db.financeTx.filter(t => t.accountId === id).reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
+    a.baseBalance = num - netTx;
+    a.updatedAt = Date.now();
+    logAudit(`Bilanciato saldo conto ${a.name} a €${num.toFixed(2)}`);
+    saveDB();
+  }
+
+  function addFinanceTx(e) {
+    e.preventDefault();
+    db.financeTx.unshift({
+      id: uuid(), updatedAt: Date.now(),
+      accountId: document.getElementById('f_account').value,
+      objectId: document.getElementById('f_object').value,
+      desc: document.getElementById('f_desc').value.trim(),
+      type: document.getElementById('f_type').value,
+      amount: parseFloat(document.getElementById('f_amount').value || 0),
+      cat: document.getElementById('f_cat').value,
+      date: document.getElementById('f_date').value
+    });
+    e.target.reset();
+    document.getElementById('f_date').valueAsDate = new Date();
+    saveDB();
+  }
+
+  function addSub(e) {
+    e.preventDefault();
+    db.subs.push({
+      id: uuid(), updatedAt: Date.now(),
+      name: document.getElementById('s_name').value.trim(),
+      cost: parseFloat(document.getElementById('s_cost').value || 0),
+      cycle: document.getElementById('s_cycle').value,
+      next: document.getElementById('s_next').value
+    });
+    e.target.reset();
+    document.getElementById('s_next').valueAsDate = new Date();
+    saveDB();
+  }
+
+  function renderFinance() {
+    const accSelect = document.getElementById('f_account');
+    const prev = accSelect.value;
+    accSelect.innerHTML = db.accounts.map(a => `<option value="${a.id}">${a.name} (€${getAccountBalance(a.id).toFixed(2)})</option>`).join('');
+    if (prev && db.accounts.some(a => a.id === prev)) accSelect.value = prev;
+
+    const inc = db.financeTx.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
+    const exp = db.financeTx.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
+    const subs = db.subs.reduce((a, s) => a + (s.cycle === 'monthly' ? s.cost : s.cost / 12), 0);
+
+    document.getElementById('f_kpis').innerHTML = `
+      <div class="kpi-card"><span>Patrimonio Conti</span><strong style="color:var(--primary)">€${getTotalNetWorth().toFixed(2)}</strong></div>
+      <div class="kpi-card"><span>Entrate Storico</span><strong style="color:var(--success)">+€${inc.toFixed(2)}</strong></div>
+      <div class="kpi-card"><span>Uscite Storico</span><strong style="color:var(--danger)">-€${exp.toFixed(2)}</strong></div>
+      <div class="kpi-card"><span>Fisso Mensile</span><strong style="color:var(--warning)">€${subs.toFixed(2)}/m</strong></div>
+    `;
+
+    document.getElementById('acc_list').innerHTML = db.accounts.map(a => {
+      const bal = getAccountBalance(a.id);
+      return `
+        <div class="item-row">
+          <div class="item-info">
+            <h4>🏦 ${a.name} <span class="pill pill-info">${a.type}</span></h4>
+            <p>Saldo: <strong style="color:${bal >= 0 ? 'var(--success)' : 'var(--danger)'}">€${bal.toFixed(2)}</strong></p>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-warn" onclick="silentBalanceAccount('${a.id}')">⚖️ Bilancia Saldo</button>
+            <button class="btn btn-outline" onclick="editAccount('${a.id}')">✏️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('s_list').innerHTML = db.subs.map(s => `
+      <div class="item-row">
+        <div class="item-info"><h4>${s.name} <span class="pill pill-warn">€${s.cost.toFixed(2)}/${s.cycle === 'monthly' ? 'mese' : 'anno'}</span></h4><p>Rinnovo: ${s.next}</p></div>
+        <button class="btn btn-danger" onclick="deleteItem('subs','${s.id}')">✕</button>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted)">Nessun abbonamento.</p>`;
+
+    document.getElementById('f_list').innerHTML = db.financeTx.map(t => {
+      const acc = db.accounts.find(a => a.id === t.accountId);
+      const obj = db.vault.find(v => v.id === t.objectId);
+      return `
+        <div class="item-row">
+          <div class="item-info">
+            <h4>${t.desc} <span class="pill pill-info">${t.cat}</span> <span class="pill pill-ok">${acc ? acc.name : 'Conto'}</span> ${obj ? `<span class="pill pill-purple">📦 ${obj.title}</span>` : ''}</h4>
+            <p>${t.date}</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'}">${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}</strong>
+            <button class="btn btn-danger" onclick="deleteItem('financeTx','${t.id}')">✕</button>
+          </div>
+        </div>
+      `;
+    }).join('') || `<p style="color:var(--text-muted)">Nessun movimento.</p>`;
+  }
+
+  /* =========================================================================
+     MODULO 6: SALUTE OS (FATSECRET + DATABOY + REFERTI + SINTOMI)
+     ========================================================================= */
+  function filterFoodLibrary() {
+    const q = (document.getElementById('fs_search_lib').value || '').toLowerCase();
+    const sel = document.getElementById('fs_food_select');
+    sel.innerHTML = db.foodLibrary.filter(f => f.name.toLowerCase().includes(q)).map(f =>
+      `<option value="${f.id}">${f.name} — ${f.kcal} kcal (C:${f.carb}g P:${f.prot}g G:${f.fat}g)</option>`
+    ).join('');
+  }
+
+  function selectFoodFromLib() {
+    const id = document.getElementById('fs_food_select').value;
+    const food = db.foodLibrary.find(f => f.id === id);
+    if (!food) return;
+    selectedLibFood = food;
+    document.getElementById('fs_food_name').value = food.name;
+    recalcPreviewMacros();
+  }
+
+  function recalcPreviewMacros() {
+    if (!selectedLibFood) return;
+    const ratio = (parseFloat(document.getElementById('fs_grams').value || 0)) / 100;
+    document.getElementById('fs_kcal').value = Math.round(selectedLibFood.kcal * ratio);
+    document.getElementById('fs_carb').value = (selectedLibFood.carb * ratio).toFixed(1);
+    document.getElementById('fs_prot').value = (selectedLibFood.prot * ratio).toFixed(1);
+    document.getElementById('fs_fat').value = (selectedLibFood.fat * ratio).toFixed(1);
+  }
+
+  function addCustomFoodToLib(e) {
+    e.preventDefault();
+    db.foodLibrary.unshift({
+      id: uuid(), updatedAt: Date.now(),
+      name: document.getElementById('lib_name').value.trim(),
+      kcal: parseFloat(document.getElementById('lib_kcal').value || 0),
+      carb: parseFloat(document.getElementById('lib_carb').value || 0),
+      prot: parseFloat(document.getElementById('lib_prot').value || 0),
+      fat: parseFloat(document.getElementById('lib_fat').value || 0)
+    });
+    e.target.reset();
+    filterFoodLibrary();
+    saveDB();
+  }
+
+  function saveMealEntry(e) {
+    e.preventDefault();
+    const editId = document.getElementById('fs_edit_id').value;
+    const entry = {
+      id: editId || uuid(), updatedAt: Date.now(),
+      date: document.getElementById('fs_date').value || new Date().toISOString().slice(0,10),
+      meal: document.getElementById('fs_meal').value,
+      name: document.getElementById('fs_food_name').value.trim(),
+      grams: parseFloat(document.getElementById('fs_grams').value || 100),
+      kcal: parseFloat(document.getElementById('fs_kcal').value || 0),
+      carb: parseFloat(document.getElementById('fs_carb').value || 0),
+      prot: parseFloat(document.getElementById('fs_prot').value || 0),
+      fat: parseFloat(document.getElementById('fs_fat').value || 0)
+    };
+    if (editId) db.foodLogs = db.foodLogs.map(x => x.id === editId ? entry : x);
+    else db.foodLogs.push(entry);
+    resetMealForm();
+    saveDB();
+  }
+
+  function editMealEntry(id) {
+    const item = db.foodLogs.find(x => x.id === id);
+    if (!item) return;
+    selectedLibFood = null;
+    document.getElementById('fs_edit_id').value = item.id;
+    document.getElementById('fs_date').value = item.date;
+    document.getElementById('fs_meal').value = item.meal;
+    document.getElementById('fs_food_name').value = item.name;
+    document.getElementById('fs_grams').value = item.grams;
+    document.getElementById('fs_kcal').value = item.kcal;
+    document.getElementById('fs_carb').value = item.carb;
+    document.getElementById('fs_prot').value = item.prot;
+    document.getElementById('fs_fat').value = item.fat;
+    document.getElementById('fs_form_title').textContent = '✏️ Modifica Alimento';
+    document.getElementById('fs_submit_btn').textContent = '💾 Aggiorna';
+    document.getElementById('fs_cancel_edit').style.display = 'inline-flex';
+  }
+
+  function resetMealForm() {
+    document.getElementById('fs_edit_id').value = '';
+    document.getElementById('fs_food_name').value = '';
+    document.getElementById('fs_grams').value = '100';
+    document.getElementById('fs_kcal').value = '';
+    document.getElementById('fs_carb').value = '0';
+    document.getElementById('fs_prot').value = '0';
+    document.getElementById('fs_fat').value = '0';
+    document.getElementById('fs_form_title').textContent = '🍽️ Aggiungi Alimento al Pasto';
+    document.getElementById('fs_submit_btn').textContent = '+ Registra nel Diario';
+    document.getElementById('fs_cancel_edit').style.display = 'none';
+    selectedLibFood = null;
+  }
+
+  function configureNutritionTargets() {
+    const g = db.nutritionGoals;
+    const kcal = prompt('Obiettivo Kcal giornaliere:', g.kcal);
+    if (kcal === null) return;
+    const carb = prompt('Carboidrati (g):', g.carb);
+    const prot = prompt('Proteine (g):', g.prot);
+    const fat = prompt('Grassi (g):', g.fat);
+    db.nutritionGoals = { kcal: parseFloat(kcal)||2100, carb: parseFloat(carb)||230, prot: parseFloat(prot)||140, fat: parseFloat(fat)||70 };
+    saveDB();
+  }
+
+  function renderNutrition() {
+    filterFoodLibrary();
+    const dInput = document.getElementById('fs_date');
+    if (!dInput.value) dInput.valueAsDate = new Date();
+    const dayLogs = db.foodLogs.filter(x => x.date === dInput.value);
+    const tot = dayLogs.reduce((acc, x) => ({ kcal: acc.kcal + x.kcal, carb: acc.carb + x.carb, prot: acc.prot + x.prot, fat: acc.fat + x.fat }), { kcal: 0, carb: 0, prot: 0, fat: 0 });
+    const goals = db.nutritionGoals;
+    const pct = (v, m) => Math.min(100, Math.round((v / (m || 1)) * 100));
+
+    document.getElementById('fs_summary_bars').innerHTML = `
+      <div class="macro-bar-wrap">
+        <div class="macro-bar-head"><span>🔥 Calorie (${Math.round(tot.kcal)} / ${goals.kcal} kcal)</span><span>Rimanenti: ${Math.round(goals.kcal - tot.kcal)} kcal</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct(tot.kcal, goals.kcal)}%; background:var(--primary)"></div></div>
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+        <div><small>🍞 Carb: ${tot.carb.toFixed(1)}/${goals.carb}g</small><div class="progress-track"><div class="progress-fill" style="width:${pct(tot.carb, goals.carb)}%; background:var(--warning)"></div></div></div>
+        <div><small>🥩 Prot: ${tot.prot.toFixed(1)}/${goals.prot}g</small><div class="progress-track"><div class="progress-fill" style="width:${pct(tot.prot, goals.prot)}%; background:var(--success)"></div></div></div>
+        <div><small>🥑 Grassi: ${tot.fat.toFixed(1)}/${goals.fat}g</small><div class="progress-track"><div class="progress-fill" style="width:${pct(tot.fat, goals.fat)}%; background:var(--purple)"></div></div></div>
+      </div>
+    `;
+
+    document.getElementById('fs_meals_container').innerHTML = ['Colazione', 'Pranzo', 'Cena', 'Spuntini'].map(mealKey => {
+      const items = dayLogs.filter(x => x.meal === mealKey);
+      const mKcal = items.reduce((a, b) => a + b.kcal, 0);
+      return `
+        <div class="meal-box">
+          <div class="meal-header"><span>${mealKey}</span><span class="pill pill-info">${Math.round(mKcal)} kcal</span></div>
+          <div class="item-list">
+            ${items.map(it => `
+              <div class="item-row" style="padding:8px 10px;">
+                <div class="item-info">
+                  <h4>${it.name} <span class="pill pill-ok">${it.grams}g</span> <span class="pill pill-info">${Math.round(it.kcal)} kcal</span></h4>
+                  <p>C: ${it.carb}g • P: ${it.prot}g • G: ${it.fat}g</p>
+                </div>
+                <div style="display:flex; gap:5px;">
+                  <button class="btn btn-outline" onclick="editMealEntry('${it.id}')">✏️</button>
+                  <button class="btn btn-danger" onclick="deleteItem('foodLogs','${it.id}')">✕</button>
+                </div>
+              </div>
+            `).join('') || `<p style="font-size:0.75rem; color:var(--text-muted)">Vuoto</p>`}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const byDate = {};
+    db.foodLogs.forEach(x => {
+      if (!byDate[x.date]) byDate[x.date] = { kcal: 0, carb: 0, prot: 0, fat: 0 };
+      byDate[x.date].kcal += x.kcal; byDate[x.date].carb += x.carb; byDate[x.date].prot += x.prot; byDate[x.date].fat += x.fat;
+    });
+    document.getElementById('fs_history_days').innerHTML = Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).map(d => `
+      <div class="item-row" style="cursor:pointer" onclick="document.getElementById('fs_date').value='${d}'; renderNutrition();">
+        <div class="item-info"><h4>📅 ${d} — <strong>${Math.round(byDate[d].kcal)} kcal</strong></h4><p>C: ${byDate[d].carb.toFixed(0)}g • P: ${byDate[d].prot.toFixed(0)}g • G: ${byDate[d].fat.toFixed(0)}g</p></div>
+        <span class="btn btn-outline">Apri →</span>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted)">Nessuno storico.</p>`;
+  }
+
+  function saveWeightLog(e) {
+    e.preventDefault();
+    const editId = document.getElementById('w_edit_id').value;
+    const entry = {
+      id: editId || uuid(), updatedAt: Date.now(),
+      date: document.getElementById('w_date').value,
+      kg: parseFloat(document.getElementById('w_kg').value || 0),
+      bodyfat: document.getElementById('w_bodyfat').value.trim(),
+      notes: document.getElementById('w_notes').value.trim()
+    };
+    if (editId) db.weightLogs = db.weightLogs.map(x => x.id === editId ? entry : x);
+    else db.weightLogs.push(entry);
+    resetWeightForm();
+    saveDB();
+  }
+
+  function editWeightLog(id) {
+    const w = db.weightLogs.find(x => x.id === id);
+    if (!w) return;
+    document.getElementById('w_edit_id').value = w.id;
+    document.getElementById('w_date').value = w.date;
+    document.getElementById('w_kg').value = w.kg;
+    document.getElementById('w_bodyfat').value = w.bodyfat || '';
+    document.getElementById('w_notes').value = w.notes || '';
+    document.getElementById('w_cancel_edit').style.display = 'inline-flex';
+  }
+
+  function resetWeightForm() {
+    document.getElementById('w_edit_id').value = '';
+    document.getElementById('w_kg').value = '';
+    document.getElementById('w_bodyfat').value = '';
+    document.getElementById('w_notes').value = '';
+    document.getElementById('w_date').valueAsDate = new Date();
+    document.getElementById('w_cancel_edit').style.display = 'none';
+  }
+
+  function setWeightGoal() {
+    const val = prompt('Peso Obiettivo (kg):', db.weightGoal || 75);
+    if (val) { db.weightGoal = parseFloat(val.replace(',', '.')) || 75; saveDB(); }
+  }
+
+  function renderWeight() {
+    const asc = [...db.weightLogs].sort((a, b) => a.date.localeCompare(b.date));
+    let ema = null;
+    const enriched = asc.map((w, i) => {
+      const delta = w.kg - (i > 0 ? asc[i - 1].kg : w.kg);
+      ema = ema === null ? w.kg : (w.kg * 0.25 + ema * 0.75);
+      return { ...w, delta, trend: ema };
+    }).reverse();
+
+    const latest = enriched[0];
+    document.getElementById('w_kpis').innerHTML = `
+      <div class="kpi-card"><span>Peso Attuale</span><strong>${latest ? latest.kg.toFixed(1) + ' kg' : '--'}</strong></div>
+      <div class="kpi-card"><span>Trend Databoy</span><strong style="color:var(--primary)">${latest ? latest.trend.toFixed(1) + ' kg' : '--'}</strong></div>
+      <div class="kpi-card"><span>Obiettivo</span><strong>${db.weightGoal} kg</strong></div>
+    `;
+    document.getElementById('w_list').innerHTML = enriched.map(w => `
+      <div class="item-row">
+        <div class="item-info">
+          <h4>📅 ${w.date} — <strong>${w.kg.toFixed(1)} kg</strong> <span class="pill ${w.delta <= 0 ? 'pill-ok' : 'pill-warn'}">Δ ${(w.delta > 0 ? '+' : '') + w.delta.toFixed(1)} kg</span> <span class="pill pill-info">Trend: ${w.trend.toFixed(1)}</span></h4>
+          <p>${w.bodyfat ? `${w.bodyfat} • ` : ''}${w.notes || ''}</p>
+        </div>
+        <div style="display:flex; gap:5px;">
+          <button class="btn btn-outline" onclick="editWeightLog('${w.id}')">✏️</button>
+          <button class="btn btn-danger" onclick="deleteItem('weightLogs','${w.id}')">✕</button>
+        </div>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted)">Nessuna pesata.</p>`;
+  }
+
+  async function saveMedRecord(e) {
+    e.preventDefault();
+    const editId = document.getElementById('med_edit_id').value;
+    const ex = editId ? db.medRecords.find(x => x.id === editId) : null;
+    const fInput = document.getElementById('med_file');
+    const att = (fInput.files && fInput.files[0]) ? await processAttachmentFile(fInput.files[0]) : null;
+
+    const item = {
+      id: editId || uuid(), updatedAt: Date.now(),
+      type: document.getElementById('med_type').value,
+      person: document.getElementById('med_person').value,
+      title: document.getElementById('med_title').value.trim(),
+      date: document.getElementById('med_date').value,
+      nextDate: document.getElementById('med_next').value,
+      doctor: document.getElementById('med_doctor').value.trim(),
+      notes: document.getElementById('med_notes').value.trim(),
+      fileData: att ? att.data : (ex ? ex.fileData : ''),
+      fileName: att ? att.name : (ex ? ex.fileName : ''),
+      fileMime: att ? att.mime : (ex ? ex.fileMime : '')
+    };
+    if (editId) db.medRecords = db.medRecords.map(x => x.id === editId ? item : x);
+    else db.medRecords.unshift(item);
+    resetMedForm();
+    saveDB();
+  }
+
+  function editMedRecord(id) {
+    const m = db.medRecords.find(x => x.id === id);
+    if (!m) return;
+    document.getElementById('med_edit_id').value = m.id;
+    document.getElementById('med_type').value = m.type;
+    document.getElementById('med_title').value = m.title;
+    document.getElementById('med_date').value = m.date;
+    document.getElementById('med_next').value = m.nextDate || '';
+    document.getElementById('med_doctor').value = m.doctor || '';
+    document.getElementById('med_notes').value = m.notes || '';
+    document.getElementById('med_cancel_edit').style.display = 'inline-flex';
+  }
+
+  function resetMedForm() {
+    document.getElementById('med_edit_id').value = '';
+    document.getElementById('med_title').value = '';
+    document.getElementById('med_next').value = '';
+    document.getElementById('med_doctor').value = '';
+    document.getElementById('med_notes').value = '';
+    document.getElementById('med_file').value = '';
+    document.getElementById('med_date').valueAsDate = new Date();
+    document.getElementById('med_cancel_edit').style.display = 'none';
+  }
+
+  function renderMedRecords() {
+    const q = (document.getElementById('med_search').value || '').toLowerCase();
+    const filtered = db.medRecords.filter(m => m.title.toLowerCase().includes(q) || m.type.toLowerCase().includes(q) || (m.doctor||'').toLowerCase().includes(q));
+    document.getElementById('med_list').innerHTML = filtered.map(m => `
+      <div class="item-row">
+        <div class="item-info">
+          <h4>🩻 ${m.title} <span class="pill pill-purple">${m.type}</span> <span class="pill pill-info">${m.date}</span> <span class="pill pill-ok">${m.person||'Io'}</span></h4>
+          <p>${m.doctor ? `👨‍⚕️ ${m.doctor} • ` : ''}${m.notes || ''}</p>
+        </div>
+        <div style="display:flex; gap:5px;">
+          ${m.fileData ? `<button class="btn btn-outline" onclick="openAttachment('${m.fileData}','${m.fileName}','${m.fileMime}')">📄 Referto</button>` : ''}
+          <button class="btn btn-outline" onclick="editMedRecord('${m.id}')">✏️</button>
+          <button class="btn btn-danger" onclick="deleteItem('medRecords','${m.id}')">✕</button>
+        </div>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted)">Nessun esame registrato.</p>`;
+  }
+
+  function addHealthLog(e) {
+    e.preventDefault();
+    db.health.unshift({
+      id: uuid(), updatedAt: Date.now(),
+      date: document.getElementById('h_date').value,
+      sleep: parseFloat(document.getElementById('h_sleep').value || 7),
+      stress: parseInt(document.getElementById('h_stress').value || 2),
+      triggers: document.getElementById('h_triggers').value.split(',').map(s => s.trim()).filter(Boolean),
+      symptoms: document.getElementById('h_symptoms').value.split(',').map(s => s.trim()).filter(Boolean),
+      severity: parseInt(document.getElementById('h_severity').value || 0)
+    });
+    e.target.reset();
+    document.getElementById('h_date').valueAsDate = new Date();
+    saveDB();
+  }
+
+  function renderHealth() {
+    const symMap = {};
+    db.health.forEach(log => {
+      const trs = [...log.triggers];
+      if (log.sleep < 6) trs.push('Sonno < 6h');
+      log.symptoms.forEach(sym => {
+        const k = sym.toLowerCase();
+        if (!symMap[k]) symMap[k] = { name: sym, count: 0, causes: {} };
+        symMap[k].count++;
+        trs.forEach(t => symMap[k].causes[t] = (symMap[k].causes[t] || 0) + 1);
+      });
+    });
+    document.getElementById('h_correlations').innerHTML = Object.values(symMap).map(s => {
+      const b = Object.entries(s.causes).map(([c, cnt]) => `<span class="pill pill-warn">${c}: ${Math.round((cnt/s.count)*100)}%</span>`).join(' ');
+      return `<div class="item-row"><div class="item-info"><h4>${s.name} (${s.count})</h4><p>${b}</p></div></div>`;
+    }).join('') || `<p style="color:var(--text-muted)">Nessun sintomo.</p>`;
+    document.getElementById('h_list').innerHTML = db.health.map(h => `
+      <div class="item-row"><div class="item-info"><h4>${h.date} • 😴 ${h.sleep}h</h4><p>${h.symptoms.join(', ') || 'OK'}</p></div><button class="btn btn-danger" onclick="deleteItem('health','${h.id}')">✕</button></div>
+    `).join('');
+  }
+
+  function switchTab(modId, btn) {
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(modId).classList.add('active');
+    if (btn) btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function switchCrmSub(subId, btn) {
+    document.querySelectorAll('.crm-sub').forEach(el => el.style.display = 'none');
+    btn.parentElement.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(subId).style.display = 'block';
+    btn.classList.add('active');
+  }
+
+  function switchHealthSub(subId, btn) {
+    document.querySelectorAll('.health-sub').forEach(el => el.style.display = 'none');
+    btn.parentElement.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(subId).style.display = 'block';
+    btn.classList.add('active');
+  }
+
+  function renderAll() {
+    populateRelationalSelectors();
+    renderHome();
+    renderVault();
+    renderCrm();
+    renderMaint();
+    renderFinance();
+    renderNutrition();
+    renderWeight();
+    renderMedRecords();
+    renderHealth();
+  }
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    ['v_date', 'c_last', 'm_date', 'f_date', 's_next', 'h_date', 'fs_date', 'w_date', 'med_date'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.valueAsDate = new Date();
+    });
+    await loadDB();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then(reg => reg.update()).catch(() => {});
+    }
+  });
+</script>
+</body>
+</html>

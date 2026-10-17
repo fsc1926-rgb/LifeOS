@@ -1,0 +1,41 @@
+===================================================================
+GUIDA RAPIDA PER SAMSUNG GALAXY S25 ULTRA E QUALSIASI DISPOSITIVO
+===================================================================
+
+Contenuto dello ZIP:
+- index.html      (L'intero ecosistema 5-in-1 + Dashboard centrale)
+- manifest.json   (Configurazione PWA per l'icona sulla Home)
+- sw.js           (Service Worker per il funzionamento 100% offline)
+- icon-192.png    (Icona app standard)
+- icon-512.png    (Icona app alta risoluzione)
+
+-------------------------------------------------------------------
+OPZIONE A: INSTALLAZIONE COME VERA APP PWA (CONSIGLIATA SU S25 ULTRA)
+-------------------------------------------------------------------
+Per ragioni di sicurezza di Android, i Service Worker (che permettono di
+installare l'icona nella schermata Home a tutto schermo) richiedono che
+la cartella venga aperta tramite un piccolo server locale o un hosting gratuito:
+
+1. Metodo istantaneo dal telefono (100% Offline, senza internet):
+   - Estrai questo file ZIP in una cartella sul tuo S25 Ultra (es. "LifeOS").
+   - Scarica dal Play Store un'app gratuita come "Simple HTTP Server" o "KSWEB".
+   - Seleziona la cartella "LifeOS" e avvia il server locale (es. http://localhost:8080).
+   - Apri quell'indirizzo su Chrome nel tuo S25 Ultra e tocca il pulsante
+     "📲 Installa su S25" (oppure Menu di Chrome -> "Aggiungi a schermata Home").
+   - Da quel momento avrai l'icona "LifeOS" tra le tue app e funzionerà
+     anche con il telefono in Modalità Aereo!
+
+2. Metodo tramite Hosting Gratuito Privato (GitHub Pages / Netlify Drop):
+   - Trascina la cartella estratta su app.netlify.com/drop dal PC.
+   - Apri il link generato sul tuo S25 Ultra e premi "Installa su S25".
+   - Una volta installata, l'app vive tutta dentro il tuo telefono e i tuoi
+     dati NON vanno mai online: restano salvati solo nel database interno
+     del tuo S25 Ultra.
+
+-------------------------------------------------------------------
+OPZIONE B: APERTURA DIRETTA DEL FILE HTML
+-------------------------------------------------------------------
+Puoi anche aprire direttamente `index.html` con Chrome sul PC o sul telefono.
+Il database automatico (IndexedDB) salverà comunque ogni tua modifica in
+tempo reale e potrai esportare/unire l'intero storico con il tasto
+"⬇️ Backup Unico".
