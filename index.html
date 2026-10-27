@@ -1,154 +1,479 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1120">
+  <meta name="theme-color" content="#090d16" id="metaThemeColor">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>LifeOS v5 — Ecosistema Relazionale Unificato</title>
+  <title>LifeOS v5.5 — Ecosistema Relazionale Unificato</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
-    :root {
-      --bg: #0b1120;
-      --surface: #1e293b;
-      --surface-2: #0f172a;
-      --surface-hover: #334155;
-      --border: #334155;
+    /* =========================================================================
+       SISTEMA DUAL-THEME: DARK (AMOLED OBSIDIAN) & LIGHT (WARM DAYLIGHT)
+       ========================================================================= */
+    :root, [data-theme="dark"] {
+      --bg: #090d16;
+      --bg-gradient: radial-gradient(circle at 15% 0%, rgba(59, 130, 246, 0.11), transparent 45%),
+                     radial-gradient(circle at 85% 10%, rgba(168, 85, 247, 0.08), transparent 40%);
+      --surface: #131b2e;
+      --surface-2: #0d1322;
+      --surface-hover: #1e293b;
+      --glass: rgba(19, 27, 46, 0.82);
+      --glass-nav: rgba(13, 19, 34, 0.88);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --primary: #3b82f6;
       --primary-hover: #2563eb;
+      --primary-glow: rgba(59, 130, 246, 0.22);
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
       --purple: #a855f7;
-      --radius: 14px;
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.55);
+      --shadow-nav: 0 12px 32px rgba(0, 0, 0, 0.65);
+      --radius: 18px;
+      --radius-sm: 12px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; padding-bottom: calc(84px + var(--safe-bottom)); }
+    [data-theme="light"] {
+      --bg: #f3f5f9;
+      --bg-gradient: radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.07), transparent 45%),
+                     radial-gradient(circle at 85% 10%, rgba(147, 51, 234, 0.05), transparent 40%);
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --surface-hover: #f1f5f9;
+      --glass: rgba(255, 255, 255, 0.86);
+      --glass-nav: rgba(255, 255, 255, 0.92);
+      --border: rgba(15, 23, 42, 0.08);
+      --border-strong: rgba(15, 23, 42, 0.15);
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-glow: rgba(37, 99, 235, 0.15);
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --purple: #9333ea;
+      --shadow-card: 0 8px 24px -6px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+      --shadow-nav: 0 10px 30px rgba(15, 23, 42, 0.12);
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: calc(104px + var(--safe-bottom));
+      transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    /* HEADER GLASSMORPHISM */
     header {
-      background: rgba(30, 41, 59, 0.95);
-      backdrop-filter: blur(12px);
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
+      padding: 12px 16px;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       position: sticky;
       top: 0;
       z-index: 100;
+      transition: background 0.35s ease, border-color 0.35s ease;
     }
-    .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.05rem; }
-    .badge-offline { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); font-size: 0.68rem; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
+    .brand-logo {
+      width: 32px; height: 32px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1rem; box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .badge-offline {
+      background: rgba(16, 185, 129, 0.14);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-size: 0.68rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
     .sync-controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 
+    /* THEME SWITCHER BUTTON */
+    .theme-toggle {
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.76rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, border-color 0.25s ease;
+    }
+    .theme-toggle:hover { border-color: var(--primary); }
+    .theme-toggle:active { transform: scale(0.92); }
+
+    /* FLOATING GLASS BOTTOM DOCK */
     nav.bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(6, 1fr);
-      padding-bottom: var(--safe-bottom); z-index: 200;
+      position: fixed;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 680px;
+      background: var(--glass-nav);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid var(--border-strong);
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      padding: 6px;
+      z-index: 200;
+      box-shadow: var(--shadow-nav);
+      transition: background 0.35s ease, border-color 0.35s ease;
     }
     .tab-btn {
-      background: transparent; color: var(--text-muted); border: none; padding: 9px 2px;
-      cursor: pointer; font-weight: 600; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      padding: 8px 2px;
+      border-radius: 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.68rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .tab-btn span.ico { font-size: 1.2rem; }
-    .tab-btn.active { color: var(--primary); }
+    .tab-btn span.ico {
+      font-size: 1.22rem;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .tab-btn:active { transform: scale(0.92); }
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--primary-glow);
+    }
+    .tab-btn.active span.ico {
+      transform: translateY(-2px) scale(1.1);
+    }
 
-    main { max-width: 1220px; width: 100%; margin: 14px auto; padding: 0 12px; flex: 1; }
-    .module { display: none; animation: fadeIn 0.15s ease-out; }
+    /* MAIN & MODULE ANIMATIONS */
+    main { max-width: 1240px; width: 100%; margin: 16px auto; padding: 0 14px; flex: 1; }
+    .module { display: none; animation: moduleSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
     .module.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes moduleSlideIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.992); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
 
-    .grid-2 { display: grid; grid-template-columns: 370px 1fr; gap: 16px; align-items: start; }
-    .grid-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px; }
-    @media (max-width: 920px) { .grid-2 { grid-template-columns: 1fr; } }
+    .grid-2 { display: grid; grid-template-columns: 380px 1fr; gap: 18px; align-items: start; }
+    .grid-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 940px) { .grid-2 { grid-template-columns: 1fr; } }
 
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; margin-bottom: 14px; }
-    .card-title { font-size: 0.98rem; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    /* BENTO CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-card);
+      transition: background-color 0.3s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-    .form-group { margin-bottom: 10px; }
-    label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+    /* FORMS & INPUTS */
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.77rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 700; }
     input, select, textarea {
-      width: 100%; padding: 9px 11px; background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 0.9rem;
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.9rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
     }
-    input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .search-bar { margin-bottom: 12px; }
 
+    /* INTERACTIVE BUTTONS */
     .btn {
-      padding: 7px 11px; border-radius: 9px; border: none; font-weight: 600; font-size: 0.78rem;
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 8px 12px;
+      border-radius: 11px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      user-select: none;
     }
-    .btn-primary { background: var(--primary); color: white; width: 100%; padding: 11px; font-size: 0.9rem; }
-    .btn-success { background: var(--success); color: #052e16; font-weight: 700; }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
-    .btn-warn { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.35); }
+    .btn:active { transform: scale(0.95); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: #ffffff;
+      width: 100%;
+      padding: 12px;
+      font-size: 0.9rem;
+      box-shadow: 0 6px 16px -4px var(--primary-glow);
+    }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-success { background: var(--success); color: #ffffff; font-weight: 700; }
+    .btn-outline { background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text); }
+    .btn-outline:hover { background: var(--surface-hover); border-color: var(--primary); }
+    .btn-danger { background: rgba(239, 68, 68, 0.14); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.22); }
+    .btn-warn { background: rgba(245, 158, 11, 0.14); color: var(--warning); border: 1px solid rgba(245,158,11,0.35); }
 
-    .item-list { display: flex; flex-direction: column; gap: 8px; }
+    /* LIST ITEMS */
+    .item-list { display: flex; flex-direction: column; gap: 9px; }
     .item-row {
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px;
-      padding: 11px 13px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.25s ease;
     }
-    .item-row.pinned { border-color: var(--warning); background: rgba(245, 158, 11, 0.06); }
+    .item-row:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+    .item-row.pinned {
+      border-color: var(--warning);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.09), var(--surface-2));
+    }
     .item-info { flex: 1; min-width: 190px; }
-    .item-info h4 { font-size: 0.9rem; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .item-info p { font-size: 0.79rem; color: var(--text-muted); line-height: 1.4; }
+    .item-info h4 { font-size: 0.91rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .item-info p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; }
 
-    .pill { font-size: 0.68rem; padding: 2px 7px; border-radius: 99px; font-weight: 700; display: inline-block; }
+    /* PILLS */
+    .pill { font-size: 0.68rem; padding: 3px 8px; border-radius: 99px; font-weight: 700; display: inline-block; }
     .pill-ok { background: rgba(16, 185, 129, 0.15); color: var(--success); }
     .pill-warn { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
     .pill-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
     .pill-info { background: rgba(59, 130, 246, 0.15); color: var(--primary); }
     .pill-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); }
 
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px; }
-    .kpi-card { background: var(--surface-2); border: 1px solid var(--border); padding: 10px; border-radius: 10px; }
-    .kpi-card span { font-size: 0.72rem; color: var(--text-muted); display: block; }
-    .kpi-card strong { font-size: 1.12rem; margin-top: 3px; display: block; }
+    /* KPI BENTO WIDGETS */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .kpi-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 13px;
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+    .kpi-card span { font-size: 0.73rem; color: var(--text-muted); font-weight: 600; display: block; }
+    .kpi-card strong { font-size: 1.2rem; font-weight: 800; margin-top: 4px; display: block; letter-spacing: -0.02em; }
 
-    .sub-nav { display: flex; gap: 7px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; }
+    /* SUB NAVIGATION PILLS */
+    .sub-nav { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; scrollbar-width: none; }
+    .sub-nav::-webkit-scrollbar { display: none; }
     .sub-btn {
-      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
-      padding: 8px 13px; border-radius: 999px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      padding: 9px 15px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.81rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .sub-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-    .macro-bar-wrap { margin-bottom: 8px; }
-    .macro-bar-head { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 3px; font-weight: 600; }
-    .progress-track { width: 100%; height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
-    .progress-fill { height: 100%; border-radius: 99px; }
-
-    .meal-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 11px; margin-bottom: 10px; }
-    .meal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 8px; font-weight: 700; font-size: 0.88rem; }
-
-    .thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; }
-    .file-badge { padding: 6px 9px; background: rgba(59,130,246,0.12); border: 1px solid var(--primary); border-radius: 8px; color: var(--primary); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
-    #syncStatus { font-size: 0.72rem; color: var(--text-muted); }
-
-    #imgModal, #objDossierModal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
-      z-index: 500; align-items: center; justify-content: center; padding: 16px; flex-direction: column; gap: 12px;
+    .sub-btn:active { transform: scale(0.95); }
+    .sub-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px var(--primary-glow);
     }
-    #imgModal img { max-width: 95%; max-height: 80vh; border-radius: 12px; }
-    .dossier-box { background: var(--surface); border: 1px solid var(--primary); border-radius: 16px; max-width: 680px; width: 100%; max-height: 86vh; overflow-y: auto; padding: 18px; }
+
+    /* PROGRESS BARS */
+    .macro-bar-wrap { margin-bottom: 10px; }
+    .macro-bar-head { display: flex; justify-content: space-between; font-size: 0.77rem; margin-bottom: 4px; font-weight: 700; }
+    .progress-track { width: 100%; height: 9px; background: var(--surface-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+    .progress-fill { height: 100%; border-radius: 99px; transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+
+    .meal-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 13px; margin-bottom: 12px; }
+    .meal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 7px; margin-bottom: 9px; font-weight: 800; font-size: 0.9rem; }
+
+    .thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-strong); cursor: pointer; flex-shrink: 0; transition: transform 0.2s ease; }
+    .thumb:hover { transform: scale(1.06); }
+    .file-badge { padding: 6px 10px; background: var(--primary-glow); border: 1px solid var(--primary); border-radius: 9px; color: var(--primary); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+    #syncStatus { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+
+    /* MODALS */
+    #imgModal, #objDossierModal, #quickHubModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 15, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeIn 0.2s ease;
+    }
+    #imgModal img { max-width: 95%; max-height: 80vh; border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+    .dossier-box {
+      background: var(--surface);
+      border: 1px solid var(--primary);
+      border-radius: 22px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 86vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+
+    /* FLOATING QUICK ACTION BUTTON (FAB) */
+    .fab-quick {
+      position: fixed;
+      right: 18px;
+      bottom: calc(88px + var(--safe-bottom));
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
+      color: #fff;
+      border: none;
+      font-size: 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.45);
+      z-index: 190;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+    }
+    .fab-quick:hover { transform: translateY(-2px) scale(1.04); }
+    .fab-quick:active { transform: scale(0.9); }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .quick-card-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 14px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .quick-card-btn:hover { border-color: var(--primary); background: var(--primary-glow); }
+
+    /* TOAST NOTIFICATION */
+    #toastContainer {
+      position: fixed;
+      top: 72px;
+      right: 16px;
+      z-index: 600;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast-msg {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--primary);
+      border-left: 4px solid var(--primary);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-card);
+      animation: moduleSlideIn 0.25s ease;
+    }
   </style>
 </head>
 <body>
 
+<!-- Toast Container per feedback immediati -->
+<div id="toastContainer"></div>
+
 <!-- Modal Anteprima Immagine -->
 <div id="imgModal" onclick="this.style.display='none'">
   <img id="modalImgSrc" src="" alt="Anteprima">
-  <button class="btn btn-outline" style="background:#1e293b">Chiudi Anteprima</button>
+  <button class="btn btn-outline">Chiudi Anteprima</button>
 </div>
 
 <!-- Modal Scheda 360° Oggetto Unico (Garanzia + Manutenzioni + Finanze + Knowledge Base) -->
@@ -156,15 +481,44 @@
   <div class="dossier-box" id="objDossierContent"></div>
 </div>
 
+<!-- Modal Quick Action Hub (Scorciatoia Rapida + Cmd/Ctrl+K) -->
+<div id="quickHubModal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="dossier-box" style="max-width:460px;">
+    <div class="card-title">
+      <span>⚡ Azioni Rapide LifeOS</span>
+      <button class="btn btn-outline" onclick="document.getElementById('quickHubModal').style.display='none'">✕</button>
+    </div>
+    <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:8px;">Salta subito all'inserimento rapido o cambia l'aspetto dell'app:</p>
+    <div class="quick-grid">
+      <button class="quick-card-btn" onclick="quickJump('mod3', 2, 'ct_title')"><span>📌</span> Nuova Attività</button>
+      <button class="quick-card-btn" onclick="quickJump('mod5', 4, 'f_desc')"><span>💰</span> Nuova Spesa</button>
+      <button class="quick-card-btn" onclick="quickJump('mod6', 5, 'fs_search_lib', 'hSubNutrition')"><span>🍎</span> Registra Pasto</button>
+      <button class="quick-card-btn" onclick="quickJump('mod6', 5, 'w_kg', 'hSubWeight')"><span>⚖️</span> Registra Peso</button>
+      <button class="quick-card-btn" onclick="quickJump('mod2', 1, 'v_title')"><span>📦</span> Nuovo Oggetto</button>
+      <button class="quick-card-btn" onclick="quickJump('mod4', 3, 'm_task')"><span>🔧</span> Manutenzione</button>
+      <button class="quick-card-btn" onclick="quickJump('modHome', 0, 'globalSearchInput')"><span>🔍</span> Cerca Ovunque</button>
+      <button class="quick-card-btn" onclick="toggleTheme(); document.getElementById('quickHubModal').style.display='none'"><span>🌓</span> Tema Chiaro/Scuro</button>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Action Button (Accesso Rapido col Pollice) -->
+<button class="fab-quick" onclick="openQuickHub()" title="Azioni Rapide (Ctrl+K)">⚡</button>
+
 <header>
   <div class="brand">
-    <span>⚡ LifeOS</span>
-    <span class="badge-offline" id="storageBadge">Core Unificato v5</span>
+    <span class="brand-logo">⚡</span>
+    <span>LifeOS</span>
+    <span class="badge-offline" id="storageBadge">v5.5 Pro</span>
   </div>
   <div class="sync-controls">
     <span id="syncStatus">Attivo</span>
-    <button class="btn btn-warn" onclick="forceAppRefresh()" title="Forza aggiornamento interfaccia senza toccare i dati">🔄 Aggiorna UI</button>
-    <button class="btn btn-outline" onclick="exportFullZipBackup()">📦 Backup ZIP (CSV+JSON+File)</button>
+    <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Passa tra Modalità Chiara e Scura">
+      <span id="themeIcon">🌙</span>
+      <span id="themeLabel">Scuro</span>
+    </button>
+    <button class="btn btn-warn" onclick="forceAppRefresh()" title="Forza aggiornamento interfaccia senza toccare i dati">🔄 UI</button>
+    <button class="btn btn-outline" onclick="exportFullZipBackup()">📦 Backup ZIP</button>
     <label class="btn btn-outline" style="margin:0; cursor:pointer;">
       ⬆️ Ripristina
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
@@ -792,6 +1146,88 @@
 
 <script>
   /* =========================================================================
+     GESTIONE TEMA CHIARO / SCURO + FEEDBACK APTICO + TOAST
+     ========================================================================= */
+  const THEME_STORAGE_KEY = 'LIFEOS_THEME_PREF';
+
+  function haptic(ms = 12) {
+    if (navigator.vibrate) {
+      try { navigator.vibrate(ms); } catch (_) {}
+    }
+  }
+
+  function showToast(msg) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const el = document.createElement('div');
+    el.className = 'toast-msg';
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 0.25s ease';
+      setTimeout(() => el.remove(), 250);
+    }, 2400);
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    const icon = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+    const meta = document.getElementById('metaThemeColor');
+    if (theme === 'light') {
+      if (icon) icon.textContent = '☀️';
+      if (label) label.textContent = 'Chiaro';
+      if (meta) meta.setAttribute('content', '#f3f5f9');
+    } else {
+      if (icon) icon.textContent = '🌙';
+      if (label) label.textContent = 'Scuro';
+      if (meta) meta.setAttribute('content', '#090d16');
+    }
+  }
+
+  function toggleTheme() {
+    haptic(15);
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    showToast(next === 'light' ? '☀️ Modalità Chiara attivata' : '🌙 Modalità Scura attivata');
+  }
+
+  (function initTheme() {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+    applyTheme(saved);
+  })();
+
+  function openQuickHub() {
+    haptic(12);
+    document.getElementById('quickHubModal').style.display = 'flex';
+  }
+
+  function quickJump(modId, btnIndex, inputId, healthSubId) {
+    document.getElementById('quickHubModal').style.display = 'none';
+    const btns = document.querySelectorAll('.tab-btn');
+    switchTab(modId, btns[btnIndex]);
+    if (healthSubId) {
+      const subBtns = document.querySelectorAll('#mod6 .sub-btn');
+      const idx = healthSubId === 'hSubNutrition' ? 0 : (healthSubId === 'hSubWeight' ? 1 : 2);
+      switchHealthSub(healthSubId, subBtns[idx]);
+    }
+    setTimeout(() => {
+      const el = document.getElementById(inputId);
+      if (el) el.focus();
+    }, 150);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openQuickHub();
+    }
+  });
+
+  /* =========================================================================
      LIBRERIA ALIMENTI PRECARICATA (45+ Alimenti per 100g)
      ========================================================================= */
   const DEFAULT_FOOD_LIBRARY = [
@@ -882,13 +1318,16 @@
 
   function undoLastAction() {
     if (undoStack.length === 0) return alert('Nessuna operazione recente da annullare.');
+    haptic(20);
     const last = undoStack.pop();
     db = JSON.parse(last.snapshot);
     logAudit(`Annullata azione: ${last.label}`);
     saveDB();
+    showToast(`↩️ Annullato: ${last.label}`);
   }
 
   function verifyArchiveIntegrity() {
+    haptic(15);
     const collections = ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'foodLogs', 'weightLogs', 'medRecords'];
     let total = 0, issues = 0;
     collections.forEach(col => {
@@ -904,6 +1343,7 @@
 
   // Svuota cache Service Worker e forza ricaricamento UI senza toccare i dati
   async function forceAppRefresh() {
+    haptic(20);
     if ('serviceWorker' in navigator) {
       const regs = await navigator.serviceWorker.getRegistrations();
       for (let r of regs) await r.unregister();
@@ -989,16 +1429,19 @@
     const item = db[collection].find(x => x.id === id);
     if (!item) return;
     if (!confirm('Spostare questo elemento nel Cestino recuperabile?')) return;
+    haptic(20);
     pushUndoSnapshot(`Eliminazione da ${collection}`);
     db[collection] = db[collection].filter(x => x.id !== id);
     db.trash.unshift({ ...item, originalCollection: collection, deletedAt: new Date().toISOString() });
     logAudit(`Cestinato: ${item.title || item.name || item.desc || item.task || 'Elemento'}`);
     saveDB();
+    showToast('🗑️ Spostato nel cestino');
   }
 
   function restoreFromTrash(id) {
     const item = db.trash.find(x => x.id === id);
     if (!item) return;
+    haptic(15);
     db.trash = db.trash.filter(x => x.id !== id);
     const col = item.originalCollection;
     delete item.originalCollection;
@@ -1006,6 +1449,7 @@
     if (Array.isArray(db[col])) db[col].unshift(item);
     logAudit(`Ripristinato dal cestino: ${item.title || item.name || item.desc || 'Elemento'}`);
     saveDB();
+    showToast('↩️ Elemento ripristinato');
   }
 
   function emptyTrashItem(id) {
@@ -1057,8 +1501,8 @@
      ESPORTAZIONE VERIFICATA ZIP (JSON DOCUMENTATO + CSV TABELLARI + FILE ORIGINALI)
      ========================================================================= */
   async function exportFullZipBackup() {
+    haptic(15);
     if (typeof JSZip === 'undefined') {
-      // Fallback JSON se offline al 100% senza libreria JSZip in cache
       const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -1070,7 +1514,6 @@
     const zip = new JSZip();
     zip.file("database_lifeos_completo.json", JSON.stringify(db, null, 2));
 
-    // CSV Tabellari leggibili da Excel
     const csvTx = "ID,Data,Conto,OggettoCollegato,Descrizione,Tipo,Importo,Categoria\n" +
       db.financeTx.map(t => {
         const acc = db.accounts.find(a => a.id === t.accountId);
@@ -1087,7 +1530,6 @@
       db.weightLogs.map(w => `${w.id},${w.date},${w.kg},"${w.bodyfat||''}","${w.notes||''}"`).join("\n");
     zip.file("csv/storico_peso.csv", csvWeight);
 
-    // Estrazione file originali per ricevute e referti
     db.vault.forEach(v => {
       if (v.img && v.img.includes(',')) {
         const ext = (v.fileMime && v.fileMime.includes('pdf')) ? 'pdf' : 'jpg';
@@ -1109,6 +1551,7 @@
     a.download = `LifeOS_Archivio_Verificato_${new Date().toISOString().slice(0,10)}.zip`;
     a.click();
     logAudit('Esportato archivio ZIP verificato');
+    showToast('📦 Backup ZIP esportato');
   }
 
   function importBackup(event) {
@@ -1197,6 +1640,7 @@
 
   // SCHEDA UNIFICATA 360° DELL'OGGETTO (Es. Lavatrice — Samsung)
   function openObjectDossier(objId) {
+    haptic(12);
     const v = db.vault.find(x => x.id === objId);
     if (!v) return;
     const linkedMaint = db.maint.filter(m => m.objectId === objId || m.asset.toLowerCase() === v.title.toLowerCase());
@@ -1362,6 +1806,7 @@
 
   async function saveVaultItem(e) {
     e.preventDefault();
+    haptic(15);
     pushUndoSnapshot('Salvataggio Oggetto');
     const editId = document.getElementById('v_edit_id').value;
     const existing = editId ? db.vault.find(x => x.id === editId) : null;
@@ -1387,6 +1832,7 @@
     logAudit(`Salvato oggetto: ${item.title}`);
     resetVaultForm();
     saveDB();
+    showToast(`📦 Salvato: ${item.title}`);
   }
 
   function editVaultItem(id) {
@@ -1401,56 +1847,71 @@
     document.getElementById('v_price').value = v.price || '';
     document.getElementById('v_notes').value = v.notes || '';
     document.getElementById('v_form_title').textContent = '✏️ Modifica Oggetto';
+    document.getElementById('v_submit_btn').text
     document.getElementById('v_submit_btn').textContent = '💾 Aggiorna Oggetto';
     document.getElementById('v_cancel_edit').style.display = 'inline-flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function resetVaultForm() {
     document.getElementById('v_form').reset();
     document.getElementById('v_edit_id').value = '';
     document.getElementById('v_date').valueAsDate = new Date();
-    document.getElementById('v_file_label').textContent = '';
     document.getElementById('v_form_title').textContent = '📦 Registra Oggetto Unico / Garanzia';
     document.getElementById('v_submit_btn').textContent = '+ Salva Oggetto nel Nucleo Comune';
     document.getElementById('v_cancel_edit').style.display = 'none';
+    document.getElementById('v_file_label').textContent = '';
     pendingVaultAttachment = null;
   }
 
   function renderVault() {
-    const q = (document.getElementById('v_search').value || '').toLowerCase();
-    const filtered = db.vault.filter(v =>
-      v.title.toLowerCase().includes(q) || (v.notes||'').toLowerCase().includes(q) || (v.serial||'').toLowerCase().includes(q)
-    );
-    document.getElementById('v_count').textContent = `${filtered.length} oggetti`;
-    document.getElementById('v_list').innerHTML = filtered.map(v => {
-      const exp = new Date(v.date); exp.setMonth(exp.getMonth() + v.months);
-      const days = Math.ceil((exp - new Date()) / 86400000);
-      let badge = `<span class="pill pill-ok">Garanzia (${days} gg)</span>`;
-      if (v.months === 0) badge = `<span class="pill pill-info">Inventario</span>`;
-      else if (days < 0) badge = `<span class="pill pill-danger">Garanzia Scaduta</span>`;
-      else if (days <= 30) badge = `<span class="pill pill-warn">Scade tra ${days} gg</span>`;
+    const q = (document.getElementById('v_search')?.value || '').toLowerCase();
+    const list = document.getElementById('v_list');
+    document.getElementById('v_count').textContent = `${db.vault.length} oggetti`;
 
-      let mediaHtml = '';
+    const filtered = db.vault.filter(v =>
+      v.title.toLowerCase().includes(q) ||
+      v.cat.toLowerCase().includes(q) ||
+      (v.serial || '').toLowerCase().includes(q) ||
+      (v.notes || '').toLowerCase().includes(q)
+    );
+
+    list.innerHTML = filtered.map(v => {
+      const exp = new Date(v.date);
+      exp.setMonth(exp.getMonth() + (v.months || 0));
+      const daysLeft = Math.ceil((exp - new Date()) / 86400000);
+      let badge = `<span class="pill pill-info">Senza scadenza</span>`;
+      if (v.months > 0) {
+        if (daysLeft < 0) badge = `<span class="pill pill-danger">Scaduta</span>`;
+        else if (daysLeft <= 45) badge = `<span class="pill pill-warn">Scade tra ${daysLeft} gg</span>`;
+        else badge = `<span class="pill pill-ok">Attiva (${daysLeft} gg)</span>`;
+      }
+
+      const maintCount = db.maint.filter(m => m.objectId === v.id || m.asset.toLowerCase() === v.title.toLowerCase()).length;
+
+      let attachHtml = '';
       if (v.img) {
-        const isImg = (v.fileMime && v.fileMime.startsWith('image/')) || v.img.startsWith('data:image/');
-        mediaHtml = isImg
-          ? `<img src="${v.img}" class="thumb" onclick="openAttachment('${v.img}','${v.fileName||''}','${v.fileMime||''}')">`
-          : `<div class="file-badge" onclick="openAttachment('${v.img}','${v.fileName||'documento.pdf'}','${v.fileMime||''}')">📄 File</div>`;
+        if ((v.fileMime && v.fileMime.startsWith('image/')) || v.img.startsWith('data:image/')) {
+          attachHtml = `<img src="${v.img}" class="thumb" onclick="openAttachment('${v.img}', '${v.fileName||''}', '${v.fileMime||''}')" title="Tocca per ingrandire">`;
+        } else {
+          attachHtml = `<span class="file-badge" onclick="openAttachment('${v.img}', '${v.fileName||'documento.pdf'}', '${v.fileMime||'application/pdf'}')">📄 PDF</span>`;
+        }
       }
 
       return `
         <div class="item-row">
-          <div style="display:flex; gap:10px; align-items:center; flex:1;">
-            ${mediaHtml}
+          <div style="display:flex; gap:12px; align-items:center; flex:1;">
+            ${attachHtml}
             <div class="item-info">
-              <h4>📦 ${v.title} <span class="pill pill-info">${v.cat}</span> ${badge}</h4>
-              <p>Acquisto: ${v.date} ${v.price ? `• €${v.price.toFixed(2)}` : ''} ${v.serial ? `• S/N: ${v.serial}` : ''}<br>📚 ${v.notes || 'Nessuna nota'}</p>
+              <h4>${v.title} ${badge} <span class="pill pill-purple">🔧 ${maintCount} int.</span></h4>
+              <p>${v.cat} ${v.serial ? `• S/N: <strong>${v.serial}</strong>` : ''} • Acquisto: ${v.date} • €${(v.price||0).toFixed(2)}</p>
+              ${v.notes ? `<p style="color:var(--text); margin-top:3px;">📚 ${v.notes}</p>` : ''}
             </div>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary)" onclick="openObjectDossier('${v.id}')">🔍 Dossier 360°</button>
+            <button class="btn btn-outline" onclick="openObjectDossier('${v.id}')">🔍 Dossier 360°</button>
             <button class="btn btn-outline" onclick="editVaultItem('${v.id}')">✏️</button>
-            <button class="btn btn-danger" onclick="deleteItem('vault','${v.id}')">✕</button>
+            <button class="btn btn-danger" onclick="deleteItem('vault','${v.id}')">🗑️</button>
           </div>
         </div>
       `;
@@ -1458,12 +1919,23 @@
   }
 
   /* =========================================================================
-     MODULO 3: ATTIVITÀ & PERSONE
+     MODULO 3: ATTIVITÀ (OGGI/SETTIMANA/PIN) & PERSONE (CRM RELAZIONALE)
      ========================================================================= */
+  function switchCrmSub(subId, btn) {
+    haptic(10);
+    document.querySelectorAll('.crm-sub').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#mod3 .sub-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(subId).style.display = 'block';
+    if (btn) btn.classList.add('active');
+  }
+
   function saveCrmTask(e) {
     e.preventDefault();
+    haptic(15);
+    pushUndoSnapshot('Nuova Attività');
     db.crmTasks.unshift({
-      id: uuid(), updatedAt: Date.now(),
+      id: uuid(),
+      updatedAt: Date.now(),
       title: document.getElementById('ct_title').value.trim(),
       scope: document.getElementById('ct_scope').value,
       pinned: document.getElementById('ct_pin').value === '1',
@@ -1474,23 +1946,29 @@
     });
     e.target.reset();
     saveDB();
+    showToast('📌 Attività aggiunta');
   }
 
   function toggleTaskPin(id) {
+    haptic(12);
     const t = db.crmTasks.find(x => x.id === id);
     if (t) { t.pinned = !t.pinned; t.updatedAt = Date.now(); saveDB(); }
   }
 
   function toggleTaskDone(id) {
+    haptic([12, 35, 18]);
     const t = db.crmTasks.find(x => x.id === id);
-    if (t) { t.done = !t.done; t.updatedAt = Date.now(); saveDB(); }
+    if (t) { t.done = !t.done; t.updatedAt = Date.now(); saveDB(); showToast(t.done ? '✅ Attività completata!' : '↩️ Attività riaperta'); }
   }
 
   function saveCrmItem(e) {
     e.preventDefault();
+    haptic(15);
+    pushUndoSnapshot('Salvataggio Persona');
     const editId = document.getElementById('c_edit_id').value;
     const item = {
-      id: editId || uuid(), updatedAt: Date.now(),
+      id: editId || uuid(),
+      updatedAt: Date.now(),
       name: document.getElementById('c_name').value.trim(),
       circle: document.getElementById('c_circle').value,
       phone: document.getElementById('c_phone').value.trim(),
@@ -1499,17 +1977,18 @@
       notes: document.getElementById('c_notes').value.trim()
     };
     if (editId) db.crm = db.crm.map(x => x.id === editId ? item : x);
-    else db.crm.push(item);
+    else db.crm.unshift(item);
     resetCrmPersonForm();
     saveDB();
+    showToast(`❤️ Salvato contatto: ${item.name}`);
   }
 
-  function editCrmItem(id) {
+  function editCrmPerson(id) {
     const c = db.crm.find(x => x.id === id);
     if (!c) return;
     document.getElementById('c_edit_id').value = c.id;
     document.getElementById('c_name').value = c.name;
-    document.getElementById('c_circle').value = c.circle;
+    document.getElementById('c_circle').value = c.circle || 'Famiglia';
     document.getElementById('c_phone').value = c.phone || '';
     document.getElementById('c_last').value = c.last;
     document.getElementById('c_freq').value = c.freq;
@@ -1523,133 +2002,169 @@
     document.getElementById('c_edit_id').value = '';
     document.getElementById('c_name').value = '';
     document.getElementById('c_phone').value = '';
-    document.getElementById('c_notes').value = '';
     document.getElementById('c_last').valueAsDate = new Date();
+    document.getElementById('c_freq').value = 14;
+    document.getElementById('c_notes').value = '';
     document.getElementById('c_form_title').textContent = '❤️ Registra Persona Unica';
     document.getElementById('c_submit_btn').textContent = '+ Salva Persona';
     document.getElementById('c_cancel_edit').style.display = 'none';
   }
 
-  function touchContact(id) {
+  function pingContact(id) {
+    haptic(15);
     const c = db.crm.find(x => x.id === id);
-    if (c) { c.last = new Date().toISOString().slice(0, 10); c.updatedAt = Date.now(); saveDB(); }
+    if (c) {
+      c.last = new Date().toISOString().slice(0, 10);
+      c.updatedAt = Date.now();
+      saveDB();
+      showToast(`👋 Contatto aggiornato: ${c.name}`);
+    }
   }
 
   function renderCrm() {
-    const renderTaskRow = (t, isPin) => {
+    const renderTaskRow = (t) => {
       const obj = db.vault.find(v => v.id === t.objectId);
       const per = db.crm.find(c => c.id === t.personId);
       return `
-        <div class="item-row ${isPin ? 'pinned' : ''}">
+        <div class="item-row ${t.pinned ? 'pinned' : ''}" style="${t.done ? 'opacity:0.55;' : ''}">
           <div class="item-info">
-            <h4 style="${t.done ? 'text-decoration:line-through; opacity:0.6' : ''}">${isPin ? '📌 ' : ''}${t.title} <span class="pill pill-info">${t.scope}</span> ${obj ? `<span class="pill pill-purple">📦 ${obj.title}</span>` : ''} ${per ? `<span class="pill pill-ok">❤️ ${per.name}</span>` : ''}</h4>
+            <h4>
+              <span class="pill pill-info">${t.scope}</span>
+              <span style="${t.done ? 'text-decoration:line-through;' : ''}">${t.title}</span>
+              ${obj ? `<span class="pill pill-purple" style="cursor:pointer" onclick="openObjectDossier('${obj.id}')">📦 ${obj.title}</span>` : ''}
+              ${per ? `<span class="pill pill-ok">❤️ ${per.name}</span>` : ''}
+            </h4>
             ${t.notes ? `<p>${t.notes}</p>` : ''}
           </div>
-          <div style="display:flex; gap:6px;">
+          <div style="display:flex; gap:5px;">
+            <button class="btn btn-outline" onclick="toggleTaskPin('${t.id}')" title="Fissa">${t.pinned ? '📌' : '📍'}</button>
             <button class="btn btn-outline" onclick="toggleTaskDone('${t.id}')">${t.done ? '↩️' : '✅'}</button>
-            <button class="btn btn-outline" onclick="toggleTaskPin('${t.id}')">📌</button>
-            <button class="btn btn-danger" onclick="deleteItem('crmTasks','${t.id}')">✕</button>
+            <button class="btn btn-danger" onclick="deleteItem('crmTasks','${t.id}')">🗑️</button>
           </div>
         </div>
       `;
     };
 
-    document.getElementById('ct_pinned_list').innerHTML = db.crmTasks.filter(t => t.pinned).map(t => renderTaskRow(t, true)).join('') || `<p style="color:var(--text-muted); font-size:0.8rem;">Nessun elemento fissato.</p>`;
-    document.getElementById('ct_todo_list').innerHTML = db.crmTasks.filter(t => !t.pinned).map(t => renderTaskRow(t, false)).join('') || `<p style="color:var(--text-muted); font-size:0.8rem;">Nessuna attività in lista.</p>`;
+    const pinned = db.crmTasks.filter(t => t.pinned && !t.done);
+    const others = db.crmTasks.filter(t => !t.pinned || t.done);
+    document.getElementById('ct_pinned_list').innerHTML = pinned.map(renderTaskRow).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna nota fissata in alto.</p>`;
+    document.getElementById('ct_todo_list').innerHTML = others.map(renderTaskRow).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna attività in lista.</p>`;
 
-    const q = (document.getElementById('c_search').value || '').toLowerCase();
-    const items = db.crm.filter(c => c.name.toLowerCase().includes(q) || (c.notes||'').toLowerCase().includes(q)).map(c => {
-      const daysSince = Math.floor((new Date() - new Date(c.last)) / 86400000);
-      return { ...c, daysSince, overdue: daysSince - c.freq };
-    }).sort((a, b) => b.overdue - a.overdue);
+    const q = (document.getElementById('c_search')?.value || '').toLowerCase();
+    const filteredPeople = db.crm.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      (c.notes || '').toLowerCase().includes(q) ||
+      (c.circle || '').toLowerCase().includes(q)
+    );
 
-    document.getElementById('c_list').innerHTML = items.map(c => `
-      <div class="item-row">
-        <div class="item-info">
-          <h4>${c.name} <span class="pill pill-info">${c.circle}</span> <span class="pill ${c.overdue > 0 ? 'pill-danger' : 'pill-ok'}">${c.daysSince} gg fa</span></h4>
-          <p>${c.phone ? `📞 ${c.phone} • ` : ''}Ultimo: ${c.last} • 💡 ${c.notes || 'Nessuna nota'}</p>
-        </div>
-        <div style="display:flex; gap:6px;">
-          <button class="btn btn-outline" onclick="touchContact('${c.id}')">✅ Oggi</button>
-          <button class="btn btn-outline" onclick="editCrmItem('${c.id}')">✏️</button>
-          <button class="btn btn-danger" onclick="deleteItem('crm','${c.id}')">✕</button>
-        </div>
-      </div>
-    `).join('') || `<p style="color:var(--text-muted)">Nessuna persona registrata.</p>`;
-  }
-
-  /* =========================================================================
-     MODULO 4: MANUTENZIONE RELAZIONALE
-     ========================================================================= */
-  function addMaintItem(e) {
-    e.preventDefault();
-    const objId = document.getElementById('m_object_id').value;
-    const asset = document.getElementById('m_asset').value.trim();
-    const task = document.getElementById('m_task').value.trim();
-    const date = document.getElementById('m_date').value;
-    const cost = parseFloat(document.getElementById('m_cost').value || 0);
-
-    db.maint.unshift({
-      id: uuid(), updatedAt: Date.now(),
-      objectId: objId, asset, task, date,
-      nextMonths: parseInt(document.getElementById('m_next_months').value || 12),
-      kmNow: document.getElementById('m_km_now').value,
-      kmNext: document.getElementById('m_km_next').value,
-      cost,
-      parts: document.getElementById('m_parts').value.trim()
-    });
-
-    // Se spuntato, crea automaticamente la spesa collegata nelle Finanze
-    if (cost > 0 && document.getElementById('m_auto_tx').checked && db.accounts.length > 0) {
-      db.financeTx.unshift({
-        id: uuid(), updatedAt: Date.now(),
-        accountId: db.accounts[0].id,
-        objectId: objId,
-        desc: `Manutenzione ${asset}: ${task}`,
-        type: 'expense',
-        amount: cost,
-        cat: 'Manutenzione & Acquisti',
-        date
-      });
-    }
-
-    logAudit(`Registrata manutenzione: ${asset} (${task})`);
-    e.target.reset();
-    document.getElementById('m_date').valueAsDate = new Date();
-    saveDB();
-  }
-
-  function renderMaint() {
-    const total = db.maint.reduce((a, m) => a + (m.cost || 0), 0);
-    document.getElementById('m_kpis').innerHTML = `
-      <div class="kpi-card"><span>Interventi Totali</span><strong>${db.maint.length}</strong></div>
-      <div class="kpi-card"><span>Spesa Manutenzioni</span><strong>€${total.toFixed(2)}</strong></div>
-    `;
-    document.getElementById('m_list').innerHTML = db.maint.map(m => {
-      const next = new Date(m.date); next.setMonth(next.getMonth() + m.nextMonths);
-      const days = Math.ceil((next - new Date()) / 86400000);
+    document.getElementById('c_list').innerHTML = filteredPeople.map(c => {
+      const daysAgo = Math.floor((new Date() - new Date(c.last)) / 86400000);
+      const due = daysAgo >= c.freq;
       return `
         <div class="item-row">
           <div class="item-info">
-            <h4>🔧 [${m.asset}] ${m.task} <span class="pill ${days < 0 ? 'pill-danger' : 'pill-ok'}">${days < 0 ? 'Scaduta' : 'Tra ' + days + ' gg'}</span></h4>
-            <p>Data: ${m.date} • €${(m.cost||0).toFixed(2)} ${m.kmNow ? `• Km: ${m.kmNow}→${m.kmNext||'?'}` : ''} ${m.parts ? `• Ricambio: ${m.parts}` : ''}</p>
+            <h4>${c.name} <span class="pill pill-info">${c.circle || 'Contatto'}</span> <span class="pill ${due ? 'pill-warn' : 'pill-ok'}">${daysAgo} gg fa</span></h4>
+            <p>${c.phone ? `📞 <a href="tel:${c.phone}" style="color:var(--primary); text-decoration:none;">${c.phone}</a> • ` : ''}Ogni ${c.freq} gg</p>
+            ${c.notes ? `<p style="color:var(--text); margin-top:4px;">🎁 ${c.notes}</p>` : ''}
           </div>
-          <button class="btn btn-danger" onclick="deleteItem('maint','${m.id}')">✕</button>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-outline" onclick="pingContact('${c.id}')">👋 Sentito Oggi</button>
+            <button class="btn btn-outline" onclick="editCrmPerson('${c.id}')">✏️</button>
+            <button class="btn btn-danger" onclick="deleteItem('crm','${c.id}')">🗑️</button>
+          </div>
         </div>
       `;
-    }).join('') || `<p style="color:var(--text-muted)">Nessuna manutenzione salvata.</p>`;
+    }).join('') || `<p style="color:var(--text-muted)">Nessuna persona registrata.</p>`;
   }
 
   /* =========================================================================
-     MODULO 5: FINANZE MULTI-CONTO + BILANCIAMENTO SILENZIOSO
+     MODULO 4: MANUTENZIONE (COLLEGATA AGLI OGGETTI E ALLE FINANZE)
+     ========================================================================= */
+  function addMaintItem(e) {
+    e.preventDefault();
+    haptic(15);
+    pushUndoSnapshot('Nuova Manutenzione');
+    const objId = document.getElementById('m_object_id').value;
+    const assetName = document.getElementById('m_asset').value.trim();
+    const taskName = document.getElementById('m_task').value.trim();
+    const dateVal = document.getElementById('m_date').value;
+    const costVal = parseFloat(document.getElementById('m_cost').value || 0);
+
+    const maintId = uuid();
+    db.maint.unshift({
+      id: maintId,
+      updatedAt: Date.now(),
+      objectId: objId,
+      asset: assetName,
+      task: taskName,
+      date: dateVal,
+      nextMonths: parseInt(document.getElementById('m_next_months').value || 12),
+      kmNow: document.getElementById('m_km_now').value,
+      kmNext: document.getElementById('m_km_next').value,
+      cost: costVal,
+      parts: document.getElementById('m_parts').value.trim()
+    });
+
+    if (document.getElementById('m_auto_tx').checked && costVal > 0 && db.accounts.length > 0) {
+      db.financeTx.unshift({
+        id: uuid(),
+        updatedAt: Date.now(),
+        accountId: db.accounts[0].id,
+        objectId: objId,
+        desc: `[Manutenzione] ${assetName}: ${taskName}`,
+        type: 'expense',
+        amount: costVal,
+        cat: 'Manutenzione & Acquisti',
+        date: dateVal
+      });
+    }
+
+    logAudit(`Manutenzione registrata: ${assetName} - ${taskName}`);
+    e.target.reset();
+    document.getElementById('m_date').valueAsDate = new Date();
+    saveDB();
+    showToast(`🔧 Manutenzione salvata: ${assetName}`);
+  }
+
+  function renderMaint() {
+    const totalCost = db.maint.reduce((acc, x) => acc + (x.cost || 0), 0);
+    document.getElementById('m_kpis').innerHTML = `
+      <div class="kpi-card"><span>Interventi Totali</span><strong>${db.maint.length}</strong></div>
+      <div class="kpi-card"><span>Spesa Manutenzione</span><strong>€${totalCost.toFixed(2)}</strong></div>
+    `;
+
+    document.getElementById('m_list').innerHTML = db.maint.map(m => {
+      const next = new Date(m.date);
+      next.setMonth(next.getMonth() + (m.nextMonths || 12));
+      const days = Math.ceil((next - new Date()) / 86400000);
+      const pill = days < 0 ? 'pill-danger' : (days <= 30 ? 'pill-warn' : 'pill-ok');
+
+      return `
+        <div class="item-row">
+          <div class="item-info">
+            <h4>
+              🔧 [${m.asset}] ${m.task}
+              <span class="pill ${pill}">${days < 0 ? 'Scaduto' : 'Tra ' + days + ' gg'}</span>
+              ${m.objectId ? `<span class="pill pill-purple" style="cursor:pointer" onclick="openObjectDossier('${m.objectId}')">🔍 Dossier</span>` : ''}
+            </h4>
+            <p>Eseguito: ${m.date} • Costo: €${(m.cost||0).toFixed(2)} ${m.kmNow ? `• Km: ${m.kmNow} (Prossimo: ${m.kmNext||'--'})` : ''} ${m.parts ? `• Ricambio: <strong>${m.parts}</strong>` : ''}</p>
+          </div>
+          <button class="btn btn-danger" onclick="deleteItem('maint','${m.id}')">🗑️</button>
+        </div>
+      `;
+    }).join('') || `<p style="color:var(--text-muted)">Nessuna manutenzione registrata.</p>`;
+  }
+
+  /* =========================================================================
+     MODULO 5: FINANZE MULTI-CONTO & BILANCIAMENTO SALDO SENZA FINTI MOVIMENTI
      ========================================================================= */
   function getAccountBalance(accId) {
     const acc = db.accounts.find(a => a.id === accId);
     if (!acc) return 0;
-    const txs = db.financeTx.filter(t => t.accountId === accId);
-    const inc = txs.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
-    const exp = txs.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-    return (parseFloat(acc.baseBalance) || 0) + inc - exp;
+    const txSum = db.financeTx
+      .filter(t => t.accountId === accId)
+      .reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
+    return (acc.baseBalance || 0) + txSum;
   }
 
   function getTotalNetWorth() {
@@ -1658,20 +2173,24 @@
 
   function saveAccount(e) {
     e.preventDefault();
+    haptic(15);
+    pushUndoSnapshot('Modifica Conto');
     const editId = document.getElementById('acc_edit_id').value;
     const name = document.getElementById('acc_name').value.trim();
     const type = document.getElementById('acc_type').value;
     const desiredBalance = parseFloat(document.getElementById('acc_base').value || 0);
 
     if (editId) {
-      const txs = db.financeTx.filter(t => t.accountId === editId);
-      const netTx = txs.reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
-      db.accounts = db.accounts.map(a => a.id === editId ? { ...a, name, type, baseBalance: desiredBalance - netTx, updatedAt: Date.now() } : a);
+      const txSum = db.financeTx
+        .filter(t => t.accountId === editId)
+        .reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
+      db.accounts = db.accounts.map(a => a.id === editId ? { ...a, updatedAt: Date.now(), name, type, baseBalance: desiredBalance - txSum } : a);
     } else {
       db.accounts.push({ id: uuid(), updatedAt: Date.now(), name, type, baseBalance: desiredBalance });
     }
     resetAccountForm();
     saveDB();
+    showToast(`🏦 Conto salvato: ${name}`);
   }
 
   function editAccount(id) {
@@ -1681,9 +2200,26 @@
     document.getElementById('acc_name').value = a.name;
     document.getElementById('acc_type').value = a.type;
     document.getElementById('acc_base').value = getAccountBalance(a.id).toFixed(2);
-    document.getElementById('acc_form_title').textContent = '✏️ Modifica Conto';
-    document.getElementById('acc_submit_btn').textContent = '💾 Salva Conto';
+    document.getElementById('acc_form_title').textContent = '⚖️ Rettifica Conto / Saldo';
+    document.getElementById('acc_submit_btn').textContent = '💾 Aggiorna Saldo Reale';
     document.getElementById('acc_cancel_btn').style.display = 'inline-flex';
+  }
+
+  function quickBalanceAccount(id) {
+    const a = db.accounts.find(x => x.id === id);
+    if (!a) return;
+    const cur = getAccountBalance(id);
+    const val = prompt(`⚖️ Bilancia Saldo per "${a.name}".\nInserisci il saldo reale attuale (€) — lo storico movimenti rimarrà invariato:`, cur.toFixed(2));
+    if (val === null) return;
+    const num = parseFloat(val.replace(',', '.'));
+    if (isNaN(num)) return;
+    pushUndoSnapshot('Bilanciamento Saldo');
+    const txSum = db.financeTx.filter(t => t.accountId === id).reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
+    a.baseBalance = num - txSum;
+    a.updatedAt = Date.now();
+    logAudit(`Saldo conto ${a.name} allineato a €${num.toFixed(2)}`);
+    saveDB();
+    showToast(`⚖️ Saldo ${a.name} aggiornato`);
   }
 
   function resetAccountForm() {
@@ -1695,68 +2231,60 @@
     document.getElementById('acc_cancel_btn').style.display = 'none';
   }
 
-  function silentBalanceAccount(id) {
-    const a = db.accounts.find(x => x.id === id);
-    if (!a) return;
-    const cur = getAccountBalance(id);
-    const val = prompt(`⚖️ BILANCIA SALDO "${a.name}" (Senza creare movimenti nello storico)\nSaldo attuale: €${cur.toFixed(2)}\nInserisci il nuovo saldo reale (€):`, cur.toFixed(2));
-    if (val === null) return;
-    const num = parseFloat(val.replace(',', '.'));
-    if (isNaN(num)) return;
-    pushUndoSnapshot(`Bilanciamento conto ${a.name}`);
-    const netTx = db.financeTx.filter(t => t.accountId === id).reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
-    a.baseBalance = num - netTx;
-    a.updatedAt = Date.now();
-    logAudit(`Bilanciato saldo conto ${a.name} a €${num.toFixed(2)}`);
-    saveDB();
-  }
-
   function addFinanceTx(e) {
     e.preventDefault();
+    haptic(15);
+    pushUndoSnapshot('Nuova Transazione');
+    const desc = document.getElementById('f_desc').value.trim();
     db.financeTx.unshift({
-      id: uuid(), updatedAt: Date.now(),
+      id: uuid(),
+      updatedAt: Date.now(),
       accountId: document.getElementById('f_account').value,
       objectId: document.getElementById('f_object').value,
-      desc: document.getElementById('f_desc').value.trim(),
+      desc: desc,
       type: document.getElementById('f_type').value,
-      amount: parseFloat(document.getElementById('f_amount').value || 0),
+      amount: parseFloat(document.getElementById('f_amount').value),
       cat: document.getElementById('f_cat').value,
       date: document.getElementById('f_date').value
     });
     e.target.reset();
     document.getElementById('f_date').valueAsDate = new Date();
     saveDB();
+    showToast(`💰 Registrato: ${desc}`);
   }
 
   function addSub(e) {
     e.preventDefault();
+    haptic(15);
+    pushUndoSnapshot('Nuovo Abbonamento');
     db.subs.push({
-      id: uuid(), updatedAt: Date.now(),
+      id: uuid(),
+      updatedAt: Date.now(),
       name: document.getElementById('s_name').value.trim(),
-      cost: parseFloat(document.getElementById('s_cost').value || 0),
+      cost: parseFloat(document.getElementById('s_cost').value),
       cycle: document.getElementById('s_cycle').value,
       next: document.getElementById('s_next').value
     });
     e.target.reset();
-    document.getElementById('s_next').valueAsDate = new Date();
     saveDB();
+    showToast('🔄 Abbonamento aggiunto');
   }
 
   function renderFinance() {
-    const accSelect = document.getElementById('f_account');
-    const prev = accSelect.value;
-    accSelect.innerHTML = db.accounts.map(a => `<option value="${a.id}">${a.name} (€${getAccountBalance(a.id).toFixed(2)})</option>`).join('');
-    if (prev && db.accounts.some(a => a.id === prev)) accSelect.value = prev;
+    const sel = document.getElementById('f_account');
+    if (sel) {
+      const cur = sel.value;
+      sel.innerHTML = db.accounts.map(a => `<option value="${a.id}">${a.name} (€${getAccountBalance(a.id).toFixed(2)})</option>`).join('');
+      if (cur && db.accounts.some(a => a.id === cur)) sel.value = cur;
+    }
 
-    const inc = db.financeTx.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
-    const exp = db.financeTx.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-    const subs = db.subs.reduce((a, s) => a + (s.cycle === 'monthly' ? s.cost : s.cost / 12), 0);
+    const totalNet = getTotalNetWorth();
+    const monthlySubs = db.subs.reduce((s, x) => s + (x.cycle === 'monthly' ? x.cost : x.cost / 12), 0);
 
     document.getElementById('f_kpis').innerHTML = `
-      <div class="kpi-card"><span>Patrimonio Conti</span><strong style="color:var(--primary)">€${getTotalNetWorth().toFixed(2)}</strong></div>
-      <div class="kpi-card"><span>Entrate Storico</span><strong style="color:var(--success)">+€${inc.toFixed(2)}</strong></div>
-      <div class="kpi-card"><span>Uscite Storico</span><strong style="color:var(--danger)">-€${exp.toFixed(2)}</strong></div>
-      <div class="kpi-card"><span>Fisso Mensile</span><strong style="color:var(--warning)">€${subs.toFixed(2)}/m</strong></div>
+      <div class="kpi-card"><span>Patrimonio Netto</span><strong style="color:var(--success)">€${totalNet.toFixed(2)}</strong></div>
+      <div class="kpi-card"><span>Conti Attivi</span><strong>${db.accounts.length}</strong></div>
+      <div class="kpi-card"><span>Costi Fissi / Mese</span><strong style="color:var(--warning)">€${monthlySubs.toFixed(2)}</strong></div>
     `;
 
     document.getElementById('acc_list').innerHTML = db.accounts.map(a => {
@@ -1765,11 +2293,12 @@
         <div class="item-row">
           <div class="item-info">
             <h4>🏦 ${a.name} <span class="pill pill-info">${a.type}</span></h4>
-            <p>Saldo: <strong style="color:${bal >= 0 ? 'var(--success)' : 'var(--danger)'}">€${bal.toFixed(2)}</strong></p>
+            <p>Saldo Attuale: <strong style="color:${bal >= 0 ? 'var(--success)' : 'var(--danger)'}">€${bal.toFixed(2)}</strong></p>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-warn" onclick="silentBalanceAccount('${a.id}')">⚖️ Bilancia Saldo</button>
+            <button class="btn btn-outline" onclick="quickBalanceAccount('${a.id}')">⚖️ Bilancia Saldo</button>
             <button class="btn btn-outline" onclick="editAccount('${a.id}')">✏️</button>
+            ${db.accounts.length > 1 ? `<button class="btn btn-danger" onclick="deleteItem('accounts','${a.id}')">🗑️</button>` : ''}
           </div>
         </div>
       `;
@@ -1777,38 +2306,50 @@
 
     document.getElementById('s_list').innerHTML = db.subs.map(s => `
       <div class="item-row">
-        <div class="item-info"><h4>${s.name} <span class="pill pill-warn">€${s.cost.toFixed(2)}/${s.cycle === 'monthly' ? 'mese' : 'anno'}</span></h4><p>Rinnovo: ${s.next}</p></div>
-        <button class="btn btn-danger" onclick="deleteItem('subs','${s.id}')">✕</button>
+        <div class="item-info">
+          <h4>🔄 ${s.name} — €${s.cost.toFixed(2)} (${s.cycle === 'monthly' ? 'Mensile' : 'Annuale'})</h4>
+          <p>Prossimo rinnovo: ${s.next}</p>
+        </div>
+        <button class="btn btn-danger" onclick="deleteItem('subs','${s.id}')">🗑️</button>
       </div>
-    `).join('') || `<p style="color:var(--text-muted)">Nessun abbonamento.</p>`;
+    `).join('') || `<p style="color:var(--text-muted)">Nessun abbonamento attivo.</p>`;
 
-    document.getElementById('f_list').innerHTML = db.financeTx.map(t => {
+    document.getElementById('f_list').innerHTML = db.financeTx.slice(0, 40).map(t => {
       const acc = db.accounts.find(a => a.id === t.accountId);
       const obj = db.vault.find(v => v.id === t.objectId);
       return `
         <div class="item-row">
           <div class="item-info">
-            <h4>${t.desc} <span class="pill pill-info">${t.cat}</span> <span class="pill pill-ok">${acc ? acc.name : 'Conto'}</span> ${obj ? `<span class="pill pill-purple">📦 ${obj.title}</span>` : ''}</h4>
-            <p>${t.date}</p>
+            <h4>
+              ${t.desc}
+              <span class="pill ${t.type === 'income' ? 'pill-ok' : 'pill-danger'}">${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}</span>
+              ${obj ? `<span class="pill pill-purple" style="cursor:pointer" onclick="openObjectDossier('${obj.id}')">📦 ${obj.title}</span>` : ''}
+            </h4>
+            <p>${t.date} • ${t.cat} • Conto: <strong>${acc ? acc.name : 'Principale'}</strong></p>
           </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <strong style="color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'}">${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}</strong>
-            <button class="btn btn-danger" onclick="deleteItem('financeTx','${t.id}')">✕</button>
-          </div>
+          <button class="btn btn-danger" onclick="deleteItem('financeTx','${t.id}')">🗑️</button>
         </div>
       `;
-    }).join('') || `<p style="color:var(--text-muted)">Nessun movimento.</p>`;
+    }).join('') || `<p style="color:var(--text-muted)">Nessun movimento registrato.</p>`;
   }
 
   /* =========================================================================
      MODULO 6: SALUTE OS (FATSECRET + DATABOY + REFERTI + SINTOMI)
      ========================================================================= */
+  function switchHealthSub(subId, btn) {
+    haptic(10);
+    document.querySelectorAll('.health-sub').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#mod6 .sub-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(subId).style.display = 'block';
+    if (btn) btn.classList.add('active');
+  }
+
   function filterFoodLibrary() {
-    const q = (document.getElementById('fs_search_lib').value || '').toLowerCase();
+    const q = (document.getElementById('fs_search_lib')?.value || '').toLowerCase();
     const sel = document.getElementById('fs_food_select');
-    sel.innerHTML = db.foodLibrary.filter(f => f.name.toLowerCase().includes(q)).map(f =>
-      `<option value="${f.id}">${f.name} — ${f.kcal} kcal (C:${f.carb}g P:${f.prot}g G:${f.fat}g)</option>`
-    ).join('');
+    if (!sel) return;
+    const matches = db.foodLibrary.filter(f => f.name.toLowerCase().includes(q));
+    sel.innerHTML = matches.map(f => `<option value="${f.id}">${f.name} (${f.kcal} kcal | C:${f.carb} P:${f.prot} G:${f.fat})</option>`).join('');
   }
 
   function selectFoodFromLib() {
@@ -1822,34 +2363,40 @@
 
   function recalcPreviewMacros() {
     if (!selectedLibFood) return;
-    const ratio = (parseFloat(document.getElementById('fs_grams').value || 0)) / 100;
-    document.getElementById('fs_kcal').value = Math.round(selectedLibFood.kcal * ratio);
-    document.getElementById('fs_carb').value = (selectedLibFood.carb * ratio).toFixed(1);
-    document.getElementById('fs_prot').value = (selectedLibFood.prot * ratio).toFixed(1);
-    document.getElementById('fs_fat').value = (selectedLibFood.fat * ratio).toFixed(1);
+    const g = parseFloat(document.getElementById('fs_grams').value || 0) / 100;
+    document.getElementById('fs_kcal').value = Math.round(selectedLibFood.kcal * g);
+    document.getElementById('fs_carb').value = (selectedLibFood.carb * g).toFixed(1);
+    document.getElementById('fs_prot').value = (selectedLibFood.prot * g).toFixed(1);
+    document.getElementById('fs_fat').value = (selectedLibFood.fat * g).toFixed(1);
   }
 
   function addCustomFoodToLib(e) {
     e.preventDefault();
+    haptic(15);
+    const name = document.getElementById('lib_name').value.trim();
     db.foodLibrary.unshift({
-      id: uuid(), updatedAt: Date.now(),
-      name: document.getElementById('lib_name').value.trim(),
+      id: uuid(),
+      updatedAt: Date.now(),
+      name: name,
       kcal: parseFloat(document.getElementById('lib_kcal').value || 0),
       carb: parseFloat(document.getElementById('lib_carb').value || 0),
       prot: parseFloat(document.getElementById('lib_prot').value || 0),
       fat: parseFloat(document.getElementById('lib_fat').value || 0)
     });
     e.target.reset();
-    filterFoodLibrary();
     saveDB();
+    showToast(`📚 Aggiunto in libreria: ${name}`);
   }
 
   function saveMealEntry(e) {
     e.preventDefault();
+    haptic(15);
     const editId = document.getElementById('fs_edit_id').value;
-    const entry = {
-      id: editId || uuid(), updatedAt: Date.now(),
-      date: document.getElementById('fs_date').value || new Date().toISOString().slice(0,10),
+    const dateStr = document.getElementById('fs_date').value || new Date().toISOString().slice(0, 10);
+    const item = {
+      id: editId || uuid(),
+      updatedAt: Date.now(),
+      date: dateStr,
       meal: document.getElementById('fs_meal').value,
       name: document.getElementById('fs_food_name').value.trim(),
       grams: parseFloat(document.getElementById('fs_grams').value || 100),
@@ -1858,127 +2405,157 @@
       prot: parseFloat(document.getElementById('fs_prot').value || 0),
       fat: parseFloat(document.getElementById('fs_fat').value || 0)
     };
-    if (editId) db.foodLogs = db.foodLogs.map(x => x.id === editId ? entry : x);
-    else db.foodLogs.push(entry);
+    if (editId) db.foodLogs = db.foodLogs.map(x => x.id === editId ? item : x);
+    else db.foodLogs.unshift(item);
     resetMealForm();
     saveDB();
+    showToast(`🍎 Registrato: ${item.name}`);
   }
 
   function editMealEntry(id) {
-    const item = db.foodLogs.find(x => x.id === id);
-    if (!item) return;
+    const m = db.foodLogs.find(x => x.id === id);
+    if (!m) return;
     selectedLibFood = null;
-    document.getElementById('fs_edit_id').value = item.id;
-    document.getElementById('fs_date').value = item.date;
-    document.getElementById('fs_meal').value = item.meal;
-    document.getElementById('fs_food_name').value = item.name;
-    document.getElementById('fs_grams').value = item.grams;
-    document.getElementById('fs_kcal').value = item.kcal;
-    document.getElementById('fs_carb').value = item.carb;
-    document.getElementById('fs_prot').value = item.prot;
-    document.getElementById('fs_fat').value = item.fat;
-    document.getElementById('fs_form_title').textContent = '✏️ Modifica Alimento';
-    document.getElementById('fs_submit_btn').textContent = '💾 Aggiorna';
+    document.getElementById('fs_edit_id').value = m.id;
+    document.getElementById('fs_date').value = m.date;
+    document.getElementById('fs_meal').value = m.meal;
+    document.getElementById('fs_food_name').value = m.name;
+    document.getElementById('fs_grams').value = m.grams;
+    document.getElementById('fs_kcal').value = m.kcal;
+    document.getElementById('fs_carb').value = m.carb;
+    document.getElementById('fs_prot').value = m.prot;
+    document.getElementById('fs_fat').value = m.fat;
+    document.getElementById('fs_form_title').textContent = '✏️ Modifica Alimento del Pasto';
+    document.getElementById('fs_submit_btn').textContent = '💾 Aggiorna Pasto';
     document.getElementById('fs_cancel_edit').style.display = 'inline-flex';
   }
 
   function resetMealForm() {
+    selectedLibFood = null;
     document.getElementById('fs_edit_id').value = '';
     document.getElementById('fs_food_name').value = '';
-    document.getElementById('fs_grams').value = '100';
+    document.getElementById('fs_grams').value = 100;
     document.getElementById('fs_kcal').value = '';
-    document.getElementById('fs_carb').value = '0';
-    document.getElementById('fs_prot').value = '0';
-    document.getElementById('fs_fat').value = '0';
+    document.getElementById('fs_carb').value = 0;
+    document.getElementById('fs_prot').value = 0;
+    document.getElementById('fs_fat').value = 0;
     document.getElementById('fs_form_title').textContent = '🍽️ Aggiungi Alimento al Pasto';
     document.getElementById('fs_submit_btn').textContent = '+ Registra nel Diario';
     document.getElementById('fs_cancel_edit').style.display = 'none';
-    selectedLibFood = null;
   }
 
   function configureNutritionTargets() {
     const g = db.nutritionGoals;
-    const kcal = prompt('Obiettivo Kcal giornaliere:', g.kcal);
+    const kcal = prompt('Obiettivo Calorie Giornaliere (Kcal):', g.kcal);
     if (kcal === null) return;
-    const carb = prompt('Carboidrati (g):', g.carb);
-    const prot = prompt('Proteine (g):', g.prot);
-    const fat = prompt('Grassi (g):', g.fat);
-    db.nutritionGoals = { kcal: parseFloat(kcal)||2100, carb: parseFloat(carb)||230, prot: parseFloat(prot)||140, fat: parseFloat(fat)||70 };
+    const carb = prompt('Obiettivo Carboidrati (g):', g.carb);
+    const prot = prompt('Obiettivo Proteine (g):', g.prot);
+    const fat = prompt('Obiettivo Grassi (g):', g.fat);
+    db.nutritionGoals = {
+      kcal: parseInt(kcal) || 2100,
+      carb: parseInt(carb) || 230,
+      prot: parseInt(prot) || 140,
+      fat: parseInt(fat) || 70
+    };
     saveDB();
+    showToast('🎯 Obiettivi nutrizionali aggiornati');
   }
 
   function renderNutrition() {
     filterFoodLibrary();
-    const dInput = document.getElementById('fs_date');
-    if (!dInput.value) dInput.valueAsDate = new Date();
-    const dayLogs = db.foodLogs.filter(x => x.date === dInput.value);
-    const tot = dayLogs.reduce((acc, x) => ({ kcal: acc.kcal + x.kcal, carb: acc.carb + x.carb, prot: acc.prot + x.prot, fat: acc.fat + x.fat }), { kcal: 0, carb: 0, prot: 0, fat: 0 });
-    const goals = db.nutritionGoals;
-    const pct = (v, m) => Math.min(100, Math.round((v / (m || 1)) * 100));
+    const dateInput = document.getElementById('fs_date');
+    if (!dateInput.value) dateInput.valueAsDate = new Date();
+    const selDate = dateInput.value;
+
+    const dayLogs = db.foodLogs.filter(x => x.date === selDate);
+    const tot = dayLogs.reduce((a, b) => ({
+      kcal: a.kcal + (b.kcal || 0),
+      carb: a.carb + (b.carb || 0),
+      prot: a.prot + (b.prot || 0),
+      fat: a.fat + (b.fat || 0)
+    }), { kcal: 0, carb: 0, prot: 0, fat: 0 });
+
+    const g = db.nutritionGoals;
+    const pct = (v, max) => Math.min(100, Math.round((v / (max || 1)) * 100));
 
     document.getElementById('fs_summary_bars').innerHTML = `
-      <div class="macro-bar-wrap">
-        <div class="macro-bar-head"><span>🔥 Calorie (${Math.round(tot.kcal)} / ${goals.kcal} kcal)</span><span>Rimanenti: ${Math.round(goals.kcal - tot.kcal)} kcal</span></div>
-        <div class="progress-track"><div class="progress-fill" style="width:${pct(tot.kcal, goals.kcal)}%; background:var(--primary)"></div></div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><span>Calorie Assunte</span><strong style="color:var(--primary)">${Math.round(tot.kcal)} / ${g.kcal} kcal</strong></div>
+        <div class="kpi-card"><span>Kcal Rimanenti</span><strong style="color:${g.kcal - tot.kcal >= 0 ? 'var(--success)' : 'var(--danger)'}">${Math.round(g.kcal - tot.kcal)} kcal</strong></div>
       </div>
-      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
-        <div><small>🍞 Carb: ${tot.carb.toFixed(1)}/${goals.carb}g</small><div class="progress-track"><div class="progress-fill" style="width:${pct(tot.carb, goals.carb)}%; background:var(--warning)"></div></div></div>
-        <div><small>🥩 Prot: ${tot.prot.toFixed(1)}/${goals.prot}g</small><div class="progress-track"><div class="progress-fill" style="width:${pct(tot.prot, goals.prot)}%; background:var(--success)"></div></div></div>
-        <div><small>🥑 Grassi: ${tot.fat.toFixed(1)}/${goals.fat}g</small><div class="progress-track"><div class="progress-fill" style="width:${pct(tot.fat, goals.fat)}%; background:var(--purple)"></div></div></div>
+      <div class="macro-bar-wrap">
+        <div class="macro-bar-head"><span>🍞 Carboidrati: ${tot.carb.toFixed(1)}g / ${g.carb}g</span><span>${pct(tot.carb, g.carb)}%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct(tot.carb, g.carb)}%; background:#3b82f6;"></div></div>
+      </div>
+      <div class="macro-bar-wrap">
+        <div class="macro-bar-head"><span>🥩 Proteine: ${tot.prot.toFixed(1)}g / ${g.prot}g</span><span>${pct(tot.prot, g.prot)}%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct(tot.prot, g.prot)}%; background:#10b981;"></div></div>
+      </div>
+      <div class="macro-bar-wrap">
+        <div class="macro-bar-head"><span>🥑 Grassi: ${tot.fat.toFixed(1)}g / ${g.fat}g</span><span>${pct(tot.fat, g.fat)}%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct(tot.fat, g.fat)}%; background:#f59e0b;"></div></div>
       </div>
     `;
 
-    document.getElementById('fs_meals_container').innerHTML = ['Colazione', 'Pranzo', 'Cena', 'Spuntini'].map(mealKey => {
-      const items = dayLogs.filter(x => x.meal === mealKey);
+    const meals = ['Colazione', 'Pranzo', 'Cena', 'Spuntini'];
+    document.getElementById('fs_meals_container').innerHTML = meals.map(mName => {
+      const items = dayLogs.filter(x => x.meal === mName);
       const mKcal = items.reduce((a, b) => a + b.kcal, 0);
       return `
         <div class="meal-box">
-          <div class="meal-header"><span>${mealKey}</span><span class="pill pill-info">${Math.round(mKcal)} kcal</span></div>
-          <div class="item-list">
-            ${items.map(it => `
-              <div class="item-row" style="padding:8px 10px;">
-                <div class="item-info">
-                  <h4>${it.name} <span class="pill pill-ok">${it.grams}g</span> <span class="pill pill-info">${Math.round(it.kcal)} kcal</span></h4>
-                  <p>C: ${it.carb}g • P: ${it.prot}g • G: ${it.fat}g</p>
-                </div>
-                <div style="display:flex; gap:5px;">
-                  <button class="btn btn-outline" onclick="editMealEntry('${it.id}')">✏️</button>
-                  <button class="btn btn-danger" onclick="deleteItem('foodLogs','${it.id}')">✕</button>
-                </div>
+          <div class="meal-header"><span>${mName}</span><span class="pill pill-info">${Math.round(mKcal)} kcal</span></div>
+          ${items.length ? items.map(it => `
+            <div class="item-row" style="padding:8px 10px; margin-bottom:6px;">
+              <div class="item-info">
+                <h4>${it.name} (${it.grams}g) — <strong>${Math.round(it.kcal)} kcal</strong></h4>
+                <p>Carb: ${it.carb}g • Prot: ${it.prot}g • Grassi: ${it.fat}g</p>
               </div>
-            `).join('') || `<p style="font-size:0.75rem; color:var(--text-muted)">Vuoto</p>`}
-          </div>
+              <div style="display:flex; gap:5px;">
+                <button class="btn btn-outline" onclick="editMealEntry('${it.id}')">✏️</button>
+                <button class="btn btn-danger" onclick="deleteItem('foodLogs','${it.id}')">🗑️</button>
+              </div>
+            </div>
+          `).join('') : `<p style="font-size:0.78rem; color:var(--text-muted)">Nessun alimento registrato.</p>`}
         </div>
       `;
     }).join('');
 
     const byDate = {};
     db.foodLogs.forEach(x => {
-      if (!byDate[x.date]) byDate[x.date] = { kcal: 0, carb: 0, prot: 0, fat: 0 };
-      byDate[x.date].kcal += x.kcal; byDate[x.date].carb += x.carb; byDate[x.date].prot += x.prot; byDate[x.date].fat += x.fat;
+      if (!byDate[x.date]) byDate[x.date] = { kcal: 0, count: 0 };
+      byDate[x.date].kcal += x.kcal;
+      byDate[x.date].count++;
     });
-    document.getElementById('fs_history_days').innerHTML = Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).map(d => `
-      <div class="item-row" style="cursor:pointer" onclick="document.getElementById('fs_date').value='${d}'; renderNutrition();">
-        <div class="item-info"><h4>📅 ${d} — <strong>${Math.round(byDate[d].kcal)} kcal</strong></h4><p>C: ${byDate[d].carb.toFixed(0)}g • P: ${byDate[d].prot.toFixed(0)}g • G: ${byDate[d].fat.toFixed(0)}g</p></div>
-        <span class="btn btn-outline">Apri →</span>
+    const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a)).slice(0, 14);
+    document.getElementById('fs_history_days').innerHTML = dates.map(d => `
+      <div class="item-row" style="cursor:pointer;" onclick="document.getElementById('fs_date').value='${d}'; renderNutrition();">
+        <div class="item-info">
+          <h4>📅 ${d} <span class="pill ${byDate[d].kcal <= g.kcal ? 'pill-ok' : 'pill-warn'}">${Math.round(byDate[d].kcal)} kcal</span></h4>
+          <p>${byDate[d].count} alimenti registrati — Tocca per ispezionare</p>
+        </div>
       </div>
-    `).join('') || `<p style="color:var(--text-muted)">Nessuno storico.</p>`;
+    `).join('') || `<p style="color:var(--text-muted)">Nessuno storico disponibile.</p>`;
   }
 
+  /* 6B: DATABOY PESO */
   function saveWeightLog(e) {
     e.preventDefault();
+    haptic(15);
     const editId = document.getElementById('w_edit_id').value;
-    const entry = {
-      id: editId || uuid(), updatedAt: Date.now(),
+    const kgVal = parseFloat(document.getElementById('w_kg').value);
+    const item = {
+      id: editId || uuid(),
+      updatedAt: Date.now(),
       date: document.getElementById('w_date').value,
-      kg: parseFloat(document.getElementById('w_kg').value || 0),
+      kg: kgVal,
       bodyfat: document.getElementById('w_bodyfat').value.trim(),
       notes: document.getElementById('w_notes').value.trim()
     };
-    if (editId) db.weightLogs = db.weightLogs.map(x => x.id === editId ? entry : x);
-    else db.weightLogs.push(entry);
+    if (editId) db.weightLogs = db.weightLogs.map(x => x.id === editId ? item : x);
+    else db.weightLogs.push(item);
     resetWeightForm();
     saveDB();
+    showToast(`⚖️ Peso registrato: ${kgVal} kg`);
   }
 
   function editWeightLog(id) {
@@ -1989,76 +2566,93 @@
     document.getElementById('w_kg').value = w.kg;
     document.getElementById('w_bodyfat').value = w.bodyfat || '';
     document.getElementById('w_notes').value = w.notes || '';
+    document.getElementById('w_form_title').textContent = '✏️ Modifica Pesata';
+    document.getElementById('w_submit_btn').textContent = '💾 Aggiorna Pesata';
     document.getElementById('w_cancel_edit').style.display = 'inline-flex';
   }
 
   function resetWeightForm() {
     document.getElementById('w_edit_id').value = '';
+    document.getElementById('w_date').valueAsDate = new Date();
     document.getElementById('w_kg').value = '';
     document.getElementById('w_bodyfat').value = '';
     document.getElementById('w_notes').value = '';
-    document.getElementById('w_date').valueAsDate = new Date();
+    document.getElementById('w_form_title').textContent = '⚖️ Registra Pesata (Databoy)';
+    document.getElementById('w_submit_btn').textContent = '+ Salva Pesata';
     document.getElementById('w_cancel_edit').style.display = 'none';
   }
 
   function setWeightGoal() {
-    const val = prompt('Peso Obiettivo (kg):', db.weightGoal || 75);
-    if (val) { db.weightGoal = parseFloat(val.replace(',', '.')) || 75; saveDB(); }
+    const val = prompt('Inserisci il tuo Peso Obiettivo (kg):', db.weightGoal || 75);
+    if (val === null) return;
+    const num = parseFloat(val.replace(',', '.'));
+    if (!isNaN(num)) { db.weightGoal = num; saveDB(); showToast(`🎯 Obiettivo peso: ${num} kg`); }
   }
 
   function renderWeight() {
-    const asc = [...db.weightLogs].sort((a, b) => a.date.localeCompare(b.date));
-    let ema = null;
-    const enriched = asc.map((w, i) => {
-      const delta = w.kg - (i > 0 ? asc[i - 1].kg : w.kg);
-      ema = ema === null ? w.kg : (w.kg * 0.25 + ema * 0.75);
-      return { ...w, delta, trend: ema };
-    }).reverse();
+    const sorted = [...db.weightLogs].sort((a, b) => b.date.localeCompare(a.date));
+    const current = sorted[0]?.kg || 0;
+    const prev = sorted[1]?.kg || current;
+    const diff = current - prev;
+    const avg7 = sorted.slice(0, 7).reduce((a, b) => a + b.kg, 0) / (Math.min(7, sorted.length) || 1);
+    const toGoal = current ? (current - (db.weightGoal || 75)).toFixed(1) : '--';
 
-    const latest = enriched[0];
     document.getElementById('w_kpis').innerHTML = `
-      <div class="kpi-card"><span>Peso Attuale</span><strong>${latest ? latest.kg.toFixed(1) + ' kg' : '--'}</strong></div>
-      <div class="kpi-card"><span>Trend Databoy</span><strong style="color:var(--primary)">${latest ? latest.trend.toFixed(1) + ' kg' : '--'}</strong></div>
-      <div class="kpi-card"><span>Obiettivo</span><strong>${db.weightGoal} kg</strong></div>
+      <div class="kpi-card"><span>Peso Attuale</span><strong>${current ? current.toFixed(1) + ' kg' : '--'}</strong></div>
+      <div class="kpi-card"><span>Media Mobile (7 pesate)</span><strong style="color:var(--primary)">${sorted.length ? avg7.toFixed(1) + ' kg' : '--'}</strong></div>
+      <div class="kpi-card"><span>Variazione Ultima</span><strong style="color:${diff <= 0 ? 'var(--success)' : 'var(--warning)'}">${sorted.length > 1 ? (diff > 0 ? '+' : '') + diff.toFixed(1) + ' kg' : '--'}</strong></div>
+      <div class="kpi-card"><span>Distanza Obiettivo (${db.weightGoal}kg)</span><strong>${toGoal} kg</strong></div>
     `;
-    document.getElementById('w_list').innerHTML = enriched.map(w => `
-      <div class="item-row">
-        <div class="item-info">
-          <h4>📅 ${w.date} — <strong>${w.kg.toFixed(1)} kg</strong> <span class="pill ${w.delta <= 0 ? 'pill-ok' : 'pill-warn'}">Δ ${(w.delta > 0 ? '+' : '') + w.delta.toFixed(1)} kg</span> <span class="pill pill-info">Trend: ${w.trend.toFixed(1)}</span></h4>
-          <p>${w.bodyfat ? `${w.bodyfat} • ` : ''}${w.notes || ''}</p>
+
+    document.getElementById('w_list').innerHTML = sorted.map((w, idx) => {
+      const older = sorted[idx + 1];
+      const delta = older ? (w.kg - older.kg).toFixed(1) : '0.0';
+      return `
+        <div class="item-row">
+          <div class="item-info">
+            <h4>⚖️ ${w.date} — <strong>${w.kg.toFixed(1)} kg</strong> <span class="pill ${parseFloat(delta) <= 0 ? 'pill-ok' : 'pill-warn'}">${parseFloat(delta) > 0 ? '+' : ''}${delta} kg</span></h4>
+            <p>${w.bodyfat ? `${w.bodyfat} • ` : ''}${w.notes || 'Nessuna nota'}</p>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-outline" onclick="editWeightLog('${w.id}')">✏️</button>
+            <button class="btn btn-danger" onclick="deleteItem('weightLogs','${w.id}')">🗑️</button>
+          </div>
         </div>
-        <div style="display:flex; gap:5px;">
-          <button class="btn btn-outline" onclick="editWeightLog('${w.id}')">✏️</button>
-          <button class="btn btn-danger" onclick="deleteItem('weightLogs','${w.id}')">✕</button>
-        </div>
-      </div>
-    `).join('') || `<p style="color:var(--text-muted)">Nessuna pesata.</p>`;
+      `;
+    }).join('') || `<p style="color:var(--text-muted)">Nessuna pesata registrata.</p>`;
   }
 
+  /* 6C: VISITE, ECOGRAFIE & RX */
   async function saveMedRecord(e) {
     e.preventDefault();
+    haptic(15);
     const editId = document.getElementById('med_edit_id').value;
-    const ex = editId ? db.medRecords.find(x => x.id === editId) : null;
-    const fInput = document.getElementById('med_file');
-    const att = (fInput.files && fInput.files[0]) ? await processAttachmentFile(fInput.files[0]) : null;
+    const existing = editId ? db.medRecords.find(x => x.id === editId) : null;
+    const fileInput = document.getElementById('med_file');
+    let att = null;
+    if (fileInput.files && fileInput.files[0]) att = await processAttachmentFile(fileInput.files[0]);
 
     const item = {
-      id: editId || uuid(), updatedAt: Date.now(),
+      id: editId || uuid(),
+      updatedAt: Date.now(),
       type: document.getElementById('med_type').value,
-      person: document.getElementById('med_person').value,
+      person: document.getElementById('med_person').value || 'Io',
       title: document.getElementById('med_title').value.trim(),
       date: document.getElementById('med_date').value,
       nextDate: document.getElementById('med_next').value,
       doctor: document.getElementById('med_doctor').value.trim(),
       notes: document.getElementById('med_notes').value.trim(),
-      fileData: att ? att.data : (ex ? ex.fileData : ''),
-      fileName: att ? att.name : (ex ? ex.fileName : ''),
-      fileMime: att ? att.mime : (ex ? ex.fileMime : '')
+      fileData: att ? att.data : (existing ? existing.fileData : ''),
+      fileName: att ? att.name : (existing ? existing.fileName : ''),
+      fileMime: att ? att.mime : (existing ? existing.fileMime : '')
     };
+
     if (editId) db.medRecords = db.medRecords.map(x => x.id === editId ? item : x);
     else db.medRecords.unshift(item);
+
     resetMedForm();
     saveDB();
+    showToast(`🩻 Salvato referto: ${item.title}`);
   }
 
   function editMedRecord(id) {
@@ -2066,100 +2660,148 @@
     if (!m) return;
     document.getElementById('med_edit_id').value = m.id;
     document.getElementById('med_type').value = m.type;
+    document.getElementById('med_person').value = m.person || 'Io';
     document.getElementById('med_title').value = m.title;
     document.getElementById('med_date').value = m.date;
     document.getElementById('med_next').value = m.nextDate || '';
     document.getElementById('med_doctor').value = m.doctor || '';
     document.getElementById('med_notes').value = m.notes || '';
+    document.getElementById('med_form_title').textContent = '✏️ Modifica Referto';
+    document.getElementById('med_submit_btn').textContent = '💾 Aggiorna Referto';
     document.getElementById('med_cancel_edit').style.display = 'inline-flex';
   }
 
   function resetMedForm() {
     document.getElementById('med_edit_id').value = '';
     document.getElementById('med_title').value = '';
+    document.getElementById('med_date').valueAsDate = new Date();
     document.getElementById('med_next').value = '';
     document.getElementById('med_doctor').value = '';
     document.getElementById('med_notes').value = '';
     document.getElementById('med_file').value = '';
-    document.getElementById('med_date').valueAsDate = new Date();
+    document.getElementById('med_form_title').textContent = '🩻 Registra Visita / Ecografia / RX';
+    document.getElementById('med_submit_btn').textContent = '+ Salva nel Libretto Clinico';
     document.getElementById('med_cancel_edit').style.display = 'none';
   }
 
   function renderMedRecords() {
-    const q = (document.getElementById('med_search').value || '').toLowerCase();
-    const filtered = db.medRecords.filter(m => m.title.toLowerCase().includes(q) || m.type.toLowerCase().includes(q) || (m.doctor||'').toLowerCase().includes(q));
-    document.getElementById('med_list').innerHTML = filtered.map(m => `
-      <div class="item-row">
-        <div class="item-info">
-          <h4>🩻 ${m.title} <span class="pill pill-purple">${m.type}</span> <span class="pill pill-info">${m.date}</span> <span class="pill pill-ok">${m.person||'Io'}</span></h4>
-          <p>${m.doctor ? `👨‍⚕️ ${m.doctor} • ` : ''}${m.notes || ''}</p>
+    const q = (document.getElementById('med_search')?.value || '').toLowerCase();
+    const filtered = db.medRecords.filter(m =>
+      m.title.toLowerCase().includes(q) ||
+      m.type.toLowerCase().includes(q) ||
+      (m.person || '').toLowerCase().includes(q) ||
+      (m.doctor || '').toLowerCase().includes(q) ||
+      (m.notes || '').toLowerCase().includes(q)
+    );
+
+    document.getElementById('med_list').innerHTML = filtered.map(m => {
+      let attachHtml = '';
+      if (m.fileData) {
+        if ((m.fileMime && m.fileMime.startsWith('image/')) || m.fileData.startsWith('data:image/')) {
+          attachHtml = `<img src="${m.fileData}" class="thumb" onclick="openAttachment('${m.fileData}', '${m.fileName||''}', '${m.fileMime||''}')">`;
+        } else {
+          attachHtml = `<span class="file-badge" onclick="openAttachment('${m.fileData}', '${m.fileName||'referto.pdf'}', '${m.fileMime||'application/pdf'}')">📄 Referto</span>`;
+        }
+      }
+      return `
+        <div class="item-row">
+          <div style="display:flex; gap:12px; align-items:center; flex:1;">
+            ${attachHtml}
+            <div class="item-info">
+              <h4><span class="pill pill-info">${m.type}</span> <span class="pill pill-purple">👤 ${m.person || 'Io'}</span> ${m.title}</h4>
+              <p>Data: <strong>${m.date}</strong> ${m.doctor ? `• Medico/Struttura: ${m.doctor}` : ''} ${m.nextDate ? `• 🔔 Controllo: ${m.nextDate}` : ''}</p>
+              ${m.notes ? `<p style="color:var(--text); margin-top:4px;">📋 ${m.notes}</p>` : ''}
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-outline" onclick="editMedRecord('${m.id}')">✏️</button>
+            <button class="btn btn-danger" onclick="deleteItem('medRecords','${m.id}')">🗑️</button>
+          </div>
         </div>
-        <div style="display:flex; gap:5px;">
-          ${m.fileData ? `<button class="btn btn-outline" onclick="openAttachment('${m.fileData}','${m.fileName}','${m.fileMime}')">📄 Referto</button>` : ''}
-          <button class="btn btn-outline" onclick="editMedRecord('${m.id}')">✏️</button>
-          <button class="btn btn-danger" onclick="deleteItem('medRecords','${m.id}')">✕</button>
-        </div>
-      </div>
-    `).join('') || `<p style="color:var(--text-muted)">Nessun esame registrato.</p>`;
+      `;
+    }).join('') || `<p style="color:var(--text-muted)">Nessun referto medico in archivio.</p>`;
   }
 
+  /* 6D: SINTOMI */
   function addHealthLog(e) {
     e.preventDefault();
+    haptic(15);
     db.health.unshift({
-      id: uuid(), updatedAt: Date.now(),
+      id: uuid(),
+      updatedAt: Date.now(),
       date: document.getElementById('h_date').value,
-      sleep: parseFloat(document.getElementById('h_sleep').value || 7),
-      stress: parseInt(document.getElementById('h_stress').value || 2),
+      sleep: parseFloat(document.getElementById('h_sleep').value),
+      stress: parseInt(document.getElementById('h_stress').value),
       triggers: document.getElementById('h_triggers').value.split(',').map(s => s.trim()).filter(Boolean),
-      symptoms: document.getElementById('h_symptoms').value.split(',').map(s => s.trim()).filter(Boolean),
+      symptoms: document.getElementById('h_symptoms').value.trim(),
       severity: parseInt(document.getElementById('h_severity').value || 0)
     });
     e.target.reset();
     document.getElementById('h_date').valueAsDate = new Date();
     saveDB();
+    showToast('🩺 Giornata salute salvata');
   }
 
-  function renderHealth() {
-    const symMap = {};
-    db.health.forEach(log => {
-      const trs = [...log.triggers];
-      if (log.sleep < 6) trs.push('Sonno < 6h');
-      log.symptoms.forEach(sym => {
-        const k = sym.toLowerCase();
-        if (!symMap[k]) symMap[k] = { name: sym, count: 0, causes: {} };
-        symMap[k].count++;
-        trs.forEach(t => symMap[k].causes[t] = (symMap[k].causes[t] || 0) + 1);
-      });
+  function renderSymptoms() {
+    const triggerStats = {};
+    db.health.forEach(h => {
+      if (h.severity > 0) {
+        h.triggers.forEach(t => {
+          const k = t.toLowerCase();
+          if (!triggerStats[k]) triggerStats[k] = { count: 0, totalSev: 0 };
+          triggerStats[k].count++;
+          triggerStats[k].totalSev += h.severity;
+        });
+      }
     });
-    document.getElementById('h_correlations').innerHTML = Object.values(symMap).map(s => {
-      const b = Object.entries(s.causes).map(([c, cnt]) => `<span class="pill pill-warn">${c}: ${Math.round((cnt/s.count)*100)}%</span>`).join(' ');
-      return `<div class="item-row"><div class="item-info"><h4>${s.name} (${s.count})</h4><p>${b}</p></div></div>`;
-    }).join('') || `<p style="color:var(--text-muted)">Nessun sintomo.</p>`;
+
+    const sortedTriggers = Object.entries(triggerStats).sort((a, b) => b[1].count - a[1].count);
+    document.getElementById('h_correlations').innerHTML = sortedTriggers.map(([k, v]) => `
+      <div class="item-row">
+        <div class="item-info">
+          <h4>⚠️ Fattore: "${k.toUpperCase()}"</h4>
+          <p>Associato a sintomi ${v.count} volte (Intensità media: ${(v.totalSev/v.count).toFixed(1)}/10)</p>
+        </div>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted)">Registra più giornate per calcolare le correlazioni.</p>`;
+
     document.getElementById('h_list').innerHTML = db.health.map(h => `
-      <div class="item-row"><div class="item-info"><h4>${h.date} • 😴 ${h.sleep}h</h4><p>${h.symptoms.join(', ') || 'OK'}</p></div><button class="btn btn-danger" onclick="deleteItem('health','${h.id}')">✕</button></div>
+      <div class="item-row">
+        <div class="item-info">
+          <h4>${h.date} — Sonno: ${h.sleep}h | Stress: ${h.stress}/5 <span class="pill ${h.severity > 4 ? 'pill-danger' : 'pill-ok'}">Sintomi: ${h.severity}/10</span></h4>
+          <p>Fattori: ${h.triggers.join(', ') || 'Nessuno'} • Note: ${h.symptoms || 'Benessere regolare'}</p>
+        </div>
+        <button class="btn btn-danger" onclick="deleteItem('health','${h.id}')">🗑️</button>
+      </div>
     `).join('');
   }
 
+  function renderHealth() {
+    renderNutrition();
+    renderWeight();
+    renderMedRecords();
+    renderSymptoms();
+  }
+
+  /* =========================================================================
+     NAVIGAZIONE FLUIDA (VIEW TRANSITIONS API + HAPTIC) & AVVIO
+     ========================================================================= */
   function switchTab(modId, btn) {
-    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(modId).classList.add('active');
-    if (btn) btn.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+    haptic(10);
+    const applySwitch = () => {
+      document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(modId).classList.add('active');
+      if (btn) btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderAll();
+    };
 
-  function switchCrmSub(subId, btn) {
-    document.querySelectorAll('.crm-sub').forEach(el => el.style.display = 'none');
-    btn.parentElement.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(subId).style.display = 'block';
-    btn.classList.add('active');
-  }
-
-  function switchHealthSub(subId, btn) {
-    document.querySelectorAll('.health-sub').forEach(el => el.style.display = 'none');
-    btn.parentElement.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(subId).style.display = 'block';
-    btn.classList.add('active');
+    if (document.startViewTransition) {
+      document.startViewTransition(applySwitch);
+    } else {
+      applySwitch();
+    }
   }
 
   function renderAll() {
@@ -2169,20 +2811,20 @@
     renderCrm();
     renderMaint();
     renderFinance();
-    renderNutrition();
-    renderWeight();
-    renderMedRecords();
     renderHealth();
   }
 
   window.addEventListener('DOMContentLoaded', async () => {
-    ['v_date', 'c_last', 'm_date', 'f_date', 's_next', 'h_date', 'fs_date', 'w_date', 'med_date'].forEach(id => {
+    ['v_date', 'c_last', 'm_date', 'f_date', 'h_date', 'fs_date', 'w_date', 'med_date'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.valueAsDate = new Date();
     });
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist();
+    }
     await loadDB();
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').then(reg => reg.update()).catch(() => {});
+      navigator.serviceWorker.register('sw.js').catch(() => {});
     }
   });
 </script>
