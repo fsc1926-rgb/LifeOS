@@ -1,25 +1,262 @@
-{
-  "name": "LifeOS Offline Suite",
-  "short_name": "LifeOS",
-  "description": "Ecosistema Offline 5-in-1: Garanzie, CRM, Manutenzione, Finanze e Diario Salute con salvataggio automatico IndexedDB.",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+/* =========================================================================
+     MIGRAZIONE UNIVERSALE (COMPATIBILE CON TUTTI I VECCHI JSON v1 -> v5.5)
+     ========================================================================= */
+  function migrateDB(loaded) {
+    const base = emptyState();
+    if (!loaded || typeof loaded !== 'object') return base;
+
+    // Se il JSON vecchio era incapsulato dentro "data", "db" o "state"
+    const src = loaded.data && typeof loaded.data === 'object' && !Array.isArray(loaded.data)
+      ? loaded.data
+      : (loaded.db || loaded.state || loaded);
+
+    const merged = { ...base, ...src };
+
+    // Helper per unire vecchi nomi di chiavi senza perdere nulla
+    const collectArrays = (...keys) => {
+      const result = [];
+      keys.forEach(k => {
+        if (Array.isArray(src[k])) result.push(...src[k]);
+      });
+      return result;
+    };
+
+    // 1. OGGETTI & GARANZIE (vault / objects / items / warranties / garanzie)
+    const rawVault = collectArrays('vault', 'objects', 'items', 'warranties', 'garanzie');
+    merged.vault = rawVault.map(o => ({
+      id: o.id || o._id || uuid(),
+      updatedAt: o.updatedAt || Date.now(),
+      title: o.title || o.name || o.oggetto || o.prodotto || 'Oggetto senza nome',
+      cat: o.cat || o.category || o.categoria || 'Elettrodomestici',
+      serial: o.serial || o.seriale || o.sn || o.targa || '',
+      date: o.date || o.buyDate || o.purchaseDate || o.data || new Date().toISOString().slice(0, 10),
+      months: parseInt(o.months ?? o.warrantyMonths ?? o.mesi ?? 24),
+      price: parseFloat(o.price ?? o.cost ?? o.prezzo ?? o.amount ?? 0),
+      notes: o.notes || o.note || o.desc || o.description || '',
+      img: o.img || o.file || o.image || o.attachment || o.dataUrl || '',
+      fileName: o.fileName || o.filename || '',
+      fileMime: o.fileMime || o.mime || ''
+    }));
+
+    // 2. PERSONE / CRM (crm / people / contacts / persone / rubrica)
+    const rawCrm = collectArrays('crm', 'people', 'contacts', 'persone', 'rubrica');
+    merged.crm = rawCrm.map(c => ({
+      id: c.id || c._id || uuid(),
+      updatedAt: c.updatedAt || Date.now(),
+      name: c.name || c.title || c.nome || 'Contatto',
+      circle: c.circle || c.cat || c.category || c.group || 'Famiglia',
+      phone: c.phone || c.tel || c.telefono || '',
+      last: c.last || c.lastContact || c.date || new Date().toISOString().slice(0, 10),
+      freq: parseInt(c.freq ?? c.frequency ?? c.days ?? 14),
+      notes: c.notes || c.note || c.gifts || ''
+    }));
+
+    // 3. ATTIVITÀ / TODO / NOTE (crmTasks / tasks / todos / notes / attivita)
+    const rawTasks = collectArrays('crmTasks', 'tasks', 'todos', 'todo', 'notes', 'attivita');
+    merged.crmTasks = rawTasks.map(t => ({
+      id: t.id || t._id || uuid(),
+      updatedAt: t.updatedAt || Date.now(),
+      title: t.title || t.text || t.name || t.task || t.desc || 'Attività',
+      scope: t.scope || t.area || (t.pinned ? 'Memoria' : 'Oggi'),
+      pinned: Boolean(t.pinned || t.pin || t.important),
+      objectId: t.objectId || t.objId || '',
+      personId: t.personId || t.contactId || '',
+      notes: t.notes || t.note || t.details || '',
+      done: Boolean(t.done || t.completed || t.checked)
+    }));
+
+    // 4. MANUTENZIONI (maint / maintenance / manutenzioni / interventions)
+    const rawMaint = collectArrays('maint', 'maintenance', 'manutenzioni', 'interventions');
+    merged.maint = rawMaint.map(m => ({
+      id: m.id || m._id || uuid(),
+      updatedAt: m.updatedAt || Date.now(),
+      objectId: m.objectId || m.objId || '',
+      asset: m.asset || m.vehicle || m.item || m.title || m.name || 'Mezzo/Impianto',
+      task: m.task || m.desc || m.intervention || m.intervento || 'Manutenzione',
+      date: m.date || m.data || new Date().toISOString().slice(0, 10),
+      nextMonths: parseInt(m.nextMonths ?? m.months ?? 12),
+      kmNow: m.kmNow || m.km || '',
+      kmNext: m.kmNext || '',
+      cost: parseFloat(m.cost ?? m.price ?? m.amount ?? 0),
+      parts: m.parts || m.ricambi || m.notes || ''
+    }));
+
+    // 5. CONTI FINANZIARI (accounts / conti / wallets)
+    const rawAcc = collectArrays('accounts', 'conti', 'wallets');
+    merged.accounts = rawAcc.map(a => ({
+      id: a.id || a._id || 'acc-main',
+      updatedAt: a.updatedAt || Date.now(),
+      name: a.name || a.title || a.nome || 'Conto Principale',
+      type: a.type || a.tipo || 'Banca',
+      baseBalance: parseFloat(a.baseBalance ?? a.balance ?? a.initialBalance ?? a.saldo ?? 0)
+    }));
+    if (merged.accounts.length === 0) {
+      merged.accounts.push({ id: 'acc-main', updatedAt: Date.now(), name: 'Conto Principale', type: 'Banca', baseBalance: 0 });
     }
-  ]
-}
+
+    // 6. TRANSAZIONI FINANZIARIE (financeTx / finance / transactions / expenses / movimenti / tx)
+    const defaultAccId = merged.accounts[0].id;
+    const rawTx = collectArrays('financeTx', 'finance', 'transactions', 'expenses', 'movimenti', 'tx');
+    merged.financeTx = rawTx.map(t => {
+      const rawAmt = parseFloat(t.amount ?? t.cost ?? t.value ?? t.price ?? t.importo ?? 0);
+      let type = t.type || t.tipo || (rawAmt < 0 ? 'expense' : 'expense');
+      if (type === 'entrata' || type === 'in' || type === '+') type = 'income';
+      if (type === 'uscita' || type === 'out' || type === '-') type = 'expense';
+      return {
+        id: t.id || t._id || uuid(),
+        updatedAt: t.updatedAt || Date.now(),
+        accountId: t.accountId || defaultAccId,
+        objectId: t.objectId || '',
+        desc: t.desc || t.title || t.name || t.description || t.descrizione || 'Movimento',
+        type: type,
+        amount: Math.abs(rawAmt),
+        cat: t.cat || t.category || t.categoria || 'Altro',
+        date: t.date || t.data || new Date().toISOString().slice(0, 10)
+      };
+    });
+
+    // 7. ABBONAMENTI (subs / subscriptions / abbonamenti / recurring)
+    const rawSubs = collectArrays('subs', 'subscriptions', 'abbonamenti', 'recurring');
+    merged.subs = rawSubs.map(s => ({
+      id: s.id || s._id || uuid(),
+      updatedAt: s.updatedAt || Date.now(),
+      name: s.name || s.title || s.service || 'Abbonamento',
+      cost: parseFloat(s.cost ?? s.amount ?? s.price ?? 0),
+      cycle: s.cycle || s.period || 'monthly',
+      next: s.next || s.nextDate || s.date || new Date().toISOString().slice(0, 10)
+    }));
+
+    // 8. DIARIO ALIMENTARE / FATSECRET (foodLogs / meals / nutrition / nutritionLogs / diary)
+    const rawFood = collectArrays('foodLogs', 'meals', 'nutrition', 'nutritionLogs', 'diary', 'pasti');
+    merged.foodLogs = rawFood.map(f => ({
+      id: f.id || f._id || uuid(),
+      updatedAt: f.updatedAt || Date.now(),
+      date: f.date || f.data || new Date().toISOString().slice(0, 10),
+      meal: f.meal || f.pasto || 'Pranzo',
+      name: f.name || f.food || f.title || f.alimento || 'Alimento',
+      grams: parseFloat(f.grams ?? f.weight ?? f.g ?? 100),
+      kcal: parseFloat(f.kcal ?? f.calories ?? f.cal ?? 0),
+      carb: parseFloat(f.carb ?? f.carbs ?? f.carboidrati ?? 0),
+      prot: parseFloat(f.prot ?? f.protein ?? f.proteins ?? f.proteine ?? 0),
+      fat: parseFloat(f.fat ?? f.fats ?? f.grassi ?? 0)
+    }));
+
+    // 9. PESO / DATABOY (weightLogs / weights / weight / pesate / peso)
+    const rawWeight = collectArrays('weightLogs', 'weights', 'weight', 'pesate', 'peso');
+    merged.weightLogs = rawWeight.map(w => ({
+      id: w.id || w._id || uuid(),
+      updatedAt: w.updatedAt || Date.now(),
+      date: w.date || w.data || new Date().toISOString().slice(0, 10),
+      kg: parseFloat(String(w.kg ?? w.weight ?? w.value ?? w.peso ?? 0).replace(',', '.')),
+      bodyfat: w.bodyfat || w.bf || '',
+      notes: w.notes || w.note || ''
+    })).filter(w => !isNaN(w.kg) && w.kg > 0);
+
+    // 10. REFERTI MEDICI (medRecords / medical / medicalRecords / visits / referti / visite)
+    const rawMed = collectArrays('medRecords', 'medical', 'medicalRecords', 'visits', 'referti', 'visite');
+    merged.medRecords = rawMed.map(m => ({
+      id: m.id || m._id || uuid(),
+      updatedAt: m.updatedAt || Date.now(),
+      type: m.type || m.cat || 'Visita Specialistica',
+      person: m.person || m.patient || 'Io',
+      title: m.title || m.name || m.exam || 'Esame Medico',
+      date: m.date || m.data || new Date().toISOString().slice(0, 10),
+      nextDate: m.nextDate || m.next || '',
+      doctor: m.doctor || m.medico || '',
+      notes: m.notes || m.note || m.result || '',
+      fileData: m.fileData || m.file || m.img || '',
+      fileName: m.fileName || '',
+      fileMime: m.fileMime || ''
+    }));
+
+    // 11. SINTOMI & SALUTE (health / symptoms / healthLogs)
+    const rawHealth = collectArrays('health', 'symptoms', 'healthLogs');
+    merged.health = rawHealth.map(h => ({
+      id: h.id || h._id || uuid(),
+      updatedAt: h.updatedAt || Date.now(),
+      date: h.date || new Date().toISOString().slice(0, 10),
+      sleep: parseFloat(h.sleep ?? 7.5),
+      stress: parseInt(h.stress ?? 2),
+      triggers: Array.isArray(h.triggers) ? h.triggers : String(h.triggers || '').split(',').map(s => s.trim()).filter(Boolean),
+      symptoms: h.symptoms || h.notes || '',
+      severity: parseInt(h.severity ?? 0)
+    }));
+
+    // Libreria alimenti
+    if (!Array.isArray(merged.foodLibrary) || merged.foodLibrary.length === 0) {
+      merged.foodLibrary = [...DEFAULT_FOOD_LIBRARY];
+    } else {
+      const existingNames = new Set(merged.foodLibrary.map(f => (f.name || '').toLowerCase()));
+      DEFAULT_FOOD_LIBRARY.forEach(def => {
+        if (!existingNames.has(def.name.toLowerCase())) merged.foodLibrary.push(def);
+      });
+    }
+
+    if (!Array.isArray(merged.trash)) merged.trash = [];
+    if (!Array.isArray(merged.auditLog)) merged.auditLog = [];
+
+    return merged;
+  }
+
+  /* =========================================================================
+     IMPORTAZIONE INTELLIGENTE (SUPPORTA SIA .JSON CHE .ZIP, ANCHE VECCHI)
+     ========================================================================= */
+  async function importBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      let jsonText = '';
+
+      // Se l'utente carica direttamente il file .ZIP
+      if (file.name.toLowerCase().endsWith('.zip') && typeof JSZip !== 'undefined') {
+        const zip = await JSZip.loadAsync(file);
+        const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.toLowerCase().endsWith('.json'));
+        if (!jsonFile) throw new Error('Nessun file .json trovato dentro lo ZIP.');
+        jsonText = await jsonFile.async('string');
+      } else {
+        jsonText = await file.text();
+      }
+
+      // Rimuove eventuale BOM UTF-8 invisibile all'inizio del file
+      jsonText = jsonText.replace(/^\uFEFF/, '').trim();
+      const rawParsed = JSON.parse(jsonText);
+
+      pushUndoSnapshot('Importazione Backup');
+      const incoming = migrateDB(rawParsed);
+
+      const cols = ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'health', 'foodLibrary', 'foodLogs', 'weightLogs', 'medRecords'];
+      let importedCount = 0;
+
+      cols.forEach(col => {
+        if (Array.isArray(incoming[col]) && incoming[col].length > 0) {
+          const map = new Map();
+          (db[col] || []).forEach(item => {
+            if (!item.id) item.id = uuid();
+            map.set(item.id, item);
+          });
+          incoming[col].forEach(inc => {
+            if (!inc.id) inc.id = uuid();
+            map.set(inc.id, inc);
+            importedCount++;
+          });
+          db[col] = Array.from(map.values());
+        }
+      });
+
+      if (incoming.nutritionGoals) db.nutritionGoals = incoming.nutritionGoals;
+      if (incoming.weightGoal) db.weightGoal = incoming.weightGoal;
+
+      logAudit(`Ripristinati ${importedCount} record dal backup`);
+      await saveDB();
+      renderAll();
+      showToast(`✅ Ripristinati ${importedCount} elementi!`);
+      alert(`✅ Ripristino completato con successo!\nSono stati recuperati e sincronizzati ${importedCount} elementi dal tuo backup.`);
+    } catch (err) {
+      console.error('Errore durante il ripristino:', err);
+      alert('❌ Errore nel formato del file di backup:\n' + err.message);
+    } finally {
+      // Reset dell'input file così puoi ricaricare lo stesso file se necessario
+      event.target.value = '';
+    }
+  }
