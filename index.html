@@ -6,15 +6,12 @@
   <meta name="theme-color" content="#090d16" id="metaThemeColor">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>LifeOS v5.5 — Ecosistema Relazionale Unificato</title>
+  <title>LifeOS v5.6 — Ecosistema Relazionale Unificato</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
-    /* =========================================================================
-       SISTEMA DUAL-THEME: DARK (AMOLED OBSIDIAN) & LIGHT (WARM DAYLIGHT)
-       ========================================================================= */
     :root, [data-theme="dark"] {
       --bg: #090d16;
       --bg-gradient: radial-gradient(circle at 15% 0%, rgba(59, 130, 246, 0.11), transparent 45%),
@@ -66,246 +63,91 @@
       --shadow-nav: 0 10px 30px rgba(15, 23, 42, 0.12);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     html { scroll-behavior: smooth; }
-
     body {
-      background-color: var(--bg);
-      background-image: var(--bg-gradient);
-      background-attachment: fixed;
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background-color: var(--bg); background-image: var(--bg-gradient); background-attachment: fixed;
+      color: var(--text); min-height: 100vh; display: flex; flex-direction: column;
       padding-bottom: calc(104px + var(--safe-bottom));
-      transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease;
-      overflow-x: hidden;
+      transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease; overflow-x: hidden;
     }
 
-    /* HEADER GLASSMORPHISM */
     header {
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      transition: background 0.35s ease, border-color 0.35s ease;
+      background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; flex-wrap: wrap;
+      justify-content: space-between; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100;
     }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
     .brand-logo {
-      width: 32px; height: 32px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--purple));
-      display: inline-flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 1rem; box-shadow: 0 4px 12px var(--primary-glow);
+      width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--purple));
+      display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; box-shadow: 0 4px 12px var(--primary-glow);
     }
-    .badge-offline {
-      background: rgba(16, 185, 129, 0.14);
-      color: var(--success);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      font-size: 0.68rem;
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-weight: 700;
-    }
+    .badge-offline { background: rgba(16, 185, 129, 0.14); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.35); font-size: 0.68rem; padding: 3px 9px; border-radius: 999px; font-weight: 700; }
     .sync-controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 
-    /* THEME SWITCHER BUTTON */
     .theme-toggle {
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      color: var(--text);
-      padding: 7px 12px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.76rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, border-color 0.25s ease;
+      background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text);
+      padding: 7px 12px; border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 0.76rem;
+      display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease;
     }
-    .theme-toggle:hover { border-color: var(--primary); }
     .theme-toggle:active { transform: scale(0.92); }
 
-    /* FLOATING GLASS BOTTOM DOCK */
     nav.bottom-nav {
-      position: fixed;
-      bottom: calc(12px + var(--safe-bottom));
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 24px);
-      max-width: 680px;
-      background: var(--glass-nav);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      border: 1px solid var(--border-strong);
-      border-radius: 24px;
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      padding: 6px;
-      z-index: 200;
-      box-shadow: var(--shadow-nav);
-      transition: background 0.35s ease, border-color 0.35s ease;
+      position: fixed; bottom: calc(12px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+      width: calc(100% - 24px); max-width: 680px; background: var(--glass-nav);
+      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 1px solid var(--border-strong);
+      border-radius: 24px; display: grid; grid-template-columns: repeat(6, 1fr); padding: 6px; z-index: 200; box-shadow: var(--shadow-nav);
     }
     .tab-btn {
-      background: transparent;
-      color: var(--text-muted);
-      border: none;
-      padding: 8px 2px;
-      border-radius: 18px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.68rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      position: relative;
+      background: transparent; color: var(--text-muted); border: none; padding: 8px 2px; border-radius: 18px;
+      cursor: pointer; font-weight: 700; font-size: 0.68rem; display: flex; flex-direction: column; align-items: center; gap: 3px;
       transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .tab-btn span.ico {
-      font-size: 1.22rem;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    .tab-btn span.ico { font-size: 1.22rem; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .tab-btn:active { transform: scale(0.92); }
-    .tab-btn.active {
-      color: var(--primary);
-      background: var(--primary-glow);
-    }
-    .tab-btn.active span.ico {
-      transform: translateY(-2px) scale(1.1);
-    }
+    .tab-btn.active { color: var(--primary); background: var(--primary-glow); }
+    .tab-btn.active span.ico { transform: translateY(-2px) scale(1.1); }
 
-    /* MAIN & MODULE ANIMATIONS */
     main { max-width: 1240px; width: 100%; margin: 16px auto; padding: 0 14px; flex: 1; }
     .module { display: none; animation: moduleSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
     .module.active { display: block; }
-    @keyframes moduleSlideIn {
-      from { opacity: 0; transform: translateY(10px) scale(0.992); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    @keyframes moduleSlideIn { from { opacity: 0; transform: translateY(10px) scale(0.992); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
     .grid-2 { display: grid; grid-template-columns: 380px 1fr; gap: 18px; align-items: start; }
     .grid-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; margin-bottom: 16px; }
     @media (max-width: 940px) { .grid-2 { grid-template-columns: 1fr; } }
 
-    /* BENTO CARDS */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-card);
-      transition: background-color 0.3s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-    }
-    .card:hover { border-color: var(--border-strong); }
-    .card-title {
-      font-size: 0.98rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow-card); }
+    .card-title { font-size: 0.98rem; font-weight: 800; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-    /* FORMS & INPUTS */
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 0.77rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 700; }
     input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 0.9rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+      width: 100%; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm); color: var(--text); font-size: 0.9rem; transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-glow);
-    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
     .search-bar { margin-bottom: 12px; }
 
-    /* INTERACTIVE BUTTONS */
     .btn {
-      padding: 8px 12px;
-      border-radius: 11px;
-      border: 1px solid transparent;
-      font-weight: 700;
-      font-size: 0.78rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      user-select: none;
+      padding: 8px 12px; border-radius: 11px; border: 1px solid transparent; font-weight: 700; font-size: 0.78rem;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease; user-select: none;
     }
     .btn:active { transform: scale(0.95); }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-      color: #ffffff;
-      width: 100%;
-      padding: 12px;
-      font-size: 0.9rem;
-      box-shadow: 0 6px 16px -4px var(--primary-glow);
-    }
-    .btn-primary:hover { filter: brightness(1.06); }
-    .btn-success { background: var(--success); color: #ffffff; font-weight: 700; }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; width: 100%; padding: 12px; font-size: 0.9rem; box-shadow: 0 6px 16px -4px var(--primary-glow); }
+    .btn-success { background: var(--success); color: #fff; font-weight: 700; }
     .btn-outline { background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text); }
-    .btn-outline:hover { background: var(--surface-hover); border-color: var(--primary); }
     .btn-danger { background: rgba(239, 68, 68, 0.14); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
-    .btn-danger:hover { background: rgba(239, 68, 68, 0.22); }
     .btn-warn { background: rgba(245, 158, 11, 0.14); color: var(--warning); border: 1px solid rgba(245,158,11,0.35); }
 
-    /* LIST ITEMS */
     .item-list { display: flex; flex-direction: column; gap: 9px; }
-    .item-row {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.25s ease;
-    }
-    .item-row:hover {
-      border-color: var(--border-strong);
-      transform: translateY(-1px);
-    }
-    .item-row.pinned {
-      border-color: var(--warning);
-      background: linear-gradient(90deg, rgba(245, 158, 11, 0.09), var(--surface-2));
-    }
+    .item-row { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .item-row.pinned { border-color: var(--warning); background: linear-gradient(90deg, rgba(245, 158, 11, 0.09), var(--surface-2)); }
     .item-info { flex: 1; min-width: 190px; }
     .item-info h4 { font-size: 0.91rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .item-info p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; }
 
-    /* PILLS */
     .pill { font-size: 0.68rem; padding: 3px 8px; border-radius: 99px; font-weight: 700; display: inline-block; }
     .pill-ok { background: rgba(16, 185, 129, 0.15); color: var(--success); }
     .pill-warn { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
@@ -313,45 +155,16 @@
     .pill-info { background: rgba(59, 130, 246, 0.15); color: var(--primary); }
     .pill-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); }
 
-    /* KPI BENTO WIDGETS */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px; }
-    .kpi-card {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      padding: 13px;
-      border-radius: 14px;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .kpi-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+    .kpi-card { background: var(--surface-2); border: 1px solid var(--border); padding: 13px; border-radius: 14px; }
     .kpi-card span { font-size: 0.73rem; color: var(--text-muted); font-weight: 600; display: block; }
-    .kpi-card strong { font-size: 1.2rem; font-weight: 800; margin-top: 4px; display: block; letter-spacing: -0.02em; }
+    .kpi-card strong { font-size: 1.2rem; font-weight: 800; margin-top: 4px; display: block; }
 
-    /* SUB NAVIGATION PILLS */
     .sub-nav { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; scrollbar-width: none; }
     .sub-nav::-webkit-scrollbar { display: none; }
-    .sub-btn {
-      background: var(--surface);
-      border: 1px solid var(--border-strong);
-      color: var(--text-muted);
-      padding: 9px 15px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 0.81rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .sub-btn:active { transform: scale(0.95); }
-    .sub-btn.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 4px 12px var(--primary-glow);
-    }
+    .sub-btn { background: var(--surface); border: 1px solid var(--border-strong); color: var(--text-muted); padding: 9px 15px; border-radius: 999px; font-weight: 700; font-size: 0.81rem; cursor: pointer; white-space: nowrap; }
+    .sub-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px var(--primary-glow); }
 
-    /* PROGRESS BARS */
     .macro-bar-wrap { margin-bottom: 10px; }
     .macro-bar-head { display: flex; justify-content: space-between; font-size: 0.77rem; margin-bottom: 4px; font-weight: 700; }
     .progress-track { width: 100%; height: 9px; background: var(--surface-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
@@ -360,138 +173,50 @@
     .meal-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 13px; margin-bottom: 12px; }
     .meal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 7px; margin-bottom: 9px; font-weight: 800; font-size: 0.9rem; }
 
-    .thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-strong); cursor: pointer; flex-shrink: 0; transition: transform 0.2s ease; }
-    .thumb:hover { transform: scale(1.06); }
+    .thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-strong); cursor: pointer; flex-shrink: 0; }
     .file-badge { padding: 6px 10px; background: var(--primary-glow); border: 1px solid var(--primary); border-radius: 9px; color: var(--primary); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
     #syncStatus { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
 
-    /* MODALS */
     #imgModal, #objDossierModal, #quickHubModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 8, 15, 0.78);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      flex-direction: column;
-      gap: 12px;
-      animation: fadeIn 0.2s ease;
+      display: none; position: fixed; inset: 0; background: rgba(5, 8, 15, 0.78);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 500;
+      align-items: center; justify-content: center; padding: 16px; flex-direction: column; gap: 12px;
     }
-    #imgModal img { max-width: 95%; max-height: 80vh; border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-    .dossier-box {
-      background: var(--surface);
-      border: 1px solid var(--primary);
-      border-radius: 22px;
-      max-width: 680px;
-      width: 100%;
-      max-height: 86vh;
-      overflow-y: auto;
-      padding: 20px;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-    }
-<label class="btn btn-outline" style="margin:0; cursor:pointer;">
-  ⬆️ Ripristina
-  <input type="file" id="importFile" accept=".json,.zip,application/json,application/zip" style="display:none" onchange="importBackup(event)">
-</label>
-    /* FLOATING QUICK ACTION BUTTON (FAB) */
+    #imgModal img { max-width: 95%; max-height: 80vh; border-radius: 14px; }
+    .dossier-box { background: var(--surface); border: 1px solid var(--primary); border-radius: 22px; max-width: 680px; width: 100%; max-height: 86vh; overflow-y: auto; padding: 20px; }
+
     .fab-quick {
-      position: fixed;
-      right: 18px;
-      bottom: calc(88px + var(--safe-bottom));
-      width: 52px;
-      height: 52px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, var(--primary), var(--purple));
-      color: #fff;
-      border: none;
-      font-size: 1.35rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.45);
-      z-index: 190;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+      position: fixed; right: 18px; bottom: calc(88px + var(--safe-bottom)); width: 52px; height: 52px;
+      border-radius: 18px; background: linear-gradient(135deg, var(--primary), var(--purple)); color: #fff;
+      border: none; font-size: 1.35rem; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.45); z-index: 190;
     }
-    .fab-quick:hover { transform: translateY(-2px) scale(1.04); }
-    .fab-quick:active { transform: scale(0.9); }
+    .quick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+    .quick-card-btn { background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 14px; padding: 14px; color: var(--text); font-weight: 700; font-size: 0.85rem; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; }
 
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .quick-card-btn {
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      border-radius: 14px;
-      padding: 14px;
-      color: var(--text);
-      font-weight: 700;
-      font-size: 0.85rem;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.2s ease;
-    }
-    .quick-card-btn:hover { border-color: var(--primary); background: var(--primary-glow); }
-
-    /* TOAST NOTIFICATION */
-    #toastContainer {
-      position: fixed;
-      top: 72px;
-      right: 16px;
-      z-index: 600;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-    .toast-msg {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--primary);
-      border-left: 4px solid var(--primary);
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      box-shadow: var(--shadow-card);
-      animation: moduleSlideIn 0.25s ease;
-    }
+    #toastContainer { position: fixed; top: 72px; right: 16px; z-index: 600; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: var(--surface); color: var(--text); border: 1px solid var(--primary); border-left: 4px solid var(--primary); padding: 10px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; box-shadow: var(--shadow-card); }
   </style>
 </head>
 <body>
 
-<!-- Toast Container per feedback immediati -->
 <div id="toastContainer"></div>
 
-<!-- Modal Anteprima Immagine -->
 <div id="imgModal" onclick="this.style.display='none'">
   <img id="modalImgSrc" src="" alt="Anteprima">
   <button class="btn btn-outline">Chiudi Anteprima</button>
 </div>
 
-<!-- Modal Scheda 360° Oggetto Unico (Garanzia + Manutenzioni + Finanze + Knowledge Base) -->
 <div id="objDossierModal" onclick="if(event.target===this)this.style.display='none'">
   <div class="dossier-box" id="objDossierContent"></div>
 </div>
 
-<!-- Modal Quick Action Hub (Scorciatoia Rapida + Cmd/Ctrl+K) -->
 <div id="quickHubModal" onclick="if(event.target===this)this.style.display='none'">
   <div class="dossier-box" style="max-width:460px;">
     <div class="card-title">
       <span>⚡ Azioni Rapide LifeOS</span>
       <button class="btn btn-outline" onclick="document.getElementById('quickHubModal').style.display='none'">✕</button>
     </div>
-    <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:8px;">Salta subito all'inserimento rapido o cambia l'aspetto dell'app:</p>
     <div class="quick-grid">
       <button class="quick-card-btn" onclick="quickJump('mod3', 2, 'ct_title')"><span>📌</span> Nuova Attività</button>
       <button class="quick-card-btn" onclick="quickJump('mod5', 4, 'f_desc')"><span>💰</span> Nuova Spesa</button>
@@ -505,49 +230,40 @@
   </div>
 </div>
 
-<!-- Floating Action Button (Accesso Rapido col Pollice) -->
 <button class="fab-quick" onclick="openQuickHub()" title="Azioni Rapide (Ctrl+K)">⚡</button>
 
 <header>
   <div class="brand">
     <span class="brand-logo">⚡</span>
     <span>LifeOS</span>
-    <span class="badge-offline" id="storageBadge">v5.5 Pro</span>
+    <span class="badge-offline" id="storageBadge">v5.6 Pro</span>
   </div>
   <div class="sync-controls">
     <span id="syncStatus">Attivo</span>
-    <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Passa tra Modalità Chiara e Scura">
+    <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
       <span id="themeIcon">🌙</span>
       <span id="themeLabel">Scuro</span>
     </button>
-    <button class="btn btn-warn" onclick="forceAppRefresh()" title="Forza aggiornamento interfaccia senza toccare i dati">🔄 UI</button>
+    <button class="btn btn-warn" onclick="forceAppRefresh()" title="Aggiorna UI senza perdere i dati">🔄 UI</button>
     <button class="btn btn-outline" onclick="exportFullZipBackup()">📦 Backup ZIP</button>
     <label class="btn btn-outline" style="margin:0; cursor:pointer;">
       ⬆️ Ripristina
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+      <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
     </label>
   </div>
 </header>
 
 <main>
-  <!-- =========================================================
-       MODULO 1: DASHBOARD CENTRALE (RICERCA GLOBALE + LE 4 AREE)
-  ========================================================== -->
+  <!-- MODULO 1: DASHBOARD -->
   <section id="modHome" class="module active">
-    <!-- Ricerca Globale Unificata -->
     <div class="card" style="border-color:var(--primary);">
       <div class="card-title">
         <span>🔍 Ricerca Globale dell'Ecosistema</span>
-        <div style="display:flex; gap:6px; align-items:center;">
-          <button class="btn btn-outline" onclick="toggleDashConfig()">⚙️ Configura 4 Aree</button>
-        </div>
+        <button class="btn btn-outline" onclick="toggleDashConfig()">⚙️ Configura 4 Aree</button>
       </div>
-      <input type="text" id="globalSearchInput" placeholder="Cerca in tempo reale: Lavatrice, persona, transazione, referto, nota, ricambio..." oninput="runGlobalSearch(this.value)">
+      <input type="text" id="globalSearchInput" placeholder="Cerca in tempo reale: Lavatrice, persona, transazione, referto, nota..." oninput="runGlobalSearch(this.value)">
       <div id="globalSearchResults" class="item-list" style="display:none; margin-top:10px; max-height:260px; overflow-y:auto;"></div>
-      
-      <!-- Configuratore visibilità 4 aree -->
       <div id="dashConfigBox" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); font-size:0.8rem;">
-        <span style="color:var(--text-muted); margin-right:10px;">Mostra/Nascondi Aree:</span>
         <label style="display:inline-flex; align-items:center; gap:4px; margin-right:12px;"><input type="checkbox" checked onchange="toggleArea('box_oggi', this.checked)"> ☀️ Oggi</label>
         <label style="display:inline-flex; align-items:center; gap:4px; margin-right:12px;"><input type="checkbox" checked onchange="toggleArea('box_scadenza', this.checked)"> ⏳ In Scadenza</label>
         <label style="display:inline-flex; align-items:center; gap:4px; margin-right:12px;"><input type="checkbox" checked onchange="toggleArea('box_situazione', this.checked)"> 📊 Situazione</label>
@@ -555,15 +271,12 @@
       </div>
     </div>
 
-    <!-- Area 3: SITUAZIONE (Indicatori chiave) -->
     <div class="card" id="box_situazione">
       <div class="card-title"><span>📊 Situazione — Saldo Finanziario, Peso &amp; Indicatori</span></div>
       <div id="area_situazione" class="kpi-grid"></div>
     </div>
 
-    <!-- Griglia 4 Aree Operative -->
     <div class="grid-dash">
-      <!-- Area 1: OGGI -->
       <div class="card" id="box_oggi">
         <div class="card-title">
           <span>☀️ Oggi — Attività &amp; Routine</span>
@@ -571,27 +284,22 @@
         </div>
         <div id="area_oggi" class="item-list"></div>
       </div>
-
-      <!-- Area 2: IN SCADENZA -->
       <div class="card" id="box_scadenza">
         <div class="card-title"><span>⏳ In Scadenza — Garanzie, Manutenzioni &amp; Rinnovi</span></div>
         <div id="area_scadenza" class="item-list"></div>
       </div>
-
-      <!-- Area 4: DA RICORDARE -->
       <div class="card" id="box_ricordare">
-        <div class="card-title"><span>🧠 Da Ricordare — Fissati (Pin) &amp; Oggetti in Garanzia</span></div>
+        <div class="card-title"><span>🧠 Da Ricordare — Fissati (Pin) &amp; Promemoria</span></div>
         <div id="area_ricordare" class="item-list"></div>
       </div>
     </div>
 
-    <!-- Cronologia Modifiche, Annulla Operazione & Cestino Recuperabile -->
     <div class="card">
       <div class="card-title">
         <span>🛡️ Cronologia, Integrità Archivi &amp; Cestino Recuperabile</span>
         <div style="display:flex; gap:6px;">
           <button class="btn btn-outline" onclick="undoLastAction()">↩️ Annulla Ultima Azione</button>
-          <button class="btn btn-outline" onclick="verifyArchiveIntegrity()">✅ Verifica Integrità DB</button>
+          <button class="btn btn-outline" onclick="verifyArchiveIntegrity()">✅ Verifica DB</button>
         </div>
       </div>
       <div id="audit_list" style="font-size:0.76rem; color:var(--text-muted); margin-bottom:10px;"></div>
@@ -599,9 +307,7 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       MODULO 2: OGGETTI UNIFICATI (GARANZIE + MANUALI + DOSSIER 360°)
-  ========================================================== -->
+  <!-- MODULO 2: OGGETTI -->
   <section id="mod2" class="module">
     <div class="grid-2">
       <div class="card">
@@ -612,7 +318,7 @@
         <form id="v_form" onsubmit="saveVaultItem(event)">
           <input type="hidden" id="v_edit_id">
           <div class="form-group">
-            <label>Oggetto / Prodotto (Es. Lavatrice — Samsung) *</label>
+            <label>Oggetto / Prodotto *</label>
             <input type="text" id="v_title" required placeholder="Es. Lavatrice Samsung, Auto Fiat 500, S25 Ultra...">
           </div>
           <div class="form-group" style="display:flex; gap:8px;">
@@ -626,302 +332,163 @@
                 <option value="Documento/Assicurazione">Documento / Assicurazione</option>
               </select>
             </div>
-            <div style="flex:1">
-              <label>Seriale / Targa / Polizza</label>
-              <input type="text" id="v_serial" placeholder="S/N o Targa">
-            </div>
+            <div style="flex:1"><label>Seriale / Targa</label><input type="text" id="v_serial" placeholder="S/N o Targa"></div>
           </div>
           <div class="form-group" style="display:flex; gap:8px;">
-            <div style="flex:1">
-              <label>Data Acquisto / Inizio *</label>
-              <input type="date" id="v_date" required>
-            </div>
-            <div style="flex:1">
-              <label>Garanzia / Copertura (Mesi)</label>
-              <input type="number" id="v_months" value="24" min="0">
-            </div>
+            <div style="flex:1"><label>Data Acquisto *</label><input type="date" id="v_date" required></div>
+            <div style="flex:1"><label>Garanzia (Mesi)</label><input type="number" id="v_months" value="24" min="0"></div>
           </div>
+          <div class="form-group"><label>Prezzo (€)</label><input type="number" step="0.01" id="v_price" placeholder="0.00"></div>
+          <div class="form-group"><label>📚 Knowledge Base / Note</label><textarea id="v_notes" rows="2"></textarea></div>
           <div class="form-group">
-            <label>Prezzo d'Acquisto (€)</label>
-            <input type="number" step="0.01" id="v_price" placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label>📚 Knowledge Base (Manuale, istruzioni, codici filtro/ricambi, note)</label>
-            <textarea id="v_notes" rows="2" placeholder="Istruzioni lavaggio filtro, negozio d'acquisto, link manuale..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Allega Scontrino, Ricevuta o Manuale PDF (Galleria / File / Fotocamera)</label>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <label class="btn btn-outline" style="flex:1; cursor:pointer; margin:0;">
-                📁 Galleria / File / PDF
-                <input type="file" id="v_file_gallery" accept="image/*,application/pdf,.doc,.docx" style="display:none" onchange="handleVaultFileSelect(this)">
-              </label>
-              <label class="btn btn-outline" style="flex:1; cursor:pointer; margin:0;">
-                📷 Fotocamera
-                <input type="file" id="v_file_camera" accept="image/*" capture="environment" style="display:none" onchange="handleVaultFileSelect(this)">
-              </label>
+            <label>Allega Scontrino o PDF</label>
+            <div style="display:flex; gap:8px;">
+              <label class="btn btn-outline" style="flex:1; cursor:pointer; margin:0;">📁 File/PDF<input type="file" id="v_file_gallery" accept="image/*,application/pdf" style="display:none" onchange="handleVaultFileSelect(this)"></label>
+              <label class="btn btn-outline" style="flex:1; cursor:pointer; margin:0;">📷 Foto<input type="file" id="v_file_camera" accept="image/*" capture="environment" style="display:none" onchange="handleVaultFileSelect(this)"></label>
             </div>
             <small id="v_file_label" style="color:var(--success); display:block; margin-top:5px; font-size:0.76rem;"></small>
           </div>
-          <button type="submit" class="btn btn-primary" id="v_submit_btn">+ Salva Oggetto nel Nucleo Comune</button>
+          <button type="submit" class="btn btn-primary" id="v_submit_btn">+ Salva Oggetto</button>
         </form>
       </div>
-
       <div class="card">
-        <div class="card-title">
-          <span>Inventario Oggetti (Tocca "🔍 Dossier 360°" per vedere Manutenzioni e Spese collegate)</span>
-          <span id="v_count" class="pill pill-info">0 oggetti</span>
-        </div>
+        <div class="card-title"><span>Inventario Oggetti</span><span id="v_count" class="pill pill-info">0 oggetti</span></div>
         <input type="text" class="search-bar" id="v_search" placeholder="🔍 Cerca oggetto, seriale, istruzioni..." oninput="renderVault()">
         <div id="v_list" class="item-list"></div>
       </div>
     </div>
   </section>
 
-  <!-- =========================================================
-       MODULO 3: ATTIVITÀ (OGGI/SETTIMANA/PIN) & PERSONE
-  ========================================================== -->
+  <!-- MODULO 3: ATTIVITÀ & PERSONE -->
   <section id="mod3" class="module">
     <div class="sub-nav">
-      <button class="sub-btn active" onclick="switchCrmSub('crmTodo', this)">✅ Attività (Oggi / Settimana / Da Ricordare)</button>
+      <button class="sub-btn active" onclick="switchCrmSub('crmTodo', this)">✅ Attività (Oggi / Settimana / Pin)</button>
       <button class="sub-btn" onclick="switchCrmSub('crmPeople', this)">❤️ Persone (Famiglia, Affetti, Emergenza)</button>
     </div>
-
-    <!-- 3A: Attività, Progetti, Note fissate collegabili a Oggetti o Persone -->
     <div id="crmTodo" class="crm-sub">
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">📌 Nuova Attività o Nota da Ricordare</div>
+          <div class="card-title">📌 Nuova Attività o Nota</div>
           <form onsubmit="saveCrmTask(event)">
-            <div class="form-group">
-              <label>Titolo Attività / Promemoria *</label>
-              <input type="text" id="ct_title" required placeholder="Es. Pulire filtro lavatrice, Prenotare visita, Idea regalo...">
+            <div class="form-group"><label>Titolo *</label><input type="text" id="ct_title" required></div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1"><label>Area</label><select id="ct_scope"><option value="Oggi">☀️ Oggi</option><option value="Settimana">📅 Settimana</option><option value="Memoria">🧠 Da Ricordare</option></select></div>
+              <div style="flex:1"><label>Pin</label><select id="ct_pin"><option value="0">Normale</option><option value="1">📌 Fissa in alto</option></select></div>
             </div>
             <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:1">
-                <label>Area Dashboard</label>
-                <select id="ct_scope">
-                  <option value="Oggi">☀️ Oggi (In Giornata)</option>
-                  <option value="Settimana">📅 In Settimana</option>
-                  <option value="Memoria">🧠 Da Ricordare / Progetto</option>
-                </select>
-              </div>
-              <div style="flex:1">
-                <label>Fissa in alto (Pin)?</label>
-                <select id="ct_pin">
-                  <option value="0">Normale</option>
-                  <option value="1">📌 Fissa in alto</option>
-                </select>
-              </div>
+              <div style="flex:1"><label>Oggetto (opz.)</label><select id="ct_obj"><option value="">-- Nessuno --</option></select></div>
+              <div style="flex:1"><label>Persona (opz.)</label><select id="ct_person"><option value="">-- Nessuna --</option></select></div>
             </div>
-            <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:1">
-                <label>Collega a Oggetto (opz.)</label>
-                <select id="ct_obj"><option value="">-- Nessuno --</option></select>
-              </div>
-              <div style="flex:1">
-                <label>Collega a Persona (opz.)</label>
-                <select id="ct_person"><option value="">-- Nessuna --</option></select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Note / Dettagli</label>
-              <textarea id="ct_notes" rows="2" placeholder="Dettagli..."></textarea>
-            </div>
+            <div class="form-group"><label>Note</label><textarea id="ct_notes" rows="2"></textarea></div>
             <button type="submit" class="btn btn-primary">+ Aggiungi Attività</button>
           </form>
         </div>
-
         <div>
-          <div class="card">
-            <div class="card-title">📌 Fissati in Alto (Da Ricordare)</div>
-            <div id="ct_pinned_list" class="item-list"></div>
-          </div>
-          <div class="card">
-            <div class="card-title">☀️ Attività Giornata &amp; Settimana</div>
-            <div id="ct_todo_list" class="item-list"></div>
-          </div>
+          <div class="card"><div class="card-title">📌 Fissati in Alto</div><div id="ct_pinned_list" class="item-list"></div></div>
+          <div class="card"><div class="card-title">☀️ Attività Giornata &amp; Settimana</div><div id="ct_todo_list" class="item-list"></div></div>
         </div>
       </div>
     </div>
-
-    <!-- 3B: Persone (CRM Personale + Emergenza + Salute Familiare) -->
     <div id="crmPeople" class="crm-sub" style="display:none">
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">
-            <span id="c_form_title">❤️ Registra Persona Unica</span>
-            <button class="btn btn-outline" id="c_cancel_edit" style="display:none" onclick="resetCrmPersonForm()">Annulla</button>
-          </div>
+          <div class="card-title"><span id="c_form_title">❤️ Registra Persona</span><button class="btn btn-outline" id="c_cancel_edit" style="display:none" onclick="resetCrmPersonForm()">Annulla</button></div>
           <form onsubmit="saveCrmItem(event)">
             <input type="hidden" id="c_edit_id">
-            <div class="form-group">
-              <label>Nome *</label>
-              <input type="text" id="c_name" required placeholder="Es. Mamma, Papà, Marco, Dott. Rossi...">
-            </div>
+            <div class="form-group"><label>Nome *</label><input type="text" id="c_name" required></div>
             <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:1">
-                <label>Cerchia Personale</label>
-                <select id="c_circle">
-                  <option value="Famiglia">🏠 Famiglia</option>
-                  <option value="Emergenza">🚨 Contatto Emergenza</option>
-                  <option value="Amici Stretti">🍻 Amici Stretti</option>
-                  <option value="Medico / Salute">🩺 Medico / Specialista</option>
-                  <option value="Compagnia / Hobby">⚽ Compagnia / Hobby</option>
-                </select>
-              </div>
-              <div style="flex:1">
-                <label>Telefono</label>
-                <input type="text" id="c_phone" placeholder="333...">
-              </div>
+              <div style="flex:1"><label>Cerchia</label><select id="c_circle"><option value="Famiglia">🏠 Famiglia</option><option value="Emergenza">🚨 Emergenza</option><option value="Amici Stretti">🍻 Amici</option><option value="Medico / Salute">🩺 Medico</option></select></div>
+              <div style="flex:1"><label>Telefono</label><input type="text" id="c_phone"></div>
             </div>
             <div class="form-group" style="display:flex; gap:8px;">
               <div style="flex:1"><label>Ultimo contatto *</label><input type="date" id="c_last" required></div>
-              <div style="flex:1"><label>Sentire ogni (gg)</label><input type="number" id="c_freq" value="14" min="1"></div>
+              <div style="flex:1"><label>Ogni (gg)</label><input type="number" id="c_freq" value="14" min="1"></div>
             </div>
-            <div class="form-group">
-              <label>Idee Regalo, Compleanno, Salute Familiare / Gruppo Sanguigno</label>
-              <textarea id="c_notes" rows="2" placeholder="Dettagli importanti, allergie, taglie, regali..."></textarea>
-            </div>
+            <div class="form-group"><label>Note / Idee Regalo / Salute</label><textarea id="c_notes" rows="2"></textarea></div>
             <button type="submit" class="btn btn-primary" id="c_submit_btn">+ Salva Persona</button>
           </form>
         </div>
-
         <div class="card">
-          <div class="card-title">Rubrica Persone &amp; Affetti</div>
-          <input type="text" class="search-bar" id="c_search" placeholder="🔍 Cerca persona, regalo o nota..." oninput="renderCrm()">
+          <div class="card-title">Rubrica Persone</div>
+          <input type="text" class="search-bar" id="c_search" placeholder="🔍 Cerca persona..." oninput="renderCrm()">
           <div id="c_list" class="item-list"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- =========================================================
-       MODULO 4: MANUTENZIONE (COLLEGATA DIRETTAMENTE AGLI OGGETTI)
-  ========================================================== -->
+  <!-- MODULO 4: MANUTENZIONE -->
   <section id="mod4" class="module">
     <div class="grid-2">
       <div class="card">
-        <div class="card-title">🔧 Registra Intervento / Guasto / Riparazione</div>
+        <div class="card-title">🔧 Registra Intervento / Manutenzione</div>
         <form onsubmit="addMaintItem(event)">
-          <div class="form-group">
-            <label>Collega a Oggetto Registrato (Es. Lavatrice Samsung, Auto) *</label>
-            <select id="m_object_id" onchange="syncMaintAssetName()"></select>
-          </div>
-          <div class="form-group">
-            <label>Oppure scrivi Nome Mezzo / Impianto *</label>
-            <input type="text" id="m_asset" required placeholder="Es. Lavatrice Samsung, Auto Fiat 500...">
-          </div>
-          <div class="form-group">
-            <label>Intervento / Riparazione Eseguita *</label>
-            <input type="text" id="m_task" required placeholder="Es. Sostituzione pompa scarico, Tagliando Olio...">
+          <div class="form-group"><label>Collega a Oggetto</label><select id="m_object_id" onchange="syncMaintAssetName()"></select></div>
+          <div class="form-group"><label>Mezzo / Impianto *</label><input type="text" id="m_asset" required></div>
+          <div class="form-group"><label>Intervento Eseguito *</label><input type="text" id="m_task" required></div>
+          <div class="form-group" style="display:flex; gap:8px;">
+            <div style="flex:1"><label>Data *</label><input type="date" id="m_date" required></div>
+            <div style="flex:1"><label>Prossima (Mesi)</label><input type="number" id="m_next_months" value="12" min="1"></div>
           </div>
           <div class="form-group" style="display:flex; gap:8px;">
-            <div style="flex:1"><label>Data Esecuzione *</label><input type="date" id="m_date" required></div>
-            <div style="flex:1"><label>Prossima Scadenza (Mesi)</label><input type="number" id="m_next_months" value="12" min="1"></div>
-          </div>
-          <div class="form-group" style="display:flex; gap:8px;">
-            <input type="number" id="m_km_now" placeholder="Km attuali (opz.)">
+            <input type="number" id="m_km_now" placeholder="Km attuali">
             <input type="number" id="m_km_next" placeholder="Prossimo cambio Km">
           </div>
           <div class="form-group" style="display:flex; gap:8px;">
             <input type="number" step="0.01" id="m_cost" placeholder="Costo €">
-            <input type="text" id="m_parts" placeholder="Cod. Ricambio / Filtro">
+            <input type="text" id="m_parts" placeholder="Cod. Ricambio">
           </div>
-          <div class="form-group">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-              <input type="checkbox" id="m_auto_tx" checked style="width:auto;">
-              <span>Addebita automaticamente il costo anche nelle Finanze</span>
-            </label>
-          </div>
+          <div class="form-group"><label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" id="m_auto_tx" checked style="width:auto;"><span>Addebita nelle Finanze</span></label></div>
           <button type="submit" class="btn btn-primary">+ Salva Manutenzione</button>
         </form>
       </div>
-
       <div class="card">
-        <div class="card-title">Scadenzario Manutenzioni &amp; Storico Guasti</div>
+        <div class="card-title">Storico Manutenzioni</div>
         <div id="m_kpis" class="kpi-grid"></div>
         <div id="m_list" class="item-list"></div>
       </div>
     </div>
   </section>
 
-  <!-- =========================================================
-       MODULO 5: FINANZE MULTI-CONTO + BILANCIAMENTO + LINK OGGETTI
-  ========================================================== -->
+  <!-- MODULO 5: FINANZE -->
   <section id="mod5" class="module">
     <div class="grid-2">
       <div>
         <div class="card">
-          <div class="card-title">
-            <span id="acc_form_title">🏦 Gestione Conti &amp; Carte</span>
-            <button class="btn btn-outline" id="acc_cancel_btn" style="display:none" onclick="resetAccountForm()">Annulla</button>
-          </div>
+          <div class="card-title"><span id="acc_form_title">🏦 Gestione Conti</span><button class="btn btn-outline" id="acc_cancel_btn" style="display:none" onclick="resetAccountForm()">Annulla</button></div>
           <form onsubmit="saveAccount(event)">
             <input type="hidden" id="acc_edit_id">
             <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:2"><label>Nome Conto *</label><input type="text" id="acc_name" required placeholder="Es. Conto Principale, Revolut..."></div>
-              <div style="flex:1">
-                <label>Tipo</label>
-                <select id="acc_type">
-                  <option value="Banca">Banca</option>
-                  <option value="Carta">Carta</option>
-                  <option value="Contanti">Contanti</option>
-                  <option value="Risparmi">Risparmi</option>
-                </select>
-              </div>
+              <div style="flex:2"><label>Nome Conto *</label><input type="text" id="acc_name" required></div>
+              <div style="flex:1"><label>Tipo</label><select id="acc_type"><option value="Banca">Banca</option><option value="Carta">Carta</option><option value="Contanti">Contanti</option><option value="Risparmi">Risparmi</option></select></div>
             </div>
-            <div class="form-group">
-              <label>Saldo Attuale (€) — Non crea movimenti nello storico</label>
-              <input type="number" step="0.01" id="acc_base" value="0.00" required>
-            </div>
+            <div class="form-group"><label>Saldo Attuale (€)</label><input type="number" step="0.01" id="acc_base" value="0.00" required></div>
             <button type="submit" class="btn btn-outline" id="acc_submit_btn" style="width:100%">+ Aggiungi / Aggiorna Conto</button>
           </form>
         </div>
-
         <div class="card">
-          <div class="card-title">💰 Registra Transazione (Collegabile a Oggetto o Persona)</div>
+          <div class="card-title">💰 Registra Transazione</div>
           <form onsubmit="addFinanceTx(event)">
             <div class="form-group" style="display:flex; gap:8px;">
               <div style="flex:1"><label>Conto *</label><select id="f_account" required></select></div>
-              <div style="flex:1"><label>Oggetto Collegato (opz.)</label><select id="f_object"><option value="">-- Nessuno --</option></select></div>
+              <div style="flex:1"><label>Oggetto (opz.)</label><select id="f_object"><option value="">-- Nessuno --</option></select></div>
             </div>
-            <div class="form-group">
-              <label>Descrizione *</label>
-              <input type="text" id="f_desc" required placeholder="Es. Acquisto Lavatrice, Spesa, Stipendio...">
+            <div class="form-group"><label>Descrizione *</label><input type="text" id="f_desc" required></div>
+            <div class="form-group" style="display:flex; gap:8px;">
+              <div style="flex:1"><label>Tipo</label><select id="f_type"><option value="expense">Uscita (-)</option><option value="income">Entrata (+)</option></select></div>
+              <div style="flex:1"><label>Importo (€) *</label><input type="number" step="0.01" id="f_amount" required></div>
             </div>
             <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:1">
-                <label>Tipo</label>
-                <select id="f_type">
-                  <option value="expense">Uscita (-)</option>
-                  <option value="income">Entrata (+)</option>
-                </select>
-              </div>
-              <div style="flex:1"><label>Importo (€) *</label><input type="number" step="0.01" id="f_amount" required placeholder="0.00"></div>
-            </div>
-            <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:1">
-                <label>Categoria</label>
-                <select id="f_cat">
-                  <option value="Alimentari">Alimentari</option>
-                  <option value="Casa & Utenze">Casa &amp; Utenze</option>
-                  <option value="Manutenzione & Acquisti">Manutenzione &amp; Acquisti</option>
-                  <option value="Auto & Trasporti">Auto &amp; Trasporti</option>
-                  <option value="Svago & Extra">Svago &amp; Extra</option>
-                  <option value="Stipendio / Entrate">Stipendio / Entrate</option>
-                </select>
-              </div>
+              <div style="flex:1"><label>Categoria</label><select id="f_cat"><option value="Alimentari">Alimentari</option><option value="Casa & Utenze">Casa &amp; Utenze</option><option value="Manutenzione & Acquisti">Manutenzione &amp; Acquisti</option><option value="Auto & Trasporti">Auto &amp; Trasporti</option><option value="Svago & Extra">Svago &amp; Extra</option><option value="Stipendio / Entrate">Stipendio / Entrate</option></select></div>
               <div style="flex:1"><label>Data *</label><input type="date" id="f_date" required></div>
             </div>
             <button type="submit" class="btn btn-primary">+ Registra Transazione</button>
           </form>
         </div>
-
         <div class="card">
-          <div class="card-title">🔄 Nuovo Abbonamento / Pagamento Ricorrente</div>
+          <div class="card-title">🔄 Nuovo Abbonamento</div>
           <form onsubmit="addSub(event)">
-            <div class="form-group"><label>Servizio *</label><input type="text" id="s_name" required placeholder="Es. Netflix, Assicurazione Auto, Palestra..."></div>
+            <div class="form-group"><label>Servizio *</label><input type="text" id="s_name" required></div>
             <div class="form-group" style="display:flex; gap:8px;">
               <input type="number" step="0.01" id="s_cost" required placeholder="Costo €">
               <select id="s_cycle"><option value="monthly">Mensile</option><option value="yearly">Annuale</option></select>
@@ -931,89 +498,66 @@
           </form>
         </div>
       </div>
-
       <div>
         <div class="card">
           <div class="card-title">Patrimonio &amp; Conti Attivi</div>
           <div id="f_kpis" class="kpi-grid"></div>
-          <h4 style="margin: 10px 0 8px; font-size:0.86rem; color:var(--text-muted)">🏦 I Tuoi Conti (Premi "⚖️ Bilancia Saldo" per rettificare senza toccare lo storico)</h4>
           <div id="acc_list" class="item-list" style="margin-bottom:16px;"></div>
-          <h4 style="margin: 10px 0 8px; font-size:0.86rem; color:var(--text-muted)">🔄 Scadenze Pagamenti Ricorrenti</h4>
           <div id="s_list" class="item-list" style="margin-bottom:16px;"></div>
-          <h4 style="margin: 10px 0 8px; font-size:0.86rem; color:var(--text-muted)">📋 Storico Transazioni</h4>
           <div id="f_list" class="item-list"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- =========================================================
-       MODULO 6: SALUTE OS COMPLETO (FATSECRET + DATABOY + REFERTI + SINTOMI)
-  ========================================================== -->
+  <!-- MODULO 6: SALUTE OS -->
   <section id="mod6" class="module">
     <div class="sub-nav">
-      <button class="sub-btn active" onclick="switchHealthSub('hSubNutrition', this)">🍎 Calorie &amp; Macro (FatSecret)</button>
-      <button class="sub-btn" onclick="switchHealthSub('hSubWeight', this)">⚖️ Peso &amp; Trend (Databoy)</button>
-      <button class="sub-btn" onclick="switchHealthSub('hSubMedical', this)">🩻 Visite, Eco &amp; RX</button>
-      <button class="sub-btn" onclick="switchHealthSub('hSubSymptoms', this)">🧠 Sintomi &amp; Correlazioni</button>
+      <button class="sub-btn active" onclick="switchHealthSub('hSubNutrition', this)">🍎 Calorie &amp; Macro</button>
+      <button class="sub-btn" onclick="switchHealthSub('hSubWeight', this)">⚖️ Peso &amp; Trend</button>
+      <button class="sub-btn" onclick="switchHealthSub('hSubMedical', this)">🩻 Visite &amp; Referti</button>
+      <button class="sub-btn" onclick="switchHealthSub('hSubSymptoms', this)">🧠 Sintomi</button>
     </div>
 
-    <!-- 6A: FATSECRET -->
     <div id="hSubNutrition" class="health-sub">
       <div class="card">
         <div class="card-title">
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span>📅 Diario Alimentare del:</span>
-            <input type="date" id="fs_date" style="width:auto; padding:6px 10px;" onchange="renderNutrition()">
-          </div>
-          <button class="btn btn-outline" onclick="configureNutritionTargets()">🎯 Obiettivi Kcal/Macro</button>
+          <div style="display:flex; align-items:center; gap:8px;"><span>📅 Diario del:</span><input type="date" id="fs_date" style="width:auto;" onchange="renderNutrition()"></div>
+          <button class="btn btn-outline" onclick="configureNutritionTargets()">🎯 Obiettivi</button>
         </div>
         <div id="fs_summary_bars"></div>
       </div>
-
       <div class="grid-2">
         <div>
           <div class="card">
-            <div class="card-title">
-              <span id="fs_form_title">🍽️ Aggiungi Alimento al Pasto</span>
-              <button class="btn btn-outline" id="fs_cancel_edit" style="display:none" onclick="resetMealForm()">Annulla</button>
-            </div>
+            <div class="card-title"><span id="fs_form_title">🍽️ Aggiungi Alimento</span><button class="btn btn-outline" id="fs_cancel_edit" style="display:none" onclick="resetMealForm()">Annulla</button></div>
             <form onsubmit="saveMealEntry(event)">
               <input type="hidden" id="fs_edit_id">
+              <div class="form-group"><label>Pasto *</label><select id="fs_meal"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntini">🍎 Spuntini</option></select></div>
               <div class="form-group">
-                <label>Pasto *</label>
-                <select id="fs_meal">
-                  <option value="Colazione">☕ Colazione</option>
-                  <option value="Pranzo">🍝 Pranzo</option>
-                  <option value="Cena">🥩 Cena</option>
-                  <option value="Spuntini">🍎 Spuntini / Snack</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>🔍 Cerca nella Libreria Alimenti (Valori per 100g)</label>
-                <input type="text" id="fs_search_lib" placeholder="Cerca Pollo, Pasta, Riso, Uova, Yogurt, Pizza..." oninput="filterFoodLibrary()">
-                <select id="fs_food_select" size="5" style="margin-top:6px; height:120px;" onchange="selectFoodFromLib()"></select>
+                <label>🔍 Libreria Alimenti (100g)</label>
+                <input type="text" id="fs_search_lib" placeholder="Cerca alimento..." oninput="filterFoodLibrary()">
+                <select id="fs_food_select" size="5" style="margin-top:6px; height:110px;" onchange="selectFoodFromLib()"></select>
               </div>
               <div class="form-group" style="display:flex; gap:8px;">
-                <div style="flex:2"><label>Nome Alimento *</label><input type="text" id="fs_food_name" required></div>
-                <div style="flex:1"><label>Grammi (g) *</label><input type="number" step="1" id="fs_grams" value="100" required oninput="recalcPreviewMacros()"></div>
+                <div style="flex:2"><label>Alimento *</label><input type="text" id="fs_food_name" required></div>
+                <div style="flex:1"><label>Grammi *</label><input type="number" id="fs_grams" value="100" required oninput="recalcPreviewMacros()"></div>
               </div>
               <div class="form-group" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px;">
-                <div><label>Kcal *</label><input type="number" step="1" id="fs_kcal" required></div>
-                <div><label>Carb (g)</label><input type="number" step="0.1" id="fs_carb" value="0"></div>
-                <div><label>Prot (g)</label><input type="number" step="0.1" id="fs_prot" value="0"></div>
-                <div><label>Grassi (g)</label><input type="number" step="0.1" id="fs_fat" value="0"></div>
+                <div><label>Kcal *</label><input type="number" id="fs_kcal" required></div>
+                <div><label>Carb</label><input type="number" step="0.1" id="fs_carb" value="0"></div>
+                <div><label>Prot</label><input type="number" step="0.1" id="fs_prot" value="0"></div>
+                <div><label>Grassi</label><input type="number" step="0.1" id="fs_fat" value="0"></div>
               </div>
               <button type="submit" class="btn btn-primary" id="fs_submit_btn">+ Registra nel Diario</button>
             </form>
           </div>
-
           <div class="card">
-            <div class="card-title">📚 Aggiungi Nuovo Cibo alla Libreria (per 100g)</div>
+            <div class="card-title">📚 Nuovo Cibo in Libreria (per 100g)</div>
             <form onsubmit="addCustomFoodToLib(event)">
-              <div class="form-group"><label>Nome Alimento / Marca *</label><input type="text" id="lib_name" required placeholder="Es. Biscotti Integrali..."></div>
+              <div class="form-group"><label>Nome *</label><input type="text" id="lib_name" required></div>
               <div class="form-group" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px;">
-                <div><label>Kcal/100g</label><input type="number" step="1" id="lib_kcal" required></div>
+                <div><label>Kcal</label><input type="number" id="lib_kcal" required></div>
                 <div><label>Carb</label><input type="number" step="0.1" id="lib_carb" required></div>
                 <div><label>Prot</label><input type="number" step="0.1" id="lib_prot" required></div>
                 <div><label>Grassi</label><input type="number" step="0.1" id="lib_fat" required></div>
@@ -1022,97 +566,66 @@
             </form>
           </div>
         </div>
-
         <div>
-          <div class="card">
-            <div class="card-title">📋 Pasti della Giornata (Modificabili)</div>
-            <div id="fs_meals_container"></div>
-          </div>
-          <div class="card">
-            <div class="card-title">🗓️ Storico Giornaliero Calorie (Tocca per aprire/modificare)</div>
-            <div id="fs_history_days" class="item-list"></div>
-          </div>
+          <div class="card"><div class="card-title">📋 Pasti della Giornata</div><div id="fs_meals_container"></div></div>
+          <div class="card"><div class="card-title">🗓️ Storico Giornaliero</div><div id="fs_history_days" class="item-list"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- 6B: DATABOY PESO -->
     <div id="hSubWeight" class="health-sub" style="display:none">
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">
-            <span id="w_form_title">⚖️ Registra Pesata (Databoy)</span>
-            <button class="btn btn-outline" id="w_cancel_edit" style="display:none" onclick="resetWeightForm()">Annulla</button>
-          </div>
+          <div class="card-title"><span id="w_form_title">⚖️ Registra Pesata</span><button class="btn btn-outline" id="w_cancel_edit" style="display:none" onclick="resetWeightForm()">Annulla</button></div>
           <form onsubmit="saveWeightLog(event)">
             <input type="hidden" id="w_edit_id">
             <div class="form-group" style="display:flex; gap:8px;">
               <div style="flex:1"><label>Data *</label><input type="date" id="w_date" required></div>
-              <div style="flex:1"><label>Peso (kg) *</label><input type="number" step="0.1" id="w_kg" required placeholder="76.4"></div>
+              <div style="flex:1"><label>Peso (kg) *</label><input type="number" step="0.1" id="w_kg" required></div>
             </div>
-            <div class="form-group"><label>Massa Grassa % / Girovita</label><input type="text" id="w_bodyfat" placeholder="Es. BF 15% • Vita 82cm"></div>
-            <div class="form-group"><label>Note</label><input type="text" id="w_notes" placeholder="Mattina a digiuno"></div>
+            <div class="form-group"><label>Massa Grassa / Girovita</label><input type="text" id="w_bodyfat"></div>
+            <div class="form-group"><label>Note</label><input type="text" id="w_notes"></div>
             <button type="submit" class="btn btn-primary" id="w_submit_btn">+ Salva Pesata</button>
           </form>
-          <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="setWeightGoal()">🎯 Imposta Peso Obiettivo</button>
+          <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="setWeightGoal()">🎯 Peso Obiettivo</button>
         </div>
-
         <div class="card">
-          <div class="card-title">📉 Andamento Peso, Trend Media Mobile &amp; Storico</div>
+          <div class="card-title">📉 Andamento Peso</div>
           <div id="w_kpis" class="kpi-grid"></div>
           <div id="w_list" class="item-list"></div>
         </div>
       </div>
     </div>
 
-    <!-- 6C: VISITE, ECOGRAFIE E RADIOGRAFIE (Collegate a Persone/Famiglia) -->
     <div id="hSubMedical" class="health-sub" style="display:none">
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">
-            <span id="med_form_title">🩻 Registra Visita / Ecografia / RX</span>
-            <button class="btn btn-outline" id="med_cancel_edit" style="display:none" onclick="resetMedForm()">Annulla</button>
-          </div>
+          <div class="card-title"><span id="med_form_title">🩻 Registra Referto</span><button class="btn btn-outline" id="med_cancel_edit" style="display:none" onclick="resetMedForm()">Annulla</button></div>
           <form onsubmit="saveMedRecord(event)">
             <input type="hidden" id="med_edit_id">
             <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:1">
-                <label>Tipo Esame *</label>
-                <select id="med_type">
-                  <option value="Visita Specialistica">👨‍⚕️ Visita Specialistica</option>
-                  <option value="Ecografia">🖥️ Ecografia</option>
-                  <option value="Radiografia (RX)">🦴 Radiografia (RX)</option>
-                  <option value="Risonanza / TAC">🧲 Risonanza / TAC</option>
-                  <option value="Analisi del Sangue">🩸 Analisi Sangue</option>
-                  <option value="Dentista">🦷 Dentista</option>
-                </select>
-              </div>
-              <div style="flex:1">
-                <label>Persona (Io o Familiare)</label>
-                <select id="med_person"><option value="Io">👤 Io (Personale)</option></select>
-              </div>
+              <div style="flex:1"><label>Tipo *</label><select id="med_type"><option value="Visita Specialistica">Visita</option><option value="Ecografia">Ecografia</option><option value="Radiografia (RX)">RX</option><option value="Risonanza / TAC">RMN / TAC</option><option value="Analisi del Sangue">Analisi</option></select></div>
+              <div style="flex:1"><label>Persona</label><select id="med_person"><option value="Io">👤 Io</option></select></div>
             </div>
-            <div class="form-group"><label>Titolo / Distretto *</label><input type="text" id="med_title" required placeholder="Es. Ecografia Addome, RX Spalla..."></div>
+            <div class="form-group"><label>Titolo *</label><input type="text" id="med_title" required></div>
             <div class="form-group" style="display:flex; gap:8px;">
-              <div style="flex:1"><label>Data Esame *</label><input type="date" id="med_date" required></div>
+              <div style="flex:1"><label>Data *</label><input type="date" id="med_date" required></div>
               <div style="flex:1"><label>Prossimo Controllo</label><input type="date" id="med_next"></div>
             </div>
-            <div class="form-group"><label>Medico / Struttura</label><input type="text" id="med_doctor" placeholder="Dott. Bianchi / Ospedale..."></div>
-            <div class="form-group"><label>Esito / Referto / Terapia</label><textarea id="med_notes" rows="2"></textarea></div>
-            <div class="form-group"><label>Allega Foto o PDF Referto</label><input type="file" id="med_file" accept="image/*,application/pdf"></div>
-            <button type="submit" class="btn btn-primary" id="med_submit_btn">+ Salva nel Libretto Clinico</button>
+            <div class="form-group"><label>Medico / Struttura</label><input type="text" id="med_doctor"></div>
+            <div class="form-group"><label>Esito / Note</label><textarea id="med_notes" rows="2"></textarea></div>
+            <div class="form-group"><label>Allega Referto</label><input type="file" id="med_file" accept="image/*,application/pdf"></div>
+            <button type="submit" class="btn btn-primary" id="med_submit_btn">+ Salva Referto</button>
           </form>
         </div>
-
         <div class="card">
-          <div class="card-title">📂 Libretto Storico Visite, Ecografie &amp; Radiografie</div>
-          <input type="text" class="search-bar" id="med_search" placeholder="🔍 Cerca ecografia, RX, medico o familiare..." oninput="renderMedRecords()">
+          <div class="card-title">📂 Libretto Clinico</div>
+          <input type="text" class="search-bar" id="med_search" placeholder="🔍 Cerca referto..." oninput="renderMedRecords()">
           <div id="med_list" class="item-list"></div>
         </div>
       </div>
     </div>
 
-    <!-- 6D: SINTOMI -->
     <div id="hSubSymptoms" class="health-sub" style="display:none">
       <div class="grid-2">
         <div class="card">
@@ -1123,8 +636,8 @@
               <div style="flex:1"><label>Ore Sonno *</label><input type="number" step="0.5" id="h_sleep" value="7.5" required></div>
             </div>
             <div class="form-group"><label>Stress (1-5)</label><input type="number" id="h_stress" min="1" max="5" value="2"></div>
-            <div class="form-group"><label>Fattori / Alimenti (separati da virgola)</label><input type="text" id="h_triggers" placeholder="Latticini, Caffè..."></div>
-            <div class="form-group"><label>Sintomi</label><input type="text" id="h_symptoms" placeholder="Emicrania, Gonfiore..."></div>
+            <div class="form-group"><label>Fattori (separati da virgola)</label><input type="text" id="h_triggers"></div>
+            <div class="form-group"><label>Sintomi</label><input type="text" id="h_symptoms"></div>
             <div class="form-group"><label>Intensità (0-10)</label><input type="number" id="h_severity" min="0" max="10" value="0"></div>
             <button type="submit" class="btn btn-primary">+ Salva Giornata</button>
           </form>
@@ -1141,12 +654,11 @@
 <nav class="bottom-nav">
   <button class="tab-btn active" onclick="switchTab('modHome', this)"><span class="ico">🏠</span><span>Centro</span></button>
   <button class="tab-btn" onclick="switchTab('mod2', this)"><span class="ico">📦</span><span>Oggetti</span></button>
-  <button class="tab-btn" onclick="switchTab('mod3', this)"><span class="ico">📌</span><span>Attività/Pers.</span></button>
+  <button class="tab-btn" onclick="switchTab('mod3', this)"><span class="ico">📌</span><span>Attività</span></button>
   <button class="tab-btn" onclick="switchTab('mod4', this)"><span class="ico">🔧</span><span>Manutenz.</span></button>
   <button class="tab-btn" onclick="switchTab('mod5', this)"><span class="ico">💰</span><span>Finanze</span></button>
   <button class="tab-btn" onclick="switchTab('mod6', this)"><span class="ico">🩺</span><span>Salute OS</span></button>
 </nav>
-
 <script>
   /* =========================================================================
      GESTIONE TEMA CHIARO / SCURO + FEEDBACK APTICO + TOAST
@@ -1231,7 +743,7 @@
   });
 
   /* =========================================================================
-     LIBRERIA ALIMENTI PRECARICATA (45+ Alimenti per 100g)
+     LIBRERIA ALIMENTI PRECARICATA (per 100g)
      ========================================================================= */
   const DEFAULT_FOOD_LIBRARY = [
     { id: 'f1', name: 'Petto di Pollo (crudo)', kcal: 110, carb: 0, prot: 23.1, fat: 1.2 },
@@ -1273,9 +785,9 @@
   ];
 
   /* =========================================================================
-     DATABASE STABILE COMPATIBILE CON TUTTE LE VERSIONI PRECEDENTI
+     DATABASE E MIGRAZIONE UNIVERSALE (LEGGE QUALSIASI VECCHIO JSON / ZIP)
      ========================================================================= */
-  const DB_NAME = 'LifeOS_IndexedDB_v2'; // Mantiene lo stesso DB per non perdere nulla!
+  const DB_NAME = 'LifeOS_IndexedDB_v2';
   const STORE_NAME = 'app_state';
   const LEGACY_KEY = 'LIFEOS_SUITE_DB_V1';
   let pendingVaultAttachment = null;
@@ -1283,23 +795,23 @@
   let undoStack = [];
 
   const emptyState = () => ({
-    meta: { updatedAt: new Date().toISOString(), version: 5 },
-    vault: [],           // Oggetti Unici (Garanzie, Veicoli, Elettrodomestici, Documenti)
-    crm: [],             // Persone Uniche (Famiglia, Affetti, Emergenza, Medici)
-    crmTasks: [],        // Attività (Oggi, Settimana, Da ricordare / Pin)
-    maint: [],           // Manutenzioni (Collegate a vault.id)
-    accounts: [],        // Conti finanziari
-    financeTx: [],       // Transazioni (Collegate a accounts.id e vault.id)
-    subs: [],            // Abbonamenti
-    health: [],          // Diario sintomi
+    meta: { updatedAt: new Date().toISOString(), version: 5.6 },
+    vault: [],
+    crm: [],
+    crmTasks: [],
+    maint: [],
+    accounts: [],
+    financeTx: [],
+    subs: [],
+    health: [],
     foodLibrary: [...DEFAULT_FOOD_LIBRARY],
-    foodLogs: [],        // Pasti FatSecret
+    foodLogs: [],
     nutritionGoals: { kcal: 2100, carb: 230, prot: 140, fat: 70 },
-    weightLogs: [],      // Peso Databoy
+    weightLogs: [],
     weightGoal: 75.0,
-    medRecords: [],      // Visite, Ecografie, RX
-    trash: [],           // Cestino recuperabile
-    auditLog: []         // Cronologia modifiche importanti
+    medRecords: [],
+    trash: [],
+    auditLog: []
   });
 
   let db = emptyState();
@@ -1341,10 +853,9 @@
       });
     });
     saveDB();
-    alert(`✅ Verifica Integrità Completata:\n• Record analizzati: ${total}\n• Anomalie corrette automaticamente: ${issues}\n• Stato Database: INTEGRO E VERIFICATO`);
+    alert(`✅ Verifica Integrità Completata:\n• Record totali attivi: ${total}\n• Anomalie corrette: ${issues}`);
   }
 
-  // Svuota cache Service Worker e forza ricaricamento UI senza toccare i dati
   async function forceAppRefresh() {
     haptic(20);
     if ('serviceWorker' in navigator) {
@@ -1358,23 +869,198 @@
     location.reload(true);
   }
 
+  // MIGRAZIONE UNIVERSALE (Supporta qualsiasi struttura vecchia o nuova)
   function migrateDB(loaded) {
     const base = emptyState();
-    const merged = { ...base, ...loaded };
-    ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'health', 'foodLogs', 'weightLogs', 'medRecords', 'trash', 'auditLog'].forEach(k => {
-      if (!Array.isArray(merged[k])) merged[k] = [];
-    });
-    // Eventuale recupero da v4 se l'utente aveva salvato lì
-    if (Array.isArray(loaded.objects) && loaded.objects.length > 0 && merged.vault.length === 0) {
-      merged.vault = loaded.objects.map(o => ({ id: o.id, title: o.name, cat: o.cat, date: o.date, months: o.months, price: o.cost, serial: o.serial, notes: o.notes, img: o.file, fileName: o.fileName, fileMime: o.fileMime }));
-    }
-    if (!Array.isArray(merged.foodLibrary) || merged.foodLibrary.length === 0) {
-      merged.foodLibrary = [...DEFAULT_FOOD_LIBRARY];
-    }
+    if (!loaded || typeof loaded !== 'object') return base;
+
+    const src = (loaded.data && typeof loaded.data === 'object' && !Array.isArray(loaded.data))
+      ? loaded.data
+      : (loaded.db || loaded.state || loaded);
+
+    const merged = { ...base, ...src };
+
+    const collectArrays = (...keys) => {
+      const res = [];
+      keys.forEach(k => {
+        if (Array.isArray(src[k])) res.push(...src[k]);
+      });
+      return res;
+    };
+
+    // 1. OGGETTI / GARANZIE
+    const rawVault = collectArrays('vault', 'objects', 'items', 'warranties', 'garanzie', 'oggetti', 'assets');
+    merged.vault = rawVault.map(o => ({
+      id: String(o.id || o._id || uuid()),
+      updatedAt: o.updatedAt || Date.now(),
+      title: o.title || o.name || o.oggetto || o.prodotto || o.item || 'Oggetto',
+      cat: o.cat || o.category || o.categoria || 'Elettrodomestici',
+      serial: o.serial || o.seriale || o.sn || o.targa || '',
+      date: o.date || o.buyDate || o.purchaseDate || o.data || new Date().toISOString().slice(0, 10),
+      months: parseInt(o.months ?? o.warrantyMonths ?? o.mesi ?? 24) || 0,
+      price: parseFloat(String(o.price ?? o.cost ?? o.prezzo ?? o.amount ?? 0).replace(',', '.')) || 0,
+      notes: o.notes || o.note || o.desc || o.description || '',
+      img: o.img || o.file || o.image || o.attachment || o.dataUrl || '',
+      fileName: o.fileName || o.filename || '',
+      fileMime: o.fileMime || o.mime || ''
+    }));
+
+    // 2. PERSONE / CRM
+    const rawCrm = collectArrays('crm', 'people', 'contacts', 'persone', 'rubrica');
+    merged.crm = rawCrm.map(c => ({
+      id: String(c.id || c._id || uuid()),
+      updatedAt: c.updatedAt || Date.now(),
+      name: c.name || c.title || c.nome || 'Contatto',
+      circle: c.circle || c.cat || c.category || c.group || 'Famiglia',
+      phone: c.phone || c.tel || c.telefono || '',
+      last: c.last || c.lastContact || c.date || new Date().toISOString().slice(0, 10),
+      freq: parseInt(c.freq ?? c.frequency ?? c.days ?? 14) || 14,
+      notes: c.notes || c.note || c.gifts || ''
+    }));
+
+    // 3. ATTIVITÀ / TODO / NOTE
+    const rawTasks = collectArrays('crmTasks', 'tasks', 'todos', 'todo', 'notes', 'attivita', 'reminders');
+    merged.crmTasks = rawTasks.map(t => ({
+      id: String(t.id || t._id || uuid()),
+      updatedAt: t.updatedAt || Date.now(),
+      title: t.title || t.text || t.name || t.task || t.desc || 'Attività',
+      scope: t.scope || t.area || (t.pinned ? 'Memoria' : 'Oggi'),
+      pinned: Boolean(t.pinned || t.pin || t.important),
+      objectId: t.objectId || t.objId || '',
+      personId: t.personId || t.contactId || '',
+      notes: t.notes || t.note || t.details || '',
+      done: Boolean(t.done || t.completed || t.checked)
+    }));
+
+    // 4. MANUTENZIONI
+    const rawMaint = collectArrays('maint', 'maintenance', 'manutenzioni', 'interventions', 'service');
+    merged.maint = rawMaint.map(m => ({
+      id: String(m.id || m._id || uuid()),
+      updatedAt: m.updatedAt || Date.now(),
+      objectId: m.objectId || m.objId || '',
+      asset: m.asset || m.vehicle || m.item || m.title || m.name || 'Mezzo/Impianto',
+      task: m.task || m.desc || m.intervention || m.intervento || 'Manutenzione',
+      date: m.date || m.data || new Date().toISOString().slice(0, 10),
+      nextMonths: parseInt(m.nextMonths ?? m.months ?? 12) || 12,
+      kmNow: m.kmNow || m.km || '',
+      kmNext: m.kmNext || '',
+      cost: parseFloat(String(m.cost ?? m.price ?? m.amount ?? 0).replace(',', '.')) || 0,
+      parts: m.parts || m.ricambi || m.notes || ''
+    }));
+
+    // 5. CONTI FINANZIARI
+    const rawAcc = collectArrays('accounts', 'conti', 'wallets', 'bankAccounts');
+    merged.accounts = rawAcc.map(a => ({
+      id: String(a.id || a._id || uuid()),
+      updatedAt: a.updatedAt || Date.now(),
+      name: a.name || a.title || a.nome || 'Conto Principale',
+      type: a.type || a.tipo || 'Banca',
+      baseBalance: parseFloat(String(a.baseBalance ?? a.balance ?? a.initialBalance ?? a.saldo ?? 0).replace(',', '.')) || 0
+    }));
     if (merged.accounts.length === 0) {
       merged.accounts.push({ id: 'acc-main', updatedAt: Date.now(), name: 'Conto Principale', type: 'Banca', baseBalance: 0 });
-      merged.financeTx.forEach(tx => { if (!tx.accountId) tx.accountId = 'acc-main'; });
     }
+
+    // 6. TRANSAZIONI FINANZIARIE
+    const defaultAccId = merged.accounts[0].id;
+    const rawTx = collectArrays('financeTx', 'finance', 'transactions', 'expenses', 'movimenti', 'tx', 'finanze');
+    merged.financeTx = rawTx.map(t => {
+      const rawAmt = parseFloat(String(t.amount ?? t.cost ?? t.value ?? t.price ?? t.importo ?? 0).replace(',', '.')) || 0;
+      let type = String(t.type || t.tipo || (rawAmt < 0 ? 'expense' : 'expense')).toLowerCase();
+      if (type === 'income' || type === 'entrata' || type === 'in' || type === '+') type = 'income';
+      else type = 'expense';
+      return {
+        id: String(t.id || t._id || uuid()),
+        updatedAt: t.updatedAt || Date.now(),
+        accountId: t.accountId || defaultAccId,
+        objectId: t.objectId || '',
+        desc: t.desc || t.title || t.name || t.description || t.descrizione || 'Movimento',
+        type: type,
+        amount: Math.abs(rawAmt),
+        cat: t.cat || t.category || t.categoria || 'Altro',
+        date: t.date || t.data || new Date().toISOString().slice(0, 10)
+      };
+    });
+
+    // 7. ABBONAMENTI
+    const rawSubs = collectArrays('subs', 'subscriptions', 'abbonamenti', 'recurring');
+    merged.subs = rawSubs.map(s => ({
+      id: String(s.id || s._id || uuid()),
+      updatedAt: s.updatedAt || Date.now(),
+      name: s.name || s.title || s.service || 'Abbonamento',
+      cost: parseFloat(String(s.cost ?? s.amount ?? s.price ?? 0).replace(',', '.')) || 0,
+      cycle: s.cycle || s.period || 'monthly',
+      next: s.next || s.nextDate || s.date || new Date().toISOString().slice(0, 10)
+    }));
+
+    // 8. DIARIO ALIMENTARE
+    const rawFood = collectArrays('foodLogs', 'meals', 'nutrition', 'nutritionLogs', 'diary', 'pasti', 'calories');
+    merged.foodLogs = rawFood.map(f => ({
+      id: String(f.id || f._id || uuid()),
+      updatedAt: f.updatedAt || Date.now(),
+      date: f.date || f.data || new Date().toISOString().slice(0, 10),
+      meal: f.meal || f.pasto || 'Pranzo',
+      name: f.name || f.food || f.title || f.alimento || 'Alimento',
+      grams: parseFloat(f.grams ?? f.weight ?? f.g ?? 100) || 100,
+      kcal: parseFloat(f.kcal ?? f.calories ?? f.cal ?? 0) || 0,
+      carb: parseFloat(f.carb ?? f.carbs ?? f.carboidrati ?? 0) || 0,
+      prot: parseFloat(f.prot ?? f.protein ?? f.proteins ?? f.proteine ?? 0) || 0,
+      fat: parseFloat(f.fat ?? f.fats ?? f.grassi ?? 0) || 0
+    }));
+
+    // 9. PESO (DATABOY)
+    const rawWeight = collectArrays('weightLogs', 'weights', 'weight', 'pesate', 'peso');
+    merged.weightLogs = rawWeight.map(w => ({
+      id: String(w.id || w._id || uuid()),
+      updatedAt: w.updatedAt || Date.now(),
+      date: w.date || w.data || new Date().toISOString().slice(0, 10),
+      kg: parseFloat(String(w.kg ?? w.weight ?? w.value ?? w.peso ?? 0).replace(',', '.')),
+      bodyfat: w.bodyfat || w.bf || '',
+      notes: w.notes || w.note || ''
+    })).filter(w => !isNaN(w.kg) && w.kg > 0);
+
+    // 10. REFERTI MEDICI
+    const rawMed = collectArrays('medRecords', 'medical', 'medicalRecords', 'visits', 'referti', 'visite');
+    merged.medRecords = rawMed.map(m => ({
+      id: String(m.id || m._id || uuid()),
+      updatedAt: m.updatedAt || Date.now(),
+      type: m.type || m.cat || 'Visita Specialistica',
+      person: m.person || m.patient || 'Io',
+      title: m.title || m.name || m.exam || 'Esame Medico',
+      date: m.date || m.data || new Date().toISOString().slice(0, 10),
+      nextDate: m.nextDate || m.next || '',
+      doctor: m.doctor || m.medico || '',
+      notes: m.notes || m.note || m.result || '',
+      fileData: m.fileData || m.file || m.img || '',
+      fileName: m.fileName || '',
+      fileMime: m.fileMime || ''
+    }));
+
+    // 11. SINTOMI
+    const rawHealth = collectArrays('health', 'symptoms', 'healthLogs');
+    merged.health = rawHealth.map(h => ({
+      id: String(h.id || h._id || uuid()),
+      updatedAt: h.updatedAt || Date.now(),
+      date: h.date || new Date().toISOString().slice(0, 10),
+      sleep: parseFloat(h.sleep ?? 7.5) || 7.5,
+      stress: parseInt(h.stress ?? 2) || 2,
+      triggers: Array.isArray(h.triggers) ? h.triggers : String(h.triggers || '').split(',').map(s => s.trim()).filter(Boolean),
+      symptoms: h.symptoms || h.notes || '',
+      severity: parseInt(h.severity ?? 0) || 0
+    }));
+
+    if (!Array.isArray(merged.foodLibrary) || merged.foodLibrary.length === 0) {
+      merged.foodLibrary = [...DEFAULT_FOOD_LIBRARY];
+    } else {
+      const existingNames = new Set(merged.foodLibrary.map(f => (f.name || '').toLowerCase()));
+      DEFAULT_FOOD_LIBRARY.forEach(def => {
+        if (!existingNames.has(def.name.toLowerCase())) merged.foodLibrary.push(def);
+      });
+    }
+
+    if (!Array.isArray(merged.trash)) merged.trash = [];
+    if (!Array.isArray(merged.auditLog)) merged.auditLog = [];
+
     return merged;
   }
 
@@ -1450,7 +1136,6 @@
     delete item.originalCollection;
     delete item.deletedAt;
     if (Array.isArray(db[col])) db[col].unshift(item);
-    logAudit(`Ripristinato dal cestino: ${item.title || item.name || item.desc || 'Elemento'}`);
     saveDB();
     showToast('↩️ Elemento ripristinato');
   }
@@ -1501,7 +1186,7 @@
   }
 
   /* =========================================================================
-     ESPORTAZIONE VERIFICATA ZIP (JSON DOCUMENTATO + CSV TABELLARI + FILE ORIGINALI)
+     BACKUP ZIP & RIPRISTINO UNIVERSALE (ACCETTA SIA .JSON CHE .ZIP)
      ========================================================================= */
   async function exportFullZipBackup() {
     haptic(15);
@@ -1525,29 +1210,6 @@
       }).join("\n");
     zip.file("csv/transazioni_finanziarie.csv", csvTx);
 
-    const csvFood = "ID,Data,Pasto,Alimento,Grammi,Kcal,Carboidrati,Proteine,Grassi\n" +
-      db.foodLogs.map(f => `${f.id},${f.date},"${f.meal}","${f.name}",${f.grams},${f.kcal},${f.carb},${f.prot},${f.fat}`).join("\n");
-    zip.file("csv/diario_alimentare.csv", csvFood);
-
-    const csvWeight = "ID,Data,PesoKg,Dettagli,Note\n" +
-      db.weightLogs.map(w => `${w.id},${w.date},${w.kg},"${w.bodyfat||''}","${w.notes||''}"`).join("\n");
-    zip.file("csv/storico_peso.csv", csvWeight);
-
-    db.vault.forEach(v => {
-      if (v.img && v.img.includes(',')) {
-        const ext = (v.fileMime && v.fileMime.includes('pdf')) ? 'pdf' : 'jpg';
-        const cleanName = v.title.replace(/[^a-z0-9]/gi, '_');
-        zip.file(`allegati_garanzie/${cleanName}_${v.id.slice(0,5)}.${ext}`, v.img.split(',')[1], { base64: true });
-      }
-    });
-    db.medRecords.forEach(m => {
-      if (m.fileData && m.fileData.includes(',')) {
-        const ext = (m.fileMime && m.fileMime.includes('pdf')) ? 'pdf' : 'jpg';
-        const cleanName = m.title.replace(/[^a-z0-9]/gi, '_');
-        zip.file(`allegati_referti_medici/${cleanName}_${m.id.slice(0,5)}.${ext}`, m.fileData.split(',')[1], { base64: true });
-      }
-    });
-
     const content = await zip.generateAsync({ type: "blob" });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(content);
@@ -1557,37 +1219,65 @@
     showToast('📦 Backup ZIP esportato');
   }
 
-  function importBackup(event) {
+  async function importBackup(event) {
     const file = event.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        pushUndoSnapshot('Importazione Backup');
-        const incoming = migrateDB(JSON.parse(e.target.result));
-        const cols = ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'health', 'foodLibrary', 'foodLogs', 'weightLogs', 'medRecords'];
-        cols.forEach(col => {
-          if (Array.isArray(incoming[col])) {
-            const map = new Map((db[col] || []).map(item => [item.id, item]));
-            incoming[col].forEach(inc => {
-              const ex = map.get(inc.id);
-              if (!ex || (inc.updatedAt || 0) > (ex.updatedAt || 0)) map.set(inc.id, inc);
-            });
-            db[col] = Array.from(map.values());
-          }
-        });
-        logAudit('Ripristinato e unito backup esterno');
-        await saveDB();
-        alert('✅ Storico unito e verificato!');
-      } catch (err) {
-        alert('Se hai scaricato lo ZIP, estrai il file database_lifeos_completo.json e selezionalo qui.');
+
+    try {
+      let jsonText = '';
+
+      if (file.name.toLowerCase().endsWith('.zip') && typeof JSZip !== 'undefined') {
+        const zip = await JSZip.loadAsync(file);
+        const jsonFile = Object.values(zip.files).find(f => !f.dir && f.name.toLowerCase().endsWith('.json'));
+        if (!jsonFile) throw new Error('Nessun file .json trovato dentro lo ZIP.');
+        jsonText = await jsonFile.async('string');
+      } else {
+        jsonText = await file.text();
       }
-    };
-    reader.readAsText(file);
+
+      jsonText = jsonText.replace(/^\uFEFF/, '').trim();
+      const rawParsed = JSON.parse(jsonText);
+
+      pushUndoSnapshot('Importazione Backup');
+      const incoming = migrateDB(rawParsed);
+
+      const cols = ['vault', 'crm', 'crmTasks', 'maint', 'accounts', 'financeTx', 'subs', 'health', 'foodLibrary', 'foodLogs', 'weightLogs', 'medRecords'];
+      let importedCount = 0;
+
+      cols.forEach(col => {
+        if (Array.isArray(incoming[col]) && incoming[col].length > 0) {
+          const map = new Map();
+          (db[col] || []).forEach(item => {
+            if (!item.id) item.id = uuid();
+            map.set(item.id, item);
+          });
+          incoming[col].forEach(inc => {
+            if (!inc.id) inc.id = uuid();
+            map.set(inc.id, inc);
+            if (col !== 'foodLibrary') importedCount++;
+          });
+          db[col] = Array.from(map.values());
+        }
+      });
+
+      if (incoming.nutritionGoals) db.nutritionGoals = incoming.nutritionGoals;
+      if (incoming.weightGoal) db.weightGoal = incoming.weightGoal;
+
+      logAudit(`Ripristinati ${importedCount} elementi dal backup`);
+      await saveDB();
+      renderAll();
+      showToast(`✅ Ripristinati ${importedCount} elementi!`);
+      alert(`✅ Ripristino completato!\nSono stati recuperati ${importedCount} record (Oggetti: ${db.vault.length}, Transazioni: ${db.financeTx.length}, Attività: ${db.crmTasks.length}, Persone: ${db.crm.length}, Salute/Pasti: ${db.foodLogs.length + db.weightLogs.length + db.medRecords.length}).`);
+    } catch (err) {
+      console.error('Errore ripristino:', err);
+      alert('❌ Impossibile leggere il file selezionato:\n' + err.message);
+    } finally {
+      event.target.value = '';
+    }
   }
 
   /* =========================================================================
-     RICERCA GLOBALE + DASHBOARD 4 AREE + DOSSIER 360° OGGETTO UNICO
+     RICERCA GLOBALE, DASHBOARD & DOSSIER 360°
      ========================================================================= */
   function toggleDashConfig() {
     const el = document.getElementById('dashConfigBox');
@@ -1619,7 +1309,7 @@
     });
     db.maint.forEach(m => {
       if (m.task.toLowerCase().includes(q) || m.asset.toLowerCase().includes(q) || (m.parts||'').toLowerCase().includes(q))
-        hits.push({ badge: '🔧 Manutenz.', title: `[${m.asset}] ${m.task}`, sub: `€${m.cost||0} • ${m.parts||''}`, action: `switchTab('mod4', document.querySelectorAll('.tab-btn')[3])` });
+        hits.push({ badge: '🔧 Manutenz.', title: `[${m.asset}] ${m.task}`, sub: `€${m.cost||0}`, action: `switchTab('mod4', document.querySelectorAll('.tab-btn')[3])` });
     });
     db.financeTx.forEach(t => {
       if (t.desc.toLowerCase().includes(q) || t.cat.toLowerCase().includes(q))
@@ -1632,16 +1322,12 @@
 
     resDiv.innerHTML = hits.map(h => `
       <div class="item-row" style="cursor:pointer" onclick="${h.action}">
-        <div class="item-info">
-          <h4><span class="pill pill-info">${h.badge}</span> ${h.title}</h4>
-          <p>${h.sub}</p>
-        </div>
+        <div class="item-info"><h4><span class="pill pill-info">${h.badge}</span> ${h.title}</h4><p>${h.sub}</p></div>
         <span class="btn btn-outline">Apri →</span>
       </div>
     `).join('') || `<p style="color:var(--text-muted)">Nessun risultato trovato.</p>`;
   }
 
-  // SCHEDA UNIFICATA 360° DELL'OGGETTO (Es. Lavatrice — Samsung)
   function openObjectDossier(objId) {
     haptic(12);
     const v = db.vault.find(x => x.id === objId);
@@ -1664,28 +1350,28 @@
       </div>
       <div class="kpi-grid">
         <div class="kpi-card"><span>Acquisto</span><strong>€${(v.price||0).toFixed(2)}</strong></div>
-        <div class="kpi-card"><span>Spese Manutenz.</span><strong>€${maintCost.toFixed(2)}</strong></div>
-        <div class="kpi-card"><span>Costo Totale Vita</span><strong style="color:var(--primary)">€${totalTCO.toFixed(2)}</strong></div>
+        <div class="kpi-card"><span>Manutenzioni</span><strong>€${maintCost.toFixed(2)}</strong></div>
+        <div class="kpi-card"><span>Costo Totale</span><strong style="color:var(--primary)">€${totalTCO.toFixed(2)}</strong></div>
         <div class="kpi-card"><span>Garanzia</span><strong>${v.months > 0 ? (daysLeft >= 0 ? daysLeft + ' gg' : 'Scaduta') : 'N/A'}</strong></div>
       </div>
       <div class="meal-box">
-        <div class="meal-header"><span>📚 Knowledge Base (Manuale, Seriale &amp; Copertura)</span></div>
+        <div class="meal-header"><span>📚 Dettagli &amp; Knowledge Base</span></div>
         <p style="font-size:0.84rem; line-height:1.5;">
-          <strong>Categoria:</strong> ${v.cat} • <strong>Seriale/Targa:</strong> ${v.serial || 'Non indicato'} • <strong>Data:</strong> ${v.date}<br>
-          <strong>Istruzioni / Note:</strong> ${v.notes || 'Nessuna istruzione salvata.'}
+          <strong>Categoria:</strong> ${v.cat} • <strong>Seriale/Targa:</strong> ${v.serial || 'N/D'} • <strong>Data:</strong> ${v.date}<br>
+          <strong>Note:</strong> ${v.notes || 'Nessuna nota.'}
         </p>
       </div>
       <div class="meal-box">
-        <div class="meal-header"><span>🔧 Guasti, Riparazioni &amp; Manutenzioni Collegate (${linkedMaint.length})</span></div>
-        ${linkedMaint.map(m => `<p style="font-size:0.82rem; margin-bottom:4px;">• <strong>${m.date}</strong>: ${m.task} (€${(m.cost||0).toFixed(2)}) ${m.parts ? `[Ricambio: ${m.parts}]` : ''}</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessuna manutenzione collegata.</p>`}
+        <div class="meal-header"><span>🔧 Manutenzioni Collegate (${linkedMaint.length})</span></div>
+        ${linkedMaint.map(m => `<p style="font-size:0.82rem;">• <strong>${m.date}</strong>: ${m.task} (€${(m.cost||0).toFixed(2)})</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessuna manutenzione.</p>`}
       </div>
       <div class="meal-box">
-        <div class="meal-header"><span>💰 Transazioni Finanziarie Collegate (${linkedTx.length})</span></div>
-        ${linkedTx.map(t => `<p style="font-size:0.82rem; margin-bottom:4px;">• <strong>${t.date}</strong>: ${t.desc} (€${t.amount.toFixed(2)})</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessuna transazione extra collegata.</p>`}
+        <div class="meal-header"><span>💰 Transazioni Collegate (${linkedTx.length})</span></div>
+        ${linkedTx.map(t => `<p style="font-size:0.82rem;">• <strong>${t.date}</strong>: ${t.desc} (€${t.amount.toFixed(2)})</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessuna transazione.</p>`}
       </div>
       <div class="meal-box">
-        <div class="meal-header"><span>✅ Attività / Promemoria Collegati (${linkedTasks.length})</span></div>
-        ${linkedTasks.map(t => `<p style="font-size:0.82rem; margin-bottom:4px;">• ${t.title} (${t.scope})</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessun promemoria collegato.</p>`}
+        <div class="meal-header"><span>✅ Promemoria Collegati (${linkedTasks.length})</span></div>
+        ${linkedTasks.map(t => `<p style="font-size:0.82rem;">• ${t.title} (${t.scope})</p>`).join('') || `<p style="font-size:0.8rem; color:var(--text-muted)">Nessun promemoria.</p>`}
       </div>
     `;
     document.getElementById('objDossierModal').style.display = 'flex';
@@ -1697,7 +1383,6 @@
     const lastWeight = db.weightLogs.length ? [...db.weightLogs].sort((a,b) => b.date.localeCompare(a.date))[0].kg + ' kg' : '--';
     const netWorth = getTotalNetWorth();
 
-    // 3. AREA SITUAZIONE
     document.getElementById('area_situazione').innerHTML = `
       <div class="kpi-card"><span>Saldo Totale Conti</span><strong style="color:var(--success)">€${netWorth.toFixed(2)}</strong></div>
       <div class="kpi-card"><span>Calorie Oggi</span><strong style="color:var(--primary)">${Math.round(todayKcal)} / ${db.nutritionGoals.kcal}</strong></div>
@@ -1705,19 +1390,14 @@
       <div class="kpi-card"><span>Oggetti Censiti</span><strong>${db.vault.length}</strong></div>
     `;
 
-    // 1. AREA OGGI
     const todayTasks = db.crmTasks.filter(t => !t.done && t.scope === 'Oggi');
     document.getElementById('area_oggi').innerHTML = todayTasks.map(t => `
       <div class="item-row">
-        <div class="item-info">
-          <h4>☀️ ${t.title}</h4>
-          ${t.notes ? `<p>${t.notes}</p>` : ''}
-        </div>
+        <div class="item-info"><h4>☀️ ${t.title}</h4>${t.notes ? `<p>${t.notes}</p>` : ''}</div>
         <button class="btn btn-outline" onclick="toggleTaskDone('${t.id}')">✅ Fatto</button>
       </div>
-    `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna attività urgente per oggi.</p>`;
+    `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna attività per oggi.</p>`;
 
-    // 2. AREA IN SCADENZA (Garanzie, Manutenzioni, Abbonamenti, Visite)
     const expItems = [];
     db.vault.forEach(v => {
       if (v.months > 0) {
@@ -1738,9 +1418,8 @@
 
     document.getElementById('area_scadenza').innerHTML = expItems.map(e => `
       <div class="item-row"><div class="item-info"><h4><span class="pill ${e.pill}">${e.badge}</span> ${e.text}</h4></div></div>
-    `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna scadenza nei prossimi 30 giorni.</p>`;
+    `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna scadenza imminente.</p>`;
 
-    // 4. AREA DA RICORDARE (Note Fissate Pin, Progetti, Contatti da sentire)
     const remItems = [];
     db.crmTasks.filter(t => !t.done && (t.pinned || t.scope === 'Memoria')).forEach(t => {
       remItems.push({ badge: '📌 Fissato', text: t.title, sub: t.notes || '' });
@@ -1754,8 +1433,7 @@
       <div class="item-row"><div class="item-info"><h4><span class="pill pill-purple">${r.badge}</span> ${r.text}</h4>${r.sub ? `<p>${r.sub}</p>` : ''}</div></div>
     `).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessun promemoria fissato.</p>`;
 
-    // Cronologia & Cestino
-    document.getElementById('audit_list').innerHTML = (db.auditLog || []).slice(0, 4).map(a => `• [${a.time}] ${a.text}`).join(' &nbsp;|&nbsp; ') || 'Nessuna modifica recente registrata.';
+    document.getElementById('audit_list').innerHTML = (db.auditLog || []).slice(0, 4).map(a => `• [${a.time}] ${a.text}`).join(' &nbsp;|&nbsp; ') || 'Nessuna modifica recente.';
     document.getElementById('trash_list').innerHTML = (db.trash || []).map(t => `
       <div class="item-row">
         <div class="item-info"><h4>🗑️ ${t.title || t.name || t.desc || t.task || 'Elemento'} <span class="pill pill-warn">${t.originalCollection}</span></h4></div>
@@ -1767,9 +1445,6 @@
     `).join('') || `<p style="color:var(--text-muted); font-size:0.8rem;">Il cestino è vuoto.</p>`;
   }
 
-  /* =========================================================================
-     POPOLAMENTO SELETTORI RELAZIONALI TRA MODULI
-     ========================================================================= */
   function populateRelationalSelectors() {
     const objOpts = '<option value="">-- Nessun Oggetto Collegato --</option>' +
       db.vault.map(v => `<option value="${v.id}">📦 ${v.title}</option>`).join('');
@@ -1798,7 +1473,7 @@
   }
 
   /* =========================================================================
-     MODULO 2: OGGETTI UNIFICATI E GARANZIE
+     MODULO 2: OGGETTI
      ========================================================================= */
   async function handleVaultFileSelect(input) {
     if (input.files && input.files[0]) {
@@ -1850,7 +1525,6 @@
     document.getElementById('v_price').value = v.price || '';
     document.getElementById('v_notes').value = v.notes || '';
     document.getElementById('v_form_title').textContent = '✏️ Modifica Oggetto';
-    document.getElementById('v_submit_btn').text
     document.getElementById('v_submit_btn').textContent = '💾 Aggiorna Oggetto';
     document.getElementById('v_cancel_edit').style.display = 'inline-flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1861,7 +1535,7 @@
     document.getElementById('v_edit_id').value = '';
     document.getElementById('v_date').valueAsDate = new Date();
     document.getElementById('v_form_title').textContent = '📦 Registra Oggetto Unico / Garanzia';
-    document.getElementById('v_submit_btn').textContent = '+ Salva Oggetto nel Nucleo Comune';
+    document.getElementById('v_submit_btn').textContent = '+ Salva Oggetto';
     document.getElementById('v_cancel_edit').style.display = 'none';
     document.getElementById('v_file_label').textContent = '';
     pendingVaultAttachment = null;
@@ -1895,7 +1569,7 @@
       let attachHtml = '';
       if (v.img) {
         if ((v.fileMime && v.fileMime.startsWith('image/')) || v.img.startsWith('data:image/')) {
-          attachHtml = `<img src="${v.img}" class="thumb" onclick="openAttachment('${v.img}', '${v.fileName||''}', '${v.fileMime||''}')" title="Tocca per ingrandire">`;
+          attachHtml = `<img src="${v.img}" class="thumb" onclick="openAttachment('${v.img}', '${v.fileName||''}', '${v.fileMime||''}')">`;
         } else {
           attachHtml = `<span class="file-badge" onclick="openAttachment('${v.img}', '${v.fileName||'documento.pdf'}', '${v.fileMime||'application/pdf'}')">📄 PDF</span>`;
         }
@@ -1922,7 +1596,7 @@
   }
 
   /* =========================================================================
-     MODULO 3: ATTIVITÀ (OGGI/SETTIMANA/PIN) & PERSONE (CRM RELAZIONALE)
+     MODULO 3: ATTIVITÀ & PERSONE
      ========================================================================= */
   function switchCrmSub(subId, btn) {
     haptic(10);
@@ -2008,7 +1682,7 @@
     document.getElementById('c_last').valueAsDate = new Date();
     document.getElementById('c_freq').value = 14;
     document.getElementById('c_notes').value = '';
-    document.getElementById('c_form_title').textContent = '❤️ Registra Persona Unica';
+    document.getElementById('c_form_title').textContent = '❤️ Registra Persona';
     document.getElementById('c_submit_btn').textContent = '+ Salva Persona';
     document.getElementById('c_cancel_edit').style.display = 'none';
   }
@@ -2040,7 +1714,7 @@
             ${t.notes ? `<p>${t.notes}</p>` : ''}
           </div>
           <div style="display:flex; gap:5px;">
-            <button class="btn btn-outline" onclick="toggleTaskPin('${t.id}')" title="Fissa">${t.pinned ? '📌' : '📍'}</button>
+            <button class="btn btn-outline" onclick="toggleTaskPin('${t.id}')">${t.pinned ? '📌' : '📍'}</button>
             <button class="btn btn-outline" onclick="toggleTaskDone('${t.id}')">${t.done ? '↩️' : '✅'}</button>
             <button class="btn btn-danger" onclick="deleteItem('crmTasks','${t.id}')">🗑️</button>
           </div>
@@ -2050,7 +1724,7 @@
 
     const pinned = db.crmTasks.filter(t => t.pinned && !t.done);
     const others = db.crmTasks.filter(t => !t.pinned || t.done);
-    document.getElementById('ct_pinned_list').innerHTML = pinned.map(renderTaskRow).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna nota fissata in alto.</p>`;
+    document.getElementById('ct_pinned_list').innerHTML = pinned.map(renderTaskRow).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna nota fissata.</p>`;
     document.getElementById('ct_todo_list').innerHTML = others.map(renderTaskRow).join('') || `<p style="color:var(--text-muted); font-size:0.82rem;">Nessuna attività in lista.</p>`;
 
     const q = (document.getElementById('c_search')?.value || '').toLowerCase();
@@ -2071,7 +1745,7 @@
             ${c.notes ? `<p style="color:var(--text); margin-top:4px;">🎁 ${c.notes}</p>` : ''}
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-outline" onclick="pingContact('${c.id}')">👋 Sentito Oggi</button>
+            <button class="btn btn-outline" onclick="pingContact('${c.id}')">👋 Sentito</button>
             <button class="btn btn-outline" onclick="editCrmPerson('${c.id}')">✏️</button>
             <button class="btn btn-danger" onclick="deleteItem('crm','${c.id}')">🗑️</button>
           </div>
@@ -2081,7 +1755,7 @@
   }
 
   /* =========================================================================
-     MODULO 4: MANUTENZIONE (COLLEGATA AGLI OGGETTI E ALLE FINANZE)
+     MODULO 4: MANUTENZIONE
      ========================================================================= */
   function addMaintItem(e) {
     e.preventDefault();
@@ -2093,9 +1767,8 @@
     const dateVal = document.getElementById('m_date').value;
     const costVal = parseFloat(document.getElementById('m_cost').value || 0);
 
-    const maintId = uuid();
     db.maint.unshift({
-      id: maintId,
+      id: uuid(),
       updatedAt: Date.now(),
       objectId: objId,
       asset: assetName,
@@ -2122,7 +1795,6 @@
       });
     }
 
-    logAudit(`Manutenzione registrata: ${assetName} - ${taskName}`);
     e.target.reset();
     document.getElementById('m_date').valueAsDate = new Date();
     saveDB();
@@ -2150,7 +1822,7 @@
               <span class="pill ${pill}">${days < 0 ? 'Scaduto' : 'Tra ' + days + ' gg'}</span>
               ${m.objectId ? `<span class="pill pill-purple" style="cursor:pointer" onclick="openObjectDossier('${m.objectId}')">🔍 Dossier</span>` : ''}
             </h4>
-            <p>Eseguito: ${m.date} • Costo: €${(m.cost||0).toFixed(2)} ${m.kmNow ? `• Km: ${m.kmNow} (Prossimo: ${m.kmNext||'--'})` : ''} ${m.parts ? `• Ricambio: <strong>${m.parts}</strong>` : ''}</p>
+            <p>Data: ${m.date} • Costo: €${(m.cost||0).toFixed(2)} ${m.kmNow ? `• Km: ${m.kmNow}` : ''} ${m.parts ? `• Ricambio: <strong>${m.parts}</strong>` : ''}</p>
           </div>
           <button class="btn btn-danger" onclick="deleteItem('maint','${m.id}')">🗑️</button>
         </div>
@@ -2159,7 +1831,7 @@
   }
 
   /* =========================================================================
-     MODULO 5: FINANZE MULTI-CONTO & BILANCIAMENTO SALDO SENZA FINTI MOVIMENTI
+     MODULO 5: FINANZE
      ========================================================================= */
   function getAccountBalance(accId) {
     const acc = db.accounts.find(a => a.id === accId);
@@ -2203,8 +1875,8 @@
     document.getElementById('acc_name').value = a.name;
     document.getElementById('acc_type').value = a.type;
     document.getElementById('acc_base').value = getAccountBalance(a.id).toFixed(2);
-    document.getElementById('acc_form_title').textContent = '⚖️ Rettifica Conto / Saldo';
-    document.getElementById('acc_submit_btn').textContent = '💾 Aggiorna Saldo Reale';
+    document.getElementById('acc_form_title').textContent = '⚖️ Rettifica Conto';
+    document.getElementById('acc_submit_btn').textContent = '💾 Aggiorna Saldo';
     document.getElementById('acc_cancel_btn').style.display = 'inline-flex';
   }
 
@@ -2212,7 +1884,7 @@
     const a = db.accounts.find(x => x.id === id);
     if (!a) return;
     const cur = getAccountBalance(id);
-    const val = prompt(`⚖️ Bilancia Saldo per "${a.name}".\nInserisci il saldo reale attuale (€) — lo storico movimenti rimarrà invariato:`, cur.toFixed(2));
+    const val = prompt(`⚖️ Bilancia Saldo per "${a.name}".\nInserisci il saldo reale attuale (€):`, cur.toFixed(2));
     if (val === null) return;
     const num = parseFloat(val.replace(',', '.'));
     if (isNaN(num)) return;
@@ -2220,7 +1892,6 @@
     const txSum = db.financeTx.filter(t => t.accountId === id).reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
     a.baseBalance = num - txSum;
     a.updatedAt = Date.now();
-    logAudit(`Saldo conto ${a.name} allineato a €${num.toFixed(2)}`);
     saveDB();
     showToast(`⚖️ Saldo ${a.name} aggiornato`);
   }
@@ -2229,7 +1900,7 @@
     document.getElementById('acc_edit_id').value = '';
     document.getElementById('acc_name').value = '';
     document.getElementById('acc_base').value = '0.00';
-    document.getElementById('acc_form_title').textContent = '🏦 Gestione Conti & Carte';
+    document.getElementById('acc_form_title').textContent = '🏦 Gestione Conti';
     document.getElementById('acc_submit_btn').textContent = '+ Aggiungi / Aggiorna Conto';
     document.getElementById('acc_cancel_btn').style.display = 'none';
   }
@@ -2259,7 +1930,6 @@
   function addSub(e) {
     e.preventDefault();
     haptic(15);
-    pushUndoSnapshot('Nuovo Abbonamento');
     db.subs.push({
       id: uuid(),
       updatedAt: Date.now(),
@@ -2299,7 +1969,7 @@
             <p>Saldo Attuale: <strong style="color:${bal >= 0 ? 'var(--success)' : 'var(--danger)'}">€${bal.toFixed(2)}</strong></p>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-outline" onclick="quickBalanceAccount('${a.id}')">⚖️ Bilancia Saldo</button>
+            <button class="btn btn-outline" onclick="quickBalanceAccount('${a.id}')">⚖️ Bilancia</button>
             <button class="btn btn-outline" onclick="editAccount('${a.id}')">✏️</button>
             ${db.accounts.length > 1 ? `<button class="btn btn-danger" onclick="deleteItem('accounts','${a.id}')">🗑️</button>` : ''}
           </div>
@@ -2317,7 +1987,7 @@
       </div>
     `).join('') || `<p style="color:var(--text-muted)">Nessun abbonamento attivo.</p>`;
 
-    document.getElementById('f_list').innerHTML = db.financeTx.slice(0, 40).map(t => {
+    document.getElementById('f_list').innerHTML = db.financeTx.slice(0, 50).map(t => {
       const acc = db.accounts.find(a => a.id === t.accountId);
       const obj = db.vault.find(v => v.id === t.objectId);
       return `
@@ -2337,7 +2007,7 @@
   }
 
   /* =========================================================================
-     MODULO 6: SALUTE OS (FATSECRET + DATABOY + REFERTI + SINTOMI)
+     MODULO 6: SALUTE OS
      ========================================================================= */
   function switchHealthSub(subId, btn) {
     haptic(10);
@@ -2388,7 +2058,7 @@
     });
     e.target.reset();
     saveDB();
-    showToast(`📚 Aggiunto in libreria: ${name}`);
+    showToast(`📚 Aggiunto: ${name}`);
   }
 
   function saveMealEntry(e) {
@@ -2428,8 +2098,8 @@
     document.getElementById('fs_carb').value = m.carb;
     document.getElementById('fs_prot').value = m.prot;
     document.getElementById('fs_fat').value = m.fat;
-    document.getElementById('fs_form_title').textContent = '✏️ Modifica Alimento del Pasto';
-    document.getElementById('fs_submit_btn').textContent = '💾 Aggiorna Pasto';
+    document.getElementById('fs_form_title').textContent = '✏️ Modifica Alimento';
+    document.getElementById('fs_submit_btn').textContent = '💾 Aggiorna';
     document.getElementById('fs_cancel_edit').style.display = 'inline-flex';
   }
 
@@ -2442,7 +2112,7 @@
     document.getElementById('fs_carb').value = 0;
     document.getElementById('fs_prot').value = 0;
     document.getElementById('fs_fat').value = 0;
-    document.getElementById('fs_form_title').textContent = '🍽️ Aggiungi Alimento al Pasto';
+    document.getElementById('fs_form_title').textContent = '🍽️ Aggiungi Alimento';
     document.getElementById('fs_submit_btn').textContent = '+ Registra nel Diario';
     document.getElementById('fs_cancel_edit').style.display = 'none';
   }
@@ -2461,7 +2131,7 @@
       fat: parseInt(fat) || 70
     };
     saveDB();
-    showToast('🎯 Obiettivi nutrizionali aggiornati');
+    showToast('🎯 Obiettivi aggiornati');
   }
 
   function renderNutrition() {
@@ -2511,14 +2181,14 @@
             <div class="item-row" style="padding:8px 10px; margin-bottom:6px;">
               <div class="item-info">
                 <h4>${it.name} (${it.grams}g) — <strong>${Math.round(it.kcal)} kcal</strong></h4>
-                <p>Carb: ${it.carb}g • Prot: ${it.prot}g • Grassi: ${it.fat}g</p>
+                <p>C: ${it.carb}g • P: ${it.prot}g • G: ${it.fat}g</p>
               </div>
               <div style="display:flex; gap:5px;">
                 <button class="btn btn-outline" onclick="editMealEntry('${it.id}')">✏️</button>
                 <button class="btn btn-danger" onclick="deleteItem('foodLogs','${it.id}')">🗑️</button>
               </div>
             </div>
-          `).join('') : `<p style="font-size:0.78rem; color:var(--text-muted)">Nessun alimento registrato.</p>`}
+          `).join('') : `<p style="font-size:0.78rem; color:var(--text-muted)">Nessun alimento.</p>`}
         </div>
       `;
     }).join('');
@@ -2534,13 +2204,12 @@
       <div class="item-row" style="cursor:pointer;" onclick="document.getElementById('fs_date').value='${d}'; renderNutrition();">
         <div class="item-info">
           <h4>📅 ${d} <span class="pill ${byDate[d].kcal <= g.kcal ? 'pill-ok' : 'pill-warn'}">${Math.round(byDate[d].kcal)} kcal</span></h4>
-          <p>${byDate[d].count} alimenti registrati — Tocca per ispezionare</p>
+          <p>${byDate[d].count} alimenti registrati</p>
         </div>
       </div>
-    `).join('') || `<p style="color:var(--text-muted)">Nessuno storico disponibile.</p>`;
+    `).join('') || `<p style="color:var(--text-muted)">Nessuno storico.</p>`;
   }
 
-  /* 6B: DATABOY PESO */
   function saveWeightLog(e) {
     e.preventDefault();
     haptic(15);
@@ -2570,7 +2239,7 @@
     document.getElementById('w_bodyfat').value = w.bodyfat || '';
     document.getElementById('w_notes').value = w.notes || '';
     document.getElementById('w_form_title').textContent = '✏️ Modifica Pesata';
-    document.getElementById('w_submit_btn').textContent = '💾 Aggiorna Pesata';
+    document.getElementById('w_submit_btn').textContent = '💾 Aggiorna';
     document.getElementById('w_cancel_edit').style.display = 'inline-flex';
   }
 
@@ -2580,7 +2249,7 @@
     document.getElementById('w_kg').value = '';
     document.getElementById('w_bodyfat').value = '';
     document.getElementById('w_notes').value = '';
-    document.getElementById('w_form_title').textContent = '⚖️ Registra Pesata (Databoy)';
+    document.getElementById('w_form_title').textContent = '⚖️ Registra Pesata';
     document.getElementById('w_submit_btn').textContent = '+ Salva Pesata';
     document.getElementById('w_cancel_edit').style.display = 'none';
   }
@@ -2589,7 +2258,7 @@
     const val = prompt('Inserisci il tuo Peso Obiettivo (kg):', db.weightGoal || 75);
     if (val === null) return;
     const num = parseFloat(val.replace(',', '.'));
-    if (!isNaN(num)) { db.weightGoal = num; saveDB(); showToast(`🎯 Obiettivo peso: ${num} kg`); }
+    if (!isNaN(num)) { db.weightGoal = num; saveDB(); showToast(`🎯 Obiettivo: ${num} kg`); }
   }
 
   function renderWeight() {
@@ -2602,9 +2271,9 @@
 
     document.getElementById('w_kpis').innerHTML = `
       <div class="kpi-card"><span>Peso Attuale</span><strong>${current ? current.toFixed(1) + ' kg' : '--'}</strong></div>
-      <div class="kpi-card"><span>Media Mobile (7 pesate)</span><strong style="color:var(--primary)">${sorted.length ? avg7.toFixed(1) + ' kg' : '--'}</strong></div>
-      <div class="kpi-card"><span>Variazione Ultima</span><strong style="color:${diff <= 0 ? 'var(--success)' : 'var(--warning)'}">${sorted.length > 1 ? (diff > 0 ? '+' : '') + diff.toFixed(1) + ' kg' : '--'}</strong></div>
-      <div class="kpi-card"><span>Distanza Obiettivo (${db.weightGoal}kg)</span><strong>${toGoal} kg</strong></div>
+      <div class="kpi-card"><span>Media Mobile (7g)</span><strong style="color:var(--primary)">${sorted.length ? avg7.toFixed(1) + ' kg' : '--'}</strong></div>
+      <div class="kpi-card"><span>Variazione</span><strong style="color:${diff <= 0 ? 'var(--success)' : 'var(--warning)'}">${sorted.length > 1 ? (diff > 0 ? '+' : '') + diff.toFixed(1) + ' kg' : '--'}</strong></div>
+      <div class="kpi-card"><span>Da Obiettivo (${db.weightGoal}kg)</span><strong>${toGoal} kg</strong></div>
     `;
 
     document.getElementById('w_list').innerHTML = sorted.map((w, idx) => {
@@ -2614,7 +2283,7 @@
         <div class="item-row">
           <div class="item-info">
             <h4>⚖️ ${w.date} — <strong>${w.kg.toFixed(1)} kg</strong> <span class="pill ${parseFloat(delta) <= 0 ? 'pill-ok' : 'pill-warn'}">${parseFloat(delta) > 0 ? '+' : ''}${delta} kg</span></h4>
-            <p>${w.bodyfat ? `${w.bodyfat} • ` : ''}${w.notes || 'Nessuna nota'}</p>
+            <p>${w.bodyfat ? `${w.bodyfat} • ` : ''}${w.notes || ''}</p>
           </div>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-outline" onclick="editWeightLog('${w.id}')">✏️</button>
@@ -2625,7 +2294,6 @@
     }).join('') || `<p style="color:var(--text-muted)">Nessuna pesata registrata.</p>`;
   }
 
-  /* 6C: VISITE, ECOGRAFIE & RX */
   async function saveMedRecord(e) {
     e.preventDefault();
     haptic(15);
@@ -2670,7 +2338,7 @@
     document.getElementById('med_doctor').value = m.doctor || '';
     document.getElementById('med_notes').value = m.notes || '';
     document.getElementById('med_form_title').textContent = '✏️ Modifica Referto';
-    document.getElementById('med_submit_btn').textContent = '💾 Aggiorna Referto';
+    document.getElementById('med_submit_btn').textContent = '💾 Aggiorna';
     document.getElementById('med_cancel_edit').style.display = 'inline-flex';
   }
 
@@ -2682,8 +2350,8 @@
     document.getElementById('med_doctor').value = '';
     document.getElementById('med_notes').value = '';
     document.getElementById('med_file').value = '';
-    document.getElementById('med_form_title').textContent = '🩻 Registra Visita / Ecografia / RX';
-    document.getElementById('med_submit_btn').textContent = '+ Salva nel Libretto Clinico';
+    document.getElementById('med_form_title').textContent = '🩻 Registra Referto';
+    document.getElementById('med_submit_btn').textContent = '+ Salva Referto';
     document.getElementById('med_cancel_edit').style.display = 'none';
   }
 
@@ -2712,7 +2380,7 @@
             ${attachHtml}
             <div class="item-info">
               <h4><span class="pill pill-info">${m.type}</span> <span class="pill pill-purple">👤 ${m.person || 'Io'}</span> ${m.title}</h4>
-              <p>Data: <strong>${m.date}</strong> ${m.doctor ? `• Medico/Struttura: ${m.doctor}` : ''} ${m.nextDate ? `• 🔔 Controllo: ${m.nextDate}` : ''}</p>
+              <p>Data: <strong>${m.date}</strong> ${m.doctor ? `• ${m.doctor}` : ''} ${m.nextDate ? `• 🔔 Controllo: ${m.nextDate}` : ''}</p>
               ${m.notes ? `<p style="color:var(--text); margin-top:4px;">📋 ${m.notes}</p>` : ''}
             </div>
           </div>
@@ -2722,10 +2390,9 @@
           </div>
         </div>
       `;
-    }).join('') || `<p style="color:var(--text-muted)">Nessun referto medico in archivio.</p>`;
+    }).join('') || `<p style="color:var(--text-muted)">Nessun referto in archivio.</p>`;
   }
 
-  /* 6D: SINTOMI */
   function addHealthLog(e) {
     e.preventDefault();
     haptic(15);
@@ -2742,7 +2409,7 @@
     e.target.reset();
     document.getElementById('h_date').valueAsDate = new Date();
     saveDB();
-    showToast('🩺 Giornata salute salvata');
+    showToast('🩺 Giornata salvata');
   }
 
   function renderSymptoms() {
@@ -2763,16 +2430,16 @@
       <div class="item-row">
         <div class="item-info">
           <h4>⚠️ Fattore: "${k.toUpperCase()}"</h4>
-          <p>Associato a sintomi ${v.count} volte (Intensità media: ${(v.totalSev/v.count).toFixed(1)}/10)</p>
+          <p>Associato a sintomi ${v.count} volte (Media: ${(v.totalSev/v.count).toFixed(1)}/10)</p>
         </div>
       </div>
-    `).join('') || `<p style="color:var(--text-muted)">Registra più giornate per calcolare le correlazioni.</p>`;
+    `).join('') || `<p style="color:var(--text-muted)">Registra più giornate per vedere le correlazioni.</p>`;
 
     document.getElementById('h_list').innerHTML = db.health.map(h => `
       <div class="item-row">
         <div class="item-info">
           <h4>${h.date} — Sonno: ${h.sleep}h | Stress: ${h.stress}/5 <span class="pill ${h.severity > 4 ? 'pill-danger' : 'pill-ok'}">Sintomi: ${h.severity}/10</span></h4>
-          <p>Fattori: ${h.triggers.join(', ') || 'Nessuno'} • Note: ${h.symptoms || 'Benessere regolare'}</p>
+          <p>Fattori: ${h.triggers.join(', ') || 'Nessuno'} • Note: ${h.symptoms || 'Regolare'}</p>
         </div>
         <button class="btn btn-danger" onclick="deleteItem('health','${h.id}')">🗑️</button>
       </div>
@@ -2786,9 +2453,6 @@
     renderSymptoms();
   }
 
-  /* =========================================================================
-     NAVIGAZIONE FLUIDA (VIEW TRANSITIONS API + HAPTIC) & AVVIO
-     ========================================================================= */
   function switchTab(modId, btn) {
     haptic(10);
     const applySwitch = () => {
@@ -2799,12 +2463,8 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
       renderAll();
     };
-
-    if (document.startViewTransition) {
-      document.startViewTransition(applySwitch);
-    } else {
-      applySwitch();
-    }
+    if (document.startViewTransition) document.startViewTransition(applySwitch);
+    else applySwitch();
   }
 
   function renderAll() {
@@ -2822,13 +2482,9 @@
       const el = document.getElementById(id);
       if (el) el.valueAsDate = new Date();
     });
-    if (navigator.storage && navigator.storage.persist) {
-      navigator.storage.persist();
-    }
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
     await loadDB();
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 </script>
 </body>
