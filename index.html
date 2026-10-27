@@ -393,7 +393,10 @@
       padding: 20px;
       box-shadow: 0 25px 60px rgba(0,0,0,0.5);
     }
-
+<label class="btn btn-outline" style="margin:0; cursor:pointer;">
+  ⬆️ Ripristina
+  <input type="file" id="importFile" accept=".json,.zip,application/json,application/zip" style="display:none" onchange="importBackup(event)">
+</label>
     /* FLOATING QUICK ACTION BUTTON (FAB) */
     .fab-quick {
       position: fixed;
