@@ -115,6 +115,63 @@
     .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
     .hub-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
     .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
+    /* ==========================================
+       FIX OTTIMIZZAZIONE MOBILE (S25 Ultra / Smartphone)
+       ========================================== */
+    body, html {
+      overflow-x: hidden !important; /* Blocca l'effetto "sito non centrato" */
+      width: 100%;
+      max-width: 100vw;
+    }
+    
+    @media (max-width: 768px) {
+      /* 1. Forza tutte le card a riempire il 100% dello schermo */
+      .bento-grid > div {
+        grid-column: span 12 !important;
+      }
+      
+      /* 2. Riduci i margini vuoti per sfruttare tutto il display */
+      .main-container {
+        padding: 0 0.75rem;
+        margin-top: 1rem;
+      }
+      
+      /* 3. Comprimi i padding interni delle card */
+      .bento-card {
+        padding: 1.15rem;
+      }
+      
+      /* 4. Fix Navigazione (Barra tipo App Nativa) */
+      .nav-tabs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.35rem;
+        padding-bottom: 0;
+        margin-top: 0.5rem;
+      }
+      
+      .nav-tab {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.2rem;
+        white-space: normal; /* Permette al testo di andare a capo */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.2;
+      }
+      
+      /* 5. Impila i form in verticale per non rimpicciolirli troppo */
+      .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem;
+      }
+      
+      /* 6. Intestazione in alto allineata */
+      .header-top {
+        gap: 0.75rem;
+      }
+    }
   </style>
 </head>
 <body>
