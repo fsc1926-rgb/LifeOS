@@ -325,6 +325,48 @@
           bottom: calc(4.5rem + env(safe-area-inset-bottom)); /* Solleva il FAB sopra la bottom bar */
       }
     }
+    /* ==========================================
+       FIX DEFINITIVO: MODALI NASCOSTI E BOTTOM BAR
+       ========================================== */
+    
+    /* 1. FORZA LE IMPOSTAZIONI A STARE NASCOSTE (Modal) */
+    .modal-backdrop { 
+        position: fixed !important; 
+        inset: 0; 
+        background: rgba(0,0,0,0.85); 
+        backdrop-filter: blur(8px); 
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 99999; 
+        display: none !important; /* Questo cancella il blocco da sotto le macroaree */
+        place-items: center; 
+        padding: 1rem; 
+    }
+    .modal-backdrop.open { 
+        display: grid !important; /* Questo lo fa riapparire SOLO quando clicchi l'ingranaggio */
+    }
+
+    /* 2. FORZA IL MENU IN BASSO SUGLI SMARTPHONE */
+    @media (max-width: 768px) {
+        .nav-tabs { 
+            display: grid !important; 
+            position: fixed !important; 
+            bottom: 0 !important; 
+            left: 0 !important; 
+            right: 0 !important; 
+            background: var(--bg-glass) !important; 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color) !important; 
+            margin: 0 !important; 
+            padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom)) !important;
+            z-index: 9999 !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 0 !important;
+        }
+        .main-container { 
+            padding-bottom: 120px !important; /* Crea lo spazio vuoto in fondo per non coprire i contenuti col menu */
+        }
+    }
   </style>
 </head>
 <body>
