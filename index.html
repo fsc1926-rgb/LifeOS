@@ -7,17 +7,16 @@
   <title>LifeOS v7.0 — Ultimate Edition</title>
   
   <!-- LIBRERIE ESTERNE -->
-  <!-- JSZip per i backup ZIP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <!-- LocalForage (IndexedDB Wrapper per superare il limite di 5MB) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
-  <!-- Chart.js per Data Visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-    /* VARIABILI TEMA */
+    /* ==========================================
+       1. VARIABILI E TEMI (Dark, Light, OLED)
+       ========================================== */
     :root[data-theme="dark"] {
       --bg-primary: #090d16; --bg-secondary: #111827; --bg-card: rgba(30, 41, 59, 0.65);
       --bg-glass: rgba(15, 23, 42, 0.8); --text-primary: #f8fafc; --text-secondary: #94a3b8;
@@ -34,148 +33,6 @@
       --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb;
       --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06); --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12);
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding-bottom: 80px; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: var(--bg-primary); } ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; opacity: 0.4; }
-
-    /* PRIVACY MODE: Sfocherà gli elementi con classe 'sensitive' quando attivo */
-    .sensitive { transition: filter 0.3s ease, opacity 0.3s ease; }
-    body.privacy-active .sensitive { filter: blur(6px); opacity: 0.5; user-select: none; pointer-events: none; }
-
-    /* LOCK SCREEN (PIN) */
-    #lockScreen {
-      position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.4s ease, visibility 0.4s;
-    }
-    #lockScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .pin-box { background: var(--bg-card); padding: 2.5rem; border-radius: 24px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-lg); width: 90%; max-width: 400px; }
-    .pin-input { width: 100%; text-align: center; font-size: 2.5rem; letter-spacing: 0.5rem; background: transparent; border: none; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); margin: 1.5rem 0; outline: none; }
-
-    /* HEADER & NAV */
-    .app-header { position: sticky; top: 0; z-index: 100; background: var(--bg-glass); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
-    .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-    .brand { display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; }
-    .brand-logo { width: 38px; height: 38px; border-radius: 10px; background: var(--accent-gradient); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1.1rem; }
-    
-    .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.2rem; }
-    .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid transparent; background: var(--bg-card); color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s ease; }
-    .nav-tab.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: transparent; }
-
-    /* LAYOUT BASE */
-    .main-container { max-width: 1440px; margin: 1.5rem auto; padding: 0 1.5rem; }
-    .module-section { display: none; animation: fadeIn 0.28s ease; }
-    .module-section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; }
-    .col-span-12 { grid-column: span 12; } .col-span-8 { grid-column: span 8; } .col-span-6 { grid-column: span 6; } .col-span-4 { grid-column: span 4; } .col-span-3 { grid-column: span 3; }
-    @media (max-width: 1024px) { .col-span-8, .col-span-6, .col-span-4, .col-span-3 { grid-column: span 6; } }
-    @media (max-width: 680px) { .col-span-8, .col-span-6, .col-span-4, .col-span-3 { grid-column: span 12; } .nav-tab { font-size: 0.8rem; padding: 0.5rem; } }
-
-    .bento-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.35rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; }
-    .card-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .stat-value { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; font-family: 'JetBrains Mono', monospace; margin: 0.35rem 0; }
-    .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
-
-    /* UI CONTROLS */
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1.1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
-    .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; }
-    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
-    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; border-radius: 8px; }
-    .input, select, textarea { width: 100%; padding: 0.65rem 0.9rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; } .form-row .input { margin-bottom: 0; }
-    .badge { display: inline-flex; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
-
-    /* LISTE, TABS E MODALS */
-    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; }
-    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); }
-    .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-    .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; padding: 0.25rem 0.5rem; }
-    .inner-tab.active { color: var(--accent-primary); border-bottom: 2px solid var(--accent-primary); }
-    
-    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.6rem; }
-    .toast { padding: 0.85rem 1.15rem; border-radius: 12px; background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 500; animation: slideIn 0.25s ease; }
-    @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 1000; display: none; place-items: center; padding: 1rem; }
-    .modal-backdrop.open { display: grid; }
-    .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;}
-    
-    /* CALENDARIO & HUB GRID */
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-top: 0.75rem; }
-    .cal-day-header { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .cal-day { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
-    .cal-day.active { background: var(--accent-gradient); color: #fff; border: none; }
-    .cal-day.today { border: 2px solid var(--accent-primary); }
-    .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); margin-top:3px;}
-
-    .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    .hub-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
-    .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
-    /* ==========================================
-       FIX OTTIMIZZAZIONE MOBILE (S25 Ultra / Smartphone)
-       ========================================== */
-    body, html {
-      overflow-x: hidden !important; /* Blocca l'effetto "sito non centrato" */
-      width: 100%;
-      max-width: 100vw;
-    }
-    
-    @media (max-width: 768px) {
-      /* 1. Forza tutte le card a riempire il 100% dello schermo */
-      .bento-grid > div {
-        grid-column: span 12 !important;
-      }
-      
-      /* 2. Riduci i margini vuoti per sfruttare tutto il display */
-      .main-container {
-        padding: 0 0.75rem;
-        margin-top: 1rem;
-      }
-      
-      /* 3. Comprimi i padding interni delle card */
-      .bento-card {
-        padding: 1.15rem;
-      }
-      
-      /* 4. Fix Navigazione (Barra tipo App Nativa) */
-      .nav-tabs {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.35rem;
-        padding-bottom: 0;
-        margin-top: 0.5rem;
-      }
-      
-      .nav-tab {
-        font-size: 0.75rem;
-        padding: 0.6rem 0.2rem;
-        white-space: normal; /* Permette al testo di andare a capo */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.2;
-      }
-      
-      /* 5. Impila i form in verticale per non rimpicciolirli troppo */
-      .form-row {
-        grid-template-columns: 1fr !important;
-        gap: 0.5rem;
-      }
-      
-      /* 6. Intestazione in alto allineata */
-      .header-top {
-        gap: 0.75rem;
-      }
-    }
-    /* ==========================================
-       UX NATIVA: TEMA OLED, BOTTOM BAR & FAB
-       ========================================== */
-    /* Tema Nero Assoluto per S25 Ultra (Spegne i pixel) */
     :root[data-theme="oled"] {
       --bg-primary: #000000; --bg-secondary: #0a0a0a; --bg-card: rgba(15, 15, 15, 0.8);
       --bg-glass: rgba(0, 0, 0, 0.85); --text-primary: #ffffff; --text-secondary: #a1a1aa;
@@ -185,8 +42,100 @@
       --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.8);
     }
 
-    /* Floating Action Button (Tasto +) */
-    .fab-container { position: fixed; bottom: 6.5rem; right: 1.5rem; z-index: 900; display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
+    /* ==========================================
+       2. RESET E BASE
+       ========================================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body, html { 
+      font-family: 'Inter', sans-serif; 
+      background-color: var(--bg-primary); 
+      color: var(--text-primary); 
+      min-height: 100vh; 
+      overflow-x: hidden; 
+      width: 100%; 
+      max-width: 100vw;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; } 
+    ::-webkit-scrollbar-track { background: var(--bg-primary); } 
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; opacity: 0.4; }
+
+    .sensitive { transition: filter 0.3s ease, opacity 0.3s ease; }
+    body.privacy-active .sensitive { filter: blur(6px); opacity: 0.5; user-select: none; pointer-events: none; }
+
+    /* ==========================================
+       3. COMPONENTI UI (Bottoni, Form, Liste)
+       ========================================== */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1.1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
+    .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; border-radius: 8px; }
+    
+    .input, select, textarea { width: 100%; padding: 0.65rem 0.9rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; } 
+    .form-row .input { margin-bottom: 0; }
+    
+    .badge { display: inline-flex; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
+    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; }
+    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); }
+    
+    .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+    .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; padding: 0.25rem 0.5rem; }
+    .inner-tab.active { color: var(--accent-primary); border-bottom: 2px solid var(--accent-primary); }
+
+    /* ==========================================
+       4. LAYOUT PRINCIPALE E CARDS
+       ========================================== */
+    .main-container { max-width: 1440px; margin: 1.5rem auto; padding: 0 1.5rem; padding-bottom: 30px; }
+    .module-section { display: none; animation: fadeIn 0.28s ease; }
+    .module-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; }
+    .col-span-12 { grid-column: span 12; } .col-span-8 { grid-column: span 8; } .col-span-6 { grid-column: span 6; } .col-span-4 { grid-column: span 4; } .col-span-3 { grid-column: span 3; }
+    
+    .bento-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.35rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; }
+    .card-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .stat-value { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; font-family: 'JetBrains Mono', monospace; margin: 0.35rem 0; }
+    .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
+
+    /* ==========================================
+       5. HEADER & BRAND (Desktop)
+       ========================================== */
+    .app-header { position: sticky; top: 0; z-index: 100; background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
+    .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; padding-bottom: 0.5rem; }
+    
+    .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.03em; white-space: nowrap; }
+    .brand-text { display: flex; align-items: center; gap: 0.4rem; }
+    .brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-gradient); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+    .header-top > div:last-child { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+    /* Navigazione Desktop (In Alto) */
+    .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.2rem; }
+    .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid transparent; background: var(--bg-card); color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s ease; }
+    .nav-tab.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: transparent; }
+
+    /* ==========================================
+       6. ELEMENTI FLUTTUANTI E MODALI
+       ========================================== */
+    /* Modale */
+    .modal-backdrop { position: fixed !important; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; display: none !important; place-items: center; padding: 1rem; }
+    .modal-backdrop.open { display: grid !important; }
+    .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;}
+
+    /* Lock Screen (PIN) */
+    #lockScreen { position: fixed; inset: 0; background: var(--bg-primary); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s; }
+    #lockScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .pin-box { background: var(--bg-card); padding: 2.5rem; border-radius: 24px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-lg); width: 90%; max-width: 400px; }
+    .pin-input { width: 100%; text-align: center; font-size: 2.5rem; letter-spacing: 0.5rem; background: transparent; border: none; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); margin: 1.5rem 0; outline: none; }
+
+    /* Toast Notifications */
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 99999; display: flex; flex-direction: column; gap: 0.6rem; }
+    .toast { padding: 0.85rem 1.15rem; border-radius: 12px; background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 500; animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* Floating Action Button (FAB) */
+    .fab-container { position: fixed; bottom: 2rem; right: 1.5rem; z-index: 9000; display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
     .fab-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: grid; place-items: center; font-size: 1.8rem; box-shadow: var(--shadow-lg); cursor: pointer; border: none; transition: transform 0.2s; }
     .fab-btn:active { transform: scale(0.9); }
     .fab-menu { display: none; flex-direction: column; gap: 0.5rem; }
@@ -194,185 +143,77 @@
     .fab-item { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-card); padding: 0.6rem 1.2rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: var(--shadow-sm); }
     @keyframes fadeInBottom { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Bottom Bar Mobile (Navigazione in basso) */
-    @media (max-width: 768px) {
-      .nav-tabs { 
-        position: fixed; bottom: 0; left: 0; right: 0; 
-        background: var(--bg-glass); backdrop-filter: blur(20px); 
-        border-top: 1px solid var(--border-color); border-bottom: none;
-        margin: 0; padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
-        z-index: 999;
-      }
-      .nav-tab { background: transparent; }
-      .nav-tab.active { background: transparent; color: var(--accent-primary); box-shadow: none; border: none; font-weight: 800; transform: translateY(-2px); }
-      .main-container { padding-bottom: 120px !important; }
-      .fab-container { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
-    }
     /* ==========================================
-       FIX: HEADER, BRAND E BOTTOM NAVIGATION
+       7. GRIGLIE E CALENDARIO
        ========================================== */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-top: 0.75rem; }
+    .cal-day-header { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .cal-day { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .cal-day.active { background: var(--accent-gradient); color: #fff; border: none; }
+    .cal-day.today { border: 2px solid var(--accent-primary); }
+    .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); margin-top:3px;}
     
-    /* Fix allineamento Brand (L7 LifeOS) */
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem; /* Ridotto il gap */
-        font-weight: 800;
-        font-size: 1.1rem; /* Leggermente più piccolo per evitare a capo strani */
-        letter-spacing: -0.03em;
-        white-space: nowrap; /* Impedisce che il testo vada a capo */
-    }
-    
-    /* Contenitore per il testo accanto al logo */
-    .brand-text {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-    
-    .brand-logo {
-        width: 32px; /* Leggermente rimpicciolito */
-        height: 32px;
-        border-radius: 8px;
-        font-size: 1rem;
-        flex-shrink: 0; /* Impedisce al logo di schiacciarsi */
-    }
+    .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .hub-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
 
-    /* Fix Header Top (Pulsanti Privacy/Settings) */
-    .header-top {
-        flex-wrap: nowrap; /* Forza su una riga */
-        padding-bottom: 0.5rem; /* Spazio extra sotto */
-    }
-    
-    .header-top > div:last-child {
-        display: flex;
-        gap: 0.4rem;
-        flex-shrink: 0;
-    }
-
-    /* NAVIGAZIONE DESKTOP (In alto) */
-    .nav-tabs { 
-        max-width: 1440px; 
-        margin: 0.85rem auto 0; 
-        display: flex; /* <-- Questo fa riapparire i bottoni su PC! */
-        gap: 0.5rem; 
-        overflow-x: auto; 
-        padding-bottom: 0.2rem; 
-    }
-
-    /* NAVIGAZIONE MOBILE (Bottom Bar) */
-    @media (max-width: 768px) {
-      .nav-tabs { 
-        display: grid; /* <-- Diventa una bottom bar su telefono */
-        position: fixed; 
-        bottom: 0; 
-        left: 0; 
-        right: 0; 
-        background: var(--bg-glass); 
-        backdrop-filter: blur(20px); 
-        -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid var(--border-color); 
-        border-bottom: none;
-        margin: 0; 
-        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
-        z-index: 999;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0;
-      }
-      /* ... (lascia il resto delle regole .nav-tab per il mobile che avevi già) ... */
-    }
-      
-      .nav-tabs { 
-        display: grid; /* Mostra come griglia */
-        position: fixed; 
-        bottom: 0; 
-        left: 0; 
-        right: 0; 
-        background: var(--bg-glass); 
-        backdrop-filter: blur(20px); 
-        -webkit-backdrop-filter: blur(20px); /* Supporto Safari/iOS */
-        border-top: 1px solid var(--border-color); 
-        border-bottom: none;
-        margin: 0; 
-        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
-        z-index: 999;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0;
-      }
-      
-      .nav-tab { 
-          background: transparent; 
-          border: none;
-          padding: 0.5rem 0.2rem;
-          font-size: 0.7rem; /* Font più piccolo per la bottom bar */
-          flex-direction: column;
-          gap: 0.2rem;
-      }
-      
-      .nav-tab.active { 
-          background: transparent; 
-          color: var(--accent-primary); 
-          box-shadow: none; 
-          transform: translateY(-2px); 
-      }
-      
-      .main-container { 
-          padding-bottom: 100px !important; /* Spazio per la bottom bar */
-          margin-top: 0.5rem;
-      }
-      
-      .fab-container { 
-          bottom: calc(4.5rem + env(safe-area-inset-bottom)); /* Solleva il FAB sopra la bottom bar */
-      }
-    }
     /* ==========================================
-       FIX DEFINITIVO: MODALI NASCOSTI E BOTTOM BAR
+       8. OTTIMIZZAZIONE MOBILE DEFINITIVA
        ========================================== */
-    
-    /* 1. FORZA LE IMPOSTAZIONI A STARE NASCOSTE (Modal) */
-    .modal-backdrop { 
+    @media (max-width: 768px) {
+      /* Grid e Padding Layout */
+      .bento-grid > div { grid-column: span 12 !important; }
+      .main-container { padding: 0 0.75rem; margin-top: 0.5rem; padding-bottom: 120px !important; }
+      .bento-card { padding: 1.15rem; }
+      .form-row { grid-template-columns: 1fr !important; gap: 0.5rem; }
+      
+      /* Header Slimmer */
+      .app-header { padding: 0.75rem 1rem; }
+
+      /* Sposta Navigation Bar in basso */
+      .nav-tabs { 
+        display: grid !important; 
         position: fixed !important; 
-        inset: 0; 
-        background: rgba(0,0,0,0.85); 
-        backdrop-filter: blur(8px); 
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 99999; 
-        display: none !important; /* Questo cancella il blocco da sotto le macroaree */
-        place-items: center; 
-        padding: 1rem; 
-    }
-    .modal-backdrop.open { 
-        display: grid !important; /* Questo lo fa riapparire SOLO quando clicchi l'ingranaggio */
-    }
-
-    /* 2. FORZA IL MENU IN BASSO SUGLI SMARTPHONE */
-    @media (max-width: 768px) {
-        .nav-tabs { 
-            display: grid !important; 
-            position: fixed !important; 
-            bottom: 0 !important; 
-            left: 0 !important; 
-            right: 0 !important; 
-            background: var(--bg-glass) !important; 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-color) !important; 
-            margin: 0 !important; 
-            padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom)) !important;
-            z-index: 9999 !important;
-            grid-template-columns: repeat(4, 1fr) !important;
-            gap: 0 !important;
-        }
-        .main-container { 
-            padding-bottom: 120px !important; /* Crea lo spazio vuoto in fondo per non coprire i contenuti col menu */
-        }
+        bottom: 0 !important; 
+        left: 0 !important; 
+        right: 0 !important; 
+        background: var(--bg-glass) !important; 
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border-color) !important; 
+        margin: 0 !important; 
+        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom)) !important;
+        z-index: 9999 !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 0 !important;
+      }
+      .nav-tab { 
+        background: transparent !important; 
+        border: none !important;
+        padding: 0.5rem 0.2rem !important;
+        font-size: 0.7rem !important; 
+        flex-direction: column;
+        gap: 0.2rem;
+        line-height: 1.2;
+        white-space: normal;
+      }
+      .nav-tab.active { 
+        color: var(--accent-primary) !important; 
+        box-shadow: none !important; 
+        transform: translateY(-2px); 
+      }
+      
+      /* Solleva FAB e Toast sopra la Bottom Bar */
+      .fab-container { bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+      #toast-container { bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
     }
   </style>
 </head>
 <body>
 
   <!-- SCHERMATA DI BLOCCO (PIN) -->
-<div id="lockScreen" class="hidden">    <div class="pin-box">
+  <div id="lockScreen" class="hidden">
+    <div class="pin-box">
       <div class="brand-logo" style="margin: 0 auto 1rem; width: 50px; height: 50px; font-size: 1.5rem;">L7</div>
       <h2>LifeOS Ultimate</h2>
       <p class="stat-label">Inserisci il PIN per accedere ai tuoi dati</p>
@@ -383,7 +224,7 @@
 
   <div id="toast-container" aria-live="polite"></div>
 
- <!-- HEADER PRINCIPALE & NAVIGAZIONE -->
+  <!-- HEADER PRINCIPALE & NAVIGAZIONE -->
   <header class="app-header">
     <div class="header-top">
       <div class="brand">
@@ -399,7 +240,6 @@
       </div>
     </div>
     
-    <!-- La navigazione viene gestita via CSS per stare in basso su Mobile -->
     <nav class="nav-tabs" role="tablist">
       <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
       <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Calendario</button>
@@ -416,7 +256,6 @@
     <section id="mod-dashboard" class="module-section active">
       <div class="bento-grid">
         
-        <!-- Liquidità / Finanze Overview -->
         <div class="bento-card col-span-4">
           <div class="card-header">
             <span class="card-title">💰 Liquidità Totale</span>
@@ -425,13 +264,11 @@
           <div class="stat-value sensitive" id="dashNetWorth">€ 0,00</div>
           <div class="stat-label" id="dashAccountsCount">0 conti attivi</div>
           
-          <!-- Grafico Patrimonio/Spese -->
           <div style="margin-top: 1.5rem; height: 160px; position: relative;">
             <canvas id="dashboardChart"></canvas>
           </div>
         </div>
 
-        <!-- Promemoria Salute -->
         <div class="bento-card col-span-4">
           <div class="card-header">
             <span class="card-title">💊 Terapie & Promemoria</span>
@@ -441,7 +278,6 @@
           <div id="dashPillReminders" class="item-list" style="max-height: 300px;"></div>
         </div>
 
-        <!-- Agenda & Attività Imminenti -->
         <div class="bento-card col-span-4">
           <div class="card-header">
             <span class="card-title">📌 Agenda & Attività</span>
@@ -451,6 +287,7 @@
         </div>
       </div>
     </section>
+
     <!-- ==========================================
          MACROAREA 4: HUB MODULI EXTRA
          ========================================== -->
@@ -465,16 +302,14 @@
             <div class="card-title" style="justify-content:center;">Salute OS (DB Mode)</div>
             <div class="stat-label">Cartella Clinica, Upload File Asincrono, Grafici Peso e Nutrizione</div>
           </div>
-          
           <div class="hub-card" onclick="App.openHubModule('mod-inventory')">
             <div class="hub-icon">📦</div>
             <div class="card-title" style="justify-content:center;">Garanzie & Archivio</div>
             <div class="stat-label">Registro Garanzie e Archivio Oggetti Base</div>
           </div>
-          
           <div class="hub-card" onclick="App.openHubModule('mod-maintenance')">
             <div class="hub-icon">🔧</div>
-            <div class="card-title" style="justify-content:center;">Manutenzioni (Auto-rinnovo)</div>
+            <div class="card-title" style="justify-content:center;">Manutenzioni</div>
             <div class="stat-label">Scadenziario Tagliandi e Interventi con automazione</div>
           </div>
         </div>
@@ -486,7 +321,6 @@
          ========================================== -->
     <section id="mod-calendar" class="module-section">
       <div class="bento-grid">
-        <!-- Calendario Mensile -->
         <div class="bento-card col-span-5">
           <div>
             <div class="card-header">
@@ -506,7 +340,6 @@
           </div>
         </div>
 
-        <!-- Attività & Promemoria del Giorno -->
         <div class="bento-card col-span-4">
           <div>
             <div class="card-header">
@@ -533,7 +366,6 @@
           </div>
         </div>
 
-        <!-- Diario & Pensieri -->
         <div class="bento-card col-span-3">
           <div>
             <div class="card-header"><div class="card-title">📓 Diario & Umore</div></div>
@@ -557,11 +389,7 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         SOTTOMODULI HUB (Aperti dinamicamente)
-         ========================================== -->
-
-    <!-- HUB 1: INVENTARIO (Registro Garanzie + Archivio Sdoppiato) -->
+    <!-- HUB 1: INVENTARIO -->
     <section id="mod-inventory" class="module-section">
       <div class="card-header" style="margin-bottom: 1.25rem;">
         <div class="card-title">📦 Sistema Inventario: Garanzie & Archivio</div>
@@ -589,24 +417,19 @@
                 <option value="Archivio">📦 Archivio Generale</option>
               </select>
             </div>
-            
             <input type="text" id="invName" class="input" placeholder="Nome Oggetto *" required>
-            
             <div class="form-row">
               <select id="invCategory" class="input" onchange="App.updateInvSubcategories()" required></select>
               <select id="invSubcategory" class="input" required></select>
             </div>
-            
             <div class="form-row">
               <div class="form-group"><label>Data Acquisto</label><input type="date" id="invDate" class="input"></div>
               <div class="form-group"><label>Scadenza Garanzia</label><input type="date" id="invWarranty" class="input"></div>
             </div>
-            
             <div class="form-row">
               <div class="form-group"><label>Valore (€)</label><input type="number" id="invPrice" class="input" step="0.01" value="0"></div>
               <div class="form-group"><label>Posizione</label><input type="text" id="invLocation" class="input" placeholder="Stanza/Luogo"></div>
             </div>
-            
             <input type="text" id="invNotes" class="input" placeholder="S/N, numero scontrino, dettagli negozio...">
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva nel Registro</button>
           </form>
@@ -617,7 +440,6 @@
             <button class="inner-tab active" id="tab-garanzie" onclick="App.switchInvTab('garanzie')">🛡️ Registro Garanzie</button>
             <button class="inner-tab" id="tab-archivio" onclick="App.switchInvTab('archivio')">📦 Archivio Oggetti</button>
           </div>
-          
           <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
             <select id="invFilterCat" class="input" style="width: auto;" onchange="App.renderInventory()">
               <option value="ALL">Tutte le categorie</option>
@@ -639,7 +461,7 @@
       <div class="bento-card col-span-12" style="margin-bottom: 1.25rem; padding: 1rem;">
         <div class="stat-label" style="margin-bottom: 0.5rem; font-weight:600;">⚙️ Personalizza Categorie Manutenzione:</div>
         <div class="form-row" style="margin-bottom:0;">
-          <input type="text" id="newMaintCatInput" class="input" placeholder="Es. Giardino, Elettronica, Salute Domestica...">
+          <input type="text" id="newMaintCatInput" class="input" placeholder="Es. Giardino, Elettronica...">
           <button type="button" class="btn btn-sm" onclick="App.addMaintenanceCategory()">+ Aggiungi Categoria</button>
         </div>
       </div>
@@ -686,12 +508,10 @@
         </div>
       </div>
     </section>
-    <!-- ==========================================
-         MACROAREA 3: FINANZE MULTI-CONTO (Con Cron Jobs)
-         ========================================== -->
+
+    <!-- MACROAREA 3: FINANZE -->
     <section id="mod-finance" class="module-section">
       <div class="bento-grid">
-        <!-- Conti e Gestione -->
         <div class="bento-card col-span-4">
           <div class="card-header">
             <div class="card-title">🏦 I Miei Conti</div>
@@ -708,7 +528,6 @@
             <button type="submit" class="btn btn-sm" style="width: 100%;">+ Crea Conto</button>
           </form>
 
-          <!-- Bilanciamento Saldo -->
           <div style="padding: 0.9rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color);">
             <div class="card-title" style="font-size: 0.88rem; margin-bottom: 0.4rem;">⚖️ Allineamento Saldo</div>
             <div class="form-row">
@@ -719,7 +538,6 @@
           </div>
         </div>
 
-        <!-- Transazioni e Registro -->
         <div class="bento-card col-span-8">
           <div class="card-header"><div class="card-title">💸 Registra Transazione</div></div>
           <form onsubmit="App.addTransaction(event)" style="margin-bottom: 1.25rem;">
@@ -741,7 +559,7 @@
             </div>
             <div class="form-row">
               <input type="date" id="txDate" class="input" required>
-              <select id="txRecurrence" class="input" title="Auto-registrazione futura">
+              <select id="txRecurrence" class="input">
                 <option value="Singola">Ripetizione: Singola</option>
                 <option value="Mensile">Ripetizione: Mensile</option>
                 <option value="Annuale">Ripetizione: Annuale</option>
@@ -759,7 +577,7 @@
       </div>
     </section>
 
-    <!-- HUB 3: SALUTE OS UNIFICATO (DB Mode) -->
+    <!-- HUB 3: SALUTE OS UNIFICATO -->
     <section id="mod-health" class="module-section">
       <div class="card-header" style="margin-bottom: 1.25rem;">
         <div class="card-title">❤️ Salute OS: Clinica, Nutrizione & Trend</div>
@@ -767,7 +585,6 @@
       </div>
 
       <div class="bento-grid">
-        <!-- Nutrizione Separata -->
         <div class="bento-card col-span-4">
           <div class="card-header"><div class="card-title">🍎 Nutrizione (Kcal & Macro)</div></div>
           <form onsubmit="App.addNutritionLog(event)" style="margin-bottom: 1rem;">
@@ -786,14 +603,11 @@
           <div id="healthNutritionList" class="item-list" style="max-height: 250px;"></div>
         </div>
 
-        <!-- Andamento Peso CON GRAFICO CHART.JS -->
         <div class="bento-card col-span-3">
           <div class="card-header"><div class="card-title">⚖️ Andamento Peso</div></div>
-          
           <div style="margin-bottom: 1rem; height: 130px; position: relative;" class="sensitive">
             <canvas id="weightChart"></canvas>
           </div>
-
           <form onsubmit="App.addWeightLog(event)" style="margin-bottom: 1rem;">
             <div class="form-row">
               <input type="number" id="weightValue" class="input" step="0.1" min="20" placeholder="Peso (kg) *" required>
@@ -804,7 +618,6 @@
           <div id="healthWeightList" class="item-list sensitive" style="max-height: 150px;"></div>
         </div>
 
-        <!-- Cartella Clinica, Referti & File -->
         <div class="bento-card col-span-5">
           <div class="card-header"><div class="card-title">🩺 Cartella Clinica & Referti</div></div>
           <form onsubmit="App.addMedicalRecord(event)" style="margin-bottom: 1rem;">
@@ -817,16 +630,13 @@
               <input type="date" id="medDate" class="input" required>
             </div>
             <input type="text" id="medTitle" class="input" placeholder="Oggetto (es. Visita Cardiologica) *" required>
-            
             <div id="medTherapyGroup">
               <input type="text" id="medTherapy" class="input" placeholder="Terapia prescritta (per promemoria dashboard)">
             </div>
-            
             <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.5rem; border-radius: 8px; margin-bottom: 0.75rem;">
               <label style="font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:0.3rem;">Allega Esito (PDF o JPEG - No Limiti DB)</label>
               <input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png" style="margin-bottom:0; padding:0.3rem;">
             </div>
-
             <input type="text" id="medNotes" class="input" placeholder="Note cliniche, valori, esiti...">
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella Clinica (DB)</button>
           </form>
@@ -834,10 +644,9 @@
         </div>
       </div>
     </section>
-
   </main>
 
-  <!-- FAB: AGGIUNTA RAPIDA (Pulsante +) -->
+  <!-- FAB: AGGIUNTA RAPIDA -->
   <div class="fab-container">
     <div class="fab-menu" id="fabMenu">
       <div class="fab-item" onclick="App.quickAdd('txAmount')">💸 Nuova Spesa</div>
@@ -847,7 +656,7 @@
     <button class="fab-btn" onclick="App.toggleFab()">+</button>
   </div>
 
-  <!-- MODALE IMPOSTAZIONI (Nascosto finché non si clicca l'ingranaggio) -->
+  <!-- MODALE IMPOSTAZIONI -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="card-header">
@@ -856,8 +665,6 @@
       </div>
       
       <div class="bento-grid">
-        
-        <!-- Aspetto & Feedback -->
         <div class="bento-card col-span-12" style="padding: 1.2rem;">
           <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">🎨 Interfaccia & Sensazioni</div>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -866,7 +673,6 @@
           </div>
         </div>
 
-        <!-- Sicurezza PIN -->
         <div class="bento-card col-span-12" style="padding: 1.2rem;">
           <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">🔒 Protezione Avvio (PIN)</div>
           <div class="form-row" style="margin-bottom: 0.5rem;">
@@ -876,108 +682,58 @@
           <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Disattiva PIN</button>
         </div>
 
-        <!-- Dati: Export & Reset -->
         <div class="bento-card col-span-12" style="padding: 1.2rem;">
           <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">📊 Gestione Dati Personali</div>
-          
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
              <button class="btn btn-sm" onclick="App.exportCSV('finance')" style="flex:1;">⬇️ CSV Finanze</button>
              <button class="btn btn-sm" onclick="App.exportCSV('health')" style="flex:1;">⬇️ CSV Salute</button>
           </div>
-          
           <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 1rem; background: var(--bg-secondary);">💾 Backup Completo JSON</button>
-          
           <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
-          
           <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Elimina Tutti i Dati (Reset App)</button>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- Inizio codice JavaScript... -->
-
-  <!-- ==========================================
-       MOTORE JAVASCRIPT: LOGICA DI BUSINESS (IndexedDB)
-       ========================================== -->
+  <!-- MOTORE JAVASCRIPT -->
   <script>
-    // Configura LocalForage (IndexedDB) per bypassare il limite di 5MB
-    localforage.config({
-      driver: localforage.INDEXEDDB,
-      name: 'LifeOS_v7',
-      version: 1.0,
-      storeName: 'lifeos_data',
-      description: 'Database unificato LifeOS Ultimate'
-    });
+    localforage.config({ driver: localforage.INDEXEDDB, name: 'LifeOS_v7', version: 1.0, storeName: 'lifeos_data' });
 
     const App = {
-      // 1. STATO GLOBALE (ora gestito tramite localForage)
       state: {
-        pin: null, // Hash o plain-text locale del PIN
-        lastCronRun: null, // Data dell'ultima esecuzione dei Cron Jobs
-        inventory: [],
-        calendarTasks: [],
-        journal: [],
-        maintenances: [],
-        accounts: [],
-        transactions: [],
-        healthNutrition: [],
-        healthWeight: [],
-        healthMedical: [],
+        pin: null, lastCronRun: null, inventory: [], calendarTasks: [], journal: [],
+        maintenances: [], accounts: [], transactions: [], healthNutrition: [], healthWeight: [], healthMedical: [],
         settings: {
-          inventoryCategories: {
-            'Elettronica': ['Smartphone', 'Computer', 'Casa'],
-            'Veicoli': ['Auto', 'Moto'],
-            'Casa': ['Elettrodomestici', 'Mobili']
-          },
+          inventoryCategories: { 'Elettronica': ['Smartphone', 'Computer', 'Casa'], 'Veicoli': ['Auto', 'Moto'], 'Casa': ['Elettrodomestici', 'Mobili'] },
           maintenanceCategories: ['Casa', 'Auto', 'Salute', 'Altro']
         }
       },
       currentDate: new Date(),
       selectedDate: new Date(),
       activeInvTab: 'garanzie',
-      charts: {}, // Riferimenti alle istanze di Chart.js
-      // ==========================================
-      // 2. CORE UTILS (IndexedDB, UI, Base64)
-      // ==========================================
-      async save() {
-        try {
-          await localforage.setItem('appData', this.state);
-          this.renderDashboard();
-        } catch (e) {
-          this.showToast('Errore di salvataggio dati', 'danger');
-        }
-      },
-      async load() {
-        try {
-          const data = await localforage.getItem('appData');
-          if (data) this.state = { ...this.state, ...data };
-        } catch (e) {
-          console.error("Errore IndexedDB:", e);
-        }
-      },
+      charts: {},
+
+      async save() { try { await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore di salvataggio dati', 'danger'); } },
+      async load() { try { const data = await localforage.getItem('appData'); if (data) this.state = { ...this.state, ...data }; } catch (e) {} },
+      
       showToast(msg, type = 'success') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`;
         container.appendChild(toast);
-        setTimeout(() => {
-          toast.style.animation = 'slideIn 0.3s ease reverse forwards';
-          setTimeout(() => toast.remove(), 300);
-        }, 3500);
+        setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse forwards'; setTimeout(() => toast.remove(), 300); }, 3500);
       },
+      
       openModal(id) { document.getElementById(id).classList.add('open'); },
       closeModal(id) { document.getElementById(id).classList.remove('open'); },
       
       switchModule(modId) {
         document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-        const target = document.getElementById(modId);
-        if(target) target.classList.add('active');
-        const tab = document.querySelector(`.nav-tab[data-target="${modId}"]`);
-        if (tab) tab.classList.add('active');
+        const target = document.getElementById(modId); if(target) target.classList.add('active');
+        const tab = document.querySelector(`.nav-tab[data-target="${modId}"]`); if (tab) tab.classList.add('active');
         if (modId === 'mod-dashboard') this.renderDashboard();
         if (modId === 'mod-calendar') this.renderCalendar();
         if (modId === 'mod-finance') { this.populateAccountSelects(); this.renderFinance(); }
@@ -995,306 +751,145 @@
         document.getElementById(`tab-${tabId}`).classList.add('active');
         this.renderInventory();
       },
-     toggleTheme() {
-        const html = document.documentElement;
-        const current = html.getAttribute('data-theme');
-        const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark';
-        html.setAttribute('data-theme', nextTheme);
-        this.save(); // Salva se vuoi, ma basta per la sessione
-        this.showToast(`Tema attivato: ${nextTheme.toUpperCase()}`);
-      },
 
+      toggleTheme() {
+        const html = document.documentElement; const current = html.getAttribute('data-theme');
+        const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark';
+        html.setAttribute('data-theme', nextTheme); this.save(); this.showToast(`Tema: ${nextTheme.toUpperCase()}`);
+      },
       toggleHaptic() {
         if (!this.state.settings) this.state.settings = {};
         this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled;
         this.save();
         if (this.state.settings.hapticEnabled) this.vibrate(20);
-        this.showToast(this.state.settings.hapticEnabled ? 'Vibrazione Attivata 📳' : 'Vibrazione Disattivata 🔕');
+        this.showToast(this.state.settings.hapticEnabled ? 'Vibrazione Attivata' : 'Vibrazione Disattivata');
         this.updateHapticButton();
       },
-
       updateHapticButton() {
         const btn = document.getElementById('hapticBtn');
         if (btn) btn.innerText = (this.state.settings && this.state.settings.hapticEnabled) ? '📳 Disattiva Vibrazione' : '🔕 Attiva Vibrazione';
       },
-
-      vibrate(ms = 10) {
-        // Funziona perfettamente sui dispositivi Android come il tuo S25 Ultra
-        if (this.state.settings && this.state.settings.hapticEnabled && navigator.vibrate) {
-          navigator.vibrate(ms);
-        }
-      },
-
-      toggleFab() {
-        document.getElementById('fabMenu').classList.toggle('open');
-        this.vibrate(10);
-      },
-
+      vibrate(ms = 10) { if (this.state.settings && this.state.settings.hapticEnabled && navigator.vibrate) navigator.vibrate(ms); },
+      toggleFab() { document.getElementById('fabMenu').classList.toggle('open'); this.vibrate(10); },
       quickAdd(inputId) {
         this.toggleFab();
         if (inputId === 'txAmount') this.switchModule('mod-finance');
         else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar');
         else if (inputId === 'weightValue') this.openHubModule('mod-health');
-        
-        // Attende la fine dell'animazione per mettere a fuoco la tastiera
-        setTimeout(() => {
-          const input = document.getElementById(inputId);
-          if(input) { 
-            input.focus(); 
-            input.scrollIntoView({behavior: 'smooth', block: 'center'}); 
-          }
-        }, 350);
+        setTimeout(() => { const input = document.getElementById(inputId); if(input) { input.focus(); input.scrollIntoView({behavior: 'smooth', block: 'center'}); } }, 350);
       },
+
       formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount); },
       formatDate(dateStr) { return dateStr ? new Date(dateStr).toLocaleDateString('it-IT') : '--'; },
       generateId() { return Math.random().toString(36).substr(2, 9); },
       fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
+        return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); });
       },
 
-      // ==========================================
-      // 3. SICUREZZA, PIN & PRIVACY
-      // ==========================================
       savePin() {
         const pin = document.getElementById('setupPinInput').value;
-        if (pin.length === 4) {
-          this.state.pin = pin; this.save();
-          document.getElementById('setupPinInput').value = '';
-          this.showToast('PIN Salvato. Sarà richiesto al prossimo avvio.');
-        } else {
-          this.showToast('Il PIN deve essere di 4 cifre', 'warning');
-        }
+        if (pin.length === 4) { this.state.pin = pin; this.save(); document.getElementById('setupPinInput').value = ''; this.showToast('PIN Salvato.'); } 
+        else this.showToast('Il PIN deve essere di 4 cifre', 'warning');
       },
-      removePin() {
-        this.state.pin = null; this.save();
-        this.showToast('PIN rimosso. Accesso libero.');
-      },
+      removePin() { this.state.pin = null; this.save(); this.showToast('PIN rimosso.'); },
       verifyPin() {
         const input = document.getElementById('loginPinInput').value;
-        if (input === this.state.pin) {
-          document.getElementById('lockScreen').classList.add('hidden');
-          this.runCronJobs(); // Avvia automazioni solo dopo lo sblocco
-          this.switchModule('mod-dashboard');
-        } else {
-          this.showToast('PIN Errato', 'danger');
-          document.getElementById('loginPinInput').value = '';
-        }
+        if (input === this.state.pin) { document.getElementById('lockScreen').classList.add('hidden'); this.runCronJobs(); this.switchModule('mod-dashboard'); } 
+        else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; }
       },
       togglePrivacyMode() {
-        document.body.classList.toggle('privacy-active');
-        const isActive = document.body.classList.contains('privacy-active');
-        document.getElementById('privacyBtn').innerHTML = isActive ? '🔒 Nascosto' : '👁️ Privacy';
-        this.showToast(isActive ? 'Dati sensibili oscurati' : 'Dati sensibili in chiaro', 'info');
+        document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active');
+        document.getElementById('privacyBtn').innerHTML = isActive ? '🔒' : '👁️'; this.showToast(isActive ? 'Dati oscurati' : 'Dati in chiaro', 'info');
       },
 
-      // ==========================================
-      // 4. CRON JOBS E AUTOMAZIONI (ESEGUITI ALL'AVVIO)
-      // ==========================================
       runCronJobs() {
-        const currentMonth = new Date().toISOString().slice(0, 7); // es. 2026-10
-        if (!this.state.lastCronRun) { 
-          this.state.lastCronRun = currentMonth; 
-          this.save(); return; 
-        }
-        
-        // Se è iniziato un nuovo mese dall'ultimo accesso
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        if (!this.state.lastCronRun) { this.state.lastCronRun = currentMonth; this.save(); return; }
         if (this.state.lastCronRun < currentMonth) {
           let tasksRun = 0;
-          
-          // 1. Processa Transazioni Ricorrenti
-          const recurringTx = this.state.transactions.filter(t => t.recurrence === 'Mensile');
-          recurringTx.forEach(tx => {
+          this.state.transactions.filter(t => t.recurrence === 'Mensile').forEach(tx => {
             const acc = this.state.accounts.find(a => a.id === tx.accountId);
             if(acc) {
               const newTx = { ...tx, id: this.generateId(), date: new Date().toISOString().slice(0,10), timestamp: new Date().toISOString() };
-              if(newTx.type === 'EXPENSE') acc.balance -= newTx.amount;
-              if(newTx.type === 'INCOME') acc.balance += newTx.amount;
-              this.state.transactions.push(newTx);
-              tasksRun++;
+              if(newTx.type === 'EXPENSE') acc.balance -= newTx.amount; if(newTx.type === 'INCOME') acc.balance += newTx.amount;
+              this.state.transactions.push(newTx); tasksRun++;
             }
           });
-
-          // 2. Processa Manutenzioni Scadute Ricorrenti
-          const recurringMaint = this.state.maintenances.filter(m => m.recurrence === 'Mensile' && m.status === 'Completata');
-          recurringMaint.forEach(m => {
-            // Sposta avanti di 1 mese
-            let d = new Date(m.dueDate); d.setMonth(d.getMonth() + 1);
-            m.dueDate = d.toISOString().slice(0,10);
-            m.status = 'In attesa';
-            tasksRun++;
+          this.state.maintenances.filter(m => m.recurrence === 'Mensile' && m.status === 'Completata').forEach(m => {
+            let d = new Date(m.dueDate); d.setMonth(d.getMonth() + 1); m.dueDate = d.toISOString().slice(0,10); m.status = 'In attesa'; tasksRun++;
           });
-
-          this.state.lastCronRun = currentMonth;
-          this.save();
-          if(tasksRun > 0) this.showToast(`Automazioni eseguite: ${tasksRun} task generati per il nuovo mese.`, 'info');
+          this.state.lastCronRun = currentMonth; this.save();
+          if(tasksRun > 0) this.showToast(`Automazioni: ${tasksRun} task generati.`, 'info');
         }
       },
 
-      // ==========================================
-      // 5. ESPORTAZIONE DATI (CSV & JSON)
-      // ==========================================
       exportJSON() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2));
-        const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v7_DB_${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a); a.click(); a.remove();
-        this.showToast('Backup JSON salvato.');
+        const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_Backup.json`;
+        document.body.appendChild(a); a.click(); a.remove(); this.showToast('Backup salvato.');
       },
       exportCSV(type) {
         let csv = '';
         if (type === 'finance') {
           csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n';
-          this.state.transactions.forEach(t => {
-            const acc = this.state.accounts.find(a => a.id === t.accountId);
-            csv += `${t.date},${t.type},${t.amount},${acc ? acc.name : 'N/D'},${t.category},${t.desc}\n`;
-          });
+          this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},${acc ? acc.name : 'N/D'},${t.category},${t.desc}\n`; });
         } else if (type === 'health') {
           csv = 'Data,Peso (kg),Kcal,Proteine,Carboidrati,Grassi\n';
-          // Raggruppa per data
           const days = [...new Set([...this.state.healthWeight.map(w=>w.date), ...this.state.healthNutrition.map(n=>n.date)])];
           days.forEach(d => {
-            const w = this.state.healthWeight.find(x => x.date === d)?.value || '';
-            const nLogs = this.state.healthNutrition.filter(x => x.date === d);
-            const kcal = nLogs.reduce((s, x) => s + x.kcal, 0);
-            const p = nLogs.reduce((s, x) => s + x.prot, 0);
-            const c = nLogs.reduce((s, x) => s + x.carbs, 0);
-            const f = nLogs.reduce((s, x) => s + x.fat, 0);
-            csv += `${d},${w},${kcal},${p},${c},${f}\n`;
+            const w = this.state.healthWeight.find(x => x.date === d)?.value || ''; const nLogs = this.state.healthNutrition.filter(x => x.date === d);
+            csv += `${d},${w},${nLogs.reduce((s,x)=>s+x.kcal,0)},${nLogs.reduce((s,x)=>s+x.prot,0)},${nLogs.reduce((s,x)=>s+x.carbs,0)},${nLogs.reduce((s,x)=>s+x.fat,0)}\n`;
           });
         }
-        const a = document.createElement('a');
-        a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-        a.download = `LifeOS_${type}_Export.csv`;
-        document.body.appendChild(a); a.click(); a.remove();
-        this.showToast(`Esportazione ${type.toUpperCase()} completata.`);
+        const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `Export_${type}.csv`; document.body.appendChild(a); a.click(); a.remove();
       },
-      async resetAllData() {
-        if(confirm("ATTENZIONE! Questo cancellerà tutti i dati (inclusi i file PDF/Foto) in modo permanente. Sei sicuro?")) {
-          await localforage.clear(); location.reload();
-        }
-      },
+      async resetAllData() { if(confirm("Cancellare tutti i dati permanentemente?")) { await localforage.clear(); location.reload(); } },
 
-      // ==========================================
-      // 6. DASHBOARD & GRAFICI
-      // ==========================================
       renderDashboard() {
         const total = this.state.accounts.reduce((acc, a) => acc + a.balance, 0);
-        document.getElementById('dashNetWorth').innerText = this.formatMoney(total);
-        document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti attivi`;
-
+        document.getElementById('dashNetWorth').innerText = this.formatMoney(total); document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti`;
         const therapies = this.state.healthMedical.filter(m => m.type === 'Visita Medica' && m.therapy);
-        document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `
-          <div class="list-row" style="border-left: 3px solid var(--accent-primary);">
-            <div><strong>💊 ${t.therapy}</strong><br><small class="text-secondary">${t.title}</small></div>
-          </div>
-        `).join('') : '<div class="list-row text-muted">Nessuna terapia attiva.</div>';
-
+        document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>💊 ${t.therapy}</strong><br><small class="text-secondary">${t.title}</small></div></div>`).join('') : '<div class="list-row text-muted">Nessuna terapia.</div>';
         const todayStr = this.currentDate.toISOString().slice(0,10);
         const upcoming = this.state.calendarTasks.filter(t => t.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 5);
-        document.getElementById('dashUpcomingTasks').innerHTML = upcoming.length ? upcoming.map(t => `
-          <div class="list-row">
-            <div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div>
-            <span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-warning'}">${t.type}</span>
-          </div>
-        `).join('') : '<div class="list-row text-muted">Nessuna attività in agenda.</div>';
-
+        document.getElementById('dashUpcomingTasks').innerHTML = upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-warning'}">${t.type}</span></div>`).join('') : '<div class="list-row text-muted">Nessuna attività.</div>';
         this.renderFinanceChart();
       },
       renderFinanceChart() {
-        const ctx = document.getElementById('dashboardChart');
-        if (!ctx) return;
-        // Calcola entrate e uscite del mese corrente
-        const currentMonth = new Date().toISOString().slice(0, 7);
-        let income = 0; let expense = 0;
-        this.state.transactions.filter(t => t.date.startsWith(currentMonth)).forEach(t => {
-          if (t.type === 'INCOME') income += t.amount;
-          if (t.type === 'EXPENSE') expense += t.amount;
-        });
-
+        const ctx = document.getElementById('dashboardChart'); if (!ctx) return;
+        const currentMonth = new Date().toISOString().slice(0, 7); let income = 0; let expense = 0;
+        this.state.transactions.filter(t => t.date.startsWith(currentMonth)).forEach(t => { if (t.type === 'INCOME') income += t.amount; if (t.type === 'EXPENSE') expense += t.amount; });
         if(this.charts.finance) this.charts.finance.destroy();
-        this.charts.finance = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Mese Corrente'],
-            datasets: [
-              { label: 'Entrate', data: [income], backgroundColor: '#10b981', borderRadius: 6 },
-              { label: 'Uscite', data: [expense], backgroundColor: '#ef4444', borderRadius: 6 }
-            ]
-          },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-        });
+        this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Mese Corrente'], datasets: [ { label: 'Entrate', data: [income], backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Uscite', data: [expense], backgroundColor: '#ef4444', borderRadius: 6 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
       },
 
-      // ==========================================
-      // 7. INVENTARIO & GARANZIE
-      // ==========================================
-      populateCategorySelects() {
-        const cats = Object.keys(this.state.settings.inventoryCategories);
-        const html = cats.map(c => `<option value="${c}">${c}</option>`).join('');
-        document.getElementById('invCategory').innerHTML = html;
-        document.getElementById('invFilterCat').innerHTML = '<option value="ALL">Tutte le categorie</option>' + html;
-        this.updateInvSubcategories();
-      },
-      updateInvSubcategories() {
-        const cat = document.getElementById('invCategory').value;
-        if(cat && this.state.settings.inventoryCategories[cat]) {
-          document.getElementById('invSubcategory').innerHTML = this.state.settings.inventoryCategories[cat].map(s => `<option value="${s}">${s}</option>`).join('');
-        }
-      },
-      addInventoryCategory() {
-        const c = document.getElementById('newInvCatInput').value.trim();
-        if(c && !this.state.settings.inventoryCategories[c]) { this.state.settings.inventoryCategories[c] = ['Generale']; this.save(); this.populateCategorySelects(); }
-      },
-      addInventorySubcategory() {
-        const c = document.getElementById('invCategory').value; const s = document.getElementById('newInvSubInput').value.trim();
-        if(c && s && !this.state.settings.inventoryCategories[c].includes(s)) { this.state.settings.inventoryCategories[c].push(s); this.save(); this.updateInvSubcategories(); }
-      },
-      addInventoryItem(e) {
-        e.preventDefault();
-        const item = { id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: document.getElementById('invPrice').value, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString() };
-        this.state.inventory.push(item); this.save(); e.target.reset(); this.renderInventory();
-      },
+      populateCategorySelects() { const html = Object.keys(this.state.settings.inventoryCategories).map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('invCategory').innerHTML = html; document.getElementById('invFilterCat').innerHTML = '<option value="ALL">Tutte</option>' + html; this.updateInvSubcategories(); },
+      updateInvSubcategories() { const cat = document.getElementById('invCategory').value; if(cat && this.state.settings.inventoryCategories[cat]) document.getElementById('invSubcategory').innerHTML = this.state.settings.inventoryCategories[cat].map(s => `<option value="${s}">${s}</option>`).join(''); },
+      addInventoryCategory() { const c = document.getElementById('newInvCatInput').value.trim(); if(c && !this.state.settings.inventoryCategories[c]) { this.state.settings.inventoryCategories[c] = ['Generale']; this.save(); this.populateCategorySelects(); } },
+      addInventorySubcategory() { const c = document.getElementById('invCategory').value; const s = document.getElementById('newInvSubInput').value.trim(); if(c && s && !this.state.settings.inventoryCategories[c].includes(s)) { this.state.settings.inventoryCategories[c].push(s); this.save(); this.updateInvSubcategories(); } },
+      addInventoryItem(e) { e.preventDefault(); this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: document.getElementById('invPrice').value, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString() }); this.save(); e.target.reset(); this.renderInventory(); },
       deleteInventoryItem(id) { if(confirm('Eliminare?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
       renderInventory() {
-        const list = document.getElementById('inventoryList');
         const filterCat = document.getElementById('invFilterCat').value; const search = document.getElementById('invSearchInput').value.toLowerCase();
         let filtered = this.state.inventory.filter(i => i.type === (this.activeInvTab === 'garanzie' ? 'Garanzia' : 'Archivio'));
-        if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat);
-        if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search));
-        
-        list.innerHTML = filtered.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)).map(item => {
-          let wBadge = '';
-          if(item.warranty) { const exp = new Date(item.warranty) < new Date(); wBadge = `<span class="badge ${exp ? 'badge-danger' : 'badge-success'}">${exp?'Scaduta':'Attiva'}: ${this.formatDate(item.warranty)}</span>`; }
-          return `<div class="list-row"><div style="flex:1;"><strong>${item.name}</strong> <span class="badge">${item.category}</span><br><small class="text-secondary">${item.subcategory} | Pos: ${item.location||'-'}</small><div style="margin-top:4px;">${wBadge}</div></div><div style="text-align:right;"><div style="font-weight:700; color:var(--accent-primary); margin-bottom:4px;">${this.formatMoney(item.price)}</div><button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div></div>`;
-        }).join('') || '<div class="list-row text-muted">Nessun elemento.</div>';
+        if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search));
+        document.getElementById('inventoryList').innerHTML = filtered.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)).map(item => { let wBadge = ''; if(item.warranty) { const exp = new Date(item.warranty) < new Date(); wBadge = `<span class="badge ${exp ? 'badge-danger' : 'badge-success'}">${exp?'Scaduta':'Attiva'}: ${this.formatDate(item.warranty)}</span>`; } return `<div class="list-row"><div style="flex:1;"><strong>${item.name}</strong> <span class="badge">${item.category}</span><br><small class="text-secondary">${item.subcategory} | Pos: ${item.location||'-'}</small><div style="margin-top:4px;">${wBadge}</div></div><div style="text-align:right;"><div style="font-weight:700; color:var(--accent-primary); margin-bottom:4px;">${this.formatMoney(item.price)}</div><button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div></div>`; }).join('') || '<div class="list-row text-muted">Nessun elemento.</div>';
       },
 
-      // ==========================================
-      // 8. CALENDARIO & DIARIO
-      // ==========================================
       changeMonth(dir) { this.currentDate.setMonth(this.currentDate.getMonth() + dir); this.renderCalendar(); },
       selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
       selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
       renderCalendar() {
         const y = this.currentDate.getFullYear(); const m = this.currentDate.getMonth();
-        document.getElementById('calMonthTitle').innerText = new Date(y, m, 1).toLocaleDateString('it-IT', {month:'long', year:'numeric'}).toUpperCase();
-        document.getElementById('calSelectedDateLabel').innerText = this.selectedDate.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'});
+        document.getElementById('calMonthTitle').innerText = new Date(y, m, 1).toLocaleDateString('it-IT', {month:'long', year:'numeric'}).toUpperCase(); document.getElementById('calSelectedDateLabel').innerText = this.selectedDate.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'});
         const grid = document.getElementById('calendarDaysGrid'); grid.innerHTML = '';
         let start = new Date(y, m, 1).getDay(); start = start === 0 ? 7 : start;
         for (let i = 1; i < start; i++) { const el = document.createElement('div'); el.className = 'cal-day'; el.style.visibility = 'hidden'; grid.appendChild(el); }
-        const todayStr = new Date().toISOString().slice(0, 10); const selStr = this.selectedDate.toISOString().slice(0, 10);
-        const last = new Date(y, m+1, 0).getDate();
+        const todayStr = new Date().toISOString().slice(0, 10); const selStr = this.selectedDate.toISOString().slice(0, 10); const last = new Date(y, m+1, 0).getDate();
         for (let d = 1; d <= last; d++) {
-          const dateStr = new Date(y, m, d, 12).toISOString().slice(0, 10);
-          const el = document.createElement('div'); el.className = 'cal-day';
-          if (dateStr === todayStr) el.classList.add('today'); if (dateStr === selStr) el.classList.add('active');
-          el.innerHTML = `<div>${d}</div>`;
-          const tasks = this.state.calendarTasks.filter(t => t.date === dateStr);
-          if (tasks.length > 0) { const dots = document.createElement('div'); dots.style.display = 'flex'; dots.style.gap = '2px'; for(let i=0; i<Math.min(3,tasks.length); i++) dots.innerHTML += `<div class="cal-dot"></div>`; el.appendChild(dots); }
+          const dateStr = new Date(y, m, d, 12).toISOString().slice(0, 10); const el = document.createElement('div'); el.className = 'cal-day';
+          if (dateStr === todayStr) el.classList.add('today'); if (dateStr === selStr) el.classList.add('active'); el.innerHTML = `<div>${d}</div>`;
+          const tasks = this.state.calendarTasks.filter(t => t.date === dateStr); if (tasks.length > 0) { const dots = document.createElement('div'); dots.style.display = 'flex'; dots.style.gap = '2px'; for(let i=0; i<Math.min(3,tasks.length); i++) dots.innerHTML += `<div class="cal-dot"></div>`; el.appendChild(dots); }
           el.onclick = () => this.selectDate(dateStr); grid.appendChild(el);
         }
         this.renderCalendarTasks(); this.renderJournalHistory();
@@ -1302,8 +897,7 @@
       addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.selectedDate.toISOString().slice(0, 10), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
       deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
       renderCalendarTasks() {
-        const tasks = this.state.calendarTasks.filter(t => t.date === this.selectedDate.toISOString().slice(0, 10));
-        document.getElementById('calTaskCountBadge').innerText = tasks.length;
+        const tasks = this.state.calendarTasks.filter(t => t.date === this.selectedDate.toISOString().slice(0, 10)); document.getElementById('calTaskCountBadge').innerText = tasks.length;
         document.getElementById('calendarTasksList').innerHTML = tasks.length ? tasks.map(t => `<div class="list-row"><div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div><button class="btn btn-sm btn-danger" onclick="App.deleteCalendarTask('${t.id}')">✕</button></div>`).join('') : '<div class="list-row text-muted">Nessuna attività programmata.</div>';
       },
       saveJournalEntry(e) { e.preventDefault(); const date = this.selectedDate.toISOString().slice(0, 10); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
@@ -1312,36 +906,22 @@
         document.getElementById('journalHistoryList').innerHTML = hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row text-muted">Nessun diario salvato.</div>';
       },
 
-      // ==========================================
-      // 9. MANUTENZIONI
-      // ==========================================
-      populateMaintenanceSelects() {
-        const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-        document.getElementById('maintCategory').innerHTML = html; document.getElementById('maintFilterCat').innerHTML = '<option value="ALL">Tutte</option>' + html;
-      },
+      populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('maintCategory').innerHTML = html; document.getElementById('maintFilterCat').innerHTML = '<option value="ALL">Tutte</option>' + html; },
       addMaintenanceCategory() { const c = document.getElementById('newMaintCatInput').value.trim(); if(c && !this.state.settings.maintenanceCategories.includes(c)) { this.state.settings.maintenanceCategories.push(c); this.save(); this.populateMaintenanceSelects(); } },
       addMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: document.getElementById('maintCost').value, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); this.renderMaintenances(); },
       deleteMaintenance(id) { if(confirm('Eliminare?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderMaintenances(); } },
       renderMaintenances() {
-        let filtered = this.state.maintenances;
-        const fCat = document.getElementById('maintFilterCat').value; const fStat = document.getElementById('maintFilterStatus').value;
+        let filtered = this.state.maintenances; const fCat = document.getElementById('maintFilterCat').value; const fStat = document.getElementById('maintFilterStatus').value;
         if(fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if(fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat);
         document.getElementById('maintenanceList').innerHTML = filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).map(m => `<div class="list-row" style="border-left: 4px solid ${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};"><div style="flex:1;"><strong>${m.title}</strong> <span class="badge">${m.category}</span> ${m.recurrence!=='Singola'?`<span class="badge badge-info">🔄 ${m.recurrence}</span>`:''}<div style="font-size:0.8rem; color:var(--text-muted);">${m.notes || ''}</div></div><div style="text-align:right;">Scad: <strong>${this.formatDate(m.dueDate)}</strong><br>${parseFloat(m.cost)>0?`<span style="color:var(--danger); font-weight:600;">${this.formatMoney(m.cost)}</span>`:''}<button class="btn btn-sm btn-danger" onclick="App.deleteMaintenance('${m.id}')">🗑</button></div></div>`).join('') || '<div class="list-row text-muted">Nessuna manutenzione.</div>';
       },
 
-      // ==========================================
-      // 10. FINANZE (Con Auto-Rinnovo)
-      // ==========================================
-      populateAccountSelects() {
-        const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join('');
-        document.getElementById('txAccount').innerHTML = '<option value="">Conto Origine *</option>' + html; document.getElementById('txTargetAccount').innerHTML = '<option value="">Conto Dest *</option>' + html; document.getElementById('reconcileAccountSelect').innerHTML = html; document.getElementById('txFilterAccount').innerHTML = '<option value="ALL">Tutti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-      },
+      populateAccountSelects() { const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join(''); document.getElementById('txAccount').innerHTML = '<option value="">Conto Origine *</option>' + html; document.getElementById('txTargetAccount').innerHTML = '<option value="">Conto Dest *</option>' + html; document.getElementById('reconcileAccountSelect').innerHTML = html; document.getElementById('txFilterAccount').innerHTML = '<option value="ALL">Tutti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
       addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
       toggleTransferFields() { document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none'; },
       addTransaction(e) {
         e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value;
-        if(!srcId) return this.showToast('Seleziona conto', 'danger');
-        const src = this.state.accounts.find(x => x.id === srcId);
+        if(!srcId) return this.showToast('Seleziona conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId);
         const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value, date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence').value, timestamp: new Date().toISOString() };
         if(t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { const trg = this.state.accounts.find(x => x.id === trgId); src.balance -= a; trg.balance += a; tx.targetAccountId = trgId; }
         this.state.transactions.push(tx); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance();
@@ -1360,20 +940,15 @@
         }
       },
       renderFinance() {
-        const total = this.state.accounts.reduce((sum, a) => sum + a.balance, 0);
-        document.getElementById('finTotalBalanceBadge').innerText = this.formatMoney(total);
+        const total = this.state.accounts.reduce((sum, a) => sum + a.balance, 0); document.getElementById('finTotalBalanceBadge').innerText = this.formatMoney(total);
         document.getElementById('financeAccountsList').innerHTML = this.state.accounts.map(a => `<div class="list-row"><strong>🏦 ${a.name}</strong><span style="font-weight:700;">${this.formatMoney(a.balance)}</span></div>`).join('');
-        let filtered = this.state.transactions; const fAcc = document.getElementById('txFilterAccount').value;
-        if(fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc);
+        let filtered = this.state.transactions; const fAcc = document.getElementById('txFilterAccount').value; if(fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc);
         document.getElementById('financeTransactionsList').innerHTML = filtered.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).map(tx => {
           let icon = tx.type === 'EXPENSE' ? '📉' : tx.type === 'INCOME' ? '📈' : '🔄'; let color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; let prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '';
           return `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(tx.date)}</span><br><strong>${icon} ${tx.desc}</strong> ${tx.recurrence!=='Singola'?`<span class="badge" style="font-size:0.6rem;">🔄 ${tx.recurrence}</span>`:''}</div><div style="text-align:right;"><div style="font-weight:700; color:${color};">${prefix}${this.formatMoney(tx.amount)}</div><button class="btn btn-sm" onclick="App.deleteTransaction('${tx.id}')">🗑</button></div></div>`;
         }).join('') || '<div class="list-row text-muted">Nessuna transazione.</div>';
       },
 
-      // ==========================================
-      // 11. SALUTE OS (Grafici & Upload Base64)
-      // ==========================================
       addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseInt(document.getElementById('nutriKcal').value)||0, prot: parseInt(document.getElementById('nutriProt').value)||0, carbs: parseInt(document.getElementById('nutriCarbs').value)||0, fat: parseInt(document.getElementById('nutriFat').value)||0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0,10); this.renderHealth(); },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0,10); this.renderHealth(); },
@@ -1381,9 +956,7 @@
       toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
       async addMedicalRecord(e) {
         e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null;
-        if(type === 'Referto' && document.getElementById('medFile').files.length > 0) {
-          try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch(err) { return this.showToast('Errore lettura file', 'danger'); }
-        }
+        if(type === 'Referto' && document.getElementById('medFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch(err) { return this.showToast('Errore lettura file', 'danger'); } }
         this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData });
         this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth(); this.showToast('Salvato nel DB locale.');
       },
@@ -1392,10 +965,9 @@
         document.getElementById('healthNutritionList').innerHTML = this.state.healthNutrition.sort((a,b) => new Date(b.date) - new Date(a.date)).map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="text-secondary">${this.formatDate(n.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun pasto.</div>';
         document.getElementById('healthWeightList').innerHTML = this.state.healthWeight.sort((a,b) => new Date(b.date) - new Date(a.date)).map(w => `<div class="list-row"><div><strong>${w.value} kg</strong><br><small class="text-secondary">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun peso.</div>';
         
-        // Grafico Peso Lineare
         const ctxW = document.getElementById('weightChart');
         if(ctxW) {
-          const sortedW = [...this.state.healthWeight].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-10); // ultimi 10
+          const sortedW = [...this.state.healthWeight].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-10);
           if(this.charts.weight) this.charts.weight.destroy();
           this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w=>this.formatDate(w.date).slice(0,5)), datasets: [{ label: 'Peso', data: sortedW.map(w=>w.value), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.2)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
@@ -1407,35 +979,19 @@
         }).join('') || '<div class="list-row text-muted">Nessun record clinico.</div>';
       },
 
-      // ==========================================
-      // 12. INITIALIZATION
-      // ==========================================
       async init() {
         await this.load();
         const todayStr = this.currentDate.toISOString().slice(0, 10);
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate'].forEach(id => { const el = document.getElementById(id); if(el) el.value = todayStr; });
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.setAttribute('data-theme', 'light');
 
-        if (this.state.pin) {
-          document.getElementById('lockScreen').classList.remove('hidden');
-        } else {
-          this.runCronJobs();
-          this.switchModule('mod-dashboard');
-        }
+        if (this.state.pin) { document.getElementById('lockScreen').classList.remove('hidden'); } 
+        else { this.runCronJobs(); document.getElementById('lockScreen').classList.add('hidden'); this.switchModule('mod-dashboard'); }
       }
     };
 
-   document.addEventListener('DOMContentLoaded', () => { 
-      App.init(); 
-      App.updateHapticButton();
-    });
-
-    // Ascoltatore globale per la vibrazione su tutta l'app
-    document.addEventListener('click', (e) => {
-      if(e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card')) {
-        App.vibrate(10); // Piccolo "tic" aptico
-      }
-    });
+    document.addEventListener('DOMContentLoaded', () => { App.init(); App.updateHapticButton(); });
+    document.addEventListener('click', (e) => { if(e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card')) App.vibrate(10); });
   </script>
 </body>
 </html>
