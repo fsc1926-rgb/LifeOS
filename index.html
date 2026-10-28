@@ -4,829 +4,207 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="LifeOS v6.0 - Sistema Operativo Personale All-in-One">
-  <title>LifeOS v6.0 — Personal Operating System</title>
-  <!-- Libreria JSZip per Backup .zip e Generatore Pacchetto GitHub PWA -->
+  <title>LifeOS v6.5 — Custom Edition</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
+    /* VARIABILI TEMA (Invariate per mantenere l'estetica premium) */
     :root[data-theme="dark"] {
-      --bg-primary: #090d16;
-      --bg-secondary: #111827;
-      --bg-card: rgba(30, 41, 59, 0.65);
-      --bg-card-hover: rgba(30, 41, 59, 0.9);
-      --bg-glass: rgba(15, 23, 42, 0.8);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-highlight: rgba(99, 102, 241, 0.4);
-      --accent-primary: #6366f1;
-      --accent-secondary: #8b5cf6;
-      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #3b82f6;
-      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
-      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+      --bg-primary: #090d16; --bg-secondary: #111827; --bg-card: rgba(30, 41, 59, 0.65);
+      --bg-glass: rgba(15, 23, 42, 0.8); --text-primary: #f8fafc; --text-secondary: #94a3b8;
+      --text-muted: #64748b; --border-color: rgba(255, 255, 255, 0.08); --border-highlight: rgba(99, 102, 241, 0.4);
+      --accent-primary: #6366f1; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
     }
-
     :root[data-theme="light"] {
-      --bg-primary: #f1f5f9;
-      --bg-secondary: #ffffff;
-      --bg-card: rgba(255, 255, 255, 0.85);
-      --bg-card-hover: #ffffff;
-      --bg-glass: rgba(255, 255, 255, 0.88);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
-      --border-color: rgba(15, 23, 42, 0.09);
-      --border-highlight: rgba(99, 102, 241, 0.45);
-      --accent-primary: #4f46e5;
-      --accent-secondary: #7c3aed;
-      --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-      --success: #059669;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --info: #2563eb;
-      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
-      --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12);
+      --bg-primary: #f1f5f9; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.85);
+      --bg-glass: rgba(255, 255, 255, 0.88); --text-primary: #0f172a; --text-secondary: #475569;
+      --text-muted: #94a3b8; --border-color: rgba(15, 23, 42, 0.09); --border-highlight: rgba(99, 102, 241, 0.45);
+      --accent-primary: #4f46e5; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06); --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    /* RESET & BASE */
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding-bottom: 80px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: var(--bg-primary); } ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; opacity: 0.4; }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      line-height: 1.5;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      overflow-x: hidden;
-      padding-bottom: 80px;
-    }
+    /* HEADER & NAVIGAZIONE A 4 AREE */
+    .app-header { position: sticky; top: 0; z-index: 100; background: var(--bg-glass); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
+    .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; }
+    .brand-logo { width: 38px; height: 38px; border-radius: 10px; background: var(--accent-gradient); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1.1rem; }
+    
+    .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.2rem; }
+    .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid transparent; background: var(--bg-card); color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s ease; }
+    .nav-tab.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: transparent; }
+    
+    /* LAYOUT & COMPONENTI */
+    .main-container { max-width: 1440px; margin: 1.5rem auto; padding: 0 1.5rem; }
+    .module-section { display: none; animation: fadeIn 0.28s ease; }
+    .module-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Scrollbar personalizzata */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-primary); }
-    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; opacity: 0.4; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+    .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; }
+    .col-span-12 { grid-column: span 12; } .col-span-8 { grid-column: span 8; } .col-span-6 { grid-column: span 6; } .col-span-4 { grid-column: span 4; }
+    @media (max-width: 1024px) { .col-span-8, .col-span-6, .col-span-4 { grid-column: span 6; } }
+    @media (max-width: 680px) { .col-span-8, .col-span-6, .col-span-4 { grid-column: span 12; } .nav-tab { font-size: 0.8rem; padding: 0.5rem; } }
 
-    /* Header & Navigazione */
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg-glass);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.85rem 1.5rem;
-    }
+    .bento-card { background: var(--bg-card); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.35rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; }
+    .card-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .stat-value { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; font-family: 'JetBrains Mono', monospace; margin: 0.35rem 0; }
+    .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
 
-    .header-top {
-      max-width: 1440px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
+    /* UI CONTROLS */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1.1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
+    .btn:hover { border-color: var(--accent-primary); }
+    .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; border-radius: 8px; }
+    .input, select, textarea { width: 100%; padding: 0.65rem 0.9rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; }
+    .input:focus { outline: none; border-color: var(--accent-primary); }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+    .form-row .input { margin-bottom: 0; }
+    .badge { display: inline-flex; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
+    
+    /* LISTE, CALENDARIO E TAB INTERNI */
+    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; }
+    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); }
+    
+    .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+    .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; padding: 0.25rem 0.5rem; }
+    .inner-tab.active { color: var(--accent-primary); border-bottom: 2px solid var(--accent-primary); }
+    .inner-tab-content { display: none; }
+    .inner-tab-content.active { display: block; animation: fadeIn 0.2s; }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-weight: 800;
-      font-size: 1.25rem;
-      letter-spacing: -0.03em;
-    }
-
-    .brand-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: var(--accent-gradient);
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-weight: 800;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
-    }
-
-    .brand-version {
-      font-size: 0.7rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 999px;
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--accent-primary);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-    }
-
-    .global-search-bar {
-      flex: 1;
-      max-width: 480px;
-      position: relative;
-    }
-
-    .global-search-bar input {
-      width: 100%;
-      padding: 0.65rem 1rem 0.65rem 2.5rem;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-    }
-
-    .global-search-bar input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-    }
-
-    .global-search-icon {
-      position: absolute;
-      left: 0.85rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .nav-tabs {
-      max-width: 1440px;
-      margin: 0.85rem auto 0;
-      display: flex;
-      gap: 0.4rem;
-      overflow-x: auto;
-      padding-bottom: 0.2rem;
-      scrollbar-width: none;
-    }
-
-    .nav-tabs::-webkit-scrollbar { display: none; }
-
-    .nav-tab {
-      padding: 0.55rem 1rem;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-    }
-
-    .nav-tab:hover {
-      color: var(--text-primary);
-      background: var(--bg-card);
-    }
-
-    .nav-tab.active {
-      background: var(--accent-gradient);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
-    /* Container Principale & Moduli */
-    .main-container {
-      max-width: 1440px;
-      margin: 1.5rem auto;
-      padding: 0 1.5rem;
-    }
-
-    .module-section {
-      display: none;
-      animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .module-section.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Bento Grid Layout */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 1.25rem;
-    }
-
-    .col-span-12 { grid-column: span 12; }
-    .col-span-8 { grid-column: span 8; }
-    .col-span-6 { grid-column: span 6; }
-    .col-span-4 { grid-column: span 4; }
-    .col-span-3 { grid-column: span 3; }
-
-    @media (max-width: 1024px) {
-      .col-span-8, .col-span-6, .col-span-4, .col-span-3 {
-        grid-column: span 6;
-      }
-    }
-
-    @media (max-width: 680px) {
-      .col-span-8, .col-span-6, .col-span-4, .col-span-3 {
-        grid-column: span 12;
-      }
-      .app-header { padding: 0.75rem 1rem; }
-      .main-container { padding: 0 1rem; }
-    }
-
-    /* Bento Cards */
-    .bento-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      border-radius: 18px;
-      padding: 1.35rem;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .bento-card:hover {
-      border-color: var(--border-highlight);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      gap: 0.75rem;
-    }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .stat-value {
-      font-size: 1.85rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      font-family: 'JetBrains Mono', monospace;
-      margin: 0.35rem 0;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-
-    /* Componenti UI: Bottoni, Input, Badge */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      padding: 0.6rem 1.1rem;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-    }
-
-    .btn:hover {
-      border-color: var(--accent-primary);
-      transform: translateY(-1px);
-    }
-
-    .btn-primary {
-      background: var(--accent-gradient);
-      color: #ffffff;
-      border: none;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-    }
-
-    .btn-primary:hover {
-      opacity: 0.95;
-      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-    }
-
-    .btn-danger {
-      background: rgba(239, 68, 68, 0.15);
-      color: var(--danger);
-      border-color: rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-sm {
-      padding: 0.35rem 0.7rem;
-      font-size: 0.78rem;
-      border-radius: 8px;
-    }
-
-    .input, select, textarea {
-      width: 100%;
-      padding: 0.65rem 0.9rem;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.88rem;
-      transition: border-color 0.2s ease;
-    }
-
-    .input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      margin-bottom: 0.85rem;
-    }
-
-    .form-group label {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 0.75rem;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--accent-primary);
-    }
-
-    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-    .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-    .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-
-    /* Liste & Tabelle */
-    .item-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      max-height: 420px;
-      overflow-y: auto;
-      padding-right: 0.25rem;
-    }
-
-    .list-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      transition: border-color 0.2s ease;
-    }
-
-    .list-row:hover {
-      border-color: var(--border-highlight);
-    }
-
-    /* Toast Notifications */
-    #toast-container {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      max-width: 360px;
-    }
-
-    .toast {
-      padding: 0.85rem 1.15rem;
-      border-radius: 12px;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border-left: 4px solid var(--accent-primary);
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      animation: slideInRight 0.25s ease;
-    }
-
-    .toast.success { border-left-color: var(--success); }
-    .toast.warning { border-left-color: var(--warning); }
-    .toast.danger { border-left-color: var(--danger); }
-
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(40px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    /* Modali */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(6px);
-      z-index: 1000;
-      display: none;
-      place-items: center;
-      padding: 1rem;
-    }
-
-    .modal-backdrop.open {
-      display: grid;
-    }
-
-    .modal-content {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 720px;
-      max-height: 88vh;
-      overflow-y: auto;
-      padding: 1.5rem;
-      box-shadow: var(--shadow-lg);
-      animation: fadeIn 0.2s ease;
-    }
-
-    /* Griglia Calendario */
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.4rem;
-      margin-top: 0.75rem;
-    }
-
-    .cal-day-header {
-      text-align: center;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      padding: 0.3rem 0;
-      text-transform: uppercase;
-    }
-
-    .cal-day {
-      aspect-ratio: 1;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      position: relative;
-      transition: all 0.15s ease;
-    }
-
-    .cal-day:hover { border-color: var(--accent-primary); }
+    /* TOAST & MODALS */
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.6rem; }
+    .toast { padding: 0.85rem 1.15rem; border-radius: 12px; background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 500; animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 1000; display: none; place-items: center; padding: 1rem; }
+    .modal-backdrop.open { display: grid; }
+    .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); }
+    
+    /* CALENDARIO GRID */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-top: 0.75rem; }
+    .cal-day-header { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .cal-day { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
     .cal-day.active { background: var(--accent-gradient); color: #fff; border: none; }
     .cal-day.today { border: 2px solid var(--accent-primary); }
-    .cal-dot-row { display: flex; gap: 3px; margin-top: 3px; }
-    .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); }
+    .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); margin-top:3px;}
+
+    /* Moduli Hub Grid */
+    .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .hub-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
+    .hub-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
   </style>
 </head>
 <body>
 
-  <!-- CONTAINER NOTIFICHE TOAST -->
   <div id="toast-container" aria-live="polite"></div>
 
-  <!-- HEADER PRINCIPALE -->
+  <!-- HEADER PRINCIPALE & NAVIGAZIONE (4 MACROAREE) -->
   <header class="app-header">
     <div class="header-top">
       <div class="brand">
         <div class="brand-logo">L6</div>
-        <div>
-          <span>LifeOS</span>
-          <span class="brand-version">v6.0 PRO</span>
-        </div>
+        <div><span>LifeOS</span> <span class="badge" style="font-size:0.6rem;">v6.5 Custom</span></div>
       </div>
-
-      <div class="global-search-bar">
-        <span class="global-search-icon">🔍</span>
-        <input type="text" id="globalSearchInput" placeholder="Ricerca Globale 360° (oggetti, finanze, manutenzioni, diario, salute)..." oninput="App.handleGlobalSearch(this.value)">
-      </div>
-
-      <div class="header-actions">
-        <button class="btn btn-sm" onclick="App.openModal('backupModal')" title="Backup, Ripristino e GitHub ZIP">
-          💾 Backup & GitHub
-        </button>
-        <button class="btn btn-sm" id="themeToggleBtn" onclick="App.toggleTheme()" title="Cambia Tema Chiaro/Scuro">
-          🌓 Tema
-        </button>
+      <div>
+        <button class="btn btn-sm" onclick="App.openModal('settingsModal')">⚙️ Impostazioni Base</button>
+        <button class="btn btn-sm" onclick="App.exportJSON()">💾 Backup</button>
       </div>
     </div>
-
-    <!-- BARRA NAVIGAZIONE MODULI -->
     <nav class="nav-tabs" role="tablist">
-      <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">
-        🏠 1. Dashboard & Dossier 360°
-      </button>
-      <button class="nav-tab" data-target="mod-inventory" onclick="App.switchModule('mod-inventory')">
-        📦 2. Inventario Oggetti
-      </button>
-      <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">
-        📅 3. Calendario & Diario
-      </button>
-      <button class="nav-tab" data-target="mod-maintenance" onclick="App.switchModule('mod-maintenance')">
-        🔧 4. Manutenzioni
-      </button>
-      <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">
-        💳 5. Finanze Multi-Conto
-      </button>
-      <button class="nav-tab" data-target="mod-health" onclick="App.switchModule('mod-health')">
-        ❤️ 6. Salute OS
-      </button>
+      <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
+      <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Calendario</button>
+      <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💰 Finanze</button>
+      <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">🗂️ Moduli & Salute</button>
     </nav>
   </header>
 
-  <!-- CONTENITORE PRINCIPALE DEI MODULI -->
   <main class="main-container">
 
     <!-- ==========================================
-         MODULO 1: DASHBOARD CENTRALE & DOSSIER 360°
+         MACROAREA 1: DASHBOARD MINIMALISTA
          ========================================== -->
     <section id="mod-dashboard" class="module-section active">
-      <!-- Risultati Ricerca Globale Unificata (visibile quando si digita) -->
-      <div id="globalSearchResultsCard" class="bento-card col-span-12" style="display: none; margin-bottom: 1.25rem;">
-        <div class="card-header">
-          <div class="card-title">🔎 Risultati Ricerca Globale Unificata</div>
-          <button class="btn btn-sm" onclick="App.clearGlobalSearch()">Chiudi ricerca</button>
-        </div>
-        <div id="globalSearchResultsList" class="item-list"></div>
-      </div>
-
       <div class="bento-grid">
-        <!-- KPI 1: Patrimonio Netto -->
-        <div class="bento-card col-span-3">
-          <div>
-            <div class="card-header">
-              <span class="card-title">💰 Liquidità Totale</span>
-              <span class="badge badge-success">Multi-Conto</span>
-            </div>
-            <div class="stat-value" id="dashNetWorth">€ 0,00</div>
-            <div class="stat-label" id="dashAccountsCount">0 conti attivi</div>
-          </div>
-          <button class="btn btn-sm" style="margin-top: 1rem;" onclick="App.switchModule('mod-finance')">Gestisci Finanze →</button>
-        </div>
-
-        <!-- KPI 2: Valore Inventario & Dossier -->
-        <div class="bento-card col-span-3">
-          <div>
-            <div class="card-header">
-              <span class="card-title">📦 Asset Inventario</span>
-              <span class="badge">Dossier 360°</span>
-            </div>
-            <div class="stat-value" id="dashInventoryCount">0</div>
-            <div class="stat-label" id="dashInventoryValue">Valore stimato: € 0,00</div>
-          </div>
-          <button class="btn btn-sm" style="margin-top: 1rem;" onclick="App.switchModule('mod-inventory')">Apri Inventario →</button>
-        </div>
-
-        <!-- KPI 3: Manutenzioni in Scadenza -->
-        <div class="bento-card col-span-3">
-          <div>
-            <div class="card-header">
-              <span class="card-title">🔧 Manutenzioni</span>
-              <span class="badge badge-warning" id="dashMaintUrgentBadge">In coda</span>
-            </div>
-            <div class="stat-value" id="dashMaintPending">0</div>
-            <div class="stat-label">Interventi programmati / attivi</div>
-          </div>
-          <button class="btn btn-sm" style="margin-top: 1rem;" onclick="App.switchModule('mod-maintenance')">Vedi Scadenze →</button>
-        </div>
-
-        <!-- KPI 4: Salute OS Oggi -->
-        <div class="bento-card col-span-3">
-          <div>
-            <div class="card-header">
-              <span class="card-title">❤️ Salute Oggi</span>
-              <span class="badge" id="dashWeightBadge">-- kg</span>
-            </div>
-            <div class="stat-value" id="dashCaloriesToday">0 kcal</div>
-            <div class="stat-label" id="dashMacrosToday">P: 0g | C: 0g | F: 0g</div>
-          </div>
-          <button class="btn btn-sm" style="margin-top: 1rem;" onclick="App.switchModule('mod-health')">Salute OS →</button>
-        </div>
-
-        <!-- Esploratore Rapido Dossier 360° Oggetti -->
-        <div class="bento-card col-span-8">
+        
+        <!-- Liquidità / Finanze Overview -->
+        <div class="bento-card col-span-4">
           <div class="card-header">
-            <div>
-              <div class="card-title">🗂️ Centrale Dossier 360° Oggetti & Asset</div>
-              <div class="stat-label">Clicca su un oggetto per ispezionare costi, manutenzioni collegate, stato garanzia e storico</div>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="App.switchModule('mod-inventory')">+ Nuovo Oggetto</button>
+            <span class="card-title">💰 Liquidità Totale</span>
+            <button class="btn btn-sm" onclick="App.switchModule('mod-finance')">Apri Finanze →</button>
           </div>
-          <div id="dashDossierList" class="item-list"></div>
+          <div class="stat-value" id="dashNetWorth">€ 0,00</div>
+          <div class="stat-label" id="dashAccountsCount">0 conti attivi</div>
+        </div>
+
+        <!-- Promemoria Salute (Terapie e Pillole di Oggi) -->
+        <div class="bento-card col-span-4">
+          <div class="card-header">
+            <span class="card-title">💊 Terapie & Promemoria Salute</span>
+            <button class="btn btn-sm" onclick="App.openHubModule('mod-health')">Salute OS →</button>
+          </div>
+          <div class="stat-label" style="margin-bottom:0.5rem;">Da assumere oggi:</div>
+          <div id="dashPillReminders" class="item-list" style="max-height: 200px;">
+            <!-- Generato dinamicamente da referti medici con campo Terapia -->
+          </div>
         </div>
 
         <!-- Agenda & Attività Imminenti -->
         <div class="bento-card col-span-4">
           <div class="card-header">
-            <div class="card-title">📌 Agenda & Promemoria</div>
-            <button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Calendario</button>
+            <span class="card-title">📌 Agenda & Attività</span>
+            <button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Calendario →</button>
           </div>
-          <div id="dashUpcomingTasks" class="item-list"></div>
+          <div id="dashUpcomingTasks" class="item-list" style="max-height: 200px;"></div>
         </div>
       </div>
     </section>
 
     <!-- ==========================================
-         MODALI GLOBALI (DOSSIER 360° & BACKUP/GITHUB)
+         MACROAREA 4: HUB MODULI EXTRA
          ========================================== -->
-    <!-- Modale Dossier 360° per singolo Oggetto -->
-    <div id="dossierModal" class="modal-backdrop">
-      <div class="modal-content">
-        <div class="card-header">
-          <div class="card-title" id="dossierModalTitle">🗂️ Dossier 360° Oggetto</div>
-          <button class="btn btn-sm" onclick="App.closeModal('dossierModal')">✕ Chiudi</button>
-        </div>
-        <div id="dossierModalBody"></div>
-      </div>
-    </div>
-
-    <!-- Modale Backup Universale (.json / .zip) & Generatore Pacchetto GitHub PWA -->
-    <div id="backupModal" class="modal-backdrop">
-      <div class="modal-content">
-        <div class="card-header">
-          <div class="card-title">💾 Centro Backup Universale & Deploy GitHub PWA</div>
-          <button class="btn btn-sm" onclick="App.closeModal('backupModal')">✕ Chiudi</button>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-          <div class="bento-card">
-            <div class="card-title" style="margin-bottom: 0.4rem;">1. Esportazione Dati (.JSON e .ZIP)</div>
-            <p class="stat-label" style="margin-bottom: 0.85rem;">Salva l'intero database locale di LifeOS v6.0 in formato JSON puro o archivio compresso ZIP.</p>
-            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-              <button class="btn btn-primary" onclick="App.exportJSON()">⬇️ Scarica Backup .JSON</button>
-              <button class="btn" onclick="App.exportZIP()">🗜️ Scarica Archivio Backup .ZIP</button>
-            </div>
+    <section id="mod-hub" class="module-section">
+      <div class="bento-card col-span-12">
+        <div class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">🗂️ Hub Moduli Aggiuntivi</div>
+        <div class="stat-label">Seleziona un'area per accedere agli archivi specifici.</div>
+        
+        <div class="hub-grid">
+          <div class="hub-card" onclick="App.openHubModule('mod-health')">
+            <div class="hub-icon">❤️</div>
+            <div class="card-title" style="justify-content:center;">Salute OS</div>
+            <div class="stat-label">Cartella Clinica, Referti PDF, Peso e Nutrizione</div>
           </div>
-
-          <div class="bento-card">
-            <div class="card-title" style="margin-bottom: 0.4rem;">2. Ripristino Universale (.JSON o .ZIP)</div>
-            <p class="stat-label" style="margin-bottom: 0.85rem;">Carica un file <code>.json</code> o un archivio <code>.zip</code> generato da LifeOS per ripristinare tutti i moduli.</p>
-            <input type="file" id="restoreFileInput" accept=".json,.zip" class="input" onchange="App.importBackupFile(event)">
+          
+          <div class="hub-card" onclick="App.openHubModule('mod-inventory')">
+            <div class="hub-icon">📦</div>
+            <div class="card-title" style="justify-content:center;">Garanzie & Archivio</div>
+            <div class="stat-label">Registro Garanzie e Archivio Oggetti Base</div>
           </div>
-
-          <div class="bento-card">
-            <div class="card-title" style="margin-bottom: 0.4rem;">3. Generatore Pacchetto ZIP per GitHub Pages (PWA Completa)</div>
-            <p class="stat-label" style="margin-bottom: 0.85rem;">Genera un archivio <code>LifeOS-v6-GitHub-PWA.zip</code> pronto per il deploy con <code>index.html</code>, <code>manifest.json</code>, <code>sw.js</code> (Service Worker offline), <code>README.md</code> e snapshot dati opzionale.</p>
-            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-              <button class="btn btn-primary" onclick="App.generateGitHubZip(false)">🚀 Genera ZIP GitHub (Codice Pulito)</button>
-              <button class="btn" onclick="App.generateGitHubZip(true)">📦 Genera ZIP GitHub (Con Dati Attuali)</button>
-              <button class="btn btn-danger" onclick="App.resetAllData()">🗑️ Reset Totale App</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- ==========================================
-         MODULO 2: INVENTARIO OGGETTI & CATEGORIE
-         ========================================== -->
-    <section id="mod-inventory" class="module-section">
-      <div class="bento-grid">
-        <!-- Colonna Sinistra: Nuovo Oggetto + Gestione Categorie/Sottocategorie -->
-        <div class="bento-card col-span-4">
-          <div>
-            <div class="card-header">
-              <div class="card-title">➕ Registra Oggetto / Asset</div>
-              <span class="badge">Dossier Ready</span>
-            </div>
-            <form id="inventoryForm" onsubmit="App.addInventoryItem(event)">
-              <div class="form-group">
-                <label>Nome Oggetto *</label>
-                <input type="text" id="invName" class="input" placeholder="Es. MacBook Pro M3, Auto, Caldaia..." required>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Categoria *</label>
-                  <select id="invCategory" class="input" onchange="App.updateInvSubcategories()" required></select>
-                </div>
-                <div class="form-group">
-                  <label>Sottocategoria *</label>
-                  <select id="invSubcategory" class="input" required></select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Valore / Prezzo (€)</label>
-                  <input type="number" id="invPrice" class="input" step="0.01" min="0" value="0">
-                </div>
-                <div class="form-group">
-                  <label>Data Acquisto</label>
-                  <input type="date" id="invDate" class="input">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Scadenza Garanzia</label>
-                  <input type="date" id="invWarranty" class="input">
-                </div>
-                <div class="form-group">
-                  <label>Posizione / Stanza</label>
-                  <input type="text" id="invLocation" class="input" placeholder="Es. Studio, Garage...">
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Seriale / Note Dossier</label>
-                <input type="text" id="invNotes" class="input" placeholder="S/N, condizioni, info utili...">
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva nell'Inventario</button>
-            </form>
-
-            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
-
-            <!-- Personalizzazione Categorie e Sottocategorie -->
-            <div class="card-title" style="margin-bottom: 0.65rem; font-size: 0.9rem;">🗂️ Categorie & Sottocategorie Personalizzate</div>
-            <div class="form-row">
-              <input type="text" id="newInvCatInput" class="input" placeholder="Nuova Categoria...">
-              <button type="button" class="btn btn-sm" onclick="App.addInventoryCategory()">+ Categoria</button>
-            </div>
-            <div class="form-row" style="margin-top: 0.5rem;">
-              <input type="text" id="newInvSubInput" class="input" placeholder="Nuova Sottocat. (per cat. attiva)...">
-              <button type="button" class="btn btn-sm" onclick="App.addInventorySubcategory()">+ Sottocategoria</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Colonna Destra: Lista Inventario e Filtri -->
-        <div class="bento-card col-span-8">
-          <div>
-            <div class="card-header" style="flex-wrap: wrap;">
-              <div class="card-title">📦 Catalogo Inventario & Asset</div>
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <select id="invFilterCat" class="input" style="width: auto;" onchange="App.renderInventory()">
-                  <option value="ALL">Tutte le categorie</option>
-                </select>
-                <input type="text" id="invSearchInput" class="input" style="width: 200px;" placeholder="Filtra oggetti..." oninput="App.renderInventory()">
-              </div>
-            </div>
-            <div id="inventoryList" class="item-list" style="max-height: 580px;"></div>
+          
+          <div class="hub-card" onclick="App.openHubModule('mod-maintenance')">
+            <div class="hub-icon">🔧</div>
+            <div class="card-title" style="justify-content:center;">Manutenzioni</div>
+            <div class="stat-label">Scadenziario Tagliandi e Interventi</div>
           </div>
         </div>
       </div>
     </section>
-
     <!-- ==========================================
-         MODULO 3: CALENDARIO, ATTIVITÀ & DIARIO
+         MACROAREA 2: CALENDARIO, ATTIVITÀ & DIARIO
          ========================================== -->
     <section id="mod-calendar" class="module-section">
       <div class="bento-grid">
-        <!-- Calendario Interattivo Mensile -->
+        <!-- Calendario Mensile -->
         <div class="bento-card col-span-5">
           <div>
             <div class="card-header">
@@ -835,17 +213,12 @@
               <button class="btn btn-sm" onclick="App.changeMonth(1)">▶</button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <span class="stat-label">Giorno selezionato: <strong id="calSelectedDateLabel" style="color: var(--accent-primary);">Oggi</strong></span>
+              <span class="stat-label">Selezionato: <strong id="calSelectedDateLabel" style="color: var(--accent-primary);">Oggi</strong></span>
               <button class="btn btn-sm" onclick="App.selectToday()">Oggi</button>
             </div>
             <div class="calendar-grid" id="calendarHeaderGrid">
-              <div class="cal-day-header">Lun</div>
-              <div class="cal-day-header">Mar</div>
-              <div class="cal-day-header">Mer</div>
-              <div class="cal-day-header">Gio</div>
-              <div class="cal-day-header">Ven</div>
-              <div class="cal-day-header">Sab</div>
-              <div class="cal-day-header">Dom</div>
+              <div class="cal-day-header">Lun</div><div class="cal-day-header">Mar</div><div class="cal-day-header">Mer</div>
+              <div class="cal-day-header">Gio</div><div class="cal-day-header">Ven</div><div class="cal-day-header">Sab</div><div class="cal-day-header">Dom</div>
             </div>
             <div class="calendar-grid" id="calendarDaysGrid"></div>
           </div>
@@ -859,9 +232,7 @@
               <span class="badge" id="calTaskCountBadge">0</span>
             </div>
             <form onsubmit="App.addCalendarTask(event)" style="margin-bottom: 1rem;">
-              <div class="form-group">
-                <input type="text" id="calTaskTitle" class="input" placeholder="Nuova attività o promemoria..." required>
-              </div>
+              <input type="text" id="calTaskTitle" class="input" placeholder="Nuova attività o promemoria..." required>
               <div class="form-row">
                 <select id="calTaskType" class="input">
                   <option value="Attività">📌 Attività</option>
@@ -870,41 +241,33 @@
                 </select>
                 <select id="calTaskPriority" class="input">
                   <option value="Normale">Priorità Normale</option>
-                  <option value="Alta">🔥 Alta Priorità</option>
-                  <option value="Bassa">🌱 Bassa Priorità</option>
+                  <option value="Alta">🔥 Alta</option>
+                  <option value="Bassa">🌱 Bassa</option>
                 </select>
               </div>
-              <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 0.6rem;">+ Aggiungi al Giorno Selezionato</button>
+              <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Aggiungi al Giorno</button>
             </form>
             <div id="calendarTasksList" class="item-list" style="max-height: 360px;"></div>
           </div>
         </div>
 
-        <!-- Diario & Pensieri della Giornata -->
+        <!-- Diario & Pensieri -->
         <div class="bento-card col-span-3">
           <div>
-            <div class="card-header">
-              <div class="card-title">📓 Pensieri & Diario</div>
-            </div>
+            <div class="card-header"><div class="card-title">📓 Diario & Umore</div></div>
             <form onsubmit="App.saveJournalEntry(event)">
-              <div class="form-group">
-                <label>Umore della Giornata</label>
-                <select id="journalMood" class="input">
-                  <option value="🚀 Eccellente">🚀 Eccellente / Produttivo</option>
-                  <option value="😊 Sereno">😊 Sereno / Positivo</option>
-                  <option value="😐 Neutro">😐 Neutro / Ordinario</option>
-                  <option value="⚡ Stressato">⚡ Stressato / Intenso</option>
-                  <option value="🔋 Stanco">🔋 Stanco / Da ricaricare</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Riflessioni, Note & Gratitudine</label>
-                <textarea id="journalText" rows="7" class="input" placeholder="Scrivi i pensieri della giornata selezionata..."></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva Pagina Diario</button>
+              <select id="journalMood" class="input">
+                <option value="🚀 Eccellente">🚀 Eccellente</option>
+                <option value="😊 Sereno">😊 Sereno</option>
+                <option value="😐 Neutro">😐 Neutro</option>
+                <option value="⚡ Stressato">⚡ Stressato</option>
+                <option value="🔋 Stanco">🔋 Stanco</option>
+              </select>
+              <textarea id="journalText" rows="7" class="input" placeholder="Scrivi i pensieri della giornata..."></textarea>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva Diario</button>
             </form>
             <div style="margin-top: 1rem;">
-              <div class="stat-label" style="margin-bottom: 0.4rem;">Ultime annotazioni diario:</div>
+              <div class="stat-label" style="margin-bottom: 0.4rem;">Ultime annotazioni:</div>
               <div id="journalHistoryList" class="item-list" style="max-height: 180px;"></div>
             </div>
           </div>
@@ -913,352 +276,347 @@
     </section>
 
     <!-- ==========================================
-         MODULO 4: MANUTENZIONI PERSONALIZZABILI
+         SOTTOMODULI HUB (Aperti dinamicamente)
          ========================================== -->
-    <section id="mod-maintenance" class="module-section">
+
+    <!-- HUB 1: INVENTARIO (Registro Garanzie + Archivio Sdoppiato) -->
+    <section id="mod-inventory" class="module-section">
+      <div class="card-header" style="margin-bottom: 1.25rem;">
+        <div class="card-title">📦 Sistema Inventario: Garanzie & Archivio</div>
+        <button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
+      </div>
+
+      <!-- Barra di Personalizzazione Categorie Globale -->
+      <div class="bento-card col-span-12" style="margin-bottom: 1.25rem; padding: 1rem;">
+        <div class="stat-label" style="margin-bottom: 0.5rem; font-weight:600;">⚙️ Personalizza Categorie e Sottocategorie:</div>
+        <div class="form-row" style="margin-bottom:0;">
+          <input type="text" id="newInvCatInput" class="input" placeholder="Nome nuova Categoria...">
+          <button type="button" class="btn btn-sm" onclick="App.addInventoryCategory()">+ Categoria</button>
+          <input type="text" id="newInvSubInput" class="input" placeholder="Sottocat. (per cat. attiva)...">
+          <button type="button" class="btn btn-sm" onclick="App.addInventorySubcategory()">+ Sottocat.</button>
+        </div>
+      </div>
+
       <div class="bento-grid">
-        <!-- Form Nuova Manutenzione + Categorie Custom -->
+        <!-- Colonna Sinistra: Registrazione -->
         <div class="bento-card col-span-4">
-          <div>
-            <div class="card-header">
-              <div class="card-title">🔧 Pianifica Manutenzione</div>
+          <div class="card-header"><div class="card-title">➕ Inserisci Oggetto / Garanzia</div></div>
+          <form id="inventoryForm" onsubmit="App.addInventoryItem(event)">
+            <div class="form-group" style="margin-bottom:0.75rem;">
+              <label style="font-size:0.75rem; color:var(--text-secondary);">Destinazione Registro *</label>
+              <select id="invType" class="input" required style="border-color:var(--accent-primary);">
+                <option value="Garanzia">🛡️ Registro Garanzie (Focus scadenze)</option>
+                <option value="Archivio">📦 Archivio Generale (Focus inventario)</option>
+              </select>
             </div>
-            <form onsubmit="App.addMaintenance(event)">
-              <div class="form-group">
-                <label>Titolo Intervento *</label>
-                <input type="text" id="maintTitle" class="input" placeholder="Es. Tagliando Auto, Pulizia Filtri..." required>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Categoria *</label>
-                  <select id="maintCategory" class="input" required></select>
-                </div>
-                <div class="form-group">
-                  <label>Oggetto Inventario (Opz.)</label>
-                  <select id="maintLinkedObject" class="input">
-                    <option value="">-- Nessun oggetto --</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Data Scadenza / Esecuzione *</label>
-                  <input type="date" id="maintDueDate" class="input" required>
-                </div>
-                <div class="form-group">
-                  <label>Costo Stimato/Effettivo (€)</label>
-                  <input type="number" id="maintCost" class="input" step="0.01" min="0" value="0">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Ricorrenza</label>
-                  <select id="maintRecurrence" class="input">
-                    <option value="Singola">Singola volta</option>
-                    <option value="Mensile">Ogni Mese</option>
-                    <option value="Semestrale">Ogni 6 Mesi</option>
-                    <option value="Annuale">Ogni Anno</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Stato</label>
-                  <select id="maintStatus" class="input">
-                    <option value="In attesa">⏳ In attesa</option>
-                    <option value="Completata">✅ Completata</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Note Tecniche / Fornitore</label>
-                <input type="text" id="maintNotes" class="input" placeholder="Ricambi, tecnico, chilometraggio...">
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra Manutenzione</button>
-            </form>
-
-            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
-
-            <div class="card-title" style="margin-bottom: 0.65rem; font-size: 0.9rem;">🏷️ Aggiungi Categoria Manutenzione</div>
+            
+            <input type="text" id="invName" class="input" placeholder="Nome Oggetto *" required>
+            
             <div class="form-row">
-              <input type="text" id="newMaintCatInput" class="input" placeholder="Es. Giardino, Moto, Impianti...">
-              <button type="button" class="btn btn-sm" onclick="App.addMaintenanceCategory()">+ Aggiungi</button>
+              <select id="invCategory" class="input" onchange="App.updateInvSubcategories()" required></select>
+              <select id="invSubcategory" class="input" required></select>
             </div>
-          </div>
+            
+            <div class="form-row">
+              <div class="form-group"><label>Data Acquisto</label><input type="date" id="invDate" class="input"></div>
+              <div class="form-group"><label>Scadenza Garanzia</label><input type="date" id="invWarranty" class="input"></div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group"><label>Valore (€)</label><input type="number" id="invPrice" class="input" step="0.01" value="0"></div>
+              <div class="form-group"><label>Posizione</label><input type="text" id="invLocation" class="input" placeholder="Stanza/Luogo"></div>
+            </div>
+            
+            <input type="text" id="invNotes" class="input" placeholder="S/N, numero scontrino, dettagli negozio...">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva nel Registro</button>
+          </form>
         </div>
 
-        <!-- Lista Manutenzioni & Filtro -->
+        <!-- Colonna Destra: Visualizzazione a Tab (Garanzie vs Archivio) -->
         <div class="bento-card col-span-8">
-          <div>
-            <div class="card-header" style="flex-wrap: wrap;">
-              <div class="card-title">🛠️ Registro Manutenzioni & Scadenziario</div>
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <select id="maintFilterCat" class="input" style="width: auto;" onchange="App.renderMaintenances()">
-                  <option value="ALL">Tutte le categorie</option>
-                </select>
-                <select id="maintFilterStatus" class="input" style="width: auto;" onchange="App.renderMaintenances()">
-                  <option value="ALL">Tutti gli stati</option>
-                  <option value="In attesa">⏳ In attesa</option>
-                  <option value="Completata">✅ Completate</option>
-                </select>
-              </div>
-            </div>
-            <div id="maintenanceList" class="item-list" style="max-height: 580px;"></div>
+          <div class="inner-tabs">
+            <button class="inner-tab active" id="tab-garanzie" onclick="App.switchInvTab('garanzie')">🛡️ Registro Garanzie</button>
+            <button class="inner-tab" id="tab-archivio" onclick="App.switchInvTab('archivio')">📦 Archivio Oggetti</button>
           </div>
+          
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <select id="invFilterCat" class="input" style="width: auto;" onchange="App.renderInventory()">
+              <option value="ALL">Tutte le categorie</option>
+            </select>
+            <input type="text" id="invSearchInput" class="input" placeholder="Cerca nel registro attivo..." oninput="App.renderInventory()">
+          </div>
+          
+          <!-- Contenitore Lista Dinamico -->
+          <div id="inventoryList" class="item-list" style="max-height: 500px;"></div>
         </div>
       </div>
     </section>
 
+    <!-- HUB 2: MANUTENZIONI -->
+    <section id="mod-maintenance" class="module-section">
+      <div class="card-header" style="margin-bottom: 1.25rem;">
+        <div class="card-title">🔧 Scadenziario Manutenzioni</div>
+        <button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
+      </div>
+
+      <!-- Barra di Personalizzazione Categorie Manutenzione -->
+      <div class="bento-card col-span-12" style="margin-bottom: 1.25rem; padding: 1rem;">
+        <div class="stat-label" style="margin-bottom: 0.5rem; font-weight:600;">⚙️ Personalizza Categorie Manutenzione:</div>
+        <div class="form-row" style="margin-bottom:0;">
+          <input type="text" id="newMaintCatInput" class="input" placeholder="Es. Giardino, Elettronica, Salute Domestica...">
+          <button type="button" class="btn btn-sm" onclick="App.addMaintenanceCategory()">+ Aggiungi Categoria</button>
+        </div>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-card col-span-4">
+          <div class="card-header"><div class="card-title">➕ Pianifica Intervento</div></div>
+          <form onsubmit="App.addMaintenance(event)">
+            <input type="text" id="maintTitle" class="input" placeholder="Titolo Intervento *" required>
+            <div class="form-row">
+              <select id="maintCategory" class="input" required></select>
+              <select id="maintLinkedObject" class="input"><option value="">-- Nessun oggetto --</option></select>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Scadenza *</label><input type="date" id="maintDueDate" class="input" required></div>
+              <div class="form-group"><label>Costo (€)</label><input type="number" id="maintCost" class="input" step="0.01" value="0"></div>
+            </div>
+            <div class="form-row">
+              <select id="maintRecurrence" class="input">
+                <option value="Singola">Singolo</option><option value="Mensile">Mensile</option>
+                <option value="Semestrale">Semestrale</option><option value="Annuale">Annuale</option>
+              </select>
+              <select id="maintStatus" class="input">
+                <option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completata</option>
+              </select>
+            </div>
+            <input type="text" id="maintNotes" class="input" placeholder="Note (tecnico, ricambi...)">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra Manutenzione</button>
+          </form>
+        </div>
+
+        <div class="bento-card col-span-8">
+          <div class="card-header" style="margin-bottom: 0.5rem;">
+            <div class="card-title">🛠️ Registro Interventi</div>
+            <div style="display:flex; gap:0.5rem;">
+              <select id="maintFilterCat" class="input" style="margin:0;" onchange="App.renderMaintenances()"></select>
+              <select id="maintFilterStatus" class="input" style="margin:0;" onchange="App.renderMaintenances()">
+                <option value="ALL">Tutti gli stati</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option>
+              </select>
+            </div>
+          </div>
+          <div id="maintenanceList" class="item-list" style="max-height: 520px;"></div>
+        </div>
+      </div>
+    </section>
     <!-- ==========================================
-         MODULO 5: FINANZE MULTI-CONTO & BILANCIAMENTO
+         MACROAREA 3: FINANZE MULTI-CONTO
          ========================================== -->
     <section id="mod-finance" class="module-section">
       <div class="bento-grid">
-        <!-- Conti Attivi + Bilanciamento Saldo -->
+        <!-- Conti e Gestione -->
         <div class="bento-card col-span-4">
-          <div>
-            <div class="card-header">
-              <div class="card-title">🏦 Conti & Portafogli</div>
-              <span class="badge badge-success" id="finTotalBalanceBadge">€ 0,00</span>
-            </div>
-            <div id="financeAccountsList" class="item-list" style="max-height: 240px; margin-bottom: 1rem;"></div>
+          <div class="card-header">
+            <div class="card-title">🏦 I Miei Conti</div>
+            <span class="badge badge-success" id="finTotalBalanceBadge">€ 0,00</span>
+          </div>
+          <div id="financeAccountsList" class="item-list" style="max-height: 240px; margin-bottom: 1rem;"></div>
 
-            <!-- Form Nuovo Conto -->
-            <form onsubmit="App.addFinanceAccount(event)" style="margin-bottom: 1.2rem;">
-              <div class="card-title" style="font-size: 0.88rem; margin-bottom: 0.5rem;">➕ Nuovo Conto / Carta / Contanti</div>
-              <div class="form-row">
-                <input type="text" id="accNameInput" class="input" placeholder="Nome conto (es. Revolut)..." required>
-                <input type="number" id="accInitialBalance" class="input" step="0.01" placeholder="Saldo iniziale €" required>
-              </div>
-              <button type="submit" class="btn btn-sm" style="width: 100%; margin-top: 0.5rem;">+ Crea Conto</button>
-            </form>
-
-            <!-- Strumento di Bilanciamento / Allineamento Rapido Saldo -->
-            <div style="padding: 0.9rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color);">
-              <div class="card-title" style="font-size: 0.88rem; margin-bottom: 0.4rem;">⚖️ Bilanciamento & Rettifica Saldo Reale</div>
-              <p class="stat-label" style="margin-bottom: 0.6rem;">Seleziona un conto e imposta il saldo reale attuale: LifeOS genererà automaticamente una transazione di allineamento.</p>
-              <div class="form-row">
-                <select id="reconcileAccountSelect" class="input"></select>
-                <input type="number" id="reconcileTargetInput" class="input" step="0.01" placeholder="Saldo reale (€)">
-              </div>
-              <button type="button" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 0.5rem;" onclick="App.reconcileAccountBalance()">⚖️ Allinea Saldo Conto</button>
+          <form onsubmit="App.addFinanceAccount(event)" style="margin-bottom: 1.2rem;">
+            <div class="card-title" style="font-size: 0.88rem; margin-bottom: 0.5rem;">➕ Nuovo Conto</div>
+            <div class="form-row">
+              <input type="text" id="accNameInput" class="input" placeholder="Nome (es. Revolut)..." required>
+              <input type="number" id="accInitialBalance" class="input" step="0.01" placeholder="Saldo iniziale €" required>
             </div>
+            <button type="submit" class="btn btn-sm" style="width: 100%;">+ Crea Conto</button>
+          </form>
+
+          <!-- Bilanciamento Saldo -->
+          <div style="padding: 0.9rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="card-title" style="font-size: 0.88rem; margin-bottom: 0.4rem;">⚖️ Allineamento Saldo</div>
+            <div class="form-row">
+              <select id="reconcileAccountSelect" class="input"></select>
+              <input type="number" id="reconcileTargetInput" class="input" step="0.01" placeholder="Saldo reale (€)">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" style="width: 100%;" onclick="App.reconcileAccountBalance()">Allinea Saldo</button>
           </div>
         </div>
 
-        <!-- Nuova Transazione & Storico Movimenti Collegati -->
+        <!-- Transazioni e Registro -->
         <div class="bento-card col-span-8">
-          <div>
-            <div class="card-header">
-              <div class="card-title">💸 Registra Transazione / Giroconto</div>
-            </div>
-            <form onsubmit="App.addTransaction(event)" style="margin-bottom: 1.25rem;">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Tipo Movimento *</label>
-                  <select id="txType" class="input" onchange="App.toggleTransferFields()" required>
-                    <option value="EXPENSE">📉 Uscita / Spesa</option>
-                    <option value="INCOME">📈 Entrata / Accredito</option>
-                    <option value="TRANSFER">🔄 Giroconto tra Conti</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Conto Origine *</label>
-                  <select id="txAccount" class="input" required></select>
-                </div>
-                <div class="form-group" id="txTargetAccountGroup" style="display: none;">
-                  <label>Conto Destinazione *</label>
-                  <select id="txTargetAccount" class="input"></select>
-                </div>
-                <div class="form-group">
-                  <label>Importo (€) *</label>
-                  <input type="number" id="txAmount" class="input" step="0.01" min="0.01" placeholder="0.00" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Descrizione / Causale *</label>
-                  <input type="text" id="txDesc" class="input" placeholder="Es. Spesa alimentare, Stipendio, Assicurazione..." required>
-                </div>
-                <div class="form-group">
-                  <label>Categoria Finanziaria</label>
-                  <input type="text" id="txCategory" class="input" placeholder="Es. Casa, Trasporti, Lavoro, Svago...">
-                </div>
-                <div class="form-group">
-                  <label>Collega a Oggetto Dossier (Opz.)</label>
-                  <select id="txLinkedObject" class="input">
-                    <option value="">-- Nessun oggetto --</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Data *</label>
-                  <input type="date" id="txDate" class="input" required>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra Movimento Contabile</button>
-            </form>
-
-            <div class="card-header">
-              <div class="card-title">📜 Libro Mastro Transazioni</div>
-              <select id="txFilterAccount" class="input" style="width: auto;" onchange="App.renderFinance()">
-                <option value="ALL">Tutti i conti</option>
+          <div class="card-header"><div class="card-title">💸 Registra Transazione</div></div>
+          <form onsubmit="App.addTransaction(event)" style="margin-bottom: 1.25rem;">
+            <div class="form-row">
+              <select id="txType" class="input" onchange="App.toggleTransferFields()" required>
+                <option value="EXPENSE">📉 Uscita / Spesa</option>
+                <option value="INCOME">📈 Entrata</option>
+                <option value="TRANSFER">🔄 Giroconto</option>
               </select>
+              <input type="number" id="txAmount" class="input" step="0.01" min="0.01" placeholder="Importo € *" required>
             </div>
-            <div id="financeTransactionsList" class="item-list" style="max-height: 350px;"></div>
+            <div class="form-row">
+              <select id="txAccount" class="input" required><option value="">Conto Origine *</option></select>
+              <select id="txTargetAccount" class="input" style="display: none;"><option value="">Conto Destinazione *</option></select>
+            </div>
+            <div class="form-row">
+              <input type="text" id="txDesc" class="input" placeholder="Causale / Descrizione *" required>
+              <input type="text" id="txCategory" class="input" placeholder="Categoria (es. Casa, Svago)">
+            </div>
+            <div class="form-row">
+              <input type="date" id="txDate" class="input" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra Movimento</button>
+          </form>
+
+          <div class="card-header" style="margin-bottom: 0.5rem;">
+            <div class="card-title">📜 Libro Mastro</div>
+            <select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select>
           </div>
+          <div id="financeTransactionsList" class="item-list" style="max-height: 350px;"></div>
         </div>
       </div>
     </section>
 
-    <!-- ==========================================
-         MODULO 6: SALUTE OS UNIFICATO
-         (Calorie, Macro & Peso | Visite, Referti & Sintomi)
-         ========================================== -->
+    <!-- HUB 3: SALUTE OS UNIFICATO -->
     <section id="mod-health" class="module-section">
+      <div class="card-header" style="margin-bottom: 1.25rem;">
+        <div class="card-title">❤️ Salute OS: Clinica, Nutrizione & Peso</div>
+        <button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
+      </div>
+
       <div class="bento-grid">
-        <!-- Parte A: Nutrizione (Calorie & Macro) + Peso Corporeo -->
-        <div class="bento-card col-span-6">
-          <div>
-            <div class="card-header">
-              <div class="card-title">🍎 Nutrizione (Calorie & Macro) + Peso</div>
-              <span class="badge badge-success" id="healthTodaySummaryBadge">Oggi: 0 kcal</span>
+        <!-- Nutrizione Separata -->
+        <div class="bento-card col-span-4">
+          <div class="card-header"><div class="card-title">🍎 Nutrizione (Kcal & Macro)</div></div>
+          <form onsubmit="App.addNutritionLog(event)" style="margin-bottom: 1rem;">
+            <input type="text" id="nutriMeal" class="input" placeholder="Pasto (es. Pranzo)..." required>
+            <div class="form-row">
+              <div class="form-group"><label>Calorie *</label><input type="number" id="nutriKcal" class="input" min="0" required></div>
+              <div class="form-group"><label>Data *</label><input type="date" id="nutriDate" class="input" required></div>
             </div>
-
-            <form onsubmit="App.addNutritionLog(event)" style="margin-bottom: 1.2rem;">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Pasto / Alimento *</label>
-                  <input type="text" id="nutriMeal" class="input" placeholder="Es. Pranzo, Colazione, Post-Workout..." required>
-                </div>
-                <div class="form-group">
-                  <label>Data *</label>
-                  <input type="date" id="nutriDate" class="input" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Calorie (kcal) *</label>
-                  <input type="number" id="nutriKcal" class="input" min="0" placeholder="0" required>
-                </div>
-                <div class="form-group">
-                  <label>Proteine (g)</label>
-                  <input type="number" id="nutriProt" class="input" min="0" value="0">
-                </div>
-                <div class="form-group">
-                  <label>Carboidrati (g)</label>
-                  <input type="number" id="nutriCarbs" class="input" min="0" value="0">
-                </div>
-                <div class="form-group">
-                  <label>Grassi (g)</label>
-                  <input type="number" id="nutriFat" class="input" min="0" value="0">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Peso Corporeo Giornaliero (kg - opz.)</label>
-                  <input type="number" id="nutriWeight" class="input" step="0.1" min="20" placeholder="Es. 74.5">
-                </div>
-                <div class="form-group" style="justify-content: flex-end;">
-                  <button type="submit" class="btn btn-primary" style="margin-top: auto;">+ Registra Diario Nutrizionale</button>
-                </div>
-              </div>
-            </form>
-
-            <div class="stat-label" style="margin-bottom: 0.5rem;">Storico Giornaliero Calorie, Macro & Peso:</div>
-            <div id="healthNutritionList" class="item-list" style="max-height: 330px;"></div>
-          </div>
+            <div class="form-row">
+              <input type="number" id="nutriProt" class="input" min="0" placeholder="Prot (g)">
+              <input type="number" id="nutriCarbs" class="input" min="0" placeholder="Carb (g)">
+              <input type="number" id="nutriFat" class="input" min="0" placeholder="Gras (g)">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Aggiungi Pasto</button>
+          </form>
+          <div id="healthNutritionList" class="item-list" style="max-height: 250px;"></div>
         </div>
 
-        <!-- Parte B: Area Medica (Visite, Referti & Sintomi) -->
-        <div class="bento-card col-span-6">
-          <div>
-            <div class="card-header">
-              <div class="card-title">🩺 Cartella Clinica: Visite, Referti & Sintomi</div>
-              <span class="badge" id="healthMedicalCountBadge">0 record</span>
+        <!-- Andamento Peso -->
+        <div class="bento-card col-span-3">
+          <div class="card-header"><div class="card-title">⚖️ Andamento Peso</div></div>
+          <form onsubmit="App.addWeightLog(event)" style="margin-bottom: 1rem;">
+            <div class="form-row">
+              <input type="number" id="weightValue" class="input" step="0.1" min="20" placeholder="Peso (kg) *" required>
+              <input type="date" id="weightDate" class="input" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra Peso</button>
+          </form>
+          <div id="healthWeightList" class="item-list" style="max-height: 250px;"></div>
+        </div>
+
+        <!-- Cartella Clinica, Referti & File -->
+        <div class="bento-card col-span-5">
+          <div class="card-header"><div class="card-title">🩺 Cartella Clinica & Referti</div></div>
+          <form onsubmit="App.addMedicalRecord(event)" style="margin-bottom: 1rem;">
+            <div class="form-row">
+              <select id="medType" class="input" onchange="App.toggleMedFields()" required>
+                <option value="Visita Medica">👨‍⚕️ Visita Medica</option>
+                <option value="Referto">📄 Referto / Analisi</option>
+                <option value="Sintomo">🌡️ Sintomo / Evento</option>
+              </select>
+              <input type="date" id="medDate" class="input" required>
+            </div>
+            <input type="text" id="medTitle" class="input" placeholder="Oggetto (es. Visita Cardiologica) *" required>
+            
+            <!-- Campo dinamico: Mostrato solo per Visita -->
+            <div id="medTherapyGroup">
+              <input type="text" id="medTherapy" class="input" placeholder="Terapia prescritta (es. Aspirina 1/giorno per dashboard)">
+            </div>
+            
+            <!-- Campo dinamico: Mostrato solo per Referti -->
+            <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.5rem; border-radius: 8px; margin-bottom: 0.75rem;">
+              <label style="font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:0.3rem;">Allega Esito (PDF o JPEG - Max ~5MB)</label>
+              <input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png" style="margin-bottom:0; padding:0.3rem;">
             </div>
 
-            <form onsubmit="App.addMedicalRecord(event)" style="margin-bottom: 1.2rem;">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Tipologia *</label>
-                  <select id="medType" class="input" required>
-                    <option value="Visita Medica">👨‍⚕️ Visita Medica / Specialistica</option>
-                    <option value="Referto / Analisi">📄 Referto / Esami del Sangue</option>
-                    <option value="Sintomo / Evento">🌡️ Sintomo / Monitoraggio</option>
-                    <option value="Terapia / Farmaco">💊 Terapia / Farmaco</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Data *</label>
-                  <input type="date" id="medDate" class="input" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Titolo / Specialista / Sintomo *</label>
-                  <input type="text" id="medTitle" class="input" placeholder="Es. Visita Cardiologica, Emocromo, Cefalea..." required>
-                </div>
-                <div class="form-group">
-                  <label>Valori / Costo / Intensità</label>
-                  <input type="text" id="medMetrics" class="input" placeholder="Es. Pressione 120/80, €120, Lieve...">
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Esito, Valori Referto o Note Cliniche</label>
-                <input type="text" id="medNotes" class="input" placeholder="Dettagli, prescrizioni, follow-up consigliato...">
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva in Cartella Clinica</button>
-            </form>
-
-            <div class="stat-label" style="margin-bottom: 0.5rem;">Archivio Visite, Referti e Sintomi:</div>
-            <div id="healthMedicalList" class="item-list" style="max-height: 330px;"></div>
-          </div>
+            <input type="text" id="medNotes" class="input" placeholder="Note cliniche, valori, esiti...">
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella Clinica</button>
+          </form>
+          <div id="healthMedicalList" class="item-list" style="max-height: 350px;"></div>
         </div>
       </div>
     </section>
 
   </main>
-  <!-- MOTORE JAVASCRIPT: LOGICA DI BUSINESS E GESTIONE STATO -->
+
+  <!-- Modale Settings (Invisibile per default) -->
+  <div id="settingsModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="card-header">
+        <div class="card-title">⚙️ Impostazioni Base</div>
+        <button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button>
+      </div>
+      <p class="stat-label">Da qui puoi modificare il tema ed effettuare il Reset completo dell'app (Danger Zone).</p>
+      <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap:wrap;">
+        <button class="btn" onclick="App.toggleTheme()">🌓 Cambia Tema</button>
+        <button class="btn btn-danger" onclick="App.resetAllData()">🗑️ Reset Totale App</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MOTORE JAVASCRIPT: LOGICA DI BUSINESS
+       ========================================== -->
   <script>
     const App = {
       // 1. STATO GLOBALE DELL'APPLICAZIONE
       state: {
-        inventory: [],
+        inventory: [], // Ora include il campo 'type' (Garanzia o Archivio)
         calendarTasks: [],
         journal: [],
         maintenances: [],
         accounts: [],
         transactions: [],
         healthNutrition: [],
-        healthMedical: [],
+        healthWeight: [], // Modulo Peso separato
+        healthMedical: [], // Modulo Medico avanzato con terapia e fileBase64
         settings: {
           inventoryCategories: {
-            'Elettronica': ['Smartphone', 'Computer', 'Audio/Video'],
-            'Veicoli': ['Auto', 'Moto', 'Bici'],
-            'Casa': ['Elettrodomestici', 'Mobili', 'Attrezzi']
+            'Elettronica': ['Smartphone', 'Computer', 'Casa'],
+            'Veicoli': ['Auto', 'Moto'],
+            'Casa': ['Elettrodomestici', 'Mobili']
           },
-          maintenanceCategories: ['Casa', 'Auto', 'Dispositivi', 'Altro']
+          maintenanceCategories: ['Casa', 'Auto', 'Salute', 'Altro']
         }
       },
       currentDate: new Date(),
       selectedDate: new Date(),
+      activeInvTab: 'garanzie',
 
       // 2. CORE UTILS: SALVATAGGIO, CARICAMENTO E UI
       save() {
-        localStorage.setItem('lifeos_v6_data', JSON.stringify(this.state));
-        this.renderDashboard();
+        try {
+          localStorage.setItem('lifeos_v65_data', JSON.stringify(this.state));
+          this.renderDashboard();
+        } catch(e) {
+          if(e.name === 'QuotaExceededError') {
+            this.showToast('⚠️ Spazio di archiviazione esaurito! Il file allegato potrebbe essere troppo grande. Rimuovi vecchi file.', 'danger');
+          }
+        }
       },
 
       load() {
-        const data = localStorage.getItem('lifeos_v6_data');
+        const data = localStorage.getItem('lifeos_v65_data');
         if (data) {
           try {
             const parsed = JSON.parse(data);
             this.state = { ...this.state, ...parsed };
-            // Gestione retrocompatibilità se mancano nuovi campi
-            if(!this.state.healthNutrition) this.state.healthNutrition = [];
-            if(!this.state.healthMedical) this.state.healthMedical = [];
-          } catch(e) {
-            console.error("Errore caricamento dati:", e);
-          }
+            // Retrocompatibilità
+            if(!this.state.healthWeight) this.state.healthWeight = [];
+          } catch(e) { console.error("Errore caricamento dati:", e); }
         }
       },
 
@@ -1266,13 +624,10 @@
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        
-        let icon = type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '❌';
-        toast.innerHTML = `<span>${icon} ${msg}</span>`;
-        
+        toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '❌'} ${msg}</span>`;
         container.appendChild(toast);
         setTimeout(() => {
-          toast.style.animation = 'slideInRight 0.3s ease reverse forwards';
+          toast.style.animation = 'slideIn 0.3s ease reverse forwards';
           setTimeout(() => toast.remove(), 300);
         }, 3500);
       },
@@ -1280,282 +635,94 @@
       openModal(id) { document.getElementById(id).classList.add('open'); },
       closeModal(id) { document.getElementById(id).classList.remove('open'); },
 
+      // NAVIGAZIONE MACROAREE
       switchModule(modId) {
         document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
         
-        document.getElementById(modId).classList.add('active');
+        // Se andiamo nei moduli Hub, mostriamo il div dell'hub, NON attiviamo il tab Hub se nascondiamo la navbar (ma noi usiamo l'Hub come tab)
+        const targetSection = document.getElementById(modId);
+        if(targetSection) targetSection.classList.add('active');
+        
         const tab = document.querySelector(`.nav-tab[data-target="${modId}"]`);
         if (tab) tab.classList.add('active');
 
-        // Aggiorna le viste quando si entra in un modulo
+        // Aggiorna viste
         if (modId === 'mod-dashboard') this.renderDashboard();
-        if (modId === 'mod-inventory') { this.populateCategorySelects(); this.renderInventory(); }
         if (modId === 'mod-calendar') this.renderCalendar();
         if (modId === 'mod-finance') { this.populateAccountSelects(); this.renderFinance(); }
-        if (modId === 'mod-maintenance') { this.populateMaintenanceSelects(); this.renderMaintenances(); }
-        if (modId === 'mod-health') this.renderHealth();
+      },
+
+      // NAVIGAZIONE SOTTOMODULI HUB
+      openHubModule(hubId) {
+        // Nascondi tutto
+        document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
+        // Attiva quello specifico (senza cambiare il tab attivo nella barra per far capire che siamo "dentro" una sezione extra)
+        document.getElementById(hubId).classList.add('active');
+        
+        if (hubId === 'mod-inventory') { this.populateCategorySelects(); this.renderInventory(); }
+        if (hubId === 'mod-maintenance') { this.populateMaintenanceSelects(); this.renderMaintenances(); }
+        if (hubId === 'mod-health') this.renderHealth();
+      },
+
+      switchInvTab(tabId) {
+        this.activeInvTab = tabId;
+        document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+        this.renderInventory();
       },
 
       toggleTheme() {
         const html = document.documentElement;
-        const currentTheme = html.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', newTheme);
-        this.showToast(`Tema ${newTheme === 'dark' ? 'Scuro' : 'Chiaro'} attivato.`);
+        this.closeModal('settingsModal');
       },
 
-      formatMoney(amount) {
-        return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
-      },
-      
-      formatDate(dateString) {
-        if (!dateString) return '--';
-        return new Date(dateString).toLocaleDateString('it-IT');
-      },
-
+      formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount); },
+      formatDate(dateStr) { return dateStr ? new Date(dateStr).toLocaleDateString('it-IT') : '--'; },
       generateId() { return Math.random().toString(36).substr(2, 9); },
 
-      // 3. RICERCA GLOBALE UNIFICATA & DOSSIER 360°
-      handleGlobalSearch(query) {
-        const resCard = document.getElementById('globalSearchResultsCard');
-        const resList = document.getElementById('globalSearchResultsList');
-        if (!query || query.length < 2) { resCard.style.display = 'none'; return; }
-        
-        query = query.toLowerCase();
-        let results = [];
-
-        // Ricerca in Inventario
-        this.state.inventory.forEach(i => {
-          if (i.name.toLowerCase().includes(query) || (i.notes && i.notes.toLowerCase().includes(query))) {
-            results.push({ type: 'Oggetto', icon: '📦', text: i.name, sub: `Valore: ${this.formatMoney(i.price)}`, action: `App.openDossier('${i.id}')` });
-          }
+      // Utility per convertire file PDF/JPEG in Base64
+      fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
         });
-        // Ricerca in Manutenzioni
-        this.state.maintenances.forEach(m => {
-          if (m.title.toLowerCase().includes(query) || (m.notes && m.notes.toLowerCase().includes(query))) {
-            results.push({ type: 'Manutenzione', icon: '🔧', text: m.title, sub: `Scadenza: ${this.formatDate(m.dueDate)}`, action: `App.switchModule('mod-maintenance')` });
-          }
-        });
-        // Ricerca in Finanze
-        this.state.transactions.forEach(t => {
-          if (t.desc.toLowerCase().includes(query) || (t.category && t.category.toLowerCase().includes(query))) {
-            results.push({ type: 'Transazione', icon: '💸', text: t.desc, sub: `${this.formatMoney(t.amount)} (${t.type})`, action: `App.switchModule('mod-finance')` });
-          }
-        });
-        // Ricerca in Salute/Medica
-        this.state.healthMedical.forEach(h => {
-          if (h.title.toLowerCase().includes(query) || (h.notes && h.notes.toLowerCase().includes(query))) {
-            results.push({ type: 'Referto/Visita', icon: '🩺', text: h.title, sub: `Data: ${this.formatDate(h.date)}`, action: `App.switchModule('mod-health')` });
-          }
-        });
+      },
 
-        resList.innerHTML = results.length > 0 ? results.map(r => `
-          <div class="list-row" style="cursor:pointer;" onclick="${r.action}; App.clearGlobalSearch();">
-            <div><strong>${r.icon} ${r.text}</strong><br><small class="text-secondary">${r.sub}</small></div>
-            <span class="badge">${r.type}</span>
-          </div>
-        `).join('') : '<div class="list-row">Nessun risultato trovato.</div>';
+      // Gestione File Dinamica (Salute OS)
+      toggleMedFields() {
+        const type = document.getElementById('medType').value;
+        document.getElementById('medTherapyGroup').style.display = type === 'Visita Medica' ? 'block' : 'none';
+        document.getElementById('medFileGroup').style.display = type === 'Referto' ? 'block' : 'none';
         
-        resCard.style.display = 'block';
+        if(type !== 'Visita Medica') document.getElementById('medTherapy').value = '';
+        if(type !== 'Referto') document.getElementById('medFile').value = '';
       },
-
-      clearGlobalSearch() {
-        document.getElementById('globalSearchInput').value = '';
-        document.getElementById('globalSearchResultsCard').style.display = 'none';
-      },
-
-      openDossier(itemId) {
-        const item = this.state.inventory.find(i => i.id === itemId);
-        if (!item) return;
-
-        // Recupera dati collegati
-        const linkedMaintenances = this.state.maintenances.filter(m => m.linkedObjectId === itemId);
-        const linkedTransactions = this.state.transactions.filter(t => t.linkedObjectId === itemId);
-        const totalMaintCost = linkedMaintenances.reduce((acc, m) => acc + (parseFloat(m.cost) || 0), 0);
-        const totalTxCost = linkedTransactions.filter(t => t.type === 'EXPENSE').reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0);
-        const tco = (parseFloat(item.price) || 0) + totalMaintCost + totalTxCost; // Total Cost of Ownership
-
-        const body = `
-          <div class="bento-grid">
-            <div class="bento-card col-span-12" style="background: rgba(99, 102, 241, 0.05);">
-              <div class="stat-value" style="font-size: 1.4rem;">${item.name}</div>
-              <div class="stat-label">${item.category} > ${item.subcategory} | Posizione: ${item.location || 'N/D'}</div>
-            </div>
-            
-            <div class="bento-card col-span-4">
-              <div class="card-title">Prezzo Iniziale</div>
-              <div class="stat-value" style="font-size:1.2rem;">${this.formatMoney(item.price)}</div>
-            </div>
-            <div class="bento-card col-span-4">
-              <div class="card-title">Costi Extra (Manut. + Spese)</div>
-              <div class="stat-value" style="font-size:1.2rem; color: var(--danger);">${this.formatMoney(totalMaintCost + totalTxCost)}</div>
-            </div>
-            <div class="bento-card col-span-4">
-              <div class="card-title">TCO (Costo Totale)</div>
-              <div class="stat-value" style="font-size:1.2rem;">${this.formatMoney(tco)}</div>
-            </div>
-
-            <div class="bento-card col-span-6">
-              <div class="card-title">Dettagli Base</div>
-              <ul style="list-style: none; margin-top: 0.5rem; line-height: 1.8; font-size: 0.85rem;">
-                <li><strong>Data Acquisto:</strong> ${this.formatDate(item.date)}</li>
-                <li><strong>Scadenza Garanzia:</strong> ${this.formatDate(item.warranty)}</li>
-                <li><strong>Note/Seriale:</strong> ${item.notes || '-'}</li>
-              </ul>
-            </div>
-
-            <div class="bento-card col-span-6">
-              <div class="card-title">Manutenzioni Collegate</div>
-              <div class="item-list" style="max-height: 120px; margin-top:0.5rem;">
-                ${linkedMaintenances.length ? linkedMaintenances.map(m => `
-                  <div style="font-size:0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom:4px; margin-bottom:4px;">
-                    ${m.status === 'Completata' ? '✅' : '⏳'} <strong>${m.title}</strong> - ${this.formatDate(m.dueDate)} (${this.formatMoney(m.cost)})
-                  </div>
-                `).join('') : '<div style="font-size:0.8rem; color:var(--text-muted);">Nessuna manutenzione registrata.</div>'}
-              </div>
-            </div>
-          </div>
-        `;
-        document.getElementById('dossierModalBody').innerHTML = body;
-        this.openModal('dossierModal');
-      },
-
-      // 4. BACKUP, RIPRISTINO & GITHUB EXPORT
-      exportJSON() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", `LifeOS_Backup_${new Date().toISOString().slice(0,10)}.json`);
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-        this.showToast('Backup JSON esportato con successo.');
-      },
-
-      async exportZIP() {
-        if (!window.JSZip) { this.showToast('Errore: JSZip non caricato.', 'danger'); return; }
-        const zip = new JSZip();
-        zip.file("lifeos_data.json", JSON.stringify(this.state, null, 2));
-        zip.file("info.txt", "Backup di LifeOS v6.0. Importare il file .zip o .json nel Centro Backup dell'app.");
-        const content = await zip.generateAsync({ type: "blob" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(content);
-        a.download = `LifeOS_Archive_${new Date().toISOString().slice(0,10)}.zip`;
-        a.click();
-        this.showToast('Archivio ZIP esportato con successo.');
-      },
-
-      importBackupFile(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        
-        reader.onload = async (e) => {
-          try {
-            if (file.name.endsWith('.zip')) {
-              if (!window.JSZip) throw new Error("JSZip mancante.");
-              const zip = await JSZip.loadAsync(e.target.result);
-              if (!zip.file("lifeos_data.json")) throw new Error("File lifeos_data.json non trovato nello ZIP.");
-              const jsonStr = await zip.file("lifeos_data.json").async("string");
-              this.state = JSON.parse(jsonStr);
-            } else {
-              this.state = JSON.parse(e.target.result);
-            }
-            this.save();
-            this.closeModal('backupModal');
-            this.switchModule('mod-dashboard');
-            this.showToast('Dati ripristinati con successo!', 'success');
-          } catch (err) {
-            this.showToast('Errore nel file di backup: ' + err.message, 'danger');
-          }
-        };
-
-        if (file.name.endsWith('.zip')) reader.readAsArrayBuffer(file);
-        else reader.readAsText(file);
-      },
-
-      async generateGitHubZip(includeData = false) {
-        if (!window.JSZip) { this.showToast('Libreria JSZip non trovata!', 'danger'); return; }
-        const zip = new JSZip();
-        
-        // Clona l'HTML attuale (senza tag <script> iniettati da estensioni, ma mantenendo il sorgente base)
-        const htmlContent = document.documentElement.outerHTML; 
-        zip.file("index.html", htmlContent);
-
-        // Se includiamo i dati, li inseriamo come JSON iniziale nel JS (opzionale) o in un file separato.
-        // Un modo pulito per GitHub Pages è fornire il file JSON a parte, o lasciare che l'utente continui con localStorage.
-        if (includeData) {
-          zip.file("snapshot_data.json", JSON.stringify(this.state, null, 2));
-        }
-
-        // Generazione manifest.json per PWA
-        const manifest = {
-          "name": "LifeOS v6.0",
-          "short_name": "LifeOS",
-          "start_url": "./index.html",
-          "display": "standalone",
-          "background_color": "#0f172a",
-          "theme_color": "#0f172a",
-          "icons": [{"src": "https://via.placeholder.com/192/6366f1/ffffff?text=L6", "sizes": "192x192", "type": "image/png"}]
-        };
-        zip.file("manifest.json", JSON.stringify(manifest, null, 2));
-
-        // Generazione sw.js (Service Worker basico per cache offline)
-        const sw = `
-const CACHE_NAME = 'lifeos-v6-cache';
-self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./', './index.html', './manifest.json']))));
-self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))));
-        `;
-        zip.file("sw.js", sw);
-        
-        zip.file("README.md", "# LifeOS v6.0\nPersonal Operating System generato.\nCarica questi file su una repo GitHub e abilita GitHub Pages.");
-
-        const content = await zip.generateAsync({ type: "blob" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(content);
-        a.download = `LifeOS-v6-GitHub-PWA.zip`;
-        a.click();
-        this.showToast('Pacchetto GitHub PWA generato!', 'success');
-      },
-
-      resetAllData() {
-        if(confirm("ATTENZIONE! Questo cancellerà tutti i dati in modo permanente. Sei sicuro?")) {
-          localStorage.removeItem('lifeos_v6_data');
-          location.reload();
-        }
-      },
-
-      // 5. DASHBOARD & RENDER
+      // ==========================================
+      // 3. DASHBOARD MINIMALISTA (Render)
+      // ==========================================
       renderDashboard() {
-        // Calcolo Valore Inventario
-        const invTotal = this.state.inventory.reduce((acc, item) => acc + (parseFloat(item.price) || 0), 0);
-        document.getElementById('dashInventoryCount').innerText = this.state.inventory.length;
-        document.getElementById('dashInventoryValue').innerText = `Valore stimato: ${this.formatMoney(invTotal)}`;
+        // 1. Liquidità
+        const totalBalance = this.state.accounts.reduce((acc, a) => acc + a.balance, 0);
+        document.getElementById('dashNetWorth').innerText = this.formatMoney(totalBalance);
+        document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti attivi`;
 
-        // Manutenzioni Pendenti
-        const pendingMaint = this.state.maintenances.filter(m => m.status === 'In attesa');
-        document.getElementById('dashMaintPending').innerText = pendingMaint.length;
-        document.getElementById('dashMaintUrgentBadge').innerText = pendingMaint.length > 0 ? `${pendingMaint.length} In attesa` : 'Tutto OK';
-        document.getElementById('dashMaintUrgentBadge').className = `badge ${pendingMaint.length > 0 ? 'badge-warning' : 'badge-success'}`;
-
-        // Dossier Rapido 
-        const dossierList = document.getElementById('dashDossierList');
-        const recentItems = [...this.state.inventory].reverse().slice(0, 5);
-        dossierList.innerHTML = recentItems.length ? recentItems.map(i => `
-          <div class="list-row" style="cursor:pointer;" onclick="App.openDossier('${i.id}')">
+        // 2. Promemoria Terapie (estratti dalle Visite Mediche)
+        const therapies = this.state.healthMedical.filter(m => m.type === 'Visita Medica' && m.therapy && m.therapy.trim() !== '');
+        document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `
+          <div class="list-row" style="padding: 0.5rem 0.8rem; border-left: 3px solid var(--accent-primary);">
             <div>
-              <strong>${i.name}</strong><br>
-              <small class="text-secondary">${i.category} > ${i.subcategory}</small>
-            </div>
-            <div style="text-align:right;">
-              <span style="font-weight:600; font-size:0.9rem;">${this.formatMoney(i.price)}</span><br>
-              <span class="badge">Apri Dossier</span>
+              <strong>💊 ${t.therapy}</strong><br>
+              <small class="text-secondary">Prescritta in: ${t.title} (${this.formatDate(t.date)})</small>
             </div>
           </div>
-        `).join('') : '<div class="list-row">Nessun oggetto in inventario.</div>';
+        `).join('') : '<div class="list-row text-muted">Nessuna terapia attiva registrata.</div>';
 
-        // Attività Imminenti (Agenda)
+        // 3. Agenda & Attività
         const todayStr = this.currentDate.toISOString().slice(0,10);
         const upcomingTasks = this.state.calendarTasks.filter(t => t.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 5);
         document.getElementById('dashUpcomingTasks').innerHTML = upcomingTasks.length ? upcomingTasks.map(t => `
@@ -1566,12 +733,12 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
             </div>
             <span class="badge ${t.priority === 'Alta' ? 'badge-danger' : t.priority === 'Bassa' ? 'badge-success' : 'badge-warning'}">${t.type}</span>
           </div>
-        `).join('') : '<div class="list-row">Nessuna attività in agenda.</div>';
-        
-        // Gli aggiornamenti per Salute e Finanza avverranno nei rispettivi render (che chiameremo in init/switch)
+        `).join('') : '<div class="list-row text-muted">Nessuna attività in agenda.</div>';
       },
 
-      // 6. LOGICA INVENTARIO
+      // ==========================================
+      // 4. INVENTARIO & GARANZIE (A Schede)
+      // ==========================================
       populateCategorySelects() {
         const catSelect = document.getElementById('invCategory');
         const filterSelect = document.getElementById('invFilterCat');
@@ -1596,23 +763,17 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
         if (newCat && !this.state.settings.inventoryCategories[newCat]) {
           this.state.settings.inventoryCategories[newCat] = ['Generale'];
           document.getElementById('newInvCatInput').value = '';
-          this.populateCategorySelects();
-          this.save();
-          this.showToast('Categoria aggiunta.');
+          this.populateCategorySelects(); this.save(); this.showToast('Categoria aggiunta.');
         }
       },
 
       addInventorySubcategory() {
         const activeCat = document.getElementById('invCategory').value;
         const newSub = document.getElementById('newInvSubInput').value.trim();
-        if (activeCat && newSub) {
-          if (!this.state.settings.inventoryCategories[activeCat].includes(newSub)) {
-            this.state.settings.inventoryCategories[activeCat].push(newSub);
-            document.getElementById('newInvSubInput').value = '';
-            this.updateInvSubcategories();
-            this.save();
-            this.showToast('Sottocategoria aggiunta.');
-          }
+        if (activeCat && newSub && !this.state.settings.inventoryCategories[activeCat].includes(newSub)) {
+          this.state.settings.inventoryCategories[activeCat].push(newSub);
+          document.getElementById('newInvSubInput').value = '';
+          this.updateInvSubcategories(); this.save(); this.showToast('Sottocategoria aggiunta.');
         }
       },
 
@@ -1620,6 +781,7 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
         e.preventDefault();
         const item = {
           id: this.generateId(),
+          type: document.getElementById('invType').value, // 'Garanzia' o 'Archivio'
           name: document.getElementById('invName').value,
           category: document.getElementById('invCategory').value,
           subcategory: document.getElementById('invSubcategory').value,
@@ -1631,22 +793,14 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
           addedAt: new Date().toISOString()
         };
         this.state.inventory.push(item);
-        this.save();
-        e.target.reset();
-        this.updateInvSubcategories(); // resetta ai default del form
-        this.renderInventory();
-        this.showToast('Oggetto aggiunto all\'inventario.');
+        this.save(); e.target.reset(); this.updateInvSubcategories(); this.renderInventory();
+        this.showToast(`Salvato in ${item.type}.`);
       },
 
       deleteInventoryItem(id) {
-        if(confirm('Eliminare questo oggetto? Rimuoverà anche i collegamenti alle manutenzioni (ma non le eliminerà).')) {
+        if(confirm('Eliminare questo oggetto/garanzia dal registro?')) {
           this.state.inventory = this.state.inventory.filter(i => i.id !== id);
-          // Rimuovi link da manutenzioni e transazioni
-          this.state.maintenances.forEach(m => { if(m.linkedObjectId === id) m.linkedObjectId = ''; });
-          this.state.transactions.forEach(t => { if(t.linkedObjectId === id) t.linkedObjectId = ''; });
-          this.save();
-          this.renderInventory();
-          this.showToast('Oggetto eliminato.');
+          this.save(); this.renderInventory();
         }
       },
 
@@ -1654,50 +808,46 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
         const list = document.getElementById('inventoryList');
         const filterCat = document.getElementById('invFilterCat').value;
         const search = document.getElementById('invSearchInput').value.toLowerCase();
+        const activeType = this.activeInvTab === 'garanzie' ? 'Garanzia' : 'Archivio';
 
-        let filtered = this.state.inventory;
+        let filtered = this.state.inventory.filter(i => i.type === activeType);
         if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat);
         if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search) || (i.notes && i.notes.toLowerCase().includes(search)));
 
-        list.innerHTML = filtered.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)).map(item => `
+        list.innerHTML = filtered.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)).map(item => {
+          // Highlight scadenza garanzia se vicina/scaduta
+          let warrantyBadge = '';
+          if(item.warranty) {
+            const wDate = new Date(item.warranty);
+            const isExpired = wDate < new Date();
+            warrantyBadge = `<span class="badge ${isExpired ? 'badge-danger' : 'badge-success'}">${isExpired ? 'Scaduta' : 'Attiva'} fino al ${this.formatDate(item.warranty)}</span>`;
+          }
+
+          return `
           <div class="list-row">
             <div style="flex:1;">
               <strong>${item.name}</strong> <span class="badge" style="margin-left:8px;">${item.category}</span><br>
-              <small class="text-secondary">${item.subcategory} | Pos: ${item.location || '-'} | Garanzia: ${this.formatDate(item.warranty)}</small>
+              <small class="text-secondary">${item.subcategory} | Pos: ${item.location || '-'}</small>
+              <div style="margin-top: 4px;">${warrantyBadge}</div>
             </div>
             <div style="text-align: right;">
               <div style="font-weight: 700; color: var(--accent-primary); margin-bottom: 4px;">${this.formatMoney(item.price)}</div>
-              <div style="display:flex; gap: 4px; justify-content: flex-end;">
-                <button class="btn btn-sm" onclick="App.openDossier('${item.id}')">🗂️ Dossier</button>
-                <button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button>
-              </div>
+              <button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button>
             </div>
           </div>
-        `).join('') || '<div class="list-row">Nessun oggetto trovato.</div>';
+        `}).join('') || `<div class="list-row text-muted">Nessun elemento nel registro ${activeType}.</div>`;
       },
 
-      // 7. CALENDARIO, ATTIVITÀ E DIARIO
-      changeMonth(dir) {
-        this.currentDate.setMonth(this.currentDate.getMonth() + dir);
-        this.renderCalendar();
-      },
-
-      selectToday() {
-        this.currentDate = new Date();
-        this.selectedDate = new Date();
-        this.renderCalendar();
-      },
-
-      selectDate(dateStr) {
-        this.selectedDate = new Date(dateStr);
-        this.renderCalendar();
-      },
+      // ==========================================
+      // 5. CALENDARIO E DIARIO
+      // ==========================================
+      changeMonth(dir) { this.currentDate.setMonth(this.currentDate.getMonth() + dir); this.renderCalendar(); },
+      selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
+      selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
 
       renderCalendar() {
-        const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
+        const year = this.currentDate.getFullYear(); const month = this.currentDate.getMonth();
+        const firstDay = new Date(year, month, 1); const lastDay = new Date(year, month + 1, 0);
         
         document.getElementById('calMonthTitle').innerText = firstDay.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }).toUpperCase();
         document.getElementById('calSelectedDateLabel').innerText = this.selectedDate.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -1705,20 +855,16 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
         const grid = document.getElementById('calendarDaysGrid');
         grid.innerHTML = '';
 
-        // Spazi vuoti inizio mese (Lunedi = 1, Domenica = 0/7)
         let startDay = firstDay.getDay() === 0 ? 7 : firstDay.getDay();
         for (let i = 1; i < startDay; i++) {
-          const empty = document.createElement('div');
-          empty.className = 'cal-day';
-          empty.style.visibility = 'hidden';
-          grid.appendChild(empty);
+          const empty = document.createElement('div'); empty.className = 'cal-day'; empty.style.visibility = 'hidden'; grid.appendChild(empty);
         }
 
         const todayStr = new Date().toISOString().slice(0, 10);
         const selStr = this.selectedDate.toISOString().slice(0, 10);
 
         for (let d = 1; d <= lastDay.getDate(); d++) {
-          const dateObj = new Date(year, month, d, 12, 0, 0); // avoid tz issues
+          const dateObj = new Date(year, month, d, 12, 0, 0);
           const dateStr = dateObj.toISOString().slice(0, 10);
           
           const dayEl = document.createElement('div');
@@ -1727,54 +873,38 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
           if (dateStr === selStr) dayEl.classList.add('active');
           
           dayEl.innerHTML = `<div>${d}</div>`;
-          
-          // Aggiungi puntini per task in quel giorno
           const tasksThatDay = this.state.calendarTasks.filter(t => t.date === dateStr);
           if (tasksThatDay.length > 0) {
-            const dots = document.createElement('div');
-            dots.className = 'cal-dot-row';
-            for(let i=0; i < Math.min(3, tasksThatDay.length); i++) {
-               dots.innerHTML += `<div class="cal-dot"></div>`;
-            }
+            const dots = document.createElement('div'); dots.style.display = 'flex'; dots.style.gap = '2px';
+            for(let i=0; i < Math.min(3, tasksThatDay.length); i++) dots.innerHTML += `<div class="cal-dot"></div>`;
             dayEl.appendChild(dots);
           }
 
           dayEl.onclick = () => this.selectDate(dateStr);
           grid.appendChild(dayEl);
         }
-
-        this.renderCalendarTasks();
-        this.renderJournalHistory();
+        this.renderCalendarTasks(); this.renderJournalHistory();
       },
 
       addCalendarTask(e) {
         e.preventDefault();
-        const dateStr = this.selectedDate.toISOString().slice(0, 10);
         const task = {
           id: this.generateId(),
-          date: dateStr,
+          date: this.selectedDate.toISOString().slice(0, 10),
           title: document.getElementById('calTaskTitle').value,
           type: document.getElementById('calTaskType').value,
           priority: document.getElementById('calTaskPriority').value
         };
         this.state.calendarTasks.push(task);
-        this.save();
-        document.getElementById('calTaskTitle').value = '';
-        this.renderCalendar();
-        this.showToast('Attività aggiunta.');
+        this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar();
       },
 
-      deleteCalendarTask(id) {
-        this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id);
-        this.save();
-        this.renderCalendar();
-      },
+      deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
 
       renderCalendarTasks() {
         const dateStr = this.selectedDate.toISOString().slice(0, 10);
         const tasks = this.state.calendarTasks.filter(t => t.date === dateStr);
         document.getElementById('calTaskCountBadge').innerText = tasks.length;
-        
         document.getElementById('calendarTasksList').innerHTML = tasks.length ? tasks.map(t => `
           <div class="list-row">
             <div>
@@ -1783,7 +913,7 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
             </div>
             <button class="btn btn-sm btn-danger" onclick="App.deleteCalendarTask('${t.id}')">✕</button>
           </div>
-        `).join('') : '<div class="list-row">Nessuna attività programmata per questo giorno.</div>';
+        `).join('') : '<div class="list-row text-muted">Nessuna attività programmata.</div>';
       },
 
       saveJournalEntry(e) {
@@ -1791,498 +921,248 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
         const dateStr = this.selectedDate.toISOString().slice(0, 10);
         const text = document.getElementById('journalText').value.trim();
         if (!text) return;
-
-        // Cerca se esiste già una voce per questo giorno e aggiornala, o creala nuova
+        const entry = { date: dateStr, mood: document.getElementById('journalMood').value, text: text };
         const existingIdx = this.state.journal.findIndex(j => j.date === dateStr);
-        const entry = {
-          date: dateStr,
-          mood: document.getElementById('journalMood').value,
-          text: text,
-          updatedAt: new Date().toISOString()
-        };
-
-        if (existingIdx >= 0) this.state.journal[existingIdx] = entry;
-        else this.state.journal.push(entry);
-
-        this.save();
-        document.getElementById('journalText').value = '';
-        this.renderJournalHistory();
-        this.showToast('Diario aggiornato con successo.');
+        if (existingIdx >= 0) this.state.journal[existingIdx] = entry; else this.state.journal.push(entry);
+        this.save(); document.getElementById('journalText').value = ''; this.renderJournalHistory(); this.showToast('Diario aggiornato.');
       },
 
       renderJournalHistory() {
-        const dateStr = this.selectedDate.toISOString().slice(0, 10);
-        const currentEntry = this.state.journal.find(j => j.date === dateStr);
-        
-        // Popola il form se c'è un'entry per il giorno selezionato
-        if (currentEntry) {
-          document.getElementById('journalMood').value = currentEntry.mood;
-          document.getElementById('journalText').value = currentEntry.text;
-        } else {
-          document.getElementById('journalMood').value = '😐 Neutro';
-          document.getElementById('journalText').value = '';
-        }
-
-        // Mostra la cronologia
         const history = [...this.state.journal].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 5);
         document.getElementById('journalHistoryList').innerHTML = history.length ? history.map(j => `
           <div class="list-row" style="align-items:flex-start; cursor:pointer;" onclick="App.selectDate('${j.date}')">
             <div>
               <strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span>
-              <div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden; text-overflow:ellipsis;">
-                ${j.text}
-              </div>
+              <div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden; text-overflow:ellipsis;">${j.text}</div>
             </div>
           </div>
-        `).join('') : '<div class="list-row">Nessuna pagina di diario scritta.</div>';
+        `).join('') : '<div class="list-row text-muted">Nessuna annotazione trovata.</div>';
       },
+
       // ==========================================
-      // 8. LOGICA MANUTENZIONI
+      // 6. MANUTENZIONI
       // ==========================================
       populateMaintenanceSelects() {
         const catSelect = document.getElementById('maintCategory');
         const filterSelect = document.getElementById('maintFilterCat');
-        const objSelect = document.getElementById('maintLinkedObject');
-        
         const catHtml = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-        catSelect.innerHTML = catHtml;
-        filterSelect.innerHTML = '<option value="ALL">Tutte le categorie</option>' + catHtml;
-
-        const objHtml = '<option value="">-- Nessun oggetto --</option>' + this.state.inventory.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
-        objSelect.innerHTML = objHtml;
+        catSelect.innerHTML = catHtml; filterSelect.innerHTML = '<option value="ALL">Tutte le categorie</option>' + catHtml;
       },
-
       addMaintenanceCategory() {
         const newCat = document.getElementById('newMaintCatInput').value.trim();
         if (newCat && !this.state.settings.maintenanceCategories.includes(newCat)) {
           this.state.settings.maintenanceCategories.push(newCat);
           document.getElementById('newMaintCatInput').value = '';
-          this.populateMaintenanceSelects();
-          this.save();
-          this.showToast('Categoria manutenzione aggiunta.');
+          this.populateMaintenanceSelects(); this.save(); this.showToast('Categoria aggiunta.');
         }
       },
-
       addMaintenance(e) {
         e.preventDefault();
         const maint = {
-          id: this.generateId(),
-          title: document.getElementById('maintTitle').value,
-          category: document.getElementById('maintCategory').value,
-          linkedObjectId: document.getElementById('maintLinkedObject').value,
-          dueDate: document.getElementById('maintDueDate').value,
-          cost: document.getElementById('maintCost').value,
-          recurrence: document.getElementById('maintRecurrence').value,
-          status: document.getElementById('maintStatus').value,
-          notes: document.getElementById('maintNotes').value,
-          createdAt: new Date().toISOString()
+          id: this.generateId(), title: document.getElementById('maintTitle').value,
+          category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value,
+          cost: document.getElementById('maintCost').value, status: document.getElementById('maintStatus').value,
+          notes: document.getElementById('maintNotes').value
         };
-        this.state.maintenances.push(maint);
-        
-        // Se la manutenzione ha un costo > 0 e viene segnata come Completata, potremmo suggerire di creare una transazione
-        if (maint.status === 'Completata' && parseFloat(maint.cost) > 0 && this.state.accounts.length > 0) {
-          if (confirm(`Manutenzione "${maint.title}" segnata come Completata con costo ${this.formatMoney(maint.cost)}.\nVuoi registrare automaticamente un'uscita finanziaria?`)) {
-            // Pre-compila e reindirizza alle finanze
-            this.switchModule('mod-finance');
-            setTimeout(() => {
-              document.getElementById('txType').value = 'EXPENSE';
-              document.getElementById('txAmount').value = maint.cost;
-              document.getElementById('txDesc').value = `Manutenzione: ${maint.title}`;
-              document.getElementById('txCategory').value = maint.category;
-              document.getElementById('txDate').value = maint.dueDate;
-              document.getElementById('txLinkedObject').value = maint.linkedObjectId;
-              App.toggleTransferFields();
-              this.showToast('Compila il conto di origine e salva per registrare la spesa.', 'warning');
-            }, 300);
-          }
-        }
-
-        this.save();
-        e.target.reset();
-        this.renderMaintenances();
-        this.showToast('Manutenzione salvata.');
+        this.state.maintenances.push(maint); this.save(); e.target.reset(); this.renderMaintenances(); this.showToast('Manutenzione salvata.');
       },
-
-      deleteMaintenance(id) {
-        if(confirm('Eliminare questa manutenzione?')) {
-          this.state.maintenances = this.state.maintenances.filter(m => m.id !== id);
-          this.save();
-          this.renderMaintenances();
-        }
-      },
-
-      toggleMaintenanceStatus(id) {
-        const m = this.state.maintenances.find(x => x.id === id);
-        if (m) {
-          m.status = m.status === 'In attesa' ? 'Completata' : 'In attesa';
-          this.save();
-          this.renderMaintenances();
-        }
-      },
-
+      deleteMaintenance(id) { if(confirm('Eliminare?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderMaintenances(); } },
       renderMaintenances() {
         const list = document.getElementById('maintenanceList');
-        const filterCat = document.getElementById('maintFilterCat').value;
-        const filterStatus = document.getElementById('maintFilterStatus').value;
-
+        const filterCat = document.getElementById('maintFilterCat').value; const filterStatus = document.getElementById('maintFilterStatus').value;
         let filtered = this.state.maintenances;
         if (filterCat !== 'ALL') filtered = filtered.filter(m => m.category === filterCat);
         if (filterStatus !== 'ALL') filtered = filtered.filter(m => m.status === filterStatus);
-
-        list.innerHTML = filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).map(m => {
-          let linkedName = '';
-          if (m.linkedObjectId) {
-            const obj = this.state.inventory.find(i => i.id === m.linkedObjectId);
-            linkedName = obj ? `<br><small class="text-secondary">🔗 ${obj.name}</small>` : '';
-          }
-          
-          return `
+        list.innerHTML = filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).map(m => `
           <div class="list-row" style="border-left: 4px solid ${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">
-            <div style="flex:1;">
-              <strong>${m.title}</strong> <span class="badge" style="margin-left:8px;">${m.category}</span>
-              ${linkedName}
-              <div style="margin-top:4px; font-size:0.8rem; color:var(--text-muted);">${m.notes || ''}</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="margin-bottom: 4px;">
-                Scadenza: <strong>${this.formatDate(m.dueDate)}</strong><br>
-                ${parseFloat(m.cost) > 0 ? `<span style="color:var(--danger); font-weight:600;">${this.formatMoney(m.cost)}</span>` : ''}
-              </div>
-              <div style="display:flex; gap: 4px; justify-content: flex-end;">
-                <button class="btn btn-sm ${m.status === 'Completata' ? 'btn-success' : 'btn-warning'}" onclick="App.toggleMaintenanceStatus('${m.id}')">
-                  ${m.status === 'Completata' ? '✅' : '⏳'}
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="App.deleteMaintenance('${m.id}')">🗑</button>
-              </div>
+            <div style="flex:1;"><strong>${m.title}</strong> <span class="badge">${m.category}</span><div style="font-size:0.8rem; color:var(--text-muted);">${m.notes || ''}</div></div>
+            <div style="text-align:right;">
+              Scadenza: <strong>${this.formatDate(m.dueDate)}</strong><br>
+              ${parseFloat(m.cost) > 0 ? `<span style="color:var(--danger); font-weight:600;">${this.formatMoney(m.cost)}</span>` : ''}
+              <button class="btn btn-sm btn-danger" onclick="App.deleteMaintenance('${m.id}')">🗑</button>
             </div>
           </div>
-        `}).join('') || '<div class="list-row">Nessuna manutenzione trovata.</div>';
+        `).join('') || '<div class="list-row text-muted">Nessuna manutenzione.</div>';
       },
 
       // ==========================================
-      // 9. LOGICA FINANZE MULTI-CONTO
+      // 7. FINANZE MULTI-CONTO
       // ==========================================
       populateAccountSelects() {
-        const txAccount = document.getElementById('txAccount');
-        const txTarget = document.getElementById('txTargetAccount');
-        const filterSelect = document.getElementById('txFilterAccount');
-        const reconcileSelect = document.getElementById('reconcileAccountSelect');
-        const objSelect = document.getElementById('txLinkedObject');
-
+        const txAccount = document.getElementById('txAccount'); const txTarget = document.getElementById('txTargetAccount');
+        const filterSelect = document.getElementById('txFilterAccount'); const reconcileSelect = document.getElementById('reconcileAccountSelect');
         const accHtml = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join('');
-        txAccount.innerHTML = accHtml;
-        txTarget.innerHTML = accHtml;
+        txAccount.innerHTML = '<option value="">Conto Origine *</option>' + accHtml;
+        txTarget.innerHTML = '<option value="">Conto Destinazione *</option>' + accHtml;
         reconcileSelect.innerHTML = accHtml;
         filterSelect.innerHTML = '<option value="ALL">Tutti i conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-
-        const objHtml = '<option value="">-- Nessun oggetto --</option>' + this.state.inventory.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
-        objSelect.innerHTML = objHtml;
       },
-
       addFinanceAccount(e) {
         e.preventDefault();
-        const acc = {
-          id: this.generateId(),
-          name: document.getElementById('accNameInput').value,
-          balance: parseFloat(document.getElementById('accInitialBalance').value) || 0,
-          createdAt: new Date().toISOString()
-        };
-        this.state.accounts.push(acc);
-        this.save();
-        e.target.reset();
-        this.populateAccountSelects();
-        this.renderFinance();
-        this.showToast('Nuovo conto creato.');
+        const acc = { id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 };
+        this.state.accounts.push(acc); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance();
       },
-
-      toggleTransferFields() {
-        const type = document.getElementById('txType').value;
-        document.getElementById('txTargetAccountGroup').style.display = type === 'TRANSFER' ? 'flex' : 'none';
-      },
-
+      toggleTransferFields() { document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none'; },
       addTransaction(e) {
         e.preventDefault();
-        const type = document.getElementById('txType').value;
-        const amount = parseFloat(document.getElementById('txAmount').value);
-        const sourceAccId = document.getElementById('txAccount').value;
-        const targetAccId = document.getElementById('txTargetAccount').value;
-
-        if (!sourceAccId) { this.showToast('Crea prima un conto.', 'danger'); return; }
-        if (type === 'TRANSFER' && sourceAccId === targetAccId) { this.showToast('I conti origine e destinazione devono essere diversi.', 'danger'); return; }
-
+        const type = document.getElementById('txType').value; const amount = parseFloat(document.getElementById('txAmount').value);
+        const sourceAccId = document.getElementById('txAccount').value; const targetAccId = document.getElementById('txTargetAccount').value;
+        if (!sourceAccId) { this.showToast('Seleziona un conto origine.', 'danger'); return; }
         const sourceAcc = this.state.accounts.find(a => a.id === sourceAccId);
-        
-        const tx = {
-          id: this.generateId(),
-          type,
-          amount,
-          accountId: sourceAccId,
-          desc: document.getElementById('txDesc').value,
-          category: document.getElementById('txCategory').value,
-          linkedObjectId: document.getElementById('txLinkedObject').value,
-          date: document.getElementById('txDate').value,
-          timestamp: new Date().toISOString()
-        };
-
-        if (type === 'EXPENSE') {
-          sourceAcc.balance -= amount;
-        } else if (type === 'INCOME') {
-          sourceAcc.balance += amount;
-        } else if (type === 'TRANSFER') {
+        const tx = { id: this.generateId(), type, amount, accountId: sourceAccId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value, date: document.getElementById('txDate').value, timestamp: new Date().toISOString() };
+        if (type === 'EXPENSE') sourceAcc.balance -= amount;
+        else if (type === 'INCOME') sourceAcc.balance += amount;
+        else if (type === 'TRANSFER') {
           const targetAcc = this.state.accounts.find(a => a.id === targetAccId);
-          sourceAcc.balance -= amount;
-          targetAcc.balance += amount;
-          tx.targetAccountId = targetAccId;
+          sourceAcc.balance -= amount; targetAcc.balance += amount; tx.targetAccountId = targetAccId;
         }
-
-        this.state.transactions.push(tx);
-        this.save();
-        e.target.reset();
-        this.populateAccountSelects();
-        this.renderFinance();
-        this.showToast('Transazione registrata.');
+        this.state.transactions.push(tx); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance();
       },
-
       reconcileAccountBalance() {
-        const accId = document.getElementById('reconcileAccountSelect').value;
-        const targetBalance = parseFloat(document.getElementById('reconcileTargetInput').value);
-        
-        if (!accId || isNaN(targetBalance)) return;
-        
-        const acc = this.state.accounts.find(a => a.id === accId);
-        const diff = targetBalance - acc.balance;
-        
-        if (diff === 0) {
-          this.showToast('Il saldo inserito è già uguale a quello attuale.');
-          return;
-        }
-
-        const tx = {
-          id: this.generateId(),
-          type: diff > 0 ? 'INCOME' : 'EXPENSE',
-          amount: Math.abs(diff),
-          accountId: accId,
-          desc: '⚖️ Rettifica Saldo Automatico',
-          category: 'Allineamento',
-          linkedObjectId: '',
-          date: new Date().toISOString().slice(0,10),
-          timestamp: new Date().toISOString()
-        };
-
-        acc.balance = targetBalance;
-        this.state.transactions.push(tx);
-        this.save();
-        document.getElementById('reconcileTargetInput').value = '';
-        this.populateAccountSelects();
-        this.renderFinance();
-        this.showToast(`Saldo allineato. Generata rettifica di ${this.formatMoney(diff)}.`);
+        const accId = document.getElementById('reconcileAccountSelect').value; const target = parseFloat(document.getElementById('reconcileTargetInput').value);
+        if (!accId || isNaN(target)) return;
+        const acc = this.state.accounts.find(a => a.id === accId); const diff = target - acc.balance;
+        if (diff === 0) return this.showToast('Saldo già allineato.');
+        const tx = { id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: accId, desc: '⚖️ Rettifica Saldo', date: new Date().toISOString().slice(0,10), timestamp: new Date().toISOString() };
+        acc.balance = target; this.state.transactions.push(tx); this.save(); document.getElementById('reconcileTargetInput').value=''; this.populateAccountSelects(); this.renderFinance();
       },
-
       deleteTransaction(id) {
-        const tx = this.state.transactions.find(t => t.id === id);
-        if(!tx) return;
-        if(confirm('Eliminare la transazione? I saldi dei conti verranno ricalcolati.')) {
+        const tx = this.state.transactions.find(t => t.id === id); if(!tx) return;
+        if(confirm('Eliminare transazione?')) {
           const source = this.state.accounts.find(a => a.id === tx.accountId);
-          if (tx.type === 'EXPENSE') source.balance += tx.amount;
-          else if (tx.type === 'INCOME') source.balance -= tx.amount;
-          else if (tx.type === 'TRANSFER') {
-            source.balance += tx.amount;
-            const target = this.state.accounts.find(a => a.id === tx.targetAccountId);
-            if(target) target.balance -= tx.amount;
-          }
-          this.state.transactions = this.state.transactions.filter(t => t.id !== id);
-          this.save();
-          this.populateAccountSelects();
-          this.renderFinance();
+          if (tx.type === 'EXPENSE') source.balance += tx.amount; else if (tx.type === 'INCOME') source.balance -= tx.amount;
+          else if (tx.type === 'TRANSFER') { source.balance += tx.amount; const target = this.state.accounts.find(a => a.id === tx.targetAccountId); if(target) target.balance -= tx.amount; }
+          this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.save(); this.populateAccountSelects(); this.renderFinance();
         }
       },
-
       renderFinance() {
-        const totalBalance = this.state.accounts.reduce((acc, a) => acc + a.balance, 0);
-        document.getElementById('finTotalBalanceBadge').innerText = this.formatMoney(totalBalance);
+        const total = this.state.accounts.reduce((acc, a) => acc + a.balance, 0);
+        document.getElementById('finTotalBalanceBadge').innerText = this.formatMoney(total);
+        document.getElementById('financeAccountsList').innerHTML = this.state.accounts.map(a => `<div class="list-row"><strong>🏦 ${a.name}</strong><span style="font-weight:700;">${this.formatMoney(a.balance)}</span></div>`).join('');
         
-        // Aggiorna Dashboard
-        const dashNetEl = document.getElementById('dashNetWorth');
-        if(dashNetEl) {
-          dashNetEl.innerText = this.formatMoney(totalBalance);
-          document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti attivi`;
-        }
-
-        document.getElementById('financeAccountsList').innerHTML = this.state.accounts.length ? this.state.accounts.map(a => `
-          <div class="list-row">
-            <strong>🏦 ${a.name}</strong>
-            <span style="font-weight:700; font-family:'JetBrains Mono';">${this.formatMoney(a.balance)}</span>
-          </div>
-        `).join('') : '<div class="list-row text-muted">Nessun conto. Creane uno per iniziare.</div>';
-
         const filterAcc = document.getElementById('txFilterAccount').value;
         let filtered = this.state.transactions;
-        if (filterAcc !== 'ALL') {
-          filtered = filtered.filter(t => t.accountId === filterAcc || t.targetAccountId === filterAcc);
-        }
+        if (filterAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === filterAcc || t.targetAccountId === filterAcc);
 
-        document.getElementById('financeTransactionsList').innerHTML = filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map(tx => {
+        document.getElementById('financeTransactionsList').innerHTML = filtered.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).map(tx => {
           let icon = tx.type === 'EXPENSE' ? '📉' : tx.type === 'INCOME' ? '📈' : '🔄';
           let color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)';
           let prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '';
-          
-          let accountName = this.state.accounts.find(a => a.id === tx.accountId)?.name || 'Eliminato';
-          let subText = `Conto: ${accountName}`;
-          if (tx.type === 'TRANSFER') {
-            let targetName = this.state.accounts.find(a => a.id === tx.targetAccountId)?.name || 'Eliminato';
-            subText = `${accountName} ➔ ${targetName}`;
-          }
-          if (tx.category) subText += ` | ${tx.category}`;
-
-          let linkedName = '';
-          if (tx.linkedObjectId) {
-            const obj = this.state.inventory.find(i => i.id === tx.linkedObjectId);
-            linkedName = obj ? `<br><small style="color:var(--accent-primary);">🔗 ${obj.name}</small>` : '';
-          }
-
           return `
           <div class="list-row">
-            <div style="flex:1;">
-              <span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(tx.date)}</span><br>
-              <strong>${icon} ${tx.desc}</strong>
-              ${linkedName}
-              <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:2px;">${subText}</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-weight: 700; color: ${color}; margin-bottom:4px;">${prefix}${this.formatMoney(tx.amount)}</div>
-              <button class="btn btn-sm" style="color:var(--text-muted); padding:2px 8px;" onclick="App.deleteTransaction('${tx.id}')">Elimina</button>
-            </div>
+            <div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(tx.date)}</span><br><strong>${icon} ${tx.desc}</strong></div>
+            <div style="text-align:right;"><div style="font-weight:700; color:${color};">${prefix}${this.formatMoney(tx.amount)}</div><button class="btn btn-sm" onclick="App.deleteTransaction('${tx.id}')">🗑</button></div>
           </div>
-        `}).join('') || '<div class="list-row">Nessuna transazione registrata.</div>';
+        `}).join('') || '<div class="list-row text-muted">Nessuna transazione.</div>';
       },
 
       // ==========================================
-      // 10. LOGICA SALUTE OS (Nutrizione & Medica)
+      // 8. SALUTE OS (Nutrizione, Peso, Cartella Clinica con Upload)
       // ==========================================
       addNutritionLog(e) {
         e.preventDefault();
-        const log = {
-          id: this.generateId(),
-          meal: document.getElementById('nutriMeal').value,
-          date: document.getElementById('nutriDate').value,
-          kcal: parseInt(document.getElementById('nutriKcal').value) || 0,
-          prot: parseInt(document.getElementById('nutriProt').value) || 0,
-          carbs: parseInt(document.getElementById('nutriCarbs').value) || 0,
-          fat: parseInt(document.getElementById('nutriFat').value) || 0,
-          weight: parseFloat(document.getElementById('nutriWeight').value) || null,
-          createdAt: new Date().toISOString()
-        };
-        this.state.healthNutrition.push(log);
-        this.save();
-        e.target.reset();
-        document.getElementById('nutriDate').value = new Date().toISOString().slice(0,10); // reimposta a oggi
-        this.renderHealth();
-        this.showToast('Record nutrizionale aggiunto.');
+        const log = { id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseInt(document.getElementById('nutriKcal').value) || 0, prot: parseInt(document.getElementById('nutriProt').value) || 0, carbs: parseInt(document.getElementById('nutriCarbs').value) || 0, fat: parseInt(document.getElementById('nutriFat').value) || 0 };
+        this.state.healthNutrition.push(log); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0,10); this.renderHealth();
       },
-
-      deleteNutritionLog(id) {
-        this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id);
-        this.save();
-        this.renderHealth();
-      },
-
-      addMedicalRecord(e) {
+      deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
+      
+      addWeightLog(e) {
         e.preventDefault();
-        const record = {
-          id: this.generateId(),
-          type: document.getElementById('medType').value,
-          date: document.getElementById('medDate').value,
-          title: document.getElementById('medTitle').value,
-          metrics: document.getElementById('medMetrics').value,
-          notes: document.getElementById('medNotes').value,
-          createdAt: new Date().toISOString()
-        };
-        this.state.healthMedical.push(record);
-        this.save();
-        e.target.reset();
-        document.getElementById('medDate').value = new Date().toISOString().slice(0,10);
-        this.renderHealth();
-        this.showToast('Record clinico salvato.');
+        const log = { id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value };
+        this.state.healthWeight.push(log); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0,10); this.renderHealth();
       },
+      deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
 
-      deleteMedicalRecord(id) {
-        this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id);
-        this.save();
-        this.renderHealth();
-      },
-
-      renderHealth() {
-        // --- Render Nutrizione (Raggruppato per Giorno) ---
-        const nutriList = document.getElementById('healthNutritionList');
-        const groupedNutrition = {};
+      async addMedicalRecord(e) {
+        e.preventDefault();
+        const type = document.getElementById('medType').value;
+        let fileData = null;
         
-        this.state.healthNutrition.forEach(log => {
-          if (!groupedNutrition[log.date]) groupedNutrition[log.date] = { kcal: 0, prot: 0, carbs: 0, fat: 0, weight: null, meals: [] };
-          groupedNutrition[log.date].kcal += log.kcal;
-          groupedNutrition[log.date].prot += log.prot;
-          groupedNutrition[log.date].carbs += log.carbs;
-          groupedNutrition[log.date].fat += log.fat;
-          if (log.weight) groupedNutrition[log.date].weight = log.weight;
-          groupedNutrition[log.date].meals.push(log);
-        });
-
-        // Aggiorna Dashboard (Oggi)
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const todayStats = groupedNutrition[todayStr] || { kcal: 0, prot: 0, carbs: 0, fat: 0, weight: null };
-        document.getElementById('healthTodaySummaryBadge').innerText = `Oggi: ${todayStats.kcal} kcal`;
-        
-        const dashKcal = document.getElementById('dashCaloriesToday');
-        if (dashKcal) {
-          dashKcal.innerText = `${todayStats.kcal} kcal`;
-          document.getElementById('dashMacrosToday').innerText = `P: ${todayStats.prot}g | C: ${todayStats.carbs}g | F: ${todayStats.fat}g`;
-          document.getElementById('dashWeightBadge').innerText = todayStats.weight ? `${todayStats.weight} kg` : '-- kg';
+        // Se è un referto e c'è un file allegato, convertiamolo asincronamente in Base64
+        if (type === 'Referto') {
+          const fileInput = document.getElementById('medFile');
+          if (fileInput.files.length > 0) {
+            try {
+              fileData = await this.fileToBase64(fileInput.files[0]);
+            } catch(err) {
+              return this.showToast('Errore durante la lettura del file.', 'danger');
+            }
+          }
         }
 
-        const sortedDates = Object.keys(groupedNutrition).sort((a,b) => b.localeCompare(a));
-        nutriList.innerHTML = sortedDates.length ? sortedDates.map(date => {
-          const g = groupedNutrition[date];
-          const mealsHtml = g.meals.map(m => `
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:4px; padding-left:8px; border-left:2px solid var(--border-color);">
-              <span>${m.meal}</span>
-              <span>${m.kcal} kcal <button class="btn btn-sm" style="padding:0 4px; color:var(--danger); border:none;" onclick="App.deleteNutritionLog('${m.id}')">✕</button></span>
-            </div>
-          `).join('');
+        const record = {
+          id: this.generateId(), type, date: document.getElementById('medDate').value,
+          title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value,
+          therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '',
+          fileData: fileData // Stringa Base64 per download offline
+        };
+        this.state.healthMedical.push(record); this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth();
+        this.showToast('Salvato in Cartella Clinica.');
+      },
+      deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
 
-          return `
-          <div class="list-row" style="flex-direction:column; align-items:stretch; gap:0.4rem;">
-            <div style="display:flex; justify-content:space-between; width:100%;">
-              <strong>📅 ${this.formatDate(date)}</strong>
-              <span class="badge ${g.kcal > 0 ? 'badge-success' : ''}">${g.kcal} kcal</span>
-            </div>
-            <div style="font-size:0.8rem; color:var(--text-secondary); display:flex; justify-content:space-between;">
-              <span>Macros: P:${g.prot}g C:${g.carbs}g F:${g.fat}g</span>
-              <span>Peso: ${g.weight ? g.weight + ' kg' : '-'}</span>
-            </div>
-            ${mealsHtml}
-          </div>
-        `}).join('') : '<div class="list-row text-muted">Nessun log nutrizionale presente.</div>';
-
-        // --- Render Record Medici ---
-        const medList = document.getElementById('healthMedicalList');
-        document.getElementById('healthMedicalCountBadge').innerText = `${this.state.healthMedical.length} record`;
-        
-        medList.innerHTML = this.state.healthMedical.sort((a, b) => new Date(b.date) - new Date(a.date)).map(m => {
-          const typeIcon = m.type.includes('Medica') ? '👨‍⚕️' : m.type.includes('Referto') ? '📄' : m.type.includes('Sintomo') ? '🌡️' : '💊';
-          return `
+      renderHealth() {
+        // Render Nutrizione
+        const nutriList = document.getElementById('healthNutritionList');
+        nutriList.innerHTML = this.state.healthNutrition.sort((a,b) => new Date(b.date) - new Date(a.date)).map(n => `
           <div class="list-row">
+            <div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="text-secondary">${this.formatDate(n.date)} | P:${n.prot} C:${n.carbs} F:${n.fat}</small></div>
+            <button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button>
+          </div>
+        `).join('') || '<div class="list-row text-muted">Nessun pasto registrato.</div>';
+
+        // Render Peso
+        const weightList = document.getElementById('healthWeightList');
+        weightList.innerHTML = this.state.healthWeight.sort((a,b) => new Date(b.date) - new Date(a.date)).map(w => `
+          <div class="list-row">
+            <div><strong>${w.value} kg</strong><br><small class="text-secondary">${this.formatDate(w.date)}</small></div>
+            <button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button>
+          </div>
+        `).join('') || '<div class="list-row text-muted">Nessun peso registrato.</div>';
+
+        // Render Medico (Con gestione file in base64)
+        const medList = document.getElementById('healthMedicalList');
+        medList.innerHTML = this.state.healthMedical.sort((a, b) => new Date(b.date) - new Date(a.date)).map(m => {
+          let extraInfo = '';
+          if (m.type === 'Visita Medica' && m.therapy) extraInfo = `<div style="margin-top:4px; font-size:0.8rem; color:var(--accent-primary);">💊 Terapia: ${m.therapy}</div>`;
+          
+          let fileDownload = '';
+          if (m.type === 'Referto' && m.fileData) {
+            fileDownload = `<div style="margin-top:6px;"><a href="${m.fileData}" download="Referto_${m.date}_${m.title}" class="badge" style="text-decoration:none; background:rgba(16, 185, 129, 0.15); color:var(--success);">📥 Scarica Referto Allegato</a></div>`;
+          }
+
+          return `
+          <div class="list-row" style="align-items:flex-start;">
             <div style="flex:1;">
               <span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(m.date)}</span><br>
-              <strong>${typeIcon} ${m.title}</strong>
-              <div style="margin-top:4px; font-size:0.85rem; color:var(--accent-primary);">${m.metrics || ''}</div>
+              <strong>${m.type === 'Visita Medica' ? '👨‍⚕️' : m.type === 'Referto' ? '📄' : '🌡️'} ${m.title}</strong>
+              ${extraInfo}
               <div style="margin-top:2px; font-size:0.8rem; color:var(--text-secondary);">${m.notes || ''}</div>
+              ${fileDownload}
             </div>
             <button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button>
           </div>
-        `}).join('') || '<div class="list-row text-muted">Nessun record clinico registrato.</div>';
+        `}).join('') || '<div class="list-row text-muted">Nessun record clinico.</div>';
       },
 
       // ==========================================
-      // 11. INIZIALIZZAZIONE ALL'AVVIO
+      // 9. BACKUP E RESET
+      // ==========================================
+      exportJSON() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2));
+        const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `LifeOS_v6.5_Backup_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove();
+        this.showToast('Backup salvato.');
+      },
+      resetAllData() {
+        if(confirm("ATTENZIONE! Questo cancellerà tutti i dati in modo permanente. Sei sicuro?")) {
+          localStorage.removeItem('lifeos_v65_data'); location.reload();
+        }
+      },
+
+      // ==========================================
+      // 10. INIZIALIZZAZIONE ALL'AVVIO
       // ==========================================
       init() {
         this.load();
@@ -2293,22 +1173,19 @@ self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r
         document.getElementById('txDate').value = todayStr;
         document.getElementById('maintDueDate').value = todayStr;
         document.getElementById('nutriDate').value = todayStr;
+        document.getElementById('weightDate').value = todayStr;
         document.getElementById('medDate').value = todayStr;
 
-        // Imposta il tema in base al salvataggio localStorage (opzionale) o preferenza di sistema
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-          document.documentElement.setAttribute('data-theme', 'light');
-        }
+        // Imposta il tema
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.setAttribute('data-theme', 'light');
 
-        // Avvio Interfaccia
+        // Avvio Interfaccia Principale (Dashboard)
         this.switchModule('mod-dashboard');
       }
     };
 
-    // Bootstrap dell'Applicazione al caricamento del DOM
-    document.addEventListener('DOMContentLoaded', () => {
-      App.init();
-    });
+    // Bootstrap dell'Applicazione
+    document.addEventListener('DOMContentLoaded', () => { App.init(); });
   </script>
 </body>
 </html>
