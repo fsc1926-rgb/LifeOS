@@ -208,6 +208,104 @@
       .main-container { padding-bottom: 120px !important; }
       .fab-container { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
     }
+    /* ==========================================
+       FIX: HEADER, BRAND E BOTTOM NAVIGATION
+       ========================================== */
+    
+    /* Fix allineamento Brand (L7 LifeOS) */
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem; /* Ridotto il gap */
+        font-weight: 800;
+        font-size: 1.1rem; /* Leggermente più piccolo per evitare a capo strani */
+        letter-spacing: -0.03em;
+        white-space: nowrap; /* Impedisce che il testo vada a capo */
+    }
+    
+    /* Contenitore per il testo accanto al logo */
+    .brand-text {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    
+    .brand-logo {
+        width: 32px; /* Leggermente rimpicciolito */
+        height: 32px;
+        border-radius: 8px;
+        font-size: 1rem;
+        flex-shrink: 0; /* Impedisce al logo di schiacciarsi */
+    }
+
+    /* Fix Header Top (Pulsanti Privacy/Settings) */
+    .header-top {
+        flex-wrap: nowrap; /* Forza su una riga */
+        padding-bottom: 0.5rem; /* Spazio extra sotto */
+    }
+    
+    .header-top > div:last-child {
+        display: flex;
+        gap: 0.4rem;
+        flex-shrink: 0;
+    }
+
+    /* Nascondi la navigazione in alto su Desktop (se la vuoi SOLO in basso)
+       Se la vuoi in alto su PC e in basso su Mobile, lascia così. */
+    .nav-tabs {
+        display: none; /* Nascondi di base, la mostriamo via Media Query */
+    }
+
+    /* Ottimizzazione Mobile (Bottom Bar) */
+    @media (max-width: 768px) {
+      .app-header {
+          padding: 0.75rem 1rem; /* Padding ridotto su mobile */
+          border-bottom: 1px solid var(--border-color);
+      }
+      
+      .nav-tabs { 
+        display: grid; /* Mostra come griglia */
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        right: 0; 
+        background: var(--bg-glass); 
+        backdrop-filter: blur(20px); 
+        -webkit-backdrop-filter: blur(20px); /* Supporto Safari/iOS */
+        border-top: 1px solid var(--border-color); 
+        border-bottom: none;
+        margin: 0; 
+        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
+        z-index: 999;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+      }
+      
+      .nav-tab { 
+          background: transparent; 
+          border: none;
+          padding: 0.5rem 0.2rem;
+          font-size: 0.7rem; /* Font più piccolo per la bottom bar */
+          flex-direction: column;
+          gap: 0.2rem;
+      }
+      
+      .nav-tab.active { 
+          background: transparent; 
+          color: var(--accent-primary); 
+          box-shadow: none; 
+          transform: translateY(-2px); 
+      }
+      
+      .main-container { 
+          padding-bottom: 100px !important; /* Spazio per la bottom bar */
+          margin-top: 0.5rem;
+      }
+      
+      .fab-container { 
+          bottom: calc(4.5rem + env(safe-area-inset-bottom)); /* Solleva il FAB sopra la bottom bar */
+      }
+    }
   </style>
 </head>
 <body>
@@ -224,24 +322,28 @@
 
   <div id="toast-container" aria-live="polite"></div>
 
-  <!-- HEADER PRINCIPALE & NAVIGAZIONE -->
+ <!-- HEADER PRINCIPALE & NAVIGAZIONE -->
   <header class="app-header">
     <div class="header-top">
       <div class="brand">
         <div class="brand-logo">L7</div>
-        <div><span>LifeOS</span> <span class="badge" style="font-size:0.6rem;">v7.0 DB</span></div>
+        <div class="brand-text">
+            <span>LifeOS</span>
+            <span class="badge" style="font-size:0.55rem; padding: 0.15rem 0.4rem;">v7.0 DB</span>
+        </div>
       </div>
-      <div style="display: flex; gap: 0.5rem;">
-        <!-- TASTO PRIVACY MODE -->
-        <button class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Nascondi dati sensibili">👁️ Privacy</button>
-        <button class="btn btn-sm" onclick="App.openModal('settingsModal')">⚙️ Settings</button>
+      <div>
+        <button class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Nascondi dati sensibili">👁️</button>
+        <button class="btn btn-sm" onclick="App.openModal('settingsModal')">⚙️ Impostazioni</button>
       </div>
     </div>
+    
+    <!-- La navigazione viene gestita via CSS per stare in basso su Mobile -->
     <nav class="nav-tabs" role="tablist">
       <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
       <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Calendario</button>
       <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💰 Finanze</button>
-      <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">🗂️ Moduli & Salute</button>
+      <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">🗂️ Moduli</button>
     </nav>
   </header>
 
@@ -687,22 +789,54 @@
     <button class="fab-btn" onclick="App.toggleFab()">+</button>
   </div>
 
-  <!-- MODALE IMPOSTAZIONI AGGIORNATO -->
+ <!-- MODALE IMPOSTAZIONI SNELLITO -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="card-header">
-        <div class="card-title">⚙️ Impostazioni & Esperienza</div>
+        <div class="card-title">⚙️ Impostazioni App</div>
         <button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button>
       </div>
       
       <div class="bento-grid">
-        <div class="bento-card col-span-12" style="padding: 1rem;">
-          <div class="card-title" style="font-size: 0.9rem;">✨ Esperienza (App Nativa)</div>
-          <div style="display: flex; gap: 0.5rem; margin-top:0.8rem; flex-wrap: wrap;">
-            <button class="btn btn-sm" onclick="App.toggleTheme()" style="flex:1;">🌓 Cambia Tema (Chiaro/Scuro/OLED)</button>
-            <button class="btn btn-sm" id="hapticBtn" onclick="App.toggleHaptic()" style="flex:1;">📳 Attiva Vibrazione (Aptico)</button>
+        
+        <!-- Aspetto & Feedback -->
+        <div class="bento-card col-span-12" style="padding: 1.2rem;">
+          <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">🎨 Interfaccia & Sensazioni</div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-sm" onclick="App.toggleTheme()" style="flex:1;">🌓 Cambia Tema</button>
+            <button class="btn btn-sm" id="hapticBtn" onclick="App.toggleHaptic()" style="flex:1;">📳 Vibrazione Aptica</button>
           </div>
         </div>
+
+        <!-- Sicurezza PIN -->
+        <div class="bento-card col-span-12" style="padding: 1.2rem;">
+          <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">🔒 Protezione Avvio (PIN)</div>
+          <div class="form-row" style="margin-bottom: 0.5rem;">
+            <input type="password" id="setupPinInput" class="input" maxlength="4" placeholder="Inserisci PIN (4 cifre)..." inputmode="numeric">
+            <button class="btn btn-sm btn-primary" onclick="App.savePin()">Attiva PIN</button>
+          </div>
+          <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Disattiva PIN</button>
+        </div>
+
+        <!-- Dati: Export & Reset -->
+        <div class="bento-card col-span-12" style="padding: 1.2rem;">
+          <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">📊 Gestione Dati Personali</div>
+          
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+             <button class="btn btn-sm" onclick="App.exportCSV('finance')" style="flex:1;">⬇️ CSV Finanze</button>
+             <button class="btn btn-sm" onclick="App.exportCSV('health')" style="flex:1;">⬇️ CSV Salute</button>
+          </div>
+          
+          <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 1rem; background: var(--bg-secondary);">💾 Backup Completo JSON</button>
+          
+          <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
+          
+          <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Elimina Tutti i Dati (Reset App)</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
         <div class="bento-card col-span-6" style="padding: 1rem;">
           <div class="card-title" style="font-size: 0.9rem;">🔒 Sicurezza (PIN)</div>
