@@ -250,18 +250,37 @@
         flex-shrink: 0;
     }
 
-    /* Nascondi la navigazione in alto su Desktop (se la vuoi SOLO in basso)
-       Se la vuoi in alto su PC e in basso su Mobile, lascia così. */
-    .nav-tabs {
-        display: none; /* Nascondi di base, la mostriamo via Media Query */
+    /* NAVIGAZIONE DESKTOP (In alto) */
+    .nav-tabs { 
+        max-width: 1440px; 
+        margin: 0.85rem auto 0; 
+        display: flex; /* <-- Questo fa riapparire i bottoni su PC! */
+        gap: 0.5rem; 
+        overflow-x: auto; 
+        padding-bottom: 0.2rem; 
     }
 
-    /* Ottimizzazione Mobile (Bottom Bar) */
+    /* NAVIGAZIONE MOBILE (Bottom Bar) */
     @media (max-width: 768px) {
-      .app-header {
-          padding: 0.75rem 1rem; /* Padding ridotto su mobile */
-          border-bottom: 1px solid var(--border-color);
+      .nav-tabs { 
+        display: grid; /* <-- Diventa una bottom bar su telefono */
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        right: 0; 
+        background: var(--bg-glass); 
+        backdrop-filter: blur(20px); 
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border-color); 
+        border-bottom: none;
+        margin: 0; 
+        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
+        z-index: 999;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
       }
+      /* ... (lascia il resto delle regole .nav-tab per il mobile che avevi già) ... */
+    }
       
       .nav-tabs { 
         display: grid; /* Mostra come griglia */
@@ -776,10 +795,7 @@
 
   </main>
 
-  <!-- ==========================================
-       MODALE IMPOSTAZIONI (Sicurezza, Esportazioni)
-       ========================================== -->
- <!-- FAB: AGGIUNTA RAPIDA -->
+  <!-- FAB: AGGIUNTA RAPIDA (Pulsante +) -->
   <div class="fab-container">
     <div class="fab-menu" id="fabMenu">
       <div class="fab-item" onclick="App.quickAdd('txAmount')">💸 Nuova Spesa</div>
@@ -789,7 +805,7 @@
     <button class="fab-btn" onclick="App.toggleFab()">+</button>
   </div>
 
- <!-- MODALE IMPOSTAZIONI SNELLITO -->
+  <!-- MODALE IMPOSTAZIONI (Nascosto finché non si clicca l'ingranaggio) -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="card-header">
@@ -838,61 +854,7 @@
     </div>
   </div>
 
-        <div class="bento-card col-span-6" style="padding: 1rem;">
-          <div class="card-title" style="font-size: 0.9rem;">🔒 Sicurezza (PIN)</div>
-          <div class="form-row" style="margin: 0.5rem 0;">
-            <input type="password" id="setupPinInput" class="input" maxlength="4" placeholder="Nuovo PIN..." inputmode="numeric">
-            <button class="btn btn-sm btn-primary" onclick="App.savePin()">Salva</button>
-          </div>
-          <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Rimuovi PIN Attuale</button>
-        </div>
-
-        <div class="bento-card col-span-6" style="padding: 1rem;">
-          <div class="card-title" style="font-size: 0.9rem;">📊 Esporta Dati</div>
-          <button class="btn btn-sm" onclick="App.exportCSV('finance')" style="margin:0.5rem 0; width:100%;">⬇️ CSV Finanze</button>
-          <button class="btn btn-sm" onclick="App.exportCSV('health')" style="width:100%;">⬇️ CSV Salute (Peso/Kcal)</button>
-        </div>
-
-        <div class="bento-card col-span-12" style="padding: 1rem; border-color: var(--danger);">
-          <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Reset Totale App (Database)</button>
-        </div>
-      </div>
-    </div>
-  </div>
-      
-      <div class="bento-grid">
-        <div class="bento-card col-span-6" style="padding: 1rem;">
-          <div class="card-title" style="font-size: 0.9rem;">🎨 Aspetto</div>
-          <p class="stat-label" style="margin: 0.5rem 0;">Cambia il tema dell'interfaccia.</p>
-          <button class="btn btn-sm" onclick="App.toggleTheme()" style="width:100%;">🌓 Cambia Tema (Chiaro/Scuro)</button>
-        </div>
-
-        <div class="bento-card col-span-6" style="padding: 1rem;">
-          <div class="card-title" style="font-size: 0.9rem;">🔒 Sicurezza (PIN)</div>
-          <p class="stat-label" style="margin: 0.5rem 0;">Imposta un PIN di 4 cifre per proteggere l'app all'avvio.</p>
-          <div class="form-row" style="margin-bottom:0;">
-            <input type="password" id="setupPinInput" class="input" maxlength="4" placeholder="Nuovo PIN..." inputmode="numeric">
-            <button class="btn btn-sm btn-primary" onclick="App.savePin()">Salva PIN</button>
-          </div>
-          <button class="btn btn-sm btn-danger" style="margin-top:0.5rem; width:100%;" onclick="App.removePin()">Rimuovi PIN Attuale</button>
-        </div>
-
-        <div class="bento-card col-span-6" style="padding: 1rem;">
-          <div class="card-title" style="font-size: 0.9rem;">📊 Esportazione CSV</div>
-          <p class="stat-label" style="margin: 0.5rem 0;">Esporta i dati per Excel o Fogli Google.</p>
-          <button class="btn btn-sm" onclick="App.exportCSV('finance')" style="margin-bottom:0.5rem; width:100%;">⬇️ CSV Finanze</button>
-          <button class="btn btn-sm" onclick="App.exportCSV('health')" style="width:100%;">⬇️ CSV Salute (Peso/Kcal)</button>
-        </div>
-
-        <div class="bento-card col-span-6" style="padding: 1rem; border-color: var(--danger);">
-          <div class="card-title" style="font-size: 0.9rem; color: var(--danger);">⚠️ Gestione Dati (IndexedDB)</div>
-          <p class="stat-label" style="margin: 0.5rem 0;">Operazioni sui dati archiviati localmente.</p>
-          <button class="btn btn-sm" onclick="App.exportJSON()" style="margin-bottom:0.5rem; width:100%;">💾 Backup Completo JSON</button>
-          <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Reset Totale App</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Inizio codice JavaScript... -->
 
   <!-- ==========================================
        MOTORE JAVASCRIPT: LOGICA DI BUSINESS (IndexedDB)
