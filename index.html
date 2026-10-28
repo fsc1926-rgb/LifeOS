@@ -688,7 +688,12 @@
              <button class="btn btn-sm" onclick="App.exportCSV('finance')" style="flex:1;">⬇️ CSV Finanze</button>
              <button class="btn btn-sm" onclick="App.exportCSV('health')" style="flex:1;">⬇️ CSV Salute</button>
           </div>
-          <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 1rem; background: var(--bg-secondary);">💾 Backup Completo JSON</button>
+          <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem; background: var(--bg-secondary);">💾 Esporta Backup JSON</button>
+          
+          <label class="btn btn-sm" style="width:100%; margin-bottom: 1rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">
+             📂 Ripristina Backup JSON
+             <input type="file" accept=".json" onchange="App.importBackupFile(event)" style="display: none;">
+          </label>
           <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
           <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Elimina Tutti i Dati (Reset App)</button>
         </div>
@@ -714,16 +719,23 @@
       activeInvTab: 'garanzie',
       charts: {},
 
-      async save() { try { await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore di salvataggio dati', 'danger'); } },
-      async load() { try { const data = await localforage.getItem('appData'); if (data) this.state = { ...this.state, ...data }; } catch (e) {} },
-      
-      showToast(msg, type = 'success') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`;
-        container.appendChild(toast);
-        setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse forwards'; setTimeout(() => toast.remove(), 300); }, 3500);
+     async importBackupFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            this.state = { ...this.state, ...parsed };
+            await this.save();
+            this.closeModal('settingsModal');
+            this.showToast('Backup ripristinato con successo! Riavvio in corso...', 'success');
+            setTimeout(() => location.reload(), 1200); // Ricarica per applicare i dati ovunque
+          } catch (err) {
+            this.showToast('Errore durante la lettura del file di backup.', 'danger');
+          }
+        };
+        reader.readAsText(file);
       },
       
       openModal(id) { document.getElementById(id).classList.add('open'); },
