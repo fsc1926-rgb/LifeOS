@@ -659,6 +659,7 @@
   <button class="tab-btn" onclick="switchTab('mod5', this)"><span class="ico">💰</span><span>Finanze</span></button>
   <button class="tab-btn" onclick="switchTab('mod6', this)"><span class="ico">🩺</span><span>Salute OS</span></button>
 </nav>
+
 <script>
   /* =========================================================================
      GESTIONE TEMA CHIARO / SCURO + FEEDBACK APTICO + TOAST
@@ -785,7 +786,7 @@
   ];
 
   /* =========================================================================
-     DATABASE E MIGRAZIONE UNIVERSALE (LEGGE QUALSIASI VECCHIO JSON / ZIP)
+     DATABASE E MIGRAZIONE UNIVERSALE
      ========================================================================= */
   const DB_NAME = 'LifeOS_IndexedDB_v2';
   const STORE_NAME = 'app_state';
@@ -869,7 +870,6 @@
     location.reload(true);
   }
 
-  // MIGRAZIONE UNIVERSALE (Supporta qualsiasi struttura vecchia o nuova)
   function migrateDB(loaded) {
     const base = emptyState();
     if (!loaded || typeof loaded !== 'object') return base;
@@ -877,8 +877,6 @@
     const src = (loaded.data && typeof loaded.data === 'object' && !Array.isArray(loaded.data))
       ? loaded.data
       : (loaded.db || loaded.state || loaded);
-
-    const merged = { ...base, ...src };
 
     const collectArrays = (...keys) => {
       const res = [];
@@ -888,7 +886,8 @@
       return res;
     };
 
-    // 1. OGGETTI / GARANZIE
+    const merged = { ...base, ...src };
+
     const rawVault = collectArrays('vault', 'objects', 'items', 'warranties', 'garanzie', 'oggetti', 'assets');
     merged.vault = rawVault.map(o => ({
       id: String(o.id || o._id || uuid()),
@@ -905,7 +904,6 @@
       fileMime: o.fileMime || o.mime || ''
     }));
 
-    // 2. PERSONE / CRM
     const rawCrm = collectArrays('crm', 'people', 'contacts', 'persone', 'rubrica');
     merged.crm = rawCrm.map(c => ({
       id: String(c.id || c._id || uuid()),
@@ -918,7 +916,6 @@
       notes: c.notes || c.note || c.gifts || ''
     }));
 
-    // 3. ATTIVITÀ / TODO / NOTE
     const rawTasks = collectArrays('crmTasks', 'tasks', 'todos', 'todo', 'notes', 'attivita', 'reminders');
     merged.crmTasks = rawTasks.map(t => ({
       id: String(t.id || t._id || uuid()),
@@ -932,7 +929,6 @@
       done: Boolean(t.done || t.completed || t.checked)
     }));
 
-    // 4. MANUTENZIONI
     const rawMaint = collectArrays('maint', 'maintenance', 'manutenzioni', 'interventions', 'service');
     merged.maint = rawMaint.map(m => ({
       id: String(m.id || m._id || uuid()),
@@ -948,7 +944,6 @@
       parts: m.parts || m.ricambi || m.notes || ''
     }));
 
-    // 5. CONTI FINANZIARI
     const rawAcc = collectArrays('accounts', 'conti', 'wallets', 'bankAccounts');
     merged.accounts = rawAcc.map(a => ({
       id: String(a.id || a._id || uuid()),
@@ -961,7 +956,6 @@
       merged.accounts.push({ id: 'acc-main', updatedAt: Date.now(), name: 'Conto Principale', type: 'Banca', baseBalance: 0 });
     }
 
-    // 6. TRANSAZIONI FINANZIARIE
     const defaultAccId = merged.accounts[0].id;
     const rawTx = collectArrays('financeTx', 'finance', 'transactions', 'expenses', 'movimenti', 'tx', 'finanze');
     merged.financeTx = rawTx.map(t => {
@@ -982,7 +976,6 @@
       };
     });
 
-    // 7. ABBONAMENTI
     const rawSubs = collectArrays('subs', 'subscriptions', 'abbonamenti', 'recurring');
     merged.subs = rawSubs.map(s => ({
       id: String(s.id || s._id || uuid()),
@@ -993,7 +986,6 @@
       next: s.next || s.nextDate || s.date || new Date().toISOString().slice(0, 10)
     }));
 
-    // 8. DIARIO ALIMENTARE
     const rawFood = collectArrays('foodLogs', 'meals', 'nutrition', 'nutritionLogs', 'diary', 'pasti', 'calories');
     merged.foodLogs = rawFood.map(f => ({
       id: String(f.id || f._id || uuid()),
@@ -1008,7 +1000,6 @@
       fat: parseFloat(f.fat ?? f.fats ?? f.grassi ?? 0) || 0
     }));
 
-    // 9. PESO (DATABOY)
     const rawWeight = collectArrays('weightLogs', 'weights', 'weight', 'pesate', 'peso');
     merged.weightLogs = rawWeight.map(w => ({
       id: String(w.id || w._id || uuid()),
@@ -1019,7 +1010,6 @@
       notes: w.notes || w.note || ''
     })).filter(w => !isNaN(w.kg) && w.kg > 0);
 
-    // 10. REFERTI MEDICI
     const rawMed = collectArrays('medRecords', 'medical', 'medicalRecords', 'visits', 'referti', 'visite');
     merged.medRecords = rawMed.map(m => ({
       id: String(m.id || m._id || uuid()),
@@ -1036,7 +1026,6 @@
       fileMime: m.fileMime || ''
     }));
 
-    // 11. SINTOMI
     const rawHealth = collectArrays('health', 'symptoms', 'healthLogs');
     merged.health = rawHealth.map(h => ({
       id: String(h.id || h._id || uuid()),
@@ -1186,7 +1175,7 @@
   }
 
   /* =========================================================================
-     BACKUP ZIP & RIPRISTINO UNIVERSALE (ACCETTA SIA .JSON CHE .ZIP)
+     BACKUP ZIP & RIPRISTINO UNIVERSALE
      ========================================================================= */
   async function exportFullZipBackup() {
     haptic(15);
@@ -1267,7 +1256,7 @@
       await saveDB();
       renderAll();
       showToast(`✅ Ripristinati ${importedCount} elementi!`);
-      alert(`✅ Ripristino completato!\nSono stati recuperati ${importedCount} record (Oggetti: ${db.vault.length}, Transazioni: ${db.financeTx.length}, Attività: ${db.crmTasks.length}, Persone: ${db.crm.length}, Salute/Pasti: ${db.foodLogs.length + db.weightLogs.length + db.medRecords.length}).`);
+      alert(`✅ Ripristino completato!\nSono stati recuperati ${importedCount} record.`);
     } catch (err) {
       console.error('Errore ripristino:', err);
       alert('❌ Impossibile leggere il file selezionato:\n' + err.message);
@@ -2489,3 +2478,4 @@
 </script>
 </body>
 </html>
+
