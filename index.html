@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#0f172a">
   <title>LifeOS v7.0 — Ultimate Edition</title>
   
+  <!-- HACK PWA: Generatore di Manifest In-line per installazione istantanea -->
+  <link rel="manifest" href='data:application/manifest+json;utf8,{"name":"LifeOS Ultimate","short_name":"LifeOS","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","icons":[{"src":"https://via.placeholder.com/192/6366f1/ffffff?text=L7","sizes":"192x192","type":"image/png"},{"src":"https://via.placeholder.com/512/6366f1/ffffff?text=L7","sizes":"512x512","type":"image/png"}]}'>
+  
   <!-- LIBRERIE ESTERNE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
@@ -102,39 +105,35 @@
     /* ==========================================
        5. HEADER & BRAND (Desktop)
        ========================================== */
-    .app-header { position: sticky; top: 0; z-index: 100; background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
-    .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; padding-bottom: 0.5rem; }
+    .app-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
+    .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
     
     .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.03em; white-space: nowrap; }
     .brand-text { display: flex; align-items: center; gap: 0.4rem; }
     .brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-gradient); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
     .header-top > div:last-child { display: flex; gap: 0.4rem; flex-shrink: 0; }
 
-    /* Navigazione Desktop (In Alto) */
-    .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.2rem; }
+    /* Navigazione Desktop (Separata dall'Header) */
+    .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.2rem; padding: 0 1.5rem; }
     .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid transparent; background: var(--bg-card); color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s ease; }
     .nav-tab.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: transparent; }
 
     /* ==========================================
        6. ELEMENTI FLUTTUANTI E MODALI
        ========================================== */
-    /* Modale */
     .modal-backdrop { position: fixed !important; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; display: none !important; place-items: center; padding: 1rem; }
     .modal-backdrop.open { display: grid !important; }
     .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;}
 
-    /* Lock Screen (PIN) */
     #lockScreen { position: fixed; inset: 0; background: var(--bg-primary); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s; }
     #lockScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .pin-box { background: var(--bg-card); padding: 2.5rem; border-radius: 24px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-lg); width: 90%; max-width: 400px; }
     .pin-input { width: 100%; text-align: center; font-size: 2.5rem; letter-spacing: 0.5rem; background: transparent; border: none; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); margin: 1.5rem 0; outline: none; }
 
-    /* Toast Notifications */
     #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 99999; display: flex; flex-direction: column; gap: 0.6rem; }
     .toast { padding: 0.85rem 1.15rem; border-radius: 12px; background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 500; animation: slideIn 0.25s ease; }
     @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-    /* Floating Action Button (FAB) */
     .fab-container { position: fixed; bottom: 2rem; right: 1.5rem; z-index: 9000; display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
     .fab-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: grid; place-items: center; font-size: 1.8rem; box-shadow: var(--shadow-lg); cursor: pointer; border: none; transition: transform 0.2s; }
     .fab-btn:active { transform: scale(0.9); }
@@ -158,19 +157,17 @@
     .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
 
     /* ==========================================
-       8. OTTIMIZZAZIONE MOBILE DEFINITIVA
+       8. OTTIMIZZAZIONE MOBILE DEFINITIVA (S25 Ultra)
        ========================================== */
-    @media (max-width: 768px) {
-      /* Grid e Padding Layout */
+    @media (max-width: 900px) {
       .bento-grid > div { grid-column: span 12 !important; }
       .main-container { padding: 0 0.75rem; margin-top: 0.5rem; padding-bottom: 120px !important; }
       .bento-card { padding: 1.15rem; }
       .form-row { grid-template-columns: 1fr !important; gap: 0.5rem; }
       
-      /* Header Slimmer */
       .app-header { padding: 0.75rem 1rem; }
 
-      /* Sposta Navigation Bar in basso */
+      /* Sposta Navigation Bar in basso FORZATAMENTE */
       .nav-tabs { 
         display: grid !important; 
         position: fixed !important; 
@@ -203,7 +200,6 @@
         transform: translateY(-2px); 
       }
       
-      /* Solleva FAB e Toast sopra la Bottom Bar */
       .fab-container { bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
       #toast-container { bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
     }
@@ -224,7 +220,7 @@
 
   <div id="toast-container" aria-live="polite"></div>
 
-  <!-- HEADER PRINCIPALE & NAVIGAZIONE -->
+  <!-- HEADER PRINCIPALE -->
   <header class="app-header">
     <div class="header-top">
       <div class="brand">
@@ -239,23 +235,21 @@
         <button class="btn btn-sm" onclick="App.openModal('settingsModal')">⚙️ Impostazioni</button>
       </div>
     </div>
-    
-    <nav class="nav-tabs" role="tablist">
-      <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
-      <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Calendario</button>
-      <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💰 Finanze</button>
-      <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">🗂️ Moduli</button>
-    </nav>
   </header>
+  
+  <!-- NAVIGAZIONE (Estrapolata dall'header per funzionare sia su PC che su Mobile) -->
+  <nav class="nav-tabs" role="tablist">
+    <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
+    <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Calendario</button>
+    <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💰 Finanze</button>
+    <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">🗂️ Moduli</button>
+  </nav>
 
   <main class="main-container">
 
-    <!-- ==========================================
-         MACROAREA 1: DASHBOARD CON GRAFICO
-         ========================================== -->
+    <!-- DASHBOARD -->
     <section id="mod-dashboard" class="module-section active">
       <div class="bento-grid">
-        
         <div class="bento-card col-span-4">
           <div class="card-header">
             <span class="card-title">💰 Liquidità Totale</span>
@@ -288,9 +282,7 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         MACROAREA 4: HUB MODULI EXTRA
-         ========================================== -->
+    <!-- HUB MODULI EXTRA -->
     <section id="mod-hub" class="module-section">
       <div class="bento-card col-span-12">
         <div class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">🗂️ Hub Moduli Aggiuntivi</div>
@@ -316,9 +308,7 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         MACROAREA 2: CALENDARIO, ATTIVITÀ & DIARIO
-         ========================================== -->
+    <!-- CALENDARIO -->
     <section id="mod-calendar" class="module-section">
       <div class="bento-grid">
         <div class="bento-card col-span-5">
@@ -389,7 +379,7 @@
       </div>
     </section>
 
-    <!-- HUB 1: INVENTARIO -->
+    <!-- INVENTARIO -->
     <section id="mod-inventory" class="module-section">
       <div class="card-header" style="margin-bottom: 1.25rem;">
         <div class="card-title">📦 Sistema Inventario: Garanzie & Archivio</div>
@@ -451,7 +441,7 @@
       </div>
     </section>
 
-    <!-- HUB 2: MANUTENZIONI -->
+    <!-- MANUTENZIONI -->
     <section id="mod-maintenance" class="module-section">
       <div class="card-header" style="margin-bottom: 1.25rem;">
         <div class="card-title">🔧 Scadenziario Manutenzioni</div>
@@ -509,7 +499,7 @@
       </div>
     </section>
 
-    <!-- MACROAREA 3: FINANZE -->
+    <!-- FINANZE -->
     <section id="mod-finance" class="module-section">
       <div class="bento-grid">
         <div class="bento-card col-span-4">
@@ -577,7 +567,7 @@
       </div>
     </section>
 
-    <!-- HUB 3: SALUTE OS UNIFICATO -->
+    <!-- SALUTE OS UNIFICATO -->
     <section id="mod-health" class="module-section">
       <div class="card-header" style="margin-bottom: 1.25rem;">
         <div class="card-title">❤️ Salute OS: Clinica, Nutrizione & Trend</div>
@@ -719,7 +709,7 @@
       activeInvTab: 'garanzie',
       charts: {},
 
-     async importBackupFile(event) {
+      async importBackupFile(event) {
         const file = event.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -729,13 +719,25 @@
             this.state = { ...this.state, ...parsed };
             await this.save();
             this.closeModal('settingsModal');
-            this.showToast('Backup ripristinato con successo! Riavvio in corso...', 'success');
-            setTimeout(() => location.reload(), 1200); // Ricarica per applicare i dati ovunque
+            this.showToast('Backup ripristinato! Riavvio in corso...', 'success');
+            setTimeout(() => location.reload(), 1200);
           } catch (err) {
-            this.showToast('Errore durante la lettura del file di backup.', 'danger');
+            this.showToast('Errore lettura backup.', 'danger');
           }
         };
         reader.readAsText(file);
+      },
+      
+      async save() { try { await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore salvataggio', 'danger'); } },
+      async load() { try { const data = await localforage.getItem('appData'); if (data) this.state = { ...this.state, ...data }; } catch (e) {} },
+      
+      showToast(msg, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse forwards'; setTimeout(() => toast.remove(), 300); }, 3500);
       },
       
       openModal(id) { document.getElementById(id).classList.add('open'); },
@@ -996,6 +998,13 @@
         const todayStr = this.currentDate.toISOString().slice(0, 10);
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate'].forEach(id => { const el = document.getElementById(id); if(el) el.value = todayStr; });
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.setAttribute('data-theme', 'light');
+
+        // INIEZIONE PWA (SERVICE WORKER DINAMICO)
+        if ('serviceWorker' in navigator) {
+          const swCode = "self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('fetch', e => {});";
+          const blob = new Blob([swCode], {type: 'application/javascript'});
+          navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW fail', err));
+        }
 
         if (this.state.pin) { document.getElementById('lockScreen').classList.remove('hidden'); } 
         else { this.runCronJobs(); document.getElementById('lockScreen').classList.add('hidden'); this.switchModule('mod-dashboard'); }
