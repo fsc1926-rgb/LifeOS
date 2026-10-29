@@ -11,6 +11,7 @@
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L7">
   
   <!-- LIBRERIE ESTERNE (Cache offline dal SW) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Motore Fotocamera Scanner Barcode -->
@@ -271,7 +272,6 @@
           <form id="inventoryForm" onsubmit="App.addInventoryItem(event)">
             <select id="invType" class="input" required style="border-color:var(--accent-primary);"><option value="Garanzia">🛡️ Registro Garanzie</option><option value="Archivio">📦 Archivio Generale</option></select>
             
-            <!-- Tasto Scanner Fotocamera -->
             <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
               <input type="text" id="invName" class="input" placeholder="Nome o Barcode *" required style="margin:0; flex:1;">
               <button type="button" class="btn btn-primary" onclick="App.startScanner()" style="padding:0 1rem;" title="Scansiona Barcode">📷</button>
@@ -416,10 +416,9 @@
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;"><button class="btn btn-sm" onclick="App.exportCSV('finance')" style="flex:1;">⬇️ CSV Finanze</button><button class="btn btn-sm" onclick="App.exportCSV('health')" style="flex:1;">⬇️ CSV Salute</button></div>
           <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem; background: var(--bg-secondary);">💾 Esporta Backup JSON</button>
           
-          <!-- TASTO AGGIORNATO PER ACCETTARE ANCHE I FILE ZIP -->
           <label class="btn btn-sm" style="width:100%; margin-bottom: 1rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">
-             📂 Ripristina Backup (JSON o ZIP)
-             <input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;">
+            📂 Ripristina Backup (JSON o ZIP)
+            <input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;">
           </label>
           
           <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
@@ -439,12 +438,18 @@
         inventory: [], calendarTasks: [], journal: [], maintenances: [], accounts: [], transactions: [], healthNutrition: [], healthWeight: [], healthMedical: [], habits: [],
         settings: {
           inventoryCategories: { 'Elettronica': ['Smartphone', 'Computer', 'Casa'], 'Veicoli': ['Auto', 'Moto'], 'Casa': ['Elettrodomestici', 'Mobili'] },
-          maintenanceCategories: ['Casa', 'Auto', 'Salute', 'Altro']
+          maintenanceCategories: ['Casa', 'Auto', 'Salute', 'Altro'],
+          hapticEnabled: false
         }
       },
-      currentDate: new Date(), selectedDate: new Date(), activeInvTab: 'garanzie', charts: {}, html5QrcodeScanner: null,
+      currentDate: new Date(),
+      selectedDate: new Date(),
+      activeInvTab: 'garanzie',
+      charts: {},
+      html5QrcodeScanner: null,
 
-async importBackupFile(event) {
+      // === IMPORT/EXPORT / BASE ===
+      async importBackupFile(event) {
         const file = event.target.files[0];
         if (!file) return;
         
@@ -453,33 +458,21 @@ async importBackupFile(event) {
           const fileName = file.name.toLowerCase();
 
           if (fileName.endsWith('.zip')) {
-            // Apri l'archivio ZIP
             const zip = new JSZip();
             const loadedZip = await zip.loadAsync(file);
-            
-            // Scansiona TUTTI i file dentro lo ZIP ignorando i nomi e le estensioni
             for (const relativePath of Object.keys(loadedZip.files)) {
-              if (loadedZip.files[relativePath].dir) continue; // Salta le cartelle
-              
+              if (loadedZip.files[relativePath].dir) continue;
               try {
-                // Estrae il testo e prova a convertirlo
                 const content = await loadedZip.files[relativePath].async('text');
                 const testParse = JSON.parse(content);
-                
-                // Se ha successo ed è un oggetto con i dati, lo memorizza e ferma la ricerca
-                if (testParse && typeof testParse === 'object') {
+                if (testParse && typeof testParse === 'object' && !Array.isArray(testParse)) {
                   parsed = testParse;
                   break; 
                 }
-              } catch (e) {
-                // Se il file non è un JSON (es. file di sistema), lo ignora e passa al prossimo
-              }
+              } catch (e) {}
             }
-            
             if (!parsed) throw new Error("Nessun dato LifeOS trovato nello ZIP.");
-            
           } else {
-            // Logica per i file .json normali
             const jsonString = await new Promise((resolve, reject) => {
               const reader = new FileReader();
               reader.onload = e => resolve(e.target.result);
@@ -489,7 +482,6 @@ async importBackupFile(event) {
             parsed = JSON.parse(jsonString);
           }
 
-          // Se siamo arrivati qui, abbiamo i dati: salviamoli
           if (parsed) {
             this.state = { ...this.state, ...parsed };
             await this.save();
@@ -500,14 +492,11 @@ async importBackupFile(event) {
           
         } catch (err) {
           console.error(err);
-          // Mostriamo l'errore ESATTO sul display per capire il problema
           this.showToast('Errore: ' + (err.message || 'File non valido'), 'danger');
         }
-        
-        // Resetta l'input
         event.target.value = '';
       },
-      },
+      
       async save() { try { await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore salvataggio', 'danger'); } },
       async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; if(!this.state.habits) this.state.habits = []; } } catch (e) {} },
       
@@ -518,8 +507,9 @@ async importBackupFile(event) {
       openHubModule(hubId) { document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active')); document.getElementById(hubId).classList.add('active'); if (hubId === 'mod-inventory') { this.populateCategorySelects(); this.renderInventory(); } if (hubId === 'mod-maintenance') { this.populateMaintenanceSelects(); this.renderMaintenances(); } if (hubId === 'mod-health') this.renderHealth(); },
       switchInvTab(tabId) { this.activeInvTab = tabId; document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`).classList.add('active'); this.renderInventory(); },
 
+      // === UX NATIVA ===
       toggleTheme() { const html = document.documentElement; const current = html.getAttribute('data-theme'); const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark'; html.setAttribute('data-theme', nextTheme); this.save(); this.showToast(`Tema: ${nextTheme.toUpperCase()}`); },
-      toggleHaptic() { if (!this.state.settings.hapticEnabled) this.state.settings.hapticEnabled = false; this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled; this.save(); if (this.state.settings.hapticEnabled) this.vibrate(20); this.showToast(this.state.settings.hapticEnabled ? 'Vibrazione Attivata' : 'Vibrazione Disattivata'); this.updateHapticButton(); },
+      toggleHaptic() { if (this.state.settings.hapticEnabled === undefined) this.state.settings.hapticEnabled = false; this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled; this.save(); if (this.state.settings.hapticEnabled) this.vibrate(20); this.showToast(this.state.settings.hapticEnabled ? 'Vibrazione Attivata' : 'Vibrazione Disattivata'); this.updateHapticButton(); },
       updateHapticButton() { const btn = document.getElementById('hapticBtn'); if (btn) btn.innerText = (this.state.settings.hapticEnabled) ? '📳 Disattiva Vibrazione' : '🔕 Attiva Vibrazione'; },
       vibrate(ms = 10) { if (this.state.settings.hapticEnabled && navigator.vibrate) navigator.vibrate(ms); },
       toggleFab() { document.getElementById('fabMenu').classList.toggle('open'); this.vibrate(10); },
@@ -530,45 +520,93 @@ async importBackupFile(event) {
       generateId() { return Math.random().toString(36).substr(2, 9); },
       fileToBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); }); },
 
+      // === SICUREZZA ===
       savePin() { const pin = document.getElementById('setupPinInput').value; if (pin.length === 4) { this.state.pin = pin; this.save(); document.getElementById('setupPinInput').value = ''; this.showToast('PIN Salvato.'); } else this.showToast('Il PIN deve essere di 4 cifre', 'warning'); },
       removePin() { this.state.pin = null; this.save(); this.showToast('PIN rimosso.'); },
       verifyPin() { const input = document.getElementById('loginPinInput').value; if (input === this.state.pin) { document.getElementById('lockScreen').classList.add('hidden'); this.runCronJobs(); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
       togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); document.getElementById('privacyBtn').innerHTML = isActive ? '🔒' : '👁️'; this.showToast(isActive ? 'Dati oscurati' : 'Dati in chiaro', 'info'); },
 
+      // === CRON JOBS E EXPORT ===
       runCronJobs() { const currentMonth = new Date().toISOString().slice(0, 7); if (!this.state.lastCronRun) { this.state.lastCronRun = currentMonth; this.save(); return; } if (this.state.lastCronRun < currentMonth) { let tasksRun = 0; this.state.transactions.filter(t => t.recurrence === 'Mensile').forEach(tx => { const acc = this.state.accounts.find(a => a.id === tx.accountId); if(acc) { const newTx = { ...tx, id: this.generateId(), date: new Date().toISOString().slice(0,10), timestamp: new Date().toISOString() }; if(newTx.type === 'EXPENSE') acc.balance -= newTx.amount; if(newTx.type === 'INCOME') acc.balance += newTx.amount; this.state.transactions.push(newTx); tasksRun++; } }); this.state.maintenances.filter(m => m.recurrence === 'Mensile' && m.status === 'Completata').forEach(m => { let d = new Date(m.dueDate); d.setMonth(d.getMonth() + 1); m.dueDate = d.toISOString().slice(0,10); m.status = 'In attesa'; tasksRun++; }); this.state.lastCronRun = currentMonth; this.save(); if(tasksRun > 0) this.showToast(`Automazioni: ${tasksRun} task generati.`, 'info'); } },
       exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_Backup.json`; document.body.appendChild(a); a.click(); a.remove(); this.showToast('Backup salvato.'); },
       exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},${acc ? acc.name : 'N/D'},${t.category},${t.desc}\n`; }); } else if (type === 'health') { csv = 'Data,Peso (kg),Kcal,Proteine,Carboidrati,Grassi\n'; const days = [...new Set([...this.state.healthWeight.map(w=>w.date), ...this.state.healthNutrition.map(n=>n.date)])]; days.forEach(d => { const w = this.state.healthWeight.find(x => x.date === d)?.value || ''; const nLogs = this.state.healthNutrition.filter(x => x.date === d); csv += `${d},${w},${nLogs.reduce((s,x)=>s+x.kcal,0)},${nLogs.reduce((s,x)=>s+x.prot,0)},${nLogs.reduce((s,x)=>s+x.carbs,0)},${nLogs.reduce((s,x)=>s+x.fat,0)}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `Export_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
       async resetAllData() { if(confirm("Cancellare tutti i dati permanentemente?")) { await localforage.clear(); location.reload(); } },
 
+      // === GLOBAL SEARCH (SPOTLIGHT) ===
       executeSearch() {
-        const query = document.getElementById('globalSearchInput').value.toLowerCase().trim(); const resBox = document.getElementById('globalSearchResults');
+        const query = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+        const resBox = document.getElementById('globalSearchResults');
         if(!query || query.length < 2) { resBox.innerHTML = '<div class="text-muted" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'; return; }
         let html = ''; let count = 0;
+        
         this.state.inventory.forEach(i => { if(i.name.toLowerCase().includes(query) || i.notes.toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>📦 ${i.name}</strong><br><small class="text-secondary">${i.category} | ${this.formatMoney(i.price)}</small></div></div>`; count++; } });
         this.state.transactions.forEach(t => { if(t.desc.toLowerCase().includes(query) || t.category.toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="text-secondary">${this.formatDate(t.date)}</small></div><strong style="color:${t.type==='EXPENSE'?'var(--danger)':'var(--success)'}">${t.amount}€</strong></div>`; count++; } });
         this.state.healthMedical.forEach(m => { if(m.title.toLowerCase().includes(query) || m.notes.toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="text-secondary">${this.formatDate(m.date)}</small></div></div>`; count++; } });
         this.state.calendarTasks.forEach(t => { if(t.title.toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>📌 ${t.title}</strong><br><small class="text-secondary">${this.formatDate(t.date)}</small></div></div>`; count++; } });
-        resBox.innerHTML = count > 0 ? html : `<div class="text-muted" style="text-align:center; padding: 2rem 0;">Nessun risultato.</div>`;
+        
+        resBox.innerHTML = count > 0 ? html : `<div class="text-muted" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`;
       },
 
-      addHabit() { const name = prompt("Nome della nuova abitudine (es. Lettura, Palestra):"); if(name && name.trim()) { this.state.habits.push({ id: this.generateId(), name: name.trim(), streak: 0, lastDone: null }); this.save(); } },
+      // === HABIT TRACKER ===
+      addHabit() {
+        const name = prompt("Nome della nuova abitudine (es. Lettura, Palestra):");
+        if(name && name.trim()) { this.state.habits.push({ id: this.generateId(), name: name.trim(), streak: 0, lastDone: null }); this.save(); }
+      },
       deleteHabit(id) { if(confirm("Eliminare abitudine?")) { this.state.habits = this.state.habits.filter(h => h.id !== id); this.save(); } },
-      toggleHabit(id) { const habit = this.state.habits.find(h => h.id === id); if(!habit) return; const today = new Date().toISOString().slice(0,10); if(habit.lastDone === today) { habit.lastDone = null; habit.streak = Math.max(0, habit.streak - 1); } else { let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); if(habit.lastDone === yesterday.toISOString().slice(0,10)) habit.streak++; else habit.streak = 1; habit.lastDone = today; this.vibrate(30); } this.save(); },
+      toggleHabit(id) {
+        const habit = this.state.habits.find(h => h.id === id); if(!habit) return;
+        const today = new Date().toISOString().slice(0,10);
+        if(habit.lastDone === today) { habit.lastDone = null; habit.streak = Math.max(0, habit.streak - 1); } // Undo
+        else { 
+            let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+            if(habit.lastDone === yesterday.toISOString().slice(0,10)) habit.streak++; else habit.streak = 1;
+            habit.lastDone = today;
+            this.vibrate(30);
+        }
+        this.save();
+      },
 
+      // === DASHBOARD ===
       renderDashboard() {
         const total = this.state.accounts.reduce((acc, a) => acc + a.balance, 0); document.getElementById('dashNetWorth').innerText = this.formatMoney(total); document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti`;
         const therapies = this.state.healthMedical.filter(m => m.type === 'Visita Medica' && m.therapy); document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>💊 ${t.therapy}</strong><br><small class="text-secondary">${t.title}</small></div></div>`).join('') : '<div class="list-row text-muted">Nessuna terapia.</div>';
         const todayStr = this.currentDate.toISOString().slice(0,10);
         const upcoming = this.state.calendarTasks.filter(t => t.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 5); document.getElementById('dashUpcomingTasks').innerHTML = upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-warning'}">${t.type}</span></div>`).join('') : '<div class="list-row text-muted">Nessuna attività.</div>';
         
-        document.getElementById('habitList').innerHTML = this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone?0.6:1};"><div style="display:flex; align-items:center; gap:0.5rem;"><button class="btn btn-sm ${isDone?'btn-primary':''}" style="width:32px; height:32px; padding:0; border-radius:50%; font-size:1.2rem;" onclick="App.toggleHabit('${h.id}')">${isDone?'✓':''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.5rem;"><span class="badge badge-info">🔥 ${h.streak}</span><button class="btn btn-sm text-muted" style="padding:0.2rem 0.4rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : '<div class="list-row text-muted">Aggiungi la tua prima abitudine.</div>';
+        // Render Habits
+        document.getElementById('habitList').innerHTML = this.state.habits.length ? this.state.habits.map(h => {
+            const isDone = h.lastDone === todayStr;
+            return `<div class="list-row" style="opacity:${isDone?0.6:1};"><div style="display:flex; align-items:center; gap:0.5rem;"><button class="btn btn-sm ${isDone?'btn-primary':''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone?'✓':''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.5rem;"><span class="badge badge-info">🔥 ${h.streak}</span><button class="btn btn-sm text-muted" style="padding:0.2rem 0.4rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`;
+        }).join('') : '<div class="list-row text-muted">Aggiungi la tua prima abitudine.</div>';
+
         this.renderFinanceChart();
       },
-      renderFinanceChart() { const ctx = document.getElementById('dashboardChart'); if (!ctx) return; const currentMonth = new Date().toISOString().slice(0, 7); let income = 0; let expense = 0; this.state.transactions.filter(t => t.date.startsWith(currentMonth)).forEach(t => { if (t.type === 'INCOME') income += t.amount; if (t.type === 'EXPENSE') expense += t.amount; }); if(this.charts.finance) this.charts.finance.destroy(); this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Mese Corrente'], datasets: [ { label: 'Entrate', data: [income], backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Uscite', data: [expense], backgroundColor: '#ef4444', borderRadius: 6 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } }); },
+      renderFinanceChart() {
+        const ctx = document.getElementById('dashboardChart'); if (!ctx) return;
+        const currentMonth = new Date().toISOString().slice(0, 7); let income = 0; let expense = 0;
+        this.state.transactions.filter(t => t.date.startsWith(currentMonth)).forEach(t => { if (t.type === 'INCOME') income += t.amount; if (t.type === 'EXPENSE') expense += t.amount; });
+        if(this.charts.finance) this.charts.finance.destroy();
+        this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Mese Corrente'], datasets: [ { label: 'Entrate', data: [income], backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Uscite', data: [expense], backgroundColor: '#ef4444', borderRadius: 6 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
+      },
 
-      startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) { this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 150}, aspectRatio: 1.0 }, false); } this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(50); this.showToast('Barcode letto!'); this.closeScanner(); }, (error) => {}); },
-      closeScanner() { if (this.html5QrcodeScanner) { this.html5QrcodeScanner.clear().catch(e => console.error(e)); } this.closeModal('scannerModal'); },
+      // === SCANNER FOTOCAMERA (HTML5-QRCODE) ===
+      startScanner() {
+        this.openModal('scannerModal');
+        if (!this.html5QrcodeScanner) {
+            this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 150}, aspectRatio: 1.0 }, false);
+        }
+        this.html5QrcodeScanner.render((decodedText) => {
+            document.getElementById('invName').value = decodedText; // Compila il form inventario
+            this.vibrate(50); this.showToast('Barcode letto!');
+            this.closeScanner();
+        }, (error) => {});
+      },
+      closeScanner() {
+          if (this.html5QrcodeScanner) { this.html5QrcodeScanner.clear().catch(e => console.error(e)); }
+          this.closeModal('scannerModal');
+      },
 
+      // === INVENTARIO ===
       populateCategorySelects() { const html = Object.keys(this.state.settings.inventoryCategories).map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('invCategory').innerHTML = html; document.getElementById('invFilterCat').innerHTML = '<option value="ALL">Tutte</option>' + html; this.updateInvSubcategories(); },
       updateInvSubcategories() { const cat = document.getElementById('invCategory').value; if(cat && this.state.settings.inventoryCategories[cat]) document.getElementById('invSubcategory').innerHTML = this.state.settings.inventoryCategories[cat].map(s => `<option value="${s}">${s}</option>`).join(''); },
       addInventoryCategory() { const c = document.getElementById('newInvCatInput').value.trim(); if(c && !this.state.settings.inventoryCategories[c]) { this.state.settings.inventoryCategories[c] = ['Generale']; this.save(); this.populateCategorySelects(); } },
@@ -577,6 +615,7 @@ async importBackupFile(event) {
       deleteInventoryItem(id) { if(confirm('Eliminare?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
       renderInventory() { const filterCat = document.getElementById('invFilterCat').value; const search = document.getElementById('invSearchInput').value.toLowerCase(); let filtered = this.state.inventory.filter(i => i.type === (this.activeInvTab === 'garanzie' ? 'Garanzia' : 'Archivio')); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search)); document.getElementById('inventoryList').innerHTML = filtered.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)).map(item => { let wBadge = ''; if(item.warranty) { const exp = new Date(item.warranty) < new Date(); wBadge = `<span class="badge ${exp ? 'badge-danger' : 'badge-success'}">${exp?'Scaduta':'Attiva'}: ${this.formatDate(item.warranty)}</span>`; } return `<div class="list-row"><div style="flex:1;"><strong>${item.name}</strong> <span class="badge">${item.category}</span><br><small class="text-secondary">${item.subcategory} | Pos: ${item.location||'-'}</small><div style="margin-top:4px;">${wBadge}</div></div><div style="text-align:right;"><div style="font-weight:700; color:var(--accent-primary); margin-bottom:4px;">${this.formatMoney(item.price)}</div><button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div></div>`; }).join('') || '<div class="list-row text-muted">Nessun elemento.</div>'; },
 
+      // === CALENDARIO ===
       changeMonth(dir) { this.currentDate.setMonth(this.currentDate.getMonth() + dir); this.renderCalendar(); },
       selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
       selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
@@ -587,12 +626,14 @@ async importBackupFile(event) {
       saveJournalEntry(e) { e.preventDefault(); const date = this.selectedDate.toISOString().slice(0, 10); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
       renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 5); document.getElementById('journalHistoryList').innerHTML = hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row text-muted">Nessun diario salvato.</div>'; },
 
+      // === MANUTENZIONI ===
       populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('maintCategory').innerHTML = html; document.getElementById('maintFilterCat').innerHTML = '<option value="ALL">Tutte</option>' + html; },
       addMaintenanceCategory() { const c = document.getElementById('newMaintCatInput').value.trim(); if(c && !this.state.settings.maintenanceCategories.includes(c)) { this.state.settings.maintenanceCategories.push(c); this.save(); this.populateMaintenanceSelects(); } },
       addMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: document.getElementById('maintCost').value, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); this.renderMaintenances(); },
       deleteMaintenance(id) { if(confirm('Eliminare?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderMaintenances(); } },
       renderMaintenances() { let filtered = this.state.maintenances; const fCat = document.getElementById('maintFilterCat').value; const fStat = document.getElementById('maintFilterStatus').value; if(fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if(fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); document.getElementById('maintenanceList').innerHTML = filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).map(m => `<div class="list-row" style="border-left: 4px solid ${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};"><div style="flex:1;"><strong>${m.title}</strong> <span class="badge">${m.category}</span> ${m.recurrence!=='Singola'?`<span class="badge badge-info">🔄 ${m.recurrence}</span>`:''}<div style="font-size:0.8rem; color:var(--text-muted);">${m.notes || ''}</div></div><div style="text-align:right;">Scad: <strong>${this.formatDate(m.dueDate)}</strong><br>${parseFloat(m.cost)>0?`<span style="color:var(--danger); font-weight:600;">${this.formatMoney(m.cost)}</span>`:''}<button class="btn btn-sm btn-danger" onclick="App.deleteMaintenance('${m.id}')">🗑</button></div></div>`).join('') || '<div class="list-row text-muted">Nessuna manutenzione.</div>'; },
 
+      // === FINANZE ===
       populateAccountSelects() { const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join(''); document.getElementById('txAccount').innerHTML = '<option value="">Conto Origine *</option>' + html; document.getElementById('txTargetAccount').innerHTML = '<option value="">Conto Dest *</option>' + html; document.getElementById('reconcileAccountSelect').innerHTML = html; document.getElementById('txFilterAccount').innerHTML = '<option value="ALL">Tutti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
       addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
       toggleTransferFields() { document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none'; },
@@ -601,6 +642,7 @@ async importBackupFile(event) {
       deleteTransaction(id) { const tx = this.state.transactions.find(t => t.id === id); if(!tx) return; if(confirm('Eliminare? I saldi saranno ricalcolati.')) { const src = this.state.accounts.find(a => a.id === tx.accountId); if(tx.type === 'EXPENSE') src.balance += tx.amount; else if(tx.type === 'INCOME') src.balance -= tx.amount; else if(tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => a.id === tx.targetAccountId); if(trg) trg.balance -= tx.amount; } this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.save(); this.populateAccountSelects(); this.renderFinance(); } },
       renderFinance() { const total = this.state.accounts.reduce((sum, a) => sum + a.balance, 0); document.getElementById('finTotalBalanceBadge').innerText = this.formatMoney(total); document.getElementById('financeAccountsList').innerHTML = this.state.accounts.map(a => `<div class="list-row"><strong>🏦 ${a.name}</strong><span style="font-weight:700;">${this.formatMoney(a.balance)}</span></div>`).join(''); let filtered = this.state.transactions; const fAcc = document.getElementById('txFilterAccount').value; if(fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc); document.getElementById('financeTransactionsList').innerHTML = filtered.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).map(tx => { let icon = tx.type === 'EXPENSE' ? '📉' : tx.type === 'INCOME' ? '📈' : '🔄'; let color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; let prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : ''; return `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(tx.date)}</span><br><strong>${icon} ${tx.desc}</strong> ${tx.recurrence!=='Singola'?`<span class="badge" style="font-size:0.6rem;">🔄 ${tx.recurrence}</span>`:''}</div><div style="text-align:right;"><div style="font-weight:700; color:${color};">${prefix}${this.formatMoney(tx.amount)}</div><button class="btn btn-sm" onclick="App.deleteTransaction('${tx.id}')">🗑</button></div></div>`; }).join('') || '<div class="list-row text-muted">Nessuna transazione.</div>'; },
 
+      // === SALUTE ===
       addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseInt(document.getElementById('nutriKcal').value)||0, prot: parseInt(document.getElementById('nutriProt').value)||0, carbs: parseInt(document.getElementById('nutriCarbs').value)||0, fat: parseInt(document.getElementById('nutriFat').value)||0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0,10); this.renderHealth(); },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0,10); this.renderHealth(); },
@@ -608,19 +650,17 @@ async importBackupFile(event) {
       toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
       async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if(type === 'Referto' && document.getElementById('medFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch(err) { return this.showToast('Errore lettura file', 'danger'); } } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth(); this.showToast('Salvato nel DB.'); },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      renderHealth() { document.getElementById('healthNutritionList').innerHTML = this.state.healthNutrition.sort((a,b) => new Date(b.date) - new Date(a.date)).map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="text-secondary">${this.formatDate(n.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun pasto.</div>'; document.getElementById('healthWeightList').innerHTML = this.state.healthWeight.sort((a,b) => new Date(b.date) - new Date(a.date)).map(w => `<div class="list-row"><div><strong>${w.value} kg</strong><br><small class="text-secondary">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun peso.</div>'; const ctxW = document.getElementById('weightChart'); if(ctxW) { const sortedW = [...this.state.healthWeight].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-10); if(this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w=>this.formatDate(w.date).slice(0,5)), datasets: [{ label: 'Peso', data: sortedW.map(w=>w.value), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.2)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); } document.getElementById('healthMedicalList').innerHTML = this.state.healthMedical.sort((a, b) => new Date(b.date) - new Date(a.date)).map(m => { let extra = m.type === 'Visita Medica' && m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; let file = m.type === 'Referto' && m.fileData ? `<div><a href="${m.fileData}" download="Referto_${m.title}" class="badge" style="text-decoration:none; background:rgba(16, 185, 129, 0.15); color:var(--success);">📥 Scarica Referto</a></div>` : ''; return `<div class="list-row" style="align-items:flex-start;"><div style="flex:1;"><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(m.date)}</span><br><strong>${m.type==='Visita Medica'?'👨‍⚕️':m.type==='Referto'?'📄':'🌡️'} ${m.title}</strong>${extra}<div style="font-size:0.8rem; color:var(--text-secondary);">${m.notes||''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`; }).join('') || '<div class="list-row text-muted">Nessun record clinico.</div>'; },
+      renderHealth() { document.getElementById('healthNutritionList').innerHTML = this.state.healthNutrition.sort((a,b) => new Date(b.date) - new Date(a.date)).map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="text-secondary">${this.formatDate(n.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun pasto.</div>'; document.getElementById('healthWeightList').innerHTML = this.state.healthWeight.sort((a,b) => new Date(b.date) - new Date(a.date)).map(w => `<div class="list-row"><div><strong>${w.value} kg</strong><br><small class="text-secondary">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun peso.</div>'; const ctxW = document.getElementById('weightChart'); if(ctxW) { const sortedW = [...this.state.healthWeight].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-10); if(this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w=>this.formatDate(w.date).slice(0,5)), datasets: [{ label: 'Peso', data: sortedW.map(w=>w.value), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.2)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); } document.getElementById('healthMedicalList').innerHTML = this.state.healthMedical.sort((a, b) => new Date(b.date) - new Date(a.date)).map(m => { let extra = m.type === 'Visita Medica' && m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; let file = m.type === 'Referto' && m.fileData ? `<div><a href="${m.fileData}" download="Referto_${m.title}" class="badge" style="text-decoration:none; background:rgba(16, 185, 129, 0.15); color:var(--success);">📥 Scarica Referto</a></div>` : ''; return `<div class="list-row" style="align-items:flex-start;"><div style="flex:1;"><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(m.date)}</span><br><strong>${m.type==='Visita Medica'?'👨‍⚕️':m.type==='Referto'?'📄':'🌡️'} ${m.title}</strong>${extra}<div style="font-size:0.8rem; color:var(--text-secondary);">${m.notes||''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`; }).join('') || '<div class="list-row text-muted">Nessun record.</div>'; },
 
+      // === INIT ===
       async init() {
         await this.load();
         const todayStr = this.currentDate.toISOString().slice(0, 10);
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate'].forEach(id => { const el = document.getElementById(id); if(el) el.value = todayStr; });
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.setAttribute('data-theme', 'light');
 
-        // REGISTRAZIONE SERVICE WORKER (PWA)
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('SW Registrato'))
-            .catch(err => console.log('SW Errore', err));
+          navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW fail', err));
         }
 
         if (this.state.pin) { document.getElementById('lockScreen').classList.remove('hidden'); } 
