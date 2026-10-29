@@ -1,37 +1,40 @@
-const CACHE_NAME = 'lifeos-pwa-v5';
-const ASSETS = [
+const CACHE_NAME = 'lifeos-v7-ultimate-v1';
+const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  'https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js',
+  'https://cdn.jsdelivr.net/npm/chart.js',
+  'https://unpkg.com/html5-qrcode'
 ];
 
+// Installa il Service Worker e forza l'attivazione immediata
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
+// Pulisce le vecchie cache e prende subito il controllo della pagina
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null)
-    )).then(() => self.clients.claim())
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) return caches.delete(cache);
+        })
+      );
+    })
   );
+  self.clients.claim();
 });
 
-// Strategia Network-First per localhost: carica sempre il file modificato più recente!
+// Intercetta le richieste: usa la cache se sei offline
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        return response;
-      })
-      .catch(() => caches.match(event.request).then(r => r || caches.match('./index.html')))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
