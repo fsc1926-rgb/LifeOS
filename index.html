@@ -415,7 +415,13 @@
           <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">📊 Gestione Dati Personali</div>
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;"><button class="btn btn-sm" onclick="App.exportCSV('finance')" style="flex:1;">⬇️ CSV Finanze</button><button class="btn btn-sm" onclick="App.exportCSV('health')" style="flex:1;">⬇️ CSV Salute</button></div>
           <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem; background: var(--bg-secondary);">💾 Esporta Backup JSON</button>
-          <label class="btn btn-sm" style="width:100%; margin-bottom: 1rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">📂 Ripristina Backup JSON<input type="file" accept=".json" onchange="App.importBackupFile(event)" style="display: none;"></label>
+          
+          <!-- TASTO AGGIORNATO PER ACCETTARE ANCHE I FILE ZIP -->
+          <label class="btn btn-sm" style="width:100%; margin-bottom: 1rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">
+             📂 Ripristina Backup (JSON o ZIP)
+             <input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;">
+          </label>
+          
           <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
           <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Elimina Tutti i Dati (Reset App)</button>
         </div>
@@ -438,10 +444,48 @@
       },
       currentDate: new Date(), selectedDate: new Date(), activeInvTab: 'garanzie', charts: {}, html5QrcodeScanner: null,
 
-      async importBackupFile(event) {
-        const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
-        reader.onload = async (e) => { try { const parsed = JSON.parse(e.target.result); this.state = { ...this.state, ...parsed }; await this.save(); this.closeModal('settingsModal'); this.showToast('Backup ripristinato! Riavvio in corso...', 'success'); setTimeout(() => location.reload(), 1200); } catch (err) { this.showToast('Errore lettura backup.', 'danger'); } };
-        reader.readAsText(file);
+     async importBackupFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        try {
+          let jsonString = '';
+          const fileName = file.name.toLowerCase();
+
+          if (fileName.endsWith('.zip')) {
+            // Logica per estrarre il file ZIP
+            const zip = new JSZip();
+            const loadedZip = await zip.loadAsync(file);
+            
+            // Trova il file JSON all'interno dello ZIP
+            const jsonFiles = Object.keys(loadedZip.files).filter(name => name.endsWith('.json'));
+            if (jsonFiles.length === 0) throw new Error("Nessun file JSON trovato nello ZIP.");
+            
+            jsonString = await loadedZip.files[jsonFiles[0]].async('text');
+          } else {
+            // Logica per leggere un normale file JSON
+            jsonString = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = e => resolve(e.target.result);
+              reader.onerror = e => reject(e);
+              reader.readAsText(file);
+            });
+          }
+
+          const parsed = JSON.parse(jsonString);
+          this.state = { ...this.state, ...parsed };
+          await this.save();
+          this.closeModal('settingsModal');
+          this.showToast('Backup ripristinato! Riavvio in corso...', 'success');
+          
+          setTimeout(() => location.reload(), 1200);
+        } catch (err) {
+          console.error(err);
+          this.showToast('Errore lettura backup (formato non valido).', 'danger');
+        }
+        
+        // Resetta l'input per permettere di ricaricare lo stesso file in caso di errore
+        event.target.value = '';
       },
       async save() { try { await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore salvataggio', 'danger'); } },
       async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; if(!this.state.habits) this.state.habits = []; } } catch (e) {} },
