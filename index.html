@@ -444,48 +444,69 @@
       },
       currentDate: new Date(), selectedDate: new Date(), activeInvTab: 'garanzie', charts: {}, html5QrcodeScanner: null,
 
-     async importBackupFile(event) {
+async importBackupFile(event) {
         const file = event.target.files[0];
         if (!file) return;
         
         try {
-          let jsonString = '';
+          let parsed = null;
           const fileName = file.name.toLowerCase();
 
           if (fileName.endsWith('.zip')) {
-            // Logica per estrarre il file ZIP
+            // Apri l'archivio ZIP
             const zip = new JSZip();
             const loadedZip = await zip.loadAsync(file);
             
-            // Trova il file JSON all'interno dello ZIP
-            const jsonFiles = Object.keys(loadedZip.files).filter(name => name.endsWith('.json'));
-            if (jsonFiles.length === 0) throw new Error("Nessun file JSON trovato nello ZIP.");
+            // Scansiona TUTTI i file dentro lo ZIP ignorando i nomi e le estensioni
+            for (const relativePath of Object.keys(loadedZip.files)) {
+              if (loadedZip.files[relativePath].dir) continue; // Salta le cartelle
+              
+              try {
+                // Estrae il testo e prova a convertirlo
+                const content = await loadedZip.files[relativePath].async('text');
+                const testParse = JSON.parse(content);
+                
+                // Se ha successo ed è un oggetto con i dati, lo memorizza e ferma la ricerca
+                if (testParse && typeof testParse === 'object') {
+                  parsed = testParse;
+                  break; 
+                }
+              } catch (e) {
+                // Se il file non è un JSON (es. file di sistema), lo ignora e passa al prossimo
+              }
+            }
             
-            jsonString = await loadedZip.files[jsonFiles[0]].async('text');
+            if (!parsed) throw new Error("Nessun dato LifeOS trovato nello ZIP.");
+            
           } else {
-            // Logica per leggere un normale file JSON
-            jsonString = await new Promise((resolve, reject) => {
+            // Logica per i file .json normali
+            const jsonString = await new Promise((resolve, reject) => {
               const reader = new FileReader();
               reader.onload = e => resolve(e.target.result);
               reader.onerror = e => reject(e);
               reader.readAsText(file);
             });
+            parsed = JSON.parse(jsonString);
           }
 
-          const parsed = JSON.parse(jsonString);
-          this.state = { ...this.state, ...parsed };
-          await this.save();
-          this.closeModal('settingsModal');
-          this.showToast('Backup ripristinato! Riavvio in corso...', 'success');
+          // Se siamo arrivati qui, abbiamo i dati: salviamoli
+          if (parsed) {
+            this.state = { ...this.state, ...parsed };
+            await this.save();
+            this.closeModal('settingsModal');
+            this.showToast('Backup ripristinato! Riavvio in corso...', 'success');
+            setTimeout(() => location.reload(), 1200);
+          }
           
-          setTimeout(() => location.reload(), 1200);
         } catch (err) {
           console.error(err);
-          this.showToast('Errore lettura backup (formato non valido).', 'danger');
+          // Mostriamo l'errore ESATTO sul display per capire il problema
+          this.showToast('Errore: ' + (err.message || 'File non valido'), 'danger');
         }
         
-        // Resetta l'input per permettere di ricaricare lo stesso file in caso di errore
+        // Resetta l'input
         event.target.value = '';
+      },
       },
       async save() { try { await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore salvataggio', 'danger'); } },
       async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; if(!this.state.habits) this.state.habits = []; } } catch (e) {} },
