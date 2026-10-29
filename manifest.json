@@ -1,29 +1,20 @@
 {
-  "name": "LifeOS v5.5 — Ecosistema Personale",
+  "name": "LifeOS Ultimate",
   "short_name": "LifeOS",
-  "description": "Sistema operativo personale offline: Oggetti, Finanze, Salute, Attività e Manutenzioni.",
-  "lang": "it-IT",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#090d16",
   "theme_color": "#090d16",
-  "categories": [
-    "productivity",
-    "finance",
-    "health",
-    "lifestyle"
-  ],
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://via.placeholder.com/192/6366f1/ffffff?text=L7",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://via.placeholder.com/512/6366f1/ffffff?text=L7",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
