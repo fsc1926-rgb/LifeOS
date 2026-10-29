@@ -6,16 +6,22 @@
   <meta name="theme-color" content="#090d16">
   <title>LifeOS v7.0 Ultimate</title>
   
+  <!-- COLLEGAMENTO PWA REALE -->
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L7">
   
+  <!-- LIBRERIE ESTERNE (Cache offline dal SW) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
+    /* ==========================================
+       1. VARIABILI E TEMI
+       ========================================== */
     :root[data-theme="dark"] { --bg-primary: #090d16; --bg-secondary: #111827; --bg-card: rgba(30, 41, 59, 0.65); --bg-glass: rgba(15, 23, 42, 0.8); --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b; --border-color: rgba(255, 255, 255, 0.08); --border-highlight: rgba(99, 102, 241, 0.4); --accent-primary: #6366f1; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45); }
     :root[data-theme="light"] { --bg-primary: #f1f5f9; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.85); --bg-glass: rgba(255, 255, 255, 0.88); --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; --border-color: rgba(15, 23, 42, 0.09); --border-highlight: rgba(99, 102, 241, 0.45); --accent-primary: #4f46e5; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb; --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06); --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12); }
     :root[data-theme="oled"] { --bg-primary: #000000; --bg-secondary: #0a0a0a; --bg-card: rgba(15, 15, 15, 0.8); --bg-glass: rgba(0, 0, 0, 0.85); --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #52525b; --border-color: rgba(255, 255, 255, 0.1); --border-highlight: rgba(99, 102, 241, 0.5); --accent-primary: #6366f1; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.8); }
@@ -25,6 +31,9 @@
     .sensitive { transition: filter 0.3s ease, opacity 0.3s ease; }
     body.privacy-active .sensitive { filter: blur(6px); opacity: 0.5; user-select: none; pointer-events: none; }
 
+    /* ==========================================
+       2. UI COMPONENTS & CARDS
+       ========================================== */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1.1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
     .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; }
     .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
@@ -53,6 +62,9 @@
     .stat-value { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; font-family: 'JetBrains Mono', monospace; margin: 0.35rem 0; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
 
+    /* ==========================================
+       3. HEADER & NAV (Desktop)
+       ========================================== */
     .app-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
     .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
     .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.03em; white-space: nowrap; }
@@ -62,6 +74,9 @@
     .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid transparent; background: var(--bg-card); color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s ease; }
     .nav-tab.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: transparent; }
 
+    /* ==========================================
+       4. MODALI, LOCK SCREEN, TOAST & FAB
+       ========================================== */
     .modal-backdrop { position: fixed !important; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; display: none !important; place-items: center; padding: 1rem; }
     .modal-backdrop.open { display: grid !important; }
     .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;}
@@ -94,6 +109,9 @@
     .hub-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
     .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
 
+    /* ==========================================
+       5. MOBILE OPTIMIZATION (BOTTOM BAR FOR S25)
+       ========================================== */
     @media (max-width: 900px) {
       .bento-grid > div { grid-column: span 12 !important; }
       .main-container { padding: 0 0.75rem; margin-top: 0.5rem; padding-bottom: 120px !important; }
@@ -246,7 +264,7 @@
       </div>
     </section>
 
-    <!-- INVENTARIO -->
+    <!-- INVENTARIO (CON SCANNER BARCODE) -->
     <section id="mod-inventory" class="module-section">
       <div class="card-header" style="margin-bottom: 1.25rem;">
         <div class="card-title">📦 Inventario & Garanzie</div>
@@ -421,16 +439,54 @@
       },
       currentDate: new Date(), selectedDate: new Date(), activeInvTab: 'garanzie', charts: {}, html5QrcodeScanner: null,
 
-      // === SCUDO TOTALE ANTI-CRASH ===
+      // === SISTEMA DI MIGRAZIONE (V5 -> V7) E SCUDO ANTI-CRASH ===
       sanitizeData() {
         const today = new Date().toISOString().slice(0, 10);
         
-        // 1. Assicura gli array base
+        // 1. MIGRAZIONE DATI VECCHIE VERSIONI (V5/V6 -> V7)
+        if (this.state.vault) {
+            this.state.inventory = this.state.vault.map(v => ({ id: v.id || this.generateId(), type: 'Archivio', name: v.title || 'Oggetto', category: v.cat || 'Generale', subcategory: 'Generale', price: parseFloat(v.price) || 0, date: v.date || today, warranty: '', location: '', notes: v.notes || '', addedAt: new Date().toISOString() }));
+            delete this.state.vault;
+        }
+        if (this.state.financeTx) {
+            this.state.transactions = this.state.financeTx.map(t => ({ id: t.id || this.generateId(), type: t.type === 'expense' ? 'EXPENSE' : (t.type === 'income' ? 'INCOME' : 'TRANSFER'), amount: parseFloat(t.amount) || 0, accountId: t.accountId || 'acc-main', desc: t.desc || 'Movimento', category: t.cat || 'Generale', date: t.date || today, recurrence: 'Singola', timestamp: new Date().toISOString() }));
+            delete this.state.financeTx;
+        }
+        if (this.state.maint) {
+            this.state.maintenances = this.state.maint.map(m => ({ id: m.id || this.generateId(), title: m.task || 'Manutenzione', category: m.asset || 'Altro', dueDate: m.date || today, cost: parseFloat(m.cost) || 0, recurrence: 'Singola', status: 'In attesa', notes: m.parts || '' }));
+            delete this.state.maint;
+        }
+        if (this.state.crmTasks) {
+            this.state.calendarTasks = this.state.crmTasks.map(c => ({ id: c.id || this.generateId(), date: today, title: c.title || 'Task', type: 'Attività', priority: 'Normale' }));
+            delete this.state.crmTasks;
+        }
+        if (this.state.weightLogs) {
+            this.state.healthWeight = this.state.weightLogs.map(w => ({ id: w.id || this.generateId(), value: parseFloat(w.kg) || 0, date: w.date || today }));
+            delete this.state.weightLogs;
+        }
+        if (this.state.foodLogs) {
+            this.state.healthNutrition = this.state.foodLogs.map(f => ({ id: f.id || this.generateId(), meal: f.meal + ' - ' + f.name, date: f.date || today, kcal: parseFloat(f.kcal) || 0, prot: parseFloat(f.prot) || 0, carbs: parseFloat(f.carb) || 0, fat: parseFloat(f.fat) || 0 }));
+            delete this.state.foodLogs;
+        }
+        if (this.state.medRecords) {
+            this.state.healthMedical = this.state.medRecords.map(m => ({ id: m.id || this.generateId(), type: m.type || 'Referto', date: m.date || today, title: m.title || 'Referto', notes: m.notes || '', therapy: '', fileData: m.fileData || null }));
+            delete this.state.medRecords;
+        }
+        if (this.state.accounts) {
+            this.state.accounts.forEach(a => {
+                if (a.baseBalance !== undefined && a.balance === undefined) {
+                    a.balance = parseFloat(a.baseBalance) || 0;
+                    delete a.baseBalance;
+                }
+            });
+        }
+
+        // 2. Assicura gli array base
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits'];
         arrays.forEach(key => { if (!Array.isArray(this.state[key])) this.state[key] = []; });
         if (!this.state.settings) this.state.settings = {};
 
-        // 2. Pulizia numeri
+        // 3. Pulizia numeri
         const cleanNumber = (val) => {
           if (typeof val === 'number' && !isNaN(val)) return val;
           if (!val) return 0;
@@ -438,19 +494,9 @@
           return parseFloat(s) || 0;
         };
 
-        // 3. Applica i fix ai dati vecchi
+        // 4. Applica i fix ai dati per evitare crash grafici
         this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.timestamp = t.timestamp || new Date().toISOString(); t.desc = t.desc || 'Transazione'; t.type = t.type || 'EXPENSE'; });
-        
-        this.state.accounts.forEach(a => {
-          a.balance = cleanNumber(a.balance);
-          let calcBalance = 0;
-          this.state.transactions.forEach(tx => {
-            if(tx.accountId === a.id) { if(tx.type === 'INCOME') calcBalance += tx.amount; else calcBalance -= tx.amount; }
-            if(tx.targetAccountId === a.id && tx.type === 'TRANSFER') calcBalance += tx.amount;
-          });
-          if (a.balance === 0 && calcBalance !== 0) a.balance = calcBalance;
-        });
-
+        this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); });
         this.state.calendarTasks.forEach(t => { t.date = t.date || today; t.title = t.title || 'Attività'; });
         this.state.maintenances.forEach(m => { m.dueDate = m.dueDate || today; m.cost = cleanNumber(m.cost); m.title = m.title || 'Manutenzione'; });
         this.state.healthMedical.forEach(m => { m.date = m.date || today; m.title = m.title || 'Referto'; });
@@ -469,6 +515,7 @@
             const zip = new JSZip(); const loadedZip = await zip.loadAsync(file);
             for (const relativePath of Object.keys(loadedZip.files)) {
               if (loadedZip.files[relativePath].dir) continue;
+              if (relativePath.endsWith('.csv')) continue; // Salta i vecchi file CSV
               try {
                 const content = await loadedZip.files[relativePath].async('text');
                 let testParse = JSON.parse(content);
@@ -529,7 +576,7 @@
         this.state.transactions.forEach(t => { if((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="text-secondary">${this.formatDate(t.date)}</small></div><strong style="color:${t.type==='EXPENSE'?'var(--danger)':'var(--success)'}">${t.amount}€</strong></div>`; count++; } });
         this.state.healthMedical.forEach(m => { if((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="text-secondary">${this.formatDate(m.date)}</small></div></div>`; count++; } });
         this.state.calendarTasks.forEach(t => { if((t.title||'').toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>📌 ${t.title}</strong><br><small class="text-secondary">${this.formatDate(t.date)}</small></div></div>`; count++; } });
-        resBox.innerHTML = count > 0 ? html : `<div class="text-muted" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`;
+        resBox.innerHTML = count > 0 ? html : `<div class="text-muted" style="text-align:center; padding: 2rem 0;">Nessun risultato.</div>`;
       },
 
       addHabit() { const name = prompt("Nome della nuova abitudine (es. Lettura, Palestra):"); if(name && name.trim()) { this.state.habits.push({ id: this.generateId(), name: name.trim(), streak: 0, lastDone: null }); this.save(); } },
