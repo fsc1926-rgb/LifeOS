@@ -427,7 +427,7 @@
     </div>
   </div>
 
-  <!-- MOTORE JAVASCRIPT -->
+<!-- MOTORE JAVASCRIPT -->
   <script>
     localforage.config({ driver: localforage.INDEXEDDB, name: 'LifeOS_v7', version: 1.0, storeName: 'lifeos_data' });
 
@@ -472,13 +472,18 @@
             this.state.healthMedical = this.state.medRecords.map(m => ({ id: m.id || this.generateId(), type: m.type || 'Referto', date: m.date || today, title: m.title || 'Referto', notes: m.notes || '', therapy: '', fileData: m.fileData || null }));
             delete this.state.medRecords;
         }
-        if (this.state.accounts) {
-            this.state.accounts.forEach(a => {
+
+        // Fix accounts: se esiste baseBalance e non balance, impostalo
+        if (this.state.accounts && Array.isArray(this.state.accounts)) {
+            this.state.accounts = this.state.accounts.map(a => {
                 if (a.baseBalance !== undefined && a.balance === undefined) {
                     a.balance = parseFloat(a.baseBalance) || 0;
                     delete a.baseBalance;
                 }
+                return a;
             });
+        } else {
+             this.state.accounts = [];
         }
 
         // 2. Assicura gli array base
@@ -496,7 +501,12 @@
 
         // 4. Applica i fix ai dati per evitare crash grafici
         this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.timestamp = t.timestamp || new Date().toISOString(); t.desc = t.desc || 'Transazione'; t.type = t.type || 'EXPENSE'; });
-        this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); });
+        
+        this.state.accounts.forEach(a => { 
+            a.balance = cleanNumber(a.balance); 
+            a.name = a.name || 'Conto'; // Forza un nome di default se manca
+        });
+
         this.state.calendarTasks.forEach(t => { t.date = t.date || today; t.title = t.title || 'Attività'; });
         this.state.maintenances.forEach(m => { m.dueDate = m.dueDate || today; m.cost = cleanNumber(m.cost); m.title = m.title || 'Manutenzione'; });
         this.state.healthMedical.forEach(m => { m.date = m.date || today; m.title = m.title || 'Referto'; });
