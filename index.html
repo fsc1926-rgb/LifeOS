@@ -10,11 +10,10 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L7">
   
-  <!-- LIBRERIE ESTERNE (Cache offline dal SW) -->
+  <!-- LIBRERIE ESTERNE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Motore Fotocamera Scanner Barcode -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -448,7 +447,22 @@
       charts: {},
       html5QrcodeScanner: null,
 
-      // === IMPORT/EXPORT / BASE ===
+      // === SISTEMA DI SCUDO ANTI-CRASH ===
+      sanitizeData() {
+        const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits'];
+        arrays.forEach(key => {
+          if (!Array.isArray(this.state[key])) this.state[key] = [];
+        });
+        
+        this.state.accounts = this.state.accounts.map(a => {
+          if (typeof a === 'string') return { id: this.generateId(), name: a, balance: 0 };
+          return { ...a, balance: parseFloat(a.balance) || 0 };
+        });
+
+        if (!this.state.settings) this.state.settings = {};
+      },
+
+      // === IMPORTAZIONE MULTIFORMATO ===
       async importBackupFile(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -471,7 +485,7 @@
                 }
               } catch (e) {}
             }
-            if (!parsed) throw new Error("Nessun dato LifeOS trovato nello ZIP.");
+            if (!parsed) throw new Error("Nessun file JSON valido trovato dentro lo ZIP.");
           } else {
             const jsonString = await new Promise((resolve, reject) => {
               const reader = new FileReader();
@@ -484,6 +498,7 @@
 
           if (parsed) {
             this.state = { ...this.state, ...parsed };
+            this.sanitizeData(); // Ripara i dati vecchi o mancanti prima di salvarli
             await this.save();
             this.closeModal('settingsModal');
             this.showToast('Backup ripristinato! Riavvio in corso...', 'success');
@@ -497,8 +512,25 @@
         event.target.value = '';
       },
       
-      async save() { try { await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore salvataggio', 'danger'); } },
-      async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; if(!this.state.habits) this.state.habits = []; } } catch (e) {} },
+      async save() { 
+        try { 
+          this.sanitizeData(); // Ultimo check di sicurezza
+          await localforage.setItem('appData', this.state); 
+          this.renderDashboard(); 
+        } catch (e) { 
+          console.error(e);
+          this.showToast('Errore salvataggio dati', 'danger'); 
+        } 
+      },
+      async load() { 
+        try { 
+          const data = await localforage.getItem('appData'); 
+          if (data) { 
+            this.state = { ...this.state, ...data }; 
+            this.sanitizeData(); 
+          } 
+        } catch (e) {} 
+      },
       
       showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse forwards'; setTimeout(() => toast.remove(), 300); }, 3500); },
       openModal(id) { document.getElementById(id).classList.add('open'); if(id === 'searchModal') setTimeout(()=>document.getElementById('globalSearchInput').focus(), 100); },
@@ -568,7 +600,10 @@
 
       // === DASHBOARD ===
       renderDashboard() {
-        const total = this.state.accounts.reduce((acc, a) => acc + a.balance, 0); document.getElementById('dashNetWorth').innerText = this.formatMoney(total); document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti`;
+        const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0); 
+        document.getElementById('dashNetWorth').innerText = this.formatMoney(total); 
+        document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti`;
+        
         const therapies = this.state.healthMedical.filter(m => m.type === 'Visita Medica' && m.therapy); document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>💊 ${t.therapy}</strong><br><small class="text-secondary">${t.title}</small></div></div>`).join('') : '<div class="list-row text-muted">Nessuna terapia.</div>';
         const todayStr = this.currentDate.toISOString().slice(0,10);
         const upcoming = this.state.calendarTasks.filter(t => t.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 5); document.getElementById('dashUpcomingTasks').innerHTML = upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-warning'}">${t.type}</span></div>`).join('') : '<div class="list-row text-muted">Nessuna attività.</div>';
@@ -650,7 +685,7 @@
       toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
       async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if(type === 'Referto' && document.getElementById('medFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch(err) { return this.showToast('Errore lettura file', 'danger'); } } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth(); this.showToast('Salvato nel DB.'); },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      renderHealth() { document.getElementById('healthNutritionList').innerHTML = this.state.healthNutrition.sort((a,b) => new Date(b.date) - new Date(a.date)).map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="text-secondary">${this.formatDate(n.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun pasto.</div>'; document.getElementById('healthWeightList').innerHTML = this.state.healthWeight.sort((a,b) => new Date(b.date) - new Date(a.date)).map(w => `<div class="list-row"><div><strong>${w.value} kg</strong><br><small class="text-secondary">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun peso.</div>'; const ctxW = document.getElementById('weightChart'); if(ctxW) { const sortedW = [...this.state.healthWeight].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-10); if(this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w=>this.formatDate(w.date).slice(0,5)), datasets: [{ label: 'Peso', data: sortedW.map(w=>w.value), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.2)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); } document.getElementById('healthMedicalList').innerHTML = this.state.healthMedical.sort((a, b) => new Date(b.date) - new Date(a.date)).map(m => { let extra = m.type === 'Visita Medica' && m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; let file = m.type === 'Referto' && m.fileData ? `<div><a href="${m.fileData}" download="Referto_${m.title}" class="badge" style="text-decoration:none; background:rgba(16, 185, 129, 0.15); color:var(--success);">📥 Scarica Referto</a></div>` : ''; return `<div class="list-row" style="align-items:flex-start;"><div style="flex:1;"><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(m.date)}</span><br><strong>${m.type==='Visita Medica'?'👨‍⚕️':m.type==='Referto'?'📄':'🌡️'} ${m.title}</strong>${extra}<div style="font-size:0.8rem; color:var(--text-secondary);">${m.notes||''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`; }).join('') || '<div class="list-row text-muted">Nessun record.</div>'; },
+      renderHealth() { document.getElementById('healthNutritionList').innerHTML = this.state.healthNutrition.sort((a,b) => new Date(b.date) - new Date(a.date)).map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="text-secondary">${this.formatDate(n.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun pasto.</div>'; document.getElementById('healthWeightList').innerHTML = this.state.healthWeight.sort((a,b) => new Date(b.date) - new Date(a.date)).map(w => `<div class="list-row"><div><strong>${w.value} kg</strong><br><small class="text-secondary">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun peso.</div>'; const ctxW = document.getElementById('weightChart'); if(ctxW) { const sortedW = [...this.state.healthWeight].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-10); if(this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w=>this.formatDate(w.date).slice(0,5)), datasets: [{ label: 'Peso', data: sortedW.map(w=>w.value), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.2)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); } document.getElementById('healthMedicalList').innerHTML = this.state.healthMedical.sort((a, b) => new Date(b.date) - new Date(a.date)).map(m => { let extra = m.type === 'Visita Medica' && m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; let file = m.type === 'Referto' && m.fileData ? `<div><a href="${m.fileData}" download="Referto_${m.title}" class="badge" style="text-decoration:none; background:rgba(16, 185, 129, 0.15); color:var(--success);">📥 Scarica Referto</a></div>` : ''; return `<div class="list-row" style="align-items:flex-start;"><div style="flex:1;"><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(m.date)}</span><br><strong>${m.type==='Visita Medica'?'👨‍⚕️':m.type==='Referto'?'📄':'🌡️'} ${m.title}</strong>${extra}<div style="font-size:0.8rem; color:var(--text-secondary);">${m.notes||''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`; }).join('') || '<div class="list-row text-muted">Nessun record clinico.</div>'; },
 
       // === INIT ===
       async init() {
