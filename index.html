@@ -6,11 +6,9 @@
   <meta name="theme-color" content="#090d16">
   <title>LifeOS v7.0 Ultimate</title>
   
-  <!-- COLLEGAMENTO PWA REALE -->
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L7">
   
-  <!-- LIBRERIE ESTERNE (Cache offline dal SW) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -19,9 +17,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-    /* ==========================================
-       1. VARIABILI E TEMI
-       ========================================== */
     :root[data-theme="dark"] { --bg-primary: #090d16; --bg-secondary: #111827; --bg-card: rgba(30, 41, 59, 0.65); --bg-glass: rgba(15, 23, 42, 0.8); --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b; --border-color: rgba(255, 255, 255, 0.08); --border-highlight: rgba(99, 102, 241, 0.4); --accent-primary: #6366f1; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45); }
     :root[data-theme="light"] { --bg-primary: #f1f5f9; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.85); --bg-glass: rgba(255, 255, 255, 0.88); --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; --border-color: rgba(15, 23, 42, 0.09); --border-highlight: rgba(99, 102, 241, 0.45); --accent-primary: #4f46e5; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb; --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06); --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12); }
     :root[data-theme="oled"] { --bg-primary: #000000; --bg-secondary: #0a0a0a; --bg-card: rgba(15, 15, 15, 0.8); --bg-glass: rgba(0, 0, 0, 0.85); --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #52525b; --border-color: rgba(255, 255, 255, 0.1); --border-highlight: rgba(99, 102, 241, 0.5); --accent-primary: #6366f1; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.8); }
@@ -31,9 +26,6 @@
     .sensitive { transition: filter 0.3s ease, opacity 0.3s ease; }
     body.privacy-active .sensitive { filter: blur(6px); opacity: 0.5; user-select: none; pointer-events: none; }
 
-    /* ==========================================
-       2. UI COMPONENTS & CARDS
-       ========================================== */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1.1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
     .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; }
     .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
@@ -62,9 +54,6 @@
     .stat-value { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; font-family: 'JetBrains Mono', monospace; margin: 0.35rem 0; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
 
-    /* ==========================================
-       3. HEADER & NAV (Desktop)
-       ========================================== */
     .app-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
     .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
     .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.03em; white-space: nowrap; }
@@ -74,9 +63,6 @@
     .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid transparent; background: var(--bg-card); color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s ease; }
     .nav-tab.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: transparent; }
 
-    /* ==========================================
-       4. MODALI, LOCK SCREEN, TOAST & FAB
-       ========================================== */
     .modal-backdrop { position: fixed !important; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; display: none !important; place-items: center; padding: 1rem; }
     .modal-backdrop.open { display: grid !important; }
     .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;}
@@ -109,9 +95,6 @@
     .hub-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
     .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
 
-    /* ==========================================
-       5. MOBILE OPTIMIZATION (BOTTOM BAR FOR S25)
-       ========================================== */
     @media (max-width: 900px) {
       .bento-grid > div { grid-column: span 12 !important; }
       .main-container { padding: 0 0.75rem; margin-top: 0.5rem; padding-bottom: 120px !important; }
@@ -264,7 +247,7 @@
       </div>
     </section>
 
-    <!-- INVENTARIO (CON SCANNER BARCODE) -->
+    <!-- INVENTARIO -->
     <section id="mod-inventory" class="module-section">
       <div class="card-header" style="margin-bottom: 1.25rem;">
         <div class="card-title">📦 Inventario & Garanzie</div>
@@ -285,7 +268,10 @@
             <div class="form-row"><select id="invCategory" class="input" onchange="App.updateInvSubcategories()" required></select><select id="invSubcategory" class="input" required></select></div>
             <div class="form-row"><div class="form-group"><label style="font-size:0.75rem; color:var(--text-secondary);">Acquisto</label><input type="date" id="invDate" class="input"></div><div class="form-group"><label style="font-size:0.75rem; color:var(--text-secondary);">Scadenza</label><input type="date" id="invWarranty" class="input"></div></div>
             <div class="form-row"><input type="number" id="invPrice" class="input" step="0.01" placeholder="Valore €"><input type="text" id="invLocation" class="input" placeholder="Stanza/Luogo"></div>
+            
+            <!-- CAMPO RIPRISTINATO -->
             <input type="text" id="invNotes" class="input" placeholder="S/N, note...">
+            
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva nel Registro</button>
           </form>
         </div>
@@ -309,11 +295,22 @@
             <div class="form-row"><select id="maintCategory" class="input" required></select><input type="date" id="maintDueDate" class="input" required></div>
             <div class="form-row"><input type="number" id="maintCost" class="input" step="0.01" placeholder="Costo €"><select id="maintRecurrence" class="input"><option value="Singola">Singolo</option><option value="Mensile">Mensile</option><option value="Semestrale">Semestrale</option><option value="Annuale">Annuale</option></select></div>
             <div class="form-group" style="margin-bottom:0.75rem;"><select id="maintStatus" class="input"><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completata</option></select></div>
+            
+            <!-- CAMPO RIPRISTINATO -->
+            <input type="text" id="maintNotes" class="input" placeholder="Note (tecnico, ricambi...)">
+            
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra</button>
           </form>
         </div>
         <div class="bento-card col-span-8">
-          <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">🛠️ Registro Interventi</div></div>
+          <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">🛠️ Registro Interventi</div>
+             <div style="display:flex; gap:0.5rem;">
+              <select id="maintFilterCat" class="input" style="margin:0;" onchange="App.renderMaintenances()"></select>
+              <select id="maintFilterStatus" class="input" style="margin:0;" onchange="App.renderMaintenances()">
+                <option value="ALL">Tutti gli stati</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option>
+              </select>
+            </div>
+          </div>
           <div id="maintenanceList" class="item-list" style="max-height: 520px;"></div>
         </div>
       </div>
@@ -329,14 +326,29 @@
             <div class="form-row"><input type="text" id="accNameInput" class="input" placeholder="Nome (Revolut)..." required><input type="number" id="accInitialBalance" class="input" step="0.01" placeholder="Saldo €" required></div>
             <button type="submit" class="btn btn-sm" style="width: 100%;">+ Crea Conto</button>
           </form>
+          
+          <!-- BLOCCO ALLINEAMENTO RIPRISTINATO -->
+          <div style="padding: 0.9rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="card-title" style="font-size: 0.88rem; margin-bottom: 0.4rem;">⚖️ Allineamento Saldo</div>
+            <div class="form-row">
+              <select id="reconcileAccountSelect" class="input"></select>
+              <input type="number" id="reconcileTargetInput" class="input" step="0.01" placeholder="Saldo reale (€)">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" style="width: 100%;" onclick="App.reconcileAccountBalance()">Allinea Saldo</button>
+          </div>
+
         </div>
         <div class="bento-card col-span-8">
           <div class="card-header"><div class="card-title">💸 Registra Transazione</div></div>
           <form onsubmit="App.addTransaction(event)" style="margin-bottom: 1.25rem;">
             <div class="form-row"><select id="txType" class="input" onchange="App.toggleTransferFields()" required><option value="EXPENSE">📉 Spesa</option><option value="INCOME">📈 Entrata</option><option value="TRANSFER">🔄 Giroconto</option></select><input type="number" id="txAmount" class="input" step="0.01" min="0.01" placeholder="Importo € *" required></div>
             <div class="form-row"><select id="txAccount" class="input" required><option value="">Conto Origine *</option></select><select id="txTargetAccount" class="input" style="display: none;"><option value="">Conto Destinazione *</option></select></div>
-            <div class="form-row"><input type="text" id="txDesc" class="input" placeholder="Causale *" required><input type="date" id="txDate" class="input" required></div>
-            <select id="txRecurrence" class="input"><option value="Singola">Ripetizione: Singola</option><option value="Mensile">Ripetizione: Mensile</option><option value="Annuale">Ripetizione: Annuale</option></select>
+            <div class="form-row">
+              <input type="text" id="txDesc" class="input" placeholder="Causale *" required>
+              <!-- CAMPO RIPRISTINATO -->
+              <input type="text" id="txCategory" class="input" placeholder="Categoria (es. Casa, Svago)">
+            </div>
+            <div class="form-row"><input type="date" id="txDate" class="input" required><select id="txRecurrence" class="input"><option value="Singola">Ripetizione: Singola</option><option value="Mensile">Ripetizione: Mensile</option><option value="Annuale">Ripetizione: Annuale</option></select></div>
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra</button>
           </form>
           <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">📜 Libro Mastro</div><select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select></div>
@@ -362,6 +374,10 @@
             <input type="text" id="medTitle" class="input" placeholder="Oggetto (es. Analisi del sangue) *" required>
             <div id="medTherapyGroup"><input type="text" id="medTherapy" class="input" placeholder="Terapia (se prescritta)"></div>
             <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.5rem; border-radius: 8px; margin-bottom: 0.75rem;"><label style="font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:0.3rem;">Allega Documento (Salvataggio in IndexedDB)</label><input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png" style="margin-bottom:0; padding:0.3rem;"></div>
+            
+            <!-- CAMPO RIPRISTINATO -->
+            <input type="text" id="medNotes" class="input" placeholder="Note cliniche, valori, esiti...">
+            
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella</button>
           </form>
           <div id="healthMedicalList" class="item-list sensitive" style="max-height: 350px;"></div>
@@ -427,7 +443,7 @@
     </div>
   </div>
 
-<!-- MOTORE JAVASCRIPT -->
+  <!-- MOTORE JAVASCRIPT -->
   <script>
     localforage.config({ driver: localforage.INDEXEDDB, name: 'LifeOS_v7', version: 1.0, storeName: 'lifeos_data' });
 
@@ -443,70 +459,25 @@
       sanitizeData() {
         const today = new Date().toISOString().slice(0, 10);
         
-        // 1. MIGRAZIONE DATI VECCHIE VERSIONI (V5/V6 -> V7)
-        if (this.state.vault) {
-            this.state.inventory = this.state.vault.map(v => ({ id: v.id || this.generateId(), type: 'Archivio', name: v.title || 'Oggetto', category: v.cat || 'Generale', subcategory: 'Generale', price: parseFloat(v.price) || 0, date: v.date || today, warranty: '', location: '', notes: v.notes || '', addedAt: new Date().toISOString() }));
-            delete this.state.vault;
-        }
-        if (this.state.financeTx) {
-            this.state.transactions = this.state.financeTx.map(t => ({ id: t.id || this.generateId(), type: t.type === 'expense' ? 'EXPENSE' : (t.type === 'income' ? 'INCOME' : 'TRANSFER'), amount: parseFloat(t.amount) || 0, accountId: t.accountId || 'acc-main', desc: t.desc || 'Movimento', category: t.cat || 'Generale', date: t.date || today, recurrence: 'Singola', timestamp: new Date().toISOString() }));
-            delete this.state.financeTx;
-        }
-        if (this.state.maint) {
-            this.state.maintenances = this.state.maint.map(m => ({ id: m.id || this.generateId(), title: m.task || 'Manutenzione', category: m.asset || 'Altro', dueDate: m.date || today, cost: parseFloat(m.cost) || 0, recurrence: 'Singola', status: 'In attesa', notes: m.parts || '' }));
-            delete this.state.maint;
-        }
-        if (this.state.crmTasks) {
-            this.state.calendarTasks = this.state.crmTasks.map(c => ({ id: c.id || this.generateId(), date: today, title: c.title || 'Task', type: 'Attività', priority: 'Normale' }));
-            delete this.state.crmTasks;
-        }
-        if (this.state.weightLogs) {
-            this.state.healthWeight = this.state.weightLogs.map(w => ({ id: w.id || this.generateId(), value: parseFloat(w.kg) || 0, date: w.date || today }));
-            delete this.state.weightLogs;
-        }
-        if (this.state.foodLogs) {
-            this.state.healthNutrition = this.state.foodLogs.map(f => ({ id: f.id || this.generateId(), meal: f.meal + ' - ' + f.name, date: f.date || today, kcal: parseFloat(f.kcal) || 0, prot: parseFloat(f.prot) || 0, carbs: parseFloat(f.carb) || 0, fat: parseFloat(f.fat) || 0 }));
-            delete this.state.foodLogs;
-        }
-        if (this.state.medRecords) {
-            this.state.healthMedical = this.state.medRecords.map(m => ({ id: m.id || this.generateId(), type: m.type || 'Referto', date: m.date || today, title: m.title || 'Referto', notes: m.notes || '', therapy: '', fileData: m.fileData || null }));
-            delete this.state.medRecords;
-        }
+        if (this.state.vault) { this.state.inventory = this.state.vault.map(v => ({ id: v.id || this.generateId(), type: 'Archivio', name: v.title || 'Oggetto', category: v.cat || 'Generale', subcategory: 'Generale', price: parseFloat(v.price) || 0, date: v.date || today, warranty: '', location: '', notes: v.notes || '', addedAt: new Date().toISOString() })); delete this.state.vault; }
+        if (this.state.financeTx) { this.state.transactions = this.state.financeTx.map(t => ({ id: t.id || this.generateId(), type: t.type === 'expense' ? 'EXPENSE' : (t.type === 'income' ? 'INCOME' : 'TRANSFER'), amount: parseFloat(t.amount) || 0, accountId: t.accountId || 'acc-main', desc: t.desc || 'Movimento', category: t.cat || 'Generale', date: t.date || today, recurrence: 'Singola', timestamp: new Date().toISOString() })); delete this.state.financeTx; }
+        if (this.state.maint) { this.state.maintenances = this.state.maint.map(m => ({ id: m.id || this.generateId(), title: m.task || 'Manutenzione', category: m.asset || 'Altro', dueDate: m.date || today, cost: parseFloat(m.cost) || 0, recurrence: 'Singola', status: 'In attesa', notes: m.parts || '' })); delete this.state.maint; }
+        if (this.state.crmTasks) { this.state.calendarTasks = this.state.crmTasks.map(c => ({ id: c.id || this.generateId(), date: today, title: c.title || 'Task', type: 'Attività', priority: 'Normale' })); delete this.state.crmTasks; }
+        if (this.state.weightLogs) { this.state.healthWeight = this.state.weightLogs.map(w => ({ id: w.id || this.generateId(), value: parseFloat(w.kg) || 0, date: w.date || today })); delete this.state.weightLogs; }
+        if (this.state.foodLogs) { this.state.healthNutrition = this.state.foodLogs.map(f => ({ id: f.id || this.generateId(), meal: f.meal + ' - ' + f.name, date: f.date || today, kcal: parseFloat(f.kcal) || 0, prot: parseFloat(f.prot) || 0, carbs: parseFloat(f.carb) || 0, fat: parseFloat(f.fat) || 0 })); delete this.state.foodLogs; }
+        if (this.state.medRecords) { this.state.healthMedical = this.state.medRecords.map(m => ({ id: m.id || this.generateId(), type: m.type || 'Referto', date: m.date || today, title: m.title || 'Referto', notes: m.notes || '', therapy: '', fileData: m.fileData || null })); delete this.state.medRecords; }
 
-        // Fix accounts: se esiste baseBalance e non balance, impostalo
-        if (this.state.accounts && Array.isArray(this.state.accounts)) {
-            this.state.accounts = this.state.accounts.map(a => {
-                if (a.baseBalance !== undefined && a.balance === undefined) {
-                    a.balance = parseFloat(a.baseBalance) || 0;
-                    delete a.baseBalance;
-                }
-                return a;
-            });
-        } else {
-             this.state.accounts = [];
-        }
+        if (this.state.accounts && Array.isArray(this.state.accounts)) { this.state.accounts = this.state.accounts.map(a => { if (a.baseBalance !== undefined && a.balance === undefined) { a.balance = parseFloat(a.baseBalance) || 0; delete a.baseBalance; } return a; }); } 
+        else { this.state.accounts = []; }
 
-        // 2. Assicura gli array base
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits'];
         arrays.forEach(key => { if (!Array.isArray(this.state[key])) this.state[key] = []; });
         if (!this.state.settings) this.state.settings = {};
 
-        // 3. Pulizia numeri
-        const cleanNumber = (val) => {
-          if (typeof val === 'number' && !isNaN(val)) return val;
-          if (!val) return 0;
-          let s = String(val).replace(/[^0-9,-]/g, '').replace(',', '.');
-          return parseFloat(s) || 0;
-        };
+        const cleanNumber = (val) => { if (typeof val === 'number' && !isNaN(val)) return val; if (!val) return 0; let s = String(val).replace(/[^0-9,-]/g, '').replace(',', '.'); return parseFloat(s) || 0; };
 
-        // 4. Applica i fix ai dati per evitare crash grafici
         this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.timestamp = t.timestamp || new Date().toISOString(); t.desc = t.desc || 'Transazione'; t.type = t.type || 'EXPENSE'; });
-        
-        this.state.accounts.forEach(a => { 
-            a.balance = cleanNumber(a.balance); 
-            a.name = a.name || 'Conto'; // Forza un nome di default se manca
-        });
-
+        this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
         this.state.calendarTasks.forEach(t => { t.date = t.date || today; t.title = t.title || 'Attività'; });
         this.state.maintenances.forEach(m => { m.dueDate = m.dueDate || today; m.cost = cleanNumber(m.cost); m.title = m.title || 'Manutenzione'; });
         this.state.healthMedical.forEach(m => { m.date = m.date || today; m.title = m.title || 'Referto'; });
@@ -525,7 +496,7 @@
             const zip = new JSZip(); const loadedZip = await zip.loadAsync(file);
             for (const relativePath of Object.keys(loadedZip.files)) {
               if (loadedZip.files[relativePath].dir) continue;
-              if (relativePath.endsWith('.csv')) continue; // Salta i vecchi file CSV
+              if (relativePath.endsWith('.csv')) continue; 
               try {
                 const content = await loadedZip.files[relativePath].async('text');
                 let testParse = JSON.parse(content);
@@ -598,12 +569,10 @@
         document.getElementById('dashNetWorth').innerText = this.formatMoney(total); 
         document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti`;
         
-        const therapies = this.state.healthMedical.filter(m => m.type === 'Visita Medica' && m.therapy); 
-        document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>💊 ${t.therapy}</strong><br><small class="text-secondary">${t.title}</small></div></div>`).join('') : '<div class="list-row text-muted">Nessuna terapia.</div>';
+        const therapies = this.state.healthMedical.filter(m => m.type === 'Visita Medica' && m.therapy); document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>💊 ${t.therapy}</strong><br><small class="text-secondary">${t.title}</small></div></div>`).join('') : '<div class="list-row text-muted">Nessuna terapia.</div>';
         
         const todayStr = this.currentDate.toISOString().slice(0,10);
-        const upcoming = this.state.calendarTasks.filter(t => t.date >= todayStr).sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(0, 5); 
-        document.getElementById('dashUpcomingTasks').innerHTML = upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-warning'}">${t.type}</span></div>`).join('') : '<div class="list-row text-muted">Nessuna attività in programma.</div>';
+        const upcoming = this.state.calendarTasks.filter(t => t.date >= todayStr).sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(0, 5); document.getElementById('dashUpcomingTasks').innerHTML = upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-warning'}">${t.type}</span></div>`).join('') : '<div class="list-row text-muted">Nessuna attività in programma.</div>';
         
         document.getElementById('habitList').innerHTML = this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone?0.6:1};"><div style="display:flex; align-items:center; gap:0.5rem;"><button class="btn btn-sm ${isDone?'btn-primary':''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone?'✓':''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.5rem;"><span class="badge badge-info">🔥 ${h.streak}</span><button class="btn btn-sm text-muted" style="padding:0.2rem 0.4rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : '<div class="list-row text-muted">Aggiungi la tua prima abitudine.</div>';
 
