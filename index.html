@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#070a12">
-  <title>LifeOS v9.5 — Ultimate Edition</title>
+  <title>LifeOS v9.6 — Ultimate Edition</title>
   
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L9">
@@ -110,19 +110,22 @@
     .wallet-arrows button { background:rgba(0,0,0,0.3); border:none; color:#fff; border-radius:6px; padding:0.2rem 0.45rem; cursor:pointer; font-size:0.72rem; }
 
     /* ==========================================
-       3. GARAGE OS - STILI DEDICATI
+       3. GARAGE OS - STILI DEDICATI (FIX CLICK)
        ========================================== */
     .vehicle-selector { display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem; margin-bottom:1rem; }
     .vehicle-chip { padding:0.5rem 1rem; border-radius:999px; background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-secondary); font-weight:700; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
     .vehicle-chip.active { background:var(--accent-gradient); color:#fff; border-color:transparent; }
 
-    .garage-car-header { position: relative; background: linear-gradient(45deg, #0f172a 0%, #1e1b4b 100%); border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-highlight); display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
-    .garage-car-header::after { content: '🚘'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-size: 8rem; opacity: 0.15; filter: blur(2px); }
-    .car-brand-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; z-index: 1; color: #fff; }
-    .car-plate { display: inline-block; background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 6px; border: 2px solid #3b82f6; z-index: 1; }
+    .garage-car-header { position: relative; background: linear-gradient(45deg, #0f172a 0%, #1e1b4b 100%); border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-highlight); display: flex; align-items: center; justify-content: space-between; gap: 1rem; overflow: hidden; }
+    .garage-car-header > div { position: relative; z-index: 2; }
+    .garage-car-header::after { content: '🚘'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-size: 8rem; opacity: 0.15; filter: blur(2px); pointer-events: none; user-select: none; z-index: 0; }
+    .car-brand-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; color: #fff; cursor: pointer; }
+    .car-plate { display: inline-block; background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 6px; border: 2px solid #3b82f6; cursor: pointer; }
     
     .traffic-light-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
-    .tl-card { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; }
+    .tl-card { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; cursor: pointer; transition: border-color 0.2s ease, transform 0.15s ease; }
+    .tl-card:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+    .tl-card:active { transform: scale(0.97); }
     .tl-indicator { width: 14px; height: 14px; border-radius: 50%; margin-bottom: 0.5rem; box-shadow: 0 0 10px currentColor; }
     .tl-red { background: #ef4444; color: #ef4444; }
     .tl-yellow { background: #f59e0b; color: #f59e0b; }
@@ -244,7 +247,6 @@
               <div class="stat-label" id="greetingDate" style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">OGGI</div>
               <h1 id="greetingTitle">Buongiorno ✨</h1>
               <div class="hero-insight"><span>🧠</span><span id="smartInsightText">Analisi in corso...</span></div>
-              <!-- RADAR SCADENZE UNIFICATO (PILLOLE CLICCABILI) -->
               <div id="heroAlertsBar" class="hero-alerts-bar"></div>
             </div>
             <div class="score-ring-box">
@@ -405,24 +407,39 @@
       <div class="bento-grid">
         <div class="col-span-12">
           <div class="garage-car-header">
-            <div>
-              <div class="stat-label" style="color:#cbd5e1; text-transform:uppercase; font-weight:700;">Veicolo Selezionato</div>
+            <div onclick="App.openGarageConfig('gConfName')" title="Tocca per modificare">
+              <div class="stat-label" style="color:#cbd5e1; text-transform:uppercase; font-weight:700;">Veicolo Selezionato (Tocca per modificare)</div>
               <div class="car-brand-title" id="garageCarName">--</div>
               <div class="car-plate" id="garageCarPlate">--</div>
             </div>
-            <div>
-              <button class="btn btn-sm btn-primary" onclick="App.openModal('garageConfigModal')" style="margin-bottom:0.5rem;">⚙️ Configura</button><br>
-              <button class="btn btn-sm btn-danger" onclick="App.deleteActiveVehicle()">🗑 Elimina</button>
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+              <button type="button" class="btn btn-sm btn-primary" onclick="App.openGarageConfig('gConfName')">⚙️ Configura</button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="App.deleteActiveVehicle()">🗑 Elimina</button>
             </div>
           </div>
         </div>
 
         <div class="bento-card col-span-12">
-          <div class="card-header" style="margin-bottom:0.5rem;"><div class="card-title">🚦 Semafori Scadenze</div></div>
+          <div class="card-header" style="margin-bottom:0.5rem;">
+            <div class="card-title">🚦 Semafori Scadenze</div>
+            <span class="stat-label">Tocca una scadenza per inserire o modificare la data</span>
+          </div>
           <div class="traffic-light-grid">
-            <div class="tl-card"><div id="tl-assicurazione" class="tl-indicator tl-green"></div><strong style="font-size:0.9rem;">Assicurazione</strong><div class="stat-label" id="date-assicurazione">--/--/----</div></div>
-            <div class="tl-card"><div id="tl-bollo" class="tl-indicator tl-green"></div><strong style="font-size:0.9rem;">Bollo</strong><div class="stat-label" id="date-bollo">--/--/----</div></div>
-            <div class="tl-card"><div id="tl-revisione" class="tl-indicator tl-green"></div><strong style="font-size:0.9rem;">Revisione</strong><div class="stat-label" id="date-revisione">--/--/----</div></div>
+            <div class="tl-card" onclick="App.openGarageConfig('gConfAssic')" title="Tocca per impostare scadenza Assicurazione">
+              <div id="tl-assicurazione" class="tl-indicator tl-green"></div>
+              <strong style="font-size:0.9rem;">Assicurazione ✏️</strong>
+              <div class="stat-label" id="date-assicurazione">--/--/----</div>
+            </div>
+            <div class="tl-card" onclick="App.openGarageConfig('gConfBollo')" title="Tocca per impostare scadenza Bollo">
+              <div id="tl-bollo" class="tl-indicator tl-green"></div>
+              <strong style="font-size:0.9rem;">Bollo ✏️</strong>
+              <div class="stat-label" id="date-bollo">--/--/----</div>
+            </div>
+            <div class="tl-card" onclick="App.openGarageConfig('gConfRevis')" title="Tocca per impostare scadenza Revisione">
+              <div id="tl-revisione" class="tl-indicator tl-green"></div>
+              <strong style="font-size:0.9rem;">Revisione ✏️</strong>
+              <div class="stat-label" id="date-revisione">--/--/----</div>
+            </div>
           </div>
         </div>
 
@@ -579,20 +596,44 @@
   </div>
 
   <!-- MODALE GARAGE CONFIG -->
-  <div id="garageConfigModal" class="modal-backdrop">
+  <div id="garageConfigModal" class="modal-backdrop" onclick="if(event.target===this) App.closeModal('garageConfigModal')">
     <div class="modal-content">
-      <div class="card-header"><div class="card-title">⚙️ Impostazioni Veicolo</div><button class="btn btn-sm" onclick="App.closeModal('garageConfigModal')">✕</button></div>
+      <div class="card-header">
+        <div class="card-title">⚙️ Configura Veicolo e Scadenze</div>
+        <button type="button" class="btn btn-sm" onclick="App.closeModal('garageConfigModal')">✕</button>
+      </div>
       <form onsubmit="App.saveGarageConfig(event)">
-        <div class="form-row"><input type="text" id="gConfName" class="input" placeholder="Marca e Modello (es. Audi A3)" required><input type="text" id="gConfPlate" class="input" placeholder="Targa (es. AB 123 CD)"></div>
         <div class="form-row">
-          <div><label class="stat-label">Scadenza Bollo</label><input type="date" id="gConfBollo" class="input"></div>
-          <div><label class="stat-label">Scad. Assicurazione</label><input type="date" id="gConfAssic" class="input"></div>
+          <div>
+            <label class="stat-label">Marca e Modello *</label>
+            <input type="text" id="gConfName" class="input" placeholder="es. Audi A3" required>
+          </div>
+          <div>
+            <label class="stat-label">Targa</label>
+            <input type="text" id="gConfPlate" class="input" placeholder="es. AB 123 CD">
+          </div>
         </div>
         <div class="form-row">
-          <div><label class="stat-label">Scadenza Revisione</label><input type="date" id="gConfRevis" class="input"></div>
-          <div><label class="stat-label">Chilometri Attuali</label><input type="number" id="gConfKm" class="input" value="0"></div>
+          <div>
+            <label class="stat-label">📅 Scadenza Assicurazione</label>
+            <input type="date" id="gConfAssic" class="input">
+          </div>
+          <div>
+            <label class="stat-label">📅 Scadenza Bollo</label>
+            <input type="date" id="gConfBollo" class="input">
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">💾 Salva Configurazione</button>
+        <div class="form-row">
+          <div>
+            <label class="stat-label">📅 Scadenza Revisione</label>
+            <input type="date" id="gConfRevis" class="input">
+          </div>
+          <div>
+            <label class="stat-label">🛣️ Chilometri Attuali</label>
+            <input type="number" id="gConfKm" class="input" value="0" min="0" step="1">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">💾 Salva Dati Veicolo</button>
       </form>
     </div>
   </div>
@@ -683,10 +724,24 @@
         return `${y}-${m}-${day}`;
       },
 
-      // Calcola i giorni di distanza tra una data YYYY-MM-DD e oggi (a mezzanotte locale)
+      normalizeDate(val) {
+        if (!val || typeof val !== 'string') return '';
+        const clean = val.trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) return clean;
+        if (/^\d{4}-\d{2}-\d{2}T/.test(clean)) return clean.slice(0, 10);
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(clean)) {
+          const [d, m, y] = clean.split('/');
+          return `${y}-${m}-${d}`;
+        }
+        const parsed = new Date(clean);
+        return isNaN(parsed) ? '' : this.toLocalISO(parsed);
+      },
+
       daysFromToday(dateStr) {
         if (!dateStr || typeof dateStr !== 'string') return null;
-        const parts = dateStr.slice(0, 10).split('-').map(Number);
+        const norm = this.normalizeDate(dateStr);
+        if (!norm) return null;
+        const parts = norm.split('-').map(Number);
         if (parts.length !== 3 || parts.some(isNaN)) return null;
         const target = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0);
         const now = new Date();
@@ -721,6 +776,18 @@
         if (this.state.vehicles.length === 0) {
           this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
         }
+
+        // Ripara sempre ID e campi di tutti i veicoli
+        this.state.vehicles.forEach((v, idx) => {
+          if (!v.id) v.id = 'veh_' + idx + '_' + this.generateId();
+          v.name = v.name || `Veicolo ${idx + 1}`;
+          v.plate = v.plate || '';
+          v.bollo = this.normalizeDate(v.bollo || v.scadenzaBollo || '');
+          v.assic = this.normalizeDate(v.assic || v.scadenzaAssicurazione || '');
+          v.revis = this.normalizeDate(v.revis || v.scadenzaRevisione || '');
+          v.km = cleanNumber(v.km);
+        });
+
         if (!this.activeVehicleId || !this.state.vehicles.find(v => v.id === this.activeVehicleId)) {
           this.activeVehicleId = this.state.vehicles[0].id;
         }
@@ -731,9 +798,19 @@
         this.state.calendarTasks.forEach(t => { if (!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
       },
 
-      // ==========================================================
-      // 2. COMPRESSIONE SMART IMMAGINI E ALLEGATI (CARTELLA CLINICA)
-      // ==========================================================
+      // Restituisce sempre un veicolo valido anche se activeVehicleId fosse disallineato
+      getActiveVehicle() {
+        if (!Array.isArray(this.state.vehicles) || this.state.vehicles.length === 0) {
+          this.state.vehicles = [{ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 }];
+        }
+        let v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        if (!v) {
+          v = this.state.vehicles[0];
+          this.activeVehicleId = v.id;
+        }
+        return v;
+      },
+
       fileToBase64(file) {
         return new Promise((res, rej) => {
           const r = new FileReader();
@@ -792,13 +869,9 @@
         return await this.fileToBase64(file);
       },
 
-      // ==========================================================
-      // 3. RADAR SCADENZE UNIFICATO (GARAGE, GARANZIE, MANUTENZIONI)
-      // ==========================================================
       getSystemAlerts(daysThreshold = 15) {
         const alerts = [];
 
-        // A. Controllo Veicoli in Garage OS (Bollo, Assicurazione, Revisione)
         this.state.vehicles.forEach(v => {
           const checks = [
             { label: 'Assicurazione', date: v.assic },
@@ -824,11 +897,9 @@
           });
         });
 
-        // B. Controllo Garanzie in Inventario
         this.state.inventory.forEach(item => {
           if (!item.warranty) return;
           const diff = this.daysFromToday(item.warranty);
-          // Mostra garanzie in scadenza entro daysThreshold o scadute da non più di 15 giorni
           if (diff !== null && diff >= -15 && diff <= daysThreshold) {
             alerts.push({
               id: `inv_${item.id}`,
@@ -844,7 +915,6 @@
           }
         });
 
-        // C. Controllo Manutenzioni Casa (In attesa)
         this.state.maintenances.forEach(m => {
           if (m.status === 'Completata' || !m.dueDate) return;
           const diff = this.daysFromToday(m.dueDate);
@@ -966,7 +1036,7 @@
       quickAdd(inputId) { this.toggleFab(); if (inputId === 'txAmount') this.switchModule('mod-finance'); else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar'); else if (inputId === 'weightValue' || inputId === 'nutriGrams') this.openHubModule('sub-health'); setTimeout(() => { const input = document.getElementById(inputId); if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 300); },
 
       formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(amount) || 0); },
-      formatDate(dateStr) { if (!dateStr) return '--'; const parts = dateStr.split('-'); if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`; return new Date(dateStr).toLocaleDateString('it-IT'); },
+      formatDate(dateStr) { if (!dateStr) return '--'; const norm = this.normalizeDate(dateStr); const parts = norm.split('-'); if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`; return new Date(dateStr).toLocaleDateString('it-IT'); },
       generateId() { return Math.random().toString(36).substr(2, 9); },
 
       togglePomodoro() { if (this.pomoTimer) { clearInterval(this.pomoTimer); this.pomoTimer = null; this.setElText('pomoBtn', '▶️ Riprendi'); } else { this.setElText('pomoBtn', '⏸️ Pausa'); this.pomoTimer = setInterval(() => { if (this.pomoSeconds > 0) { this.pomoSeconds--; const m = String(Math.floor(this.pomoSeconds / 60)).padStart(2, '0'); const s = String(this.pomoSeconds % 60).padStart(2, '0'); this.setElText('pomoDisplay', `${m}:${s}`); } else { clearInterval(this.pomoTimer); this.pomoTimer = null; this.vibrate([100, 50, 100]); this.showToast('Sessione Completata! 🎉'); } }, 1000); } },
@@ -1007,7 +1077,7 @@
         }
       },
 
-      // === DASHBOARD CON RADAR SCADENZE UNIFICATO ===
+      // === DASHBOARD ===
       renderDashboard() {
         const hour = new Date().getHours();
         const greet = hour < 12 ? 'Buongiorno ✨' : hour < 18 ? 'Buon pomeriggio ☀️' : 'Buonasera 🌙';
@@ -1022,18 +1092,15 @@
         const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length;
         const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
 
-        // Scansione urgenze entro 15 giorni per Hero Card
         const urgentAlerts = this.getSystemAlerts(15);
         const expiredCount = urgentAlerts.filter(a => a.diffDays < 0).length;
 
-        // Il Life Score tiene conto anche di eventuali scadenze superate
         const penalty = expiredCount * 8;
         const score = Math.min(100, Math.max(20, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15) - penalty)));
         this.setElText('lifeScoreValue', `${score}%`);
         const circle = document.getElementById('lifeScoreCircle');
         if (circle) circle.style.strokeDashoffset = 150 - (150 * score) / 100;
 
-        // Popola Smart Insight + Pillole di Urgenza nella Hero Card
         const txCount = this.state.transactions.length;
         const lastWeight = [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||''))[0];
 
@@ -1059,11 +1126,9 @@
           this.setElHTML('heroAlertsBar', '');
         }
 
-        // Promemoria Clinici
         const medItems = this.state.healthMedical.slice(0, 4);
         this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + t.therapy : '🩺 ' + t.title}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + t.notes : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
         
-        // Unione Prossime Attività Calendario + Scadenze Ecosistema entro 30 giorni
         const alerts30 = this.getSystemAlerts(30);
         const upcomingTasks = this.state.calendarTasks
           .filter(t => t.date >= todayStr)
@@ -1176,7 +1241,7 @@
       saveJournalEntry(e) { e.preventDefault(); const date = this.toLocalISO(this.selectedDate); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); this.showToast('Diario salvato!'); this.renderJournalHistory(); },
       renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row clickable" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
 
-      // === GARAGE OS (MULTI-VEHICLE) ===
+      // === GARAGE OS (MULTI-VEHICLE & CONFIGURAZIONE SBLOCCATA) ===
       switchVehicle(id) { this.activeVehicleId = id; this.renderGarage(); },
       addVehicle() {
         const name = prompt("Inserisci marca/modello del nuovo veicolo (es. Moto Honda):");
@@ -1185,6 +1250,7 @@
           this.state.vehicles.push(newV);
           this.activeVehicleId = newV.id;
           this.save();
+          setTimeout(() => this.openGarageConfig('gConfPlate'), 150);
         }
       },
       deleteActiveVehicle() {
@@ -1196,37 +1262,51 @@
           this.save();
         }
       },
+      openGarageConfig(focusFieldId = 'gConfName') {
+        this.loadGarageConfig();
+        const modal = document.getElementById('garageConfigModal');
+        if (modal) modal.classList.add('open');
+        if (focusFieldId) {
+          setTimeout(() => {
+            const el = document.getElementById(focusFieldId);
+            if (el) el.focus();
+          }, 120);
+        }
+      },
       loadGarageConfig() {
-        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        const v = this.getActiveVehicle();
         if (!v) return;
         document.getElementById('gConfName').value = v.name || '';
         document.getElementById('gConfPlate').value = v.plate || '';
-        document.getElementById('gConfBollo').value = v.bollo || '';
-        document.getElementById('gConfAssic').value = v.assic || '';
-        document.getElementById('gConfRevis').value = v.revis || '';
+        document.getElementById('gConfBollo').value = this.normalizeDate(v.bollo);
+        document.getElementById('gConfAssic').value = this.normalizeDate(v.assic);
+        document.getElementById('gConfRevis').value = this.normalizeDate(v.revis);
         document.getElementById('gConfKm').value = v.km || 0;
       },
       saveGarageConfig(e) {
         e.preventDefault();
-        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        const v = this.getActiveVehicle();
         if (!v) return;
-        v.name = document.getElementById('gConfName').value;
-        v.plate = document.getElementById('gConfPlate').value.toUpperCase();
-        v.bollo = document.getElementById('gConfBollo').value;
-        v.assic = document.getElementById('gConfAssic').value;
-        v.revis = document.getElementById('gConfRevis').value;
+        v.name = (document.getElementById('gConfName').value || 'Veicolo').trim();
+        v.plate = (document.getElementById('gConfPlate').value || '').trim().toUpperCase();
+        v.bollo = this.normalizeDate(document.getElementById('gConfBollo').value);
+        v.assic = this.normalizeDate(document.getElementById('gConfAssic').value);
+        v.revis = this.normalizeDate(document.getElementById('gConfRevis').value);
         v.km = parseFloat(document.getElementById('gConfKm').value) || 0;
-        this.save(); this.closeModal('garageConfigModal'); this.showToast('Veicolo Aggiornato!');
+        this.save();
+        this.closeModal('garageConfigModal');
+        this.renderGarage();
+        this.showToast('Dati e scadenze veicolo salvati!');
       },
       updateGarageKm() {
-        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        const v = this.getActiveVehicle();
         if (!v) return;
         const newKm = prompt("Inserisci chilometraggio attuale:", v.km);
-        if (newKm && !isNaN(newKm)) { v.km = parseFloat(newKm); this.save(); }
+        if (newKm !== null && newKm !== '' && !isNaN(newKm)) { v.km = parseFloat(newKm); this.save(); }
       },
       addGarageMaintenance(e) {
         e.preventDefault();
-        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        const v = this.getActiveVehicle();
         if (!v) return;
         this.state.garageMaint.push({
           id: this.generateId(), vehicleId: v.id,
@@ -1239,17 +1319,15 @@
       },
       deleteGarageMaint(id) { if (confirm("Eliminare lavoro?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
       renderGarage() {
-        this.setElHTML('garageVehicleTabs', this.state.vehicles.map(v => `<div class="vehicle-chip ${v.id === this.activeVehicleId ? 'active' : ''}" onclick="App.switchVehicle('${v.id}')">${v.name}</div>`).join('') + `<div class="vehicle-chip" style="background:transparent; border-style:dashed;" onclick="App.addVehicle()">+ Nuovo</div>`);
-
-        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
-        if (!v) return;
+        const v = this.getActiveVehicle();
+        this.setElHTML('garageVehicleTabs', this.state.vehicles.map(veh => `<div class="vehicle-chip ${veh.id === v.id ? 'active' : ''}" onclick="App.switchVehicle('${veh.id}')">${veh.name}</div>`).join('') + `<div class="vehicle-chip" style="background:transparent; border-style:dashed;" onclick="App.addVehicle()">+ Nuovo</div>`);
 
         this.setElText('garageCarName', v.name);
         this.setElText('garageCarPlate', v.plate || 'Targa N/D');
         this.setElText('garageKmOdo', `${(v.km || 0).toLocaleString('it-IT')} km`);
 
         const setTrafficLight = (idDate, idTl, dateStr) => {
-          this.setElText(idDate, this.formatDate(dateStr));
+          this.setElText(idDate, dateStr ? this.formatDate(dateStr) : 'Tocca per inserire');
           const el = document.getElementById(idTl);
           if (!el) return;
           el.className = 'tl-indicator'; 
@@ -1343,7 +1421,7 @@
       addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: this.toLocalISO() }); this.save(); e.target.reset(); this.renderFinance(); },
       deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
 
-      // === SALUTE OS (CON COMPRESSIONE SMART REFERTI) ===
+      // === SALUTE OS ===
       configureNutritionGoals() {
         const g = this.state.nutritionGoals || { kcal: 2100, prot: 140, carb: 230, fat: 70 };
         const kcal = prompt("Inserisci obiettivo Kcal giornaliere:", g.kcal);
@@ -1505,7 +1583,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
-    document.addEventListener('click', (e) => { if (e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card, .wallet-card, .vehicle-chip, .alert-pill')) App.vibrate(10); });
+    document.addEventListener('click', (e) => { if (e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card, .wallet-card, .vehicle-chip, .alert-pill, .tl-card')) App.vibrate(10); });
   </script>
 </body>
 </html>
