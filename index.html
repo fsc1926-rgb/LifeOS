@@ -3,69 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#090d16">
-  <title>LifeOS v7.0 Ultimate</title>
+  <meta name="theme-color" content="#070a12">
+  <title>LifeOS v9.0 — Ultimate Garage Edition</title>
   
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L7">
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L9">
   
+  <!-- LIBRERIE ESTERNE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
-    :root[data-theme="dark"] { --bg-primary: #090d16; --bg-secondary: #111827; --bg-card: rgba(30, 41, 59, 0.65); --bg-glass: rgba(15, 23, 42, 0.8); --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b; --border-color: rgba(255, 255, 255, 0.08); --border-highlight: rgba(99, 102, 241, 0.4); --accent-primary: #6366f1; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45); }
-    :root[data-theme="light"] { --bg-primary: #f1f5f9; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.85); --bg-glass: rgba(255, 255, 255, 0.88); --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; --border-color: rgba(15, 23, 42, 0.09); --border-highlight: rgba(99, 102, 241, 0.45); --accent-primary: #4f46e5; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb; --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06); --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12); }
-    :root[data-theme="oled"] { --bg-primary: #000000; --bg-secondary: #0a0a0a; --bg-card: rgba(15, 15, 15, 0.8); --bg-glass: rgba(0, 0, 0, 0.85); --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #52525b; --border-color: rgba(255, 255, 255, 0.1); --border-highlight: rgba(99, 102, 241, 0.5); --accent-primary: #6366f1; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5); --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.8); }
+    /* ==========================================
+       1. TEMI E VARIABILI GLOBALI
+       ========================================== */
+    :root[data-theme="dark"] { --bg-primary: #070a12; --bg-secondary: rgba(17, 24, 39, 0.85); --bg-card: rgba(24, 33, 52, 0.62); --bg-glass: rgba(10, 15, 28, 0.82); --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b; --border-color: rgba(255, 255, 255, 0.08); --border-highlight: rgba(139, 92, 246, 0.45); --accent-primary: #6366f1; --accent-secondary: #ec4899; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.3); --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55); --aurora-1: rgba(99, 102, 241, 0.16); --aurora-2: rgba(236, 72, 153, 0.12); }
+    :root[data-theme="oled"] { --bg-primary: #000000; --bg-secondary: #08080c; --bg-card: rgba(14, 14, 20, 0.88); --bg-glass: rgba(0, 0, 0, 0.9); --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #52525b; --border-color: rgba(255, 255, 255, 0.11); --border-highlight: rgba(139, 92, 246, 0.6); --accent-primary: #818cf8; --accent-secondary: #f472b6; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #e11d48 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.8); --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.95); --aurora-1: rgba(99, 102, 241, 0.12); --aurora-2: rgba(236, 72, 153, 0.08); }
+    :root[data-theme="light"] { --bg-primary: #f1f5f9; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.88); --bg-glass: rgba(255, 255, 255, 0.88); --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; --border-color: rgba(15, 23, 42, 0.08); --border-highlight: rgba(99, 102, 241, 0.45); --accent-primary: #4f46e5; --accent-secondary: #db2777; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%); --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb; --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.06); --shadow-lg: 0 16px 32px rgba(15, 23, 42, 0.12); --aurora-1: rgba(99, 102, 241, 0.1); --aurora-2: rgba(236, 72, 153, 0.08); }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body, html { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; width: 100%; max-width: 100vw; }
-    .sensitive { transition: filter 0.3s ease, opacity 0.3s ease; }
-    body.privacy-active .sensitive { filter: blur(6px); opacity: 0.5; user-select: none; pointer-events: none; }
+    body, html { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); background-image: radial-gradient(circle at 10% 15%, var(--aurora-1) 0%, transparent 45%), radial-gradient(circle at 90% 80%, var(--aurora-2) 0%, transparent 45%); background-attachment: fixed; color: var(--text-primary); min-height: 100vh; overflow-x: hidden; width: 100%; max-width: 100vw; }
+    .sensitive { transition: filter 0.35s ease, opacity 0.35s ease; }
+    body.privacy-active .sensitive { filter: blur(8px); opacity: 0.4; user-select: none; pointer-events: none; }
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 1.1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
-    .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; }
-    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
-    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; border-radius: 8px; }
+    /* ==========================================
+       2. COMPONENTI UI BASE
+       ========================================== */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
+    .btn-danger { background: rgba(239, 68, 68, 0.14); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+    .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.78rem; border-radius: 10px; }
     
-    .input, select, textarea { width: 100%; padding: 0.65rem 0.9rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; } .form-row .input { margin-bottom: 0; }
+    .input, select, textarea { width: 100%; padding: 0.7rem 0.95rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none; }
+    .input:focus, select:focus, textarea:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+    .form-row .input, .form-row select { margin-bottom: 0; }
     
-    .badge { display: inline-flex; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
-    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; }
-    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); }
+    .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+
+    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; padding-right: 2px; }
+    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); transition: transform 0.15s ease, border-color 0.2s ease; }
     
     .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-    .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; padding: 0.25rem 0.5rem; }
-    .inner-tab.active { color: var(--accent-primary); border-bottom: 2px solid var(--accent-primary); }
+    .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 700; font-size: 0.9rem; cursor: pointer; padding: 0.35rem 0.75rem; border-radius: 8px; }
+    .inner-tab.active { color: #fff; background: var(--accent-gradient); }
 
-    .main-container { max-width: 1440px; margin: 1.5rem auto; padding: 0 1.5rem; padding-bottom: 30px; }
-    .module-section { display: none; animation: fadeIn 0.28s ease; }
+    .main-container { max-width: 1440px; margin: 1rem auto; padding: 0 1.25rem 40px; }
+    .module-section { display: none; animation: fadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
     .module-section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; }
-    .col-span-12 { grid-column: span 12; } .col-span-8 { grid-column: span 8; } .col-span-6 { grid-column: span 6; } .col-span-4 { grid-column: span 4; } .col-span-3 { grid-column: span 3; }
-    .bento-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.35rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; position: relative; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.15rem; }
+    .col-span-12 { grid-column: span 12; } .col-span-9 { grid-column: span 9; } .col-span-8 { grid-column: span 8; } .col-span-6 { grid-column: span 6; } .col-span-5 { grid-column: span 5; } .col-span-4 { grid-column: span 4; } .col-span-3 { grid-column: span 3; }
+
+    .bento-card { background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-top: 1px solid rgba(255, 255, 255, 0.14); border-radius: 22px; padding: 1.35rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; position: relative; overflow: hidden; }
     .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; }
-    .card-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .stat-value { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; font-family: 'JetBrains Mono', monospace; margin: 0.35rem 0; }
+    .card-title { font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.02em; }
+    .stat-value { font-size: 2rem; font-weight: 900; letter-spacing: -0.03em; font-family: 'JetBrains Mono', monospace; margin: 0.25rem 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
 
-    .app-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); padding: 0.85rem 1.5rem; }
-    .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
-    .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.03em; white-space: nowrap; }
-    .brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-gradient); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
-    .header-top > div:last-child { display: flex; gap: 0.4rem; flex-shrink: 0; }
-    .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.2rem; padding: 0 1.5rem; }
-    .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid transparent; background: var(--bg-card); color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; white-space: nowrap; transition: all 0.2s ease; }
-    .nav-tab.active { background: var(--accent-gradient); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: transparent; }
+    /* HERO E WALLET */
+    .hero-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(139, 92, 246, 0.12) 50%, rgba(236, 72, 153, 0.15) 100%); border: 1px solid var(--border-highlight); padding: 1.4rem; }
+    .hero-content { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap; }
+    .hero-greeting h1 { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+    .hero-insight { margin-top: 0.75rem; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem; border-radius: 12px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-primary); }
+    .score-ring-box { display: flex; align-items: center; gap: 0.85rem; background: rgba(0,0,0,0.25); padding: 0.65rem 1rem; border-radius: 18px; border: 1px solid var(--border-color); }
+    .score-svg { width: 58px; height: 58px; transform: rotate(-90deg); }
+    .score-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
+    .score-progress { fill: none; stroke: url(#auroraGrad); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 150; stroke-dashoffset: 150; transition: stroke-dashoffset 1s ease; }
+    .wallet-carousel { display: flex; gap: 0.85rem; overflow-x: auto; padding-bottom: 0.6rem; margin-bottom: 1rem; scroll-snap-type: x mandatory; }
+    .wallet-card { min-width: 210px; flex: 1; scroll-snap-align: start; padding: 1.15rem; border-radius: 18px; color: #fff; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: transform 0.2s ease, outline 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 118px; }
+    .wallet-card:active { transform: scale(0.97); }
+    .wallet-card.selected { outline: 3px solid #ffffff; }
+    .wallet-card-0 { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+    .wallet-card-1 { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); }
+    .wallet-card-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+    .wallet-card-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .wallet-chip { width: 28px; height: 20px; border-radius: 5px; background: rgba(255,255,255,0.28); border: 1px solid rgba(255,255,255,0.4); }
 
-    .modal-backdrop { position: fixed !important; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99999; display: none !important; place-items: center; padding: 1rem; }
+    /* ==========================================
+       3. GARAGE OS - STILI DEDICATI
+       ========================================== */
+    .garage-car-header { position: relative; background: linear-gradient(45deg, #0f172a 0%, #1e1b4b 100%); border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-highlight); display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
+    .garage-car-header::after { content: '🚘'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-size: 8rem; opacity: 0.15; filter: blur(2px); }
+    .car-brand-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; z-index: 1; }
+    .car-plate { display: inline-block; background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 6px; border: 2px solid #3b82f6; z-index: 1; }
+    
+    .traffic-light-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+    .tl-card { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; }
+    .tl-indicator { width: 14px; height: 14px; border-radius: 50%; margin-bottom: 0.5rem; box-shadow: 0 0 10px currentColor; }
+    .tl-red { background: #ef4444; color: #ef4444; }
+    .tl-yellow { background: #f59e0b; color: #f59e0b; }
+    .tl-green { background: #10b981; color: #10b981; }
+
+    /* MACRO NUTRIZIONE */
+    .macro-bar-bg { width: 100%; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; margin-top: 4px; }
+    .macro-bar-fill { height: 100%; border-radius: 999px; background: var(--accent-gradient); transition: width 0.5s ease; }
+
+    /* NAV, HEADER & MODALI */
+    .app-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 0.8rem 1.25rem; }
+    .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: nowrap; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 900; font-size: 1.15rem; letter-spacing: -0.03em; white-space: nowrap; }
+    .brand-logo { width: 34px; height: 34px; border-radius: 10px; background: var(--accent-gradient); display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+    
+    .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; padding: 0 1.25rem; }
+    .nav-tab { flex: 1; padding: 0.65rem 1rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-weight: 700; font-size: 0.88rem; cursor: pointer; text-align: center; transition: all 0.2s ease; }
+    .nav-tab.active { background: var(--accent-gradient); color: #ffffff; border-color: transparent; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
+
+    .modal-backdrop { position: fixed !important; inset: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 99999; display: none !important; place-items: center; padding: 1rem; }
     .modal-backdrop.open { display: grid !important; }
-    .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;}
+    .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
     
     #lockScreen { position: fixed; inset: 0; background: var(--bg-primary); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s; }
     #lockScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -73,56 +129,56 @@
     .pin-input { width: 100%; text-align: center; font-size: 2.5rem; letter-spacing: 0.5rem; background: transparent; border: none; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); margin: 1.5rem 0; outline: none; }
 
     #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 99999; display: flex; flex-direction: column; gap: 0.6rem; }
-    .toast { padding: 0.85rem 1.15rem; border-radius: 12px; background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 500; animation: slideIn 0.25s ease; }
+    .toast { padding: 0.85rem 1.15rem; border-radius: 14px; background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 600; animation: slideIn 0.25s ease; }
     @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-    .fab-container { position: fixed; bottom: 2rem; right: 1.5rem; z-index: 9000; display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
-    .fab-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: grid; place-items: center; font-size: 1.8rem; box-shadow: var(--shadow-lg); cursor: pointer; border: none; transition: transform 0.2s; }
+    .fab-container { position: fixed; bottom: 2rem; right: 1.25rem; z-index: 9000; display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
+    .fab-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: grid; place-items: center; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5); cursor: pointer; border: none; transition: transform 0.2s; }
     .fab-btn:active { transform: scale(0.9); }
     .fab-menu { display: none; flex-direction: column; gap: 0.5rem; }
-    .fab-menu.open { display: flex; animation: fadeInBottom 0.2s ease; }
-    .fab-item { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-card); padding: 0.6rem 1.2rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: var(--shadow-sm); }
-    @keyframes fadeInBottom { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fab-menu.open { display: flex; animation: fadeIn 0.2s ease; }
+    .fab-item { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-secondary); padding: 0.65rem 1.2rem; border-radius: 999px; border: 1px solid var(--border-highlight); color: var(--text-primary); font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: var(--shadow-lg); }
 
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-top: 0.75rem; }
     .cal-day-header { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .cal-day { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .cal-day { aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
     .cal-day.active { background: var(--accent-gradient); color: #fff; border: none; }
     .cal-day.today { border: 2px solid var(--accent-primary); }
-    .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); margin-top:3px;}
+    .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); margin-top: 3px; }
     
-    .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    .hub-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
-    .hub-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); }
+    .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .hub-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .hub-card:hover, .hub-card:active { border-color: var(--accent-primary); transform: translateY(-3px); }
+    .hub-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
 
     @media (max-width: 900px) {
       .bento-grid > div { grid-column: span 12 !important; }
-      .main-container { padding: 0 0.75rem; margin-top: 0.5rem; padding-bottom: 120px !important; }
-      .bento-card { padding: 1.15rem; }
+      .main-container { padding: 0 0.75rem 125px !important; margin-top: 0.6rem; }
+      .bento-card { padding: 1.15rem; border-radius: 20px; }
       .form-row { grid-template-columns: 1fr !important; gap: 0.5rem; }
-      .app-header { padding: 0.75rem 1rem; }
+      .app-header { padding: 0.7rem 0.9rem; }
 
-      .nav-tabs { 
-        display: grid !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; 
-        background: var(--bg-glass) !important; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid var(--border-color) !important; margin: 0 !important; 
-        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom)) !important;
-        z-index: 9999 !important; grid-template-columns: repeat(4, 1fr) !important; gap: 0 !important;
-      }
-      .nav-tab { background: transparent !important; border: none !important; padding: 0.5rem 0.2rem !important; font-size: 0.7rem !important; flex-direction: column; gap: 0.2rem; line-height: 1.2; white-space: normal; }
-      .nav-tab.active { color: var(--accent-primary) !important; box-shadow: none !important; transform: translateY(-2px); }
-      .fab-container, #toast-container { bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+      .nav-tabs { display: grid !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--bg-glass) !important; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid var(--border-color) !important; margin: 0 !important; padding: 0.45rem 0.5rem calc(0.45rem + env(safe-area-inset-bottom)) !important; z-index: 9999 !important; grid-template-columns: repeat(5, 1fr) !important; gap: 0.25rem !important; }
+      .nav-tab { background: transparent !important; border: none !important; padding: 0.45rem 0.2rem !important; font-size: 0.65rem !important; display: flex; flex-direction: column; align-items: center; gap: 0.15rem; line-height: 1.15; white-space: normal; box-shadow: none !important; }
+      .nav-tab.active { color: var(--accent-primary) !important; background: rgba(99, 102, 241, 0.12) !important; transform: translateY(-2px); }
+      .fab-container, #toast-container { bottom: calc(4.8rem + env(safe-area-inset-bottom)); }
     }
   </style>
 </head>
 <body>
 
-  <!-- SCHERMATA DI BLOCCO (PIN) -->
+  <!-- SVG PER GRADIENTI -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="auroraGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1" /><stop offset="50%" stop-color="#8b5cf6" /><stop offset="100%" stop-color="#ec4899" /></linearGradient>
+    </defs>
+  </svg>
+
   <div id="lockScreen" class="hidden">
     <div class="pin-box">
-      <div class="brand-logo" style="margin: 0 auto 1rem; width: 50px; height: 50px; font-size: 1.5rem;">L7</div>
-      <h2>LifeOS Ultimate</h2>
-      <p class="stat-label">Inserisci il PIN per accedere ai tuoi dati</p>
+      <div class="brand-logo" style="margin: 0 auto 1rem; width: 54px; height: 54px; font-size: 1.4rem;">L9</div>
+      <h2>LifeOS Garage</h2>
+      <p class="stat-label">Inserisci il PIN per sbloccare il tuo ecosistema</p>
       <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="4" placeholder="••••">
       <button class="btn btn-primary" style="width: 100%;" onclick="App.verifyPin()">Sblocca</button>
     </div>
@@ -134,12 +190,15 @@
   <header class="app-header">
     <div class="header-top">
       <div class="brand">
-        <div class="brand-logo">L7</div>
-        <div class="brand-text"><span>LifeOS</span><span class="badge" style="font-size:0.55rem; padding: 0.15rem 0.4rem;">v7.0 DB</span></div>
+        <div class="brand-logo">L9</div>
+        <div class="brand-text">
+          <span>LifeOS</span><span class="badge" style="font-size:0.6rem; padding: 0.15rem 0.45rem; margin-left:4px;">GARAGE EDITION</span>
+        </div>
       </div>
       <div>
+        <button class="btn btn-sm" onclick="App.openModal('pomodoroModal')" title="Focus Timer">⏱️</button>
         <button class="btn btn-sm" onclick="App.openModal('searchModal')" title="Ricerca Globale">🔍</button>
-        <button class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Nascondi dati sensibili">👁️</button>
+        <button class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Privacy">👁️</button>
         <button class="btn btn-sm" onclick="App.openModal('settingsModal')">⚙️</button>
       </div>
     </div>
@@ -147,356 +206,514 @@
   
   <nav class="nav-tabs" role="tablist">
     <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
-    <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Calendario</button>
-    <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💰 Finanze</button>
-    <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">🗂️ Moduli</button>
+    <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Agenda</button>
+    <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💳 Finanze</button>
+    <button class="nav-tab" data-target="mod-garage" onclick="App.switchModule('mod-garage')">🏎️ Garage OS</button>
+    <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">⚡ Hub Extra</button>
   </nav>
 
   <main class="main-container">
 
-    <!-- DASHBOARD -->
+    <!-- ==========================================
+         1. DASHBOARD
+         ========================================== -->
     <section id="mod-dashboard" class="module-section active">
       <div class="bento-grid">
+        <div class="bento-card hero-card col-span-12">
+          <div class="hero-content">
+            <div class="hero-greeting">
+              <div class="stat-label" id="greetingDate" style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">OGGI</div>
+              <h1 id="greetingTitle">Buongiorno ✨</h1>
+              <div class="hero-insight"><span>🧠</span><span id="smartInsightText">Analisi del tuo ecosistema in corso...</span></div>
+            </div>
+            <div class="score-ring-box">
+              <div style="position:relative; display:grid; place-items:center;">
+                <svg class="score-svg" viewBox="0 0 60 60"><circle class="score-bg" cx="30" cy="30" r="24"></circle><circle class="score-progress" id="lifeScoreCircle" cx="30" cy="30" r="24"></circle></svg>
+                <span id="lifeScoreValue" style="position:absolute; font-weight:900; font-size:0.85rem; font-family:'JetBrains Mono',monospace;">0%</span>
+              </div>
+              <div><div style="font-weight:800; font-size:0.9rem;">Life Score</div><div class="stat-label" style="font-size:0.72rem;">Indice Giornata</div></div>
+            </div>
+          </div>
+        </div>
+
         <div class="bento-card col-span-4">
-          <div class="card-header"><span class="card-title">💰 Liquidità Totale</span><button class="btn btn-sm" onclick="App.switchModule('mod-finance')">Finanze →</button></div>
+          <div class="card-header"><span class="card-title">💰 Patrimonio Liquido</span><button class="btn btn-sm" onclick="App.switchModule('mod-finance')">Wallet →</button></div>
           <div class="stat-value sensitive" id="dashNetWorth">€ 0,00</div>
           <div class="stat-label" id="dashAccountsCount">0 conti attivi</div>
-          <div style="margin-top: 1.5rem; height: 160px; position: relative;"><canvas id="dashboardChart"></canvas></div>
+          <div style="margin-top: 1rem; height: 150px; position: relative;"><canvas id="dashboardChart"></canvas></div>
         </div>
 
         <div class="bento-card col-span-4">
-          <div class="card-header"><span class="card-title">💊 Terapie & Promemoria</span><button class="btn btn-sm" onclick="App.openHubModule('mod-health')">Salute OS →</button></div>
-          <div class="stat-label" style="margin-bottom:0.5rem;">Da assumere oggi:</div>
-          <div id="dashPillReminders" class="item-list" style="max-height: 150px;"></div>
+          <div class="card-header"><span class="card-title">🔥 Abitudini & Streak</span><button class="btn btn-sm btn-primary" onclick="App.addHabit()">+ Nuova</button></div>
+          <div class="stat-label" style="margin-bottom:0.5rem;">Tocca per completare oggi:</div>
+          <div id="habitList" class="item-list" style="max-height: 210px;"></div>
         </div>
 
         <div class="bento-card col-span-4">
-          <div class="card-header"><span class="card-title">💪 Habit Tracker</span><button class="btn btn-sm" onclick="App.addHabit()">+ Nuova</button></div>
-          <div class="stat-label" style="margin-bottom:0.5rem;">Abitudini giornaliere:</div>
-          <div id="habitList" class="item-list" style="max-height: 150px;"></div>
+          <div class="card-header"><span class="card-title">💊 Terapie & Salute</span><button class="btn btn-sm" onclick="App.openHubModule('mod-health')">Salute OS →</button></div>
+          <div class="stat-label" style="margin-bottom:0.5rem;">Promemoria clinici & nutrizione:</div>
+          <div id="dashPillReminders" class="item-list" style="max-height: 210px;"></div>
         </div>
 
         <div class="bento-card col-span-12">
-          <div class="card-header"><span class="card-title">📌 Agenda & Attività</span><button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Calendario →</button></div>
-          <div id="dashUpcomingTasks" class="item-list" style="max-height: 200px;"></div>
+          <div class="card-header"><span class="card-title">📌 Prossime Attività & Scadenze</span><button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Apri Calendario →</button></div>
+          <div id="dashUpcomingTasks" class="item-list" style="max-height: 220px;"></div>
         </div>
       </div>
     </section>
 
-    <!-- HUB MODULI EXTRA -->
-    <section id="mod-hub" class="module-section">
-      <div class="bento-card col-span-12">
-        <div class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">🗂️ Hub Moduli Aggiuntivi</div>
-        <div class="stat-label">Seleziona un'area per accedere agli archivi specifici.</div>
-        <div class="hub-grid">
-          <div class="hub-card" onclick="App.openHubModule('mod-health')"><div class="hub-icon">❤️</div><div class="card-title" style="justify-content:center;">Salute OS (DB)</div><div class="stat-label">Referti, Grafici Peso e Nutrizione</div></div>
-          <div class="hub-card" onclick="App.openHubModule('mod-inventory')"><div class="hub-icon">📦</div><div class="card-title" style="justify-content:center;">Inventario & Scanner</div><div class="stat-label">Garanzie e Fotocamera Barcode</div></div>
-          <div class="hub-card" onclick="App.openHubModule('mod-maintenance')"><div class="hub-icon">🔧</div><div class="card-title" style="justify-content:center;">Manutenzioni</div><div class="stat-label">Automazione tagliandi e scadenze</div></div>
+    <!-- ==========================================
+         NEW: 2. GARAGE OS (IL CRUSCOTTO AUTO)
+         ========================================== -->
+    <section id="mod-garage" class="module-section">
+      <div class="bento-grid">
+        
+        <!-- HEADER VEICOLO -->
+        <div class="col-span-12">
+          <div class="garage-car-header">
+            <div>
+              <div class="stat-label" style="color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Il Mio Veicolo Principale</div>
+              <div class="car-brand-title" id="garageCarName">Configura Veicolo</div>
+              <div class="car-plate" id="garageCarPlate">XX 000 XX</div>
+            </div>
+            <button class="btn btn-primary" onclick="App.openModal('garageConfigModal')">⚙️ Configura</button>
+          </div>
         </div>
+
+        <!-- SEMAFORI SCADENZE (BOLLO, ASSICURAZIONE, REVISIONE) -->
+        <div class="bento-card col-span-12">
+          <div class="card-header" style="margin-bottom:0.5rem;"><div class="card-title">🚦 Semafori Scadenze</div></div>
+          <div class="traffic-light-grid">
+            <div class="tl-card">
+              <div id="tl-assicurazione" class="tl-indicator tl-green"></div>
+              <strong style="font-size:0.9rem;">Assicurazione</strong>
+              <div class="stat-label" id="date-assicurazione">--/--/----</div>
+            </div>
+            <div class="tl-card">
+              <div id="tl-bollo" class="tl-indicator tl-green"></div>
+              <strong style="font-size:0.9rem;">Bollo Auto</strong>
+              <div class="stat-label" id="date-bollo">--/--/----</div>
+            </div>
+            <div class="tl-card">
+              <div id="tl-revisione" class="tl-indicator tl-green"></div>
+              <strong style="font-size:0.9rem;">Revisione</strong>
+              <div class="stat-label" id="date-revisione">--/--/----</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATISTICHE KM E CARBURANTE (Da Transazioni) -->
+        <div class="bento-card col-span-4">
+          <div class="card-header"><div class="card-title">⛽ Consumi & Chilometraggio</div></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+            <div>
+              <div class="stat-label">Chilometri Attuali</div>
+              <div class="stat-value" id="garageKmOdo" style="font-size:1.6rem;">0 km</div>
+            </div>
+            <button class="btn btn-sm" onclick="App.updateGarageKm()">Aggiorna</button>
+          </div>
+          <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:12px; padding:0.8rem; margin-bottom:1rem;">
+            <div class="stat-label">Spesa Carburante (Ultimi 30g)</div>
+            <div style="font-size:1.2rem; font-weight:800; color:var(--danger);" id="garageFuelMonth">€ 0,00</div>
+          </div>
+          <div class="stat-label" style="text-align:center;">Registra i rifornimenti in <strong>Finanze</strong> con categoria "Auto & Trasporti" per alimentare le statistiche.</div>
+        </div>
+
+        <!-- TIMELINE INTERVENTI MECCANICI -->
+        <div class="bento-card col-span-8">
+          <div class="card-header"><div class="card-title">🔧 Storico Interventi (Tagliandi, Gomme)</div></div>
+          <form onsubmit="App.addGarageMaintenance(event)" style="display:flex; gap:0.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
+            <input type="text" id="gMaintTitle" class="input" placeholder="Lavoro (es. Cambio Gomme, Tagliando)..." required style="margin:0; flex:2; min-width:200px;">
+            <input type="date" id="gMaintDate" class="input" required style="margin:0; flex:1; min-width:120px;">
+            <input type="number" id="gMaintCost" class="input" step="0.01" placeholder="Costo €" style="margin:0; flex:1; min-width:100px;">
+            <button type="submit" class="btn btn-primary" style="white-space:nowrap;">+ Aggiungi</button>
+          </form>
+          <div id="garageMaintList" class="item-list" style="max-height:300px;"></div>
+        </div>
+
       </div>
     </section>
 
-    <!-- CALENDARIO -->
+    <!-- ==========================================
+         3. CALENDARIO
+         ========================================== -->
     <section id="mod-calendar" class="module-section">
       <div class="bento-grid">
         <div class="bento-card col-span-5">
-          <div>
-            <div class="card-header">
-              <button class="btn btn-sm" onclick="App.changeMonth(-1)">◀</button>
-              <div class="card-title" id="calMonthTitle">Mese Anno</div>
-              <button class="btn btn-sm" onclick="App.changeMonth(1)">▶</button>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <span class="stat-label">Selezionato: <strong id="calSelectedDateLabel" style="color: var(--accent-primary);">Oggi</strong></span>
-              <button class="btn btn-sm" onclick="App.selectToday()">Oggi</button>
-            </div>
-            <div class="calendar-grid" id="calendarHeaderGrid">
-              <div class="cal-day-header">Lun</div><div class="cal-day-header">Mar</div><div class="cal-day-header">Mer</div>
-              <div class="cal-day-header">Gio</div><div class="cal-day-header">Ven</div><div class="cal-day-header">Sab</div><div class="cal-day-header">Dom</div>
-            </div>
-            <div class="calendar-grid" id="calendarDaysGrid"></div>
-          </div>
+          <div class="card-header"><button class="btn btn-sm" onclick="App.changeMonth(-1)">◀</button><div class="card-title" id="calMonthTitle">Mese Anno</div><button class="btn btn-sm" onclick="App.changeMonth(1)">▶</button></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;"><span class="stat-label">Giorno: <strong id="calSelectedDateLabel" style="color: var(--accent-primary);">Oggi</strong></span><button class="btn btn-sm" onclick="App.selectToday()">Oggi</button></div>
+          <div class="calendar-grid"><div class="cal-day-header">Lun</div><div class="cal-day-header">Mar</div><div class="cal-day-header">Mer</div><div class="cal-day-header">Gio</div><div class="cal-day-header">Ven</div><div class="cal-day-header">Sab</div><div class="cal-day-header">Dom</div></div>
+          <div class="calendar-grid" id="calendarDaysGrid"></div>
         </div>
-
         <div class="bento-card col-span-4">
-          <div>
-            <div class="card-header"><div class="card-title">✅ Attività & Promemoria</div><span class="badge" id="calTaskCountBadge">0</span></div>
-            <form onsubmit="App.addCalendarTask(event)" style="margin-bottom: 1rem;">
-              <input type="text" id="calTaskTitle" class="input" placeholder="Nuova attività o promemoria..." required>
-              <div class="form-row">
-                <select id="calTaskType" class="input"><option value="Attività">📌 Attività</option><option value="Promemoria">⏰ Promemoria</option><option value="Evento">🗓️ Evento</option></select>
-                <select id="calTaskPriority" class="input"><option value="Normale">Priorità Normale</option><option value="Alta">🔥 Alta</option><option value="Bassa">🌱 Bassa</option></select>
-              </div>
-              <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Aggiungi al Giorno</button>
-            </form>
-            <div id="calendarTasksList" class="item-list" style="max-height: 360px;"></div>
-          </div>
+          <div class="card-header"><div class="card-title">✅ Task del Giorno</div><span class="badge" id="calTaskCountBadge">0</span></div>
+          <form onsubmit="App.addCalendarTask(event)" style="margin-bottom: 1rem;">
+            <input type="text" id="calTaskTitle" class="input" placeholder="Nuova attività o promemoria..." required>
+            <div class="form-row"><select id="calTaskType" class="input"><option value="Attività">📌 Attività</option><option value="Promemoria">⏰ Promemoria</option><option value="Evento">🗓️ Evento</option></select><select id="calTaskPriority" class="input"><option value="Normale">Priorità Normale</option><option value="Alta">🔥 Alta</option><option value="Bassa">🌱 Bassa</option></select></div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Aggiungi al Giorno</button>
+          </form>
+          <div id="calendarTasksList" class="item-list" style="max-height: 320px;"></div>
         </div>
-
         <div class="bento-card col-span-3">
-          <div>
-            <div class="card-header"><div class="card-title">📓 Diario & Umore</div></div>
-            <form onsubmit="App.saveJournalEntry(event)">
-              <select id="journalMood" class="input"><option value="🚀 Eccellente">🚀 Eccellente</option><option value="😊 Sereno">😊 Sereno</option><option value="😐 Neutro">😐 Neutro</option><option value="⚡ Stressato">⚡ Stressato</option><option value="🔋 Stanco">🔋 Stanco</option></select>
-              <textarea id="journalText" rows="7" class="input" placeholder="Scrivi i pensieri della giornata..."></textarea>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva Diario</button>
-            </form>
-            <div style="margin-top: 1rem;"><div class="stat-label" style="margin-bottom: 0.4rem;">Ultime annotazioni:</div><div id="journalHistoryList" class="item-list" style="max-height: 180px;"></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- INVENTARIO -->
-    <section id="mod-inventory" class="module-section">
-      <div class="card-header" style="margin-bottom: 1.25rem;">
-        <div class="card-title">📦 Inventario & Garanzie</div>
-        <button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
-      </div>
-
-      <div class="bento-grid">
-        <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">➕ Inserisci Oggetto</div></div>
-          <form id="inventoryForm" onsubmit="App.addInventoryItem(event)">
-            <select id="invType" class="input" required style="border-color:var(--accent-primary);"><option value="Garanzia">🛡️ Registro Garanzie</option><option value="Archivio">📦 Archivio Generale</option></select>
-            
-            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
-              <input type="text" id="invName" class="input" placeholder="Nome o Barcode *" required style="margin:0; flex:1;">
-              <button type="button" class="btn btn-primary" onclick="App.startScanner()" style="padding:0 1rem;" title="Scansiona Barcode">📷</button>
-            </div>
-
-            <div class="form-row"><select id="invCategory" class="input" onchange="App.updateInvSubcategories()" required></select><select id="invSubcategory" class="input" required></select></div>
-            <div class="form-row"><div class="form-group"><label style="font-size:0.75rem; color:var(--text-secondary);">Acquisto</label><input type="date" id="invDate" class="input"></div><div class="form-group"><label style="font-size:0.75rem; color:var(--text-secondary);">Scadenza</label><input type="date" id="invWarranty" class="input"></div></div>
-            <div class="form-row"><input type="number" id="invPrice" class="input" step="0.01" placeholder="Valore €"><input type="text" id="invLocation" class="input" placeholder="Stanza/Luogo"></div>
-            
-            <!-- CAMPO RIPRISTINATO -->
-            <input type="text" id="invNotes" class="input" placeholder="S/N, note...">
-            
-            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva nel Registro</button>
+          <div class="card-header"><div class="card-title">📓 Diario & Mood</div></div>
+          <form onsubmit="App.saveJournalEntry(event)">
+            <select id="journalMood" class="input"><option value="🚀 Eccellente">🚀 Eccellente</option><option value="😊 Sereno">😊 Sereno</option><option value="😐 Neutro">😐 Neutro</option><option value="⚡ Stressato">⚡ Stressato</option><option value="🔋 Stanco">🔋 Stanco</option></select>
+            <textarea id="journalText" rows="5" class="input" placeholder="Pensieri, gratitudine o note di oggi..."></textarea>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva nel Diario</button>
           </form>
-        </div>
-
-        <div class="bento-card col-span-8">
-          <div class="inner-tabs"><button class="inner-tab active" id="tab-garanzie" onclick="App.switchInvTab('garanzie')">🛡️ Garanzie</button><button class="inner-tab" id="tab-archivio" onclick="App.switchInvTab('archivio')">📦 Archivio</button></div>
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><select id="invFilterCat" class="input" style="width: auto;" onchange="App.renderInventory()"><option value="ALL">Tutte</option></select><input type="text" id="invSearchInput" class="input" placeholder="Cerca..." oninput="App.renderInventory()"></div>
-          <div id="inventoryList" class="item-list" style="max-height: 500px;"></div>
+          <div style="margin-top: 1rem;"><div class="stat-label" style="margin-bottom: 0.4rem;">Storico Diario:</div><div id="journalHistoryList" class="item-list" style="max-height: 180px;"></div></div>
         </div>
       </div>
     </section>
 
-    <!-- MANUTENZIONI -->
-    <section id="mod-maintenance" class="module-section">
-      <div class="card-header" style="margin-bottom: 1.25rem;"><div class="card-title">🔧 Scadenziario Manutenzioni</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
-      <div class="bento-grid">
-        <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">➕ Pianifica Intervento</div></div>
-          <form onsubmit="App.addMaintenance(event)">
-            <input type="text" id="maintTitle" class="input" placeholder="Titolo Intervento *" required>
-            <div class="form-row"><select id="maintCategory" class="input" required></select><input type="date" id="maintDueDate" class="input" required></div>
-            <div class="form-row"><input type="number" id="maintCost" class="input" step="0.01" placeholder="Costo €"><select id="maintRecurrence" class="input"><option value="Singola">Singolo</option><option value="Mensile">Mensile</option><option value="Semestrale">Semestrale</option><option value="Annuale">Annuale</option></select></div>
-            <div class="form-group" style="margin-bottom:0.75rem;"><select id="maintStatus" class="input"><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completata</option></select></div>
-            
-            <!-- CAMPO RIPRISTINATO -->
-            <input type="text" id="maintNotes" class="input" placeholder="Note (tecnico, ricambi...)">
-            
-            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra</button>
-          </form>
-        </div>
-        <div class="bento-card col-span-8">
-          <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">🛠️ Registro Interventi</div>
-             <div style="display:flex; gap:0.5rem;">
-              <select id="maintFilterCat" class="input" style="margin:0;" onchange="App.renderMaintenances()"></select>
-              <select id="maintFilterStatus" class="input" style="margin:0;" onchange="App.renderMaintenances()">
-                <option value="ALL">Tutti gli stati</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option>
-              </select>
-            </div>
-          </div>
-          <div id="maintenanceList" class="item-list" style="max-height: 520px;"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FINANZE -->
+    <!-- ==========================================
+         4. FINANZE WALLET
+         ========================================== -->
     <section id="mod-finance" class="module-section">
       <div class="bento-grid">
-        <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">🏦 I Miei Conti</div><span class="badge badge-success sensitive" id="finTotalBalanceBadge">€ 0,00</span></div>
-          <div id="financeAccountsList" class="item-list sensitive" style="max-height: 240px; margin-bottom: 1rem;"></div>
-          <form onsubmit="App.addFinanceAccount(event)" style="margin-bottom: 1.2rem;">
-            <div class="form-row"><input type="text" id="accNameInput" class="input" placeholder="Nome (Revolut)..." required><input type="number" id="accInitialBalance" class="input" step="0.01" placeholder="Saldo €" required></div>
-            <button type="submit" class="btn btn-sm" style="width: 100%;">+ Crea Conto</button>
-          </form>
-          
-          <!-- BLOCCO ALLINEAMENTO RIPRISTINATO -->
-          <div style="padding: 0.9rem; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color);">
-            <div class="card-title" style="font-size: 0.88rem; margin-bottom: 0.4rem;">⚖️ Allineamento Saldo</div>
-            <div class="form-row">
-              <select id="reconcileAccountSelect" class="input"></select>
-              <input type="number" id="reconcileTargetInput" class="input" step="0.01" placeholder="Saldo reale (€)">
-            </div>
-            <button type="button" class="btn btn-primary btn-sm" style="width: 100%;" onclick="App.reconcileAccountBalance()">Allinea Saldo</button>
+        <div class="bento-card col-span-12">
+          <div class="card-header">
+            <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti</div></div>
+            <span class="badge badge-success sensitive" id="finTotalBalanceBadge" style="font-size:0.95rem; padding:0.35rem 0.85rem;">€ 0,00</span>
           </div>
-
+          <div id="financeAccountsList" class="wallet-carousel sensitive"></div>
+          <div class="form-row" style="margin-top:0.5rem; margin-bottom:0;">
+            <form onsubmit="App.addFinanceAccount(event)" style="display:flex; gap:0.5rem;">
+              <input type="text" id="accNameInput" class="input" placeholder="Nuovo Conto..." required style="margin:0;">
+              <input type="number" id="accInitialBalance" class="input" step="0.01" placeholder="Saldo €" required style="margin:0; max-width:120px;">
+              <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">+ Conto</button>
+            </form>
+            <div style="display:flex; gap:0.5rem;">
+              <select id="reconcileAccountSelect" class="input" style="margin:0;"></select>
+              <input type="number" id="reconcileTargetInput" class="input" step="0.01" placeholder="Saldo reale €" style="margin:0; max-width:130px;">
+              <button type="button" class="btn btn-sm" style="white-space:nowrap;" onclick="App.reconcileAccountBalance()">⚖️ Allinea</button>
+            </div>
+          </div>
         </div>
+
         <div class="bento-card col-span-8">
           <div class="card-header"><div class="card-title">💸 Registra Transazione</div></div>
           <form onsubmit="App.addTransaction(event)" style="margin-bottom: 1.25rem;">
-            <div class="form-row"><select id="txType" class="input" onchange="App.toggleTransferFields()" required><option value="EXPENSE">📉 Spesa</option><option value="INCOME">📈 Entrata</option><option value="TRANSFER">🔄 Giroconto</option></select><input type="number" id="txAmount" class="input" step="0.01" min="0.01" placeholder="Importo € *" required></div>
-            <div class="form-row"><select id="txAccount" class="input" required><option value="">Conto Origine *</option></select><select id="txTargetAccount" class="input" style="display: none;"><option value="">Conto Destinazione *</option></select></div>
+            <div class="form-row">
+              <select id="txType" class="input" onchange="App.toggleTransferFields()" required><option value="EXPENSE">📉 Uscita / Spesa</option><option value="INCOME">📈 Entrata / Stipendio</option><option value="TRANSFER">🔄 Giroconto</option></select>
+              <input type="number" id="txAmount" class="input" step="0.01" min="0.01" placeholder="Importo € *" required>
+            </div>
+            <div class="form-row">
+              <select id="txAccount" class="input" required><option value="">Conto Origine *</option></select>
+              <select id="txTargetAccount" class="input" style="display: none;"><option value="">Conto Destinazione *</option></select>
+            </div>
             <div class="form-row">
               <input type="text" id="txDesc" class="input" placeholder="Causale *" required>
-              <!-- CAMPO RIPRISTINATO -->
-              <input type="text" id="txCategory" class="input" placeholder="Categoria (es. Casa, Svago)">
+              <input type="text" id="txCategory" class="input" list="catSuggestions" placeholder="Categoria (es. Alimentari)">
+              <datalist id="catSuggestions"><option value="Alimentari"><option value="Auto & Trasporti"><option value="Svago & Extra"><option value="Casa & Utenze"><option value="Salute"><option value="Stipendio / Entrate"></datalist>
             </div>
             <div class="form-row"><input type="date" id="txDate" class="input" required><select id="txRecurrence" class="input"><option value="Singola">Ripetizione: Singola</option><option value="Mensile">Ripetizione: Mensile</option><option value="Annuale">Ripetizione: Annuale</option></select></div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra nel Libro Mastro</button>
           </form>
-          <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">📜 Libro Mastro</div><select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select></div>
-          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 350px;"></div>
+          <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">📜 Libro Mastro Storico</div><select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select></div>
+          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 380px;"></div>
+        </div>
+
+        <div class="bento-card col-span-4">
+          <div class="card-header"><div class="card-title">🍩 Spese per Categoria</div></div>
+          <div style="height: 180px; position: relative; margin-bottom: 1.25rem;"><canvas id="expenseCatChart"></canvas></div>
+          <hr style="border:none; border-top:1px solid var(--border-color); margin-bottom:1rem;">
+          <div class="card-header" style="margin-bottom:0.5rem;"><div class="card-title">🔄 Abbonamenti Attivi</div><span class="badge badge-warning sensitive" id="subsTotalBadge">0 €/mese</span></div>
+          <form onsubmit="App.addSubscription(event)" style="display:flex; gap:0.4rem; margin-bottom:0.75rem;">
+            <input type="text" id="subName" class="input" placeholder="Nome" required style="margin:0;"><input type="number" id="subCost" class="input" step="0.01" placeholder="€" required style="margin:0; max-width:80px;"><button type="submit" class="btn btn-primary btn-sm">+</button>
+          </form>
+          <div id="subsList" class="item-list sensitive" style="max-height: 200px;"></div>
         </div>
       </div>
     </section>
 
-    <!-- SALUTE OS -->
-    <section id="mod-health" class="module-section">
-      <div class="card-header" style="margin-bottom: 1.25rem;"><div class="card-title">❤️ Salute OS: Clinica & Trend</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
-      <div class="bento-grid">
-        <div class="bento-card col-span-3">
-          <div class="card-header"><div class="card-title">⚖️ Peso</div></div>
-          <div style="margin-bottom: 1rem; height: 130px; position: relative;" class="sensitive"><canvas id="weightChart"></canvas></div>
-          <form onsubmit="App.addWeightLog(event)" style="margin-bottom: 1rem;"><div class="form-row"><input type="number" id="weightValue" class="input" step="0.1" min="20" placeholder="Peso (kg) *" required><input type="date" id="weightDate" class="input" required></div><button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra Peso</button></form>
-          <div id="healthWeightList" class="item-list sensitive" style="max-height: 150px;"></div>
+    <!-- ==========================================
+         5. HUB EXTRA (INVENTARIO, MANUTENZIONI GENERICHE E SALUTE)
+         ========================================== -->
+    <section id="mod-hub" class="module-section">
+      <div class="bento-card col-span-12" style="margin-bottom: 1.5rem;">
+        <div class="card-title" style="font-size: 1.25rem; margin-bottom: 0.3rem;">⚡ Hub Moduli Extra</div>
+        <div class="stat-label">Sottomoduli specializzati non presenti in Dashboard:</div>
+        <div class="hub-grid">
+          <div class="hub-card" onclick="App.openHubModule('sub-health')"><div class="hub-icon">❤️</div><div class="card-title" style="justify-content:center;">Salute & Dieta</div></div>
+          <div class="hub-card" onclick="App.openHubModule('sub-inventory')"><div class="hub-icon">📦</div><div class="card-title" style="justify-content:center;">Inventario</div></div>
+          <div class="hub-card" onclick="App.openHubModule('sub-maintenance')"><div class="hub-icon">🔧</div><div class="card-title" style="justify-content:center;">Manutenzioni Casa</div></div>
         </div>
-        <div class="bento-card col-span-9">
+      </div>
+    </section>
+
+    <!-- SUB: INVENTARIO -->
+    <section id="sub-inventory" class="module-section">
+      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">📦 Inventario, Beni & Garanzie</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
+      <div class="bento-grid">
+        <div class="bento-card col-span-4">
+          <div class="card-header"><div class="card-title">➕ Registra Oggetto</div></div>
+          <form id="inventoryForm" onsubmit="App.addInventoryItem(event)">
+            <select id="invType" class="input" required style="border-color:var(--accent-primary);"><option value="Archivio">📦 Archivio Generale</option><option value="Garanzia">🛡️ Registro Garanzie</option></select>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;"><input type="text" id="invName" class="input" placeholder="Nome o Barcode *" required style="margin:0; flex:1;"><button type="button" class="btn btn-primary" onclick="App.startScanner()" style="padding:0 1rem;">📷</button></div>
+            <div class="form-row"><select id="invCategory" class="input" onchange="App.updateInvSubcategories()" required></select><select id="invSubcategory" class="input" required></select></div>
+            <div class="form-row"><div><label class="stat-label">Acquisto</label><input type="date" id="invDate" class="input"></div><div><label class="stat-label">Fine Garanzia</label><input type="date" id="invWarranty" class="input"></div></div>
+            <div class="form-row"><input type="number" id="invPrice" class="input" step="0.01" placeholder="Valore (€)"><input type="text" id="invLocation" class="input" placeholder="Luogo / Stanza"></div>
+            <input type="text" id="invNotes" class="input" placeholder="Seriale, modello, note...">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Salva Bene</button>
+          </form>
+        </div>
+        <div class="bento-card col-span-8">
+          <div class="inner-tabs"><button class="inner-tab active" id="tab-archivio" onclick="App.switchInvTab('archivio')">📦 Archivio Oggetti</button><button class="inner-tab" id="tab-garanzie" onclick="App.switchInvTab('garanzie')">🛡️ Garanzie</button></div>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><select id="invFilterCat" class="input" style="width: auto; margin:0;" onchange="App.renderInventory()"><option value="ALL">Tutte</option></select><input type="text" id="invSearchInput" class="input" style="margin:0;" placeholder="Cerca bene, seriale o nota..." oninput="App.renderInventory()"></div>
+          <div id="inventoryList" class="item-list" style="max-height: 480px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUB: MANUTENZIONI -->
+    <section id="sub-maintenance" class="module-section">
+      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">🔧 Scadenziario Manutenzioni Casa/Varie</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
+      <div class="bento-grid">
+        <div class="bento-card col-span-4">
+          <div class="card-header"><div class="card-title">➕ Nuovo Intervento</div></div>
+          <form onsubmit="App.addGeneralMaintenance(event)">
+            <input type="text" id="maintTitle" class="input" placeholder="Intervento *" required>
+            <div class="form-row"><select id="maintCategory" class="input" required></select><input type="date" id="maintDueDate" class="input" required></div>
+            <div class="form-row"><input type="number" id="maintCost" class="input" step="0.01" placeholder="Costo €"><select id="maintRecurrence" class="input"><option value="Singola">Singolo</option><option value="Mensile">Mensile</option><option value="Semestrale">Semestrale</option><option value="Annuale">Annuale</option></select></div>
+            <select id="maintStatus" class="input"><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completata</option></select>
+            <input type="text" id="maintNotes" class="input" placeholder="Note o ricambi...">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra Manutenzione</button>
+          </form>
+        </div>
+        <div class="bento-card col-span-8">
+          <div class="card-header" style="margin-bottom: 0.75rem;"><div class="card-title">🛠️ Storico & Scadenze</div>
+            <div style="display:flex; gap:0.5rem;"><select id="maintFilterCat" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"></select><select id="maintFilterStatus" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"><option value="ALL">Tutti</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option></select></div>
+          </div>
+          <div id="maintenanceList" class="item-list" style="max-height: 500px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUB: SALUTE OS -->
+    <section id="sub-health" class="module-section">
+      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">❤️ Salute OS: Nutrizione, Peso & Cartella Clinica</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
+      <div class="bento-grid">
+        <div class="bento-card col-span-4">
+          <div class="card-header"><div class="card-title">🍎 Diario Alimentare</div><span class="badge badge-info" id="kcalProgressText">0 / 2100 kcal</span></div>
+          <div style="margin-bottom: 1rem; background: var(--bg-secondary); padding: 0.85rem; border-radius: 14px; border: 1px solid var(--border-color);">
+            <div class="macro-bar-bg" style="height:10px; margin-bottom:0.6rem;"><div id="kcalProgressBar" class="macro-bar-fill" style="width:0%;"></div></div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; text-align:center; font-size:0.75rem;"><div><span class="stat-label">Proteine</span><br><strong id="protProgressText" style="color:#10b981;">0g</strong></div><div><span class="stat-label">Carbo</span><br><strong id="carbProgressText" style="color:#3b82f6;">0g</strong></div><div><span class="stat-label">Grassi</span><br><strong id="fatProgressText" style="color:#f59e0b;">0g</strong></div></div>
+          </div>
+          <div style="margin-bottom:0.75rem; padding:0.75rem; border-radius:12px; border:1px dashed var(--border-highlight);">
+            <div class="stat-label" style="margin-bottom:0.4rem; color:var(--accent-primary); font-weight:700;">⚡ Calcolo Rapido Cibi:</div>
+            <select id="nutriFoodSelect" class="input" style="margin-bottom:0.5rem;" onchange="App.AutoCalcFood()"></select>
+            <div style="display:flex; gap:0.5rem;"><select id="nutriMealType" class="input" style="margin:0;"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntino">🍎 Spuntino</option></select><input type="number" id="nutriGrams" class="input" placeholder="Grammi (g)" value="100" oninput="App.AutoCalcFood()" style="margin:0; max-width:110px;"></div>
+          </div>
+          <form onsubmit="App.addNutritionLog(event)" style="margin-bottom: 1rem;">
+            <input type="text" id="nutriMeal" class="input" placeholder="Pasto manuale..." required>
+            <div class="form-row"><input type="number" id="nutriKcal" class="input" min="0" placeholder="Kcal *" required><input type="date" id="nutriDate" class="input" required></div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-bottom:0.75rem;"><input type="number" id="nutriProt" class="input" step="0.1" placeholder="Prot" style="margin:0;"><input type="number" id="nutriCarbs" class="input" step="0.1" placeholder="Carb" style="margin:0;"><input type="number" id="nutriFat" class="input" step="0.1" placeholder="Gras" style="margin:0;"></div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra Pasto</button>
+          </form>
+          <div id="healthNutritionList" class="item-list" style="max-height: 240px;"></div>
+        </div>
+        <div class="bento-card col-span-3">
+          <div class="card-header"><div class="card-title">⚖️ Trend Peso</div></div>
+          <div style="margin-bottom: 1rem; height: 150px; position: relative;" class="sensitive"><canvas id="weightChart"></canvas></div>
+          <form onsubmit="App.addWeightLog(event)" style="margin-bottom: 1rem;"><div class="form-row"><input type="number" id="weightValue" class="input" step="0.1" min="20" placeholder="Peso (kg) *" required><input type="date" id="weightDate" class="input" required></div><button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra</button></form>
+          <div id="healthWeightList" class="item-list sensitive" style="max-height: 220px;"></div>
+        </div>
+        <div class="bento-card col-span-5">
           <div class="card-header"><div class="card-title">🩺 Cartella Clinica & Referti (DB Offline)</div></div>
           <form onsubmit="App.addMedicalRecord(event)" style="margin-bottom: 1rem;">
-            <div class="form-row"><select id="medType" class="input" onchange="App.toggleMedFields()" required><option value="Visita Medica">👨‍⚕️ Visita Medica</option><option value="Referto">📄 Referto (Upload PDF/Img)</option><option value="Sintomo">🌡️ Sintomo</option></select><input type="date" id="medDate" class="input" required></div>
-            <input type="text" id="medTitle" class="input" placeholder="Oggetto (es. Analisi del sangue) *" required>
-            <div id="medTherapyGroup"><input type="text" id="medTherapy" class="input" placeholder="Terapia (se prescritta)"></div>
-            <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.5rem; border-radius: 8px; margin-bottom: 0.75rem;"><label style="font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:0.3rem;">Allega Documento (Salvataggio in IndexedDB)</label><input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png" style="margin-bottom:0; padding:0.3rem;"></div>
-            
-            <!-- CAMPO RIPRISTINATO -->
-            <input type="text" id="medNotes" class="input" placeholder="Note cliniche, valori, esiti...">
-            
+            <div class="form-row"><select id="medType" class="input" onchange="App.toggleMedFields()" required><option value="Visita Medica">👨‍⚕️ Visita Specialistica</option><option value="Referto">📄 Referto (Upload PDF/Img)</option><option value="Sintomo">🌡️ Sintomo / Evento</option></select><input type="date" id="medDate" class="input" required></div>
+            <input type="text" id="medTitle" class="input" placeholder="Oggetto *" required>
+            <div id="medTherapyGroup"><input type="text" id="medTherapy" class="input" placeholder="Terapia prescritta (mostrata in Dashboard)"></div>
+            <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.6rem; border-radius: 10px; margin-bottom: 0.75rem;"><label class="stat-label" style="display:block; margin-bottom:0.3rem;">Allega Documento (Salvato nel DB)</label><input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png" style="margin:0; padding:0.3rem;"></div>
+            <input type="text" id="medNotes" class="input" placeholder="Note cliniche...">
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella</button>
           </form>
-          <div id="healthMedicalList" class="item-list sensitive" style="max-height: 350px;"></div>
+          <div id="healthMedicalList" class="item-list sensitive" style="max-height: 320px;"></div>
         </div>
       </div>
     </section>
+
   </main>
 
-  <!-- FAB E MODALI -->
+  <!-- MODALI EXTRA -->
   <div class="fab-container">
     <div class="fab-menu" id="fabMenu">
       <div class="fab-item" onclick="App.quickAdd('txAmount')">💸 Nuova Spesa</div>
       <div class="fab-item" onclick="App.quickAdd('calTaskTitle')">📌 Nuovo Task</div>
+      <div class="fab-item" onclick="App.quickAdd('nutriGrams')">🍎 Registra Pasto</div>
       <div class="fab-item" onclick="App.quickAdd('weightValue')">⚖️ Registra Peso</div>
     </div>
     <button class="fab-btn" onclick="App.toggleFab()">+</button>
   </div>
 
+  <div id="pomodoroModal" class="modal-backdrop">
+    <div class="modal-content" style="text-align:center; max-width:380px;">
+      <div class="card-header"><div class="card-title">⏱️ Deep Focus Timer</div><button class="btn btn-sm" onclick="App.closeModal('pomodoroModal')">✕</button></div>
+      <div id="pomoDisplay" style="font-size:3.5rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin:1.5rem 0;">25:00</div>
+      <div style="display:flex; gap:0.5rem; justify-content:center;"><button class="btn btn-primary" onclick="App.togglePomodoro()" id="pomoBtn">▶️ Avvia Focus</button><button class="btn" onclick="App.resetPomodoro()">🔄 Reset</button></div>
+    </div>
+  </div>
+
   <div id="searchModal" class="modal-backdrop">
-    <div class="modal-content" style="align-self: flex-start; margin-top: 4rem;">
-      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-        <input type="text" id="globalSearchInput" class="input" placeholder="Cerca (Scontrini, Referti...)" style="margin:0; font-size:1.1rem; border-color:var(--accent-primary);" oninput="App.executeSearch()">
-        <button class="btn btn-sm" onclick="App.closeModal('searchModal')">✕</button>
-      </div>
-      <div id="globalSearchResults" class="item-list" style="max-height: 60vh;"><div class="text-muted" style="text-align:center; padding: 2rem 0;">Scrivi per cercare nel DB...</div></div>
+    <div class="modal-content" style="align-self: flex-start; margin-top: 3.5rem;">
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><input type="text" id="globalSearchInput" class="input" placeholder="Cerca ovunque..." style="margin:0; font-size:1rem; border-color:var(--accent-primary);" oninput="App.executeSearch()"><button class="btn btn-sm" onclick="App.closeModal('searchModal')">✕</button></div>
+      <div id="globalSearchResults" class="item-list" style="max-height: 60vh;"><div class="stat-label" style="text-align:center; padding: 2rem 0;">Digita almeno 2 caratteri...</div></div>
     </div>
   </div>
 
   <div id="scannerModal" class="modal-backdrop">
+    <div class="modal-content"><div class="card-header"><div class="card-title">📷 Scanner Barcode</div><button class="btn btn-sm" onclick="App.closeScanner()">✕</button></div><div id="reader" style="width:100%; border-radius:14px; overflow:hidden;"></div></div>
+  </div>
+
+  <!-- MODALE CONFIGURAZIONE GARAGE -->
+  <div id="garageConfigModal" class="modal-backdrop">
     <div class="modal-content">
-      <div class="card-header"><div class="card-title">📷 Scansione Barcode</div><button class="btn btn-sm" onclick="App.closeScanner()">✕</button></div>
-      <div id="reader" style="width:100%; border-radius:12px; overflow:hidden;"></div>
-      <p class="stat-label" style="text-align:center; margin-top:1rem;">Inquadra un codice a barre per riempire il campo testo in automatico.</p>
+      <div class="card-header"><div class="card-title">⚙️ Impostazioni Veicolo Principale</div><button class="btn btn-sm" onclick="App.closeModal('garageConfigModal')">✕</button></div>
+      <form onsubmit="App.saveGarageConfig(event)">
+        <div class="form-row"><input type="text" id="gConfName" class="input" placeholder="Marca e Modello (es. Audi A3)" required><input type="text" id="gConfPlate" class="input" placeholder="Targa (es. AB 123 CD)" required></div>
+        <div class="form-row">
+          <div><label class="stat-label">Scad. Bollo</label><input type="date" id="gConfBollo" class="input" required></div>
+          <div><label class="stat-label">Scad. Assicurazione</label><input type="date" id="gConfAssic" class="input" required></div>
+        </div>
+        <div class="form-row">
+          <div><label class="stat-label">Scad. Revisione</label><input type="date" id="gConfRevis" class="input" required></div>
+          <div><label class="stat-label">Km Attuali Iniziali</label><input type="number" id="gConfKm" class="input" value="0"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Salva Configurazione Veicolo</button>
+      </form>
     </div>
   </div>
 
+  <!-- MODALE IMPOSTAZIONI GLOBALI -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal-content">
-      <div class="card-header"><div class="card-title">⚙️ Impostazioni App</div><button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button></div>
+      <div class="card-header"><div class="card-title">⚙️ Impostazioni Ecosistema</div><button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button></div>
       <div class="bento-grid">
-        <div class="bento-card col-span-12" style="padding: 1.2rem;">
-          <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">🎨 Interfaccia & Sensazioni</div>
+        <div class="bento-card col-span-12" style="padding: 1.1rem;">
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">🎨 Estetica & Display</div>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;"><button class="btn btn-sm" onclick="App.toggleTheme()" style="flex:1;">🌓 Cambia Tema</button><button class="btn btn-sm" id="hapticBtn" onclick="App.toggleHaptic()" style="flex:1;">📳 Vibrazione Aptica</button></div>
         </div>
-        <div class="bento-card col-span-12" style="padding: 1.2rem;">
-          <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">🔒 Protezione Avvio (PIN)</div>
-          <div class="form-row" style="margin-bottom: 0.5rem;"><input type="password" id="setupPinInput" class="input" maxlength="4" placeholder="Inserisci PIN (4 cifre)..." inputmode="numeric"><button class="btn btn-sm btn-primary" onclick="App.savePin()">Attiva PIN</button></div>
-          <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Disattiva PIN</button>
+        <div class="bento-card col-span-12" style="padding: 1.1rem;">
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">🔒 Sicurezza PIN</div>
+          <div class="form-row" style="margin-bottom: 0.5rem;"><input type="password" id="setupPinInput" class="input" maxlength="4" placeholder="Nuovo PIN (4 cifre)..." inputmode="numeric"><button class="btn btn-sm btn-primary" onclick="App.savePin()">Attiva PIN</button></div>
+          <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Rimuovi PIN</button>
         </div>
-        <div class="bento-card col-span-12" style="padding: 1.2rem;">
-          <div class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem;">📊 Gestione Dati Personali</div>
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;"><button class="btn btn-sm" onclick="App.exportCSV('finance')" style="flex:1;">⬇️ CSV Finanze</button><button class="btn btn-sm" onclick="App.exportCSV('health')" style="flex:1;">⬇️ CSV Salute</button></div>
-          <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem; background: var(--bg-secondary);">💾 Esporta Backup JSON</button>
-          
-          <label class="btn btn-sm" style="width:100%; margin-bottom: 1rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">
-            📂 Ripristina Backup (JSON o ZIP)
-            <input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;">
-          </label>
+        <div class="bento-card col-span-12" style="padding: 1.1rem;">
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">📊 Backup & Ripristino</div>
+          <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem;">💾 Esporta Backup Completo (JSON)</button>
+          <label class="btn btn-sm" style="width:100%; margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">📂 Ripristina Backup (JSON o ZIP)<input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;"></label>
+          <button class="btn btn-sm" onclick="App.forceUpdateCache()" style="width:100%; margin-bottom: 1rem; border-color: var(--accent-primary); color: var(--accent-primary);">🔄 Forza Aggiornamento PWA</button>
           <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
-          <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Elimina Tutti i Dati (Reset App)</button>
+          <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Reset Totale App</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MOTORE JAVASCRIPT -->
   <script>
     localforage.config({ driver: localforage.INDEXEDDB, name: 'LifeOS_v7', version: 1.0, storeName: 'lifeos_data' });
 
+    const DEFAULT_FOODS = [
+      { id: 'f1', name: 'Petto di Pollo (crudo)', kcal: 110, carb: 0, prot: 23.1, fat: 1.2 },
+      { id: 'f2', name: 'Pasta di Semola (cruda)', kcal: 353, carb: 72.7, prot: 12.5, fat: 1.5 },
+      { id: 'f3', name: 'Riso Basmati (crudo)', kcal: 349, carb: 78, prot: 7.5, fat: 0.6 },
+      { id: 'f4', name: 'Uovo Intero', kcal: 143, carb: 0.7, prot: 12.6, fat: 9.5 },
+      { id: 'f6', name: 'Olio EVO', kcal: 899, carb: 0, prot: 0, fat: 99.9 },
+      { id: 'f8', name: 'Tonno al Naturale', kcal: 108, carb: 0, prot: 25.1, fat: 0.8 },
+      { id: 'f15', name: 'Yogurt Greco 0%', kcal: 59, carb: 3.6, prot: 10.3, fat: 0.4 },
+      { id: 'f18', name: 'Mozzarella Fior di Latte', kcal: 253, carb: 0.7, prot: 18.7, fat: 19.5 },
+      { id: 'f20', name: 'Latte Parz. Scremato', kcal: 46, carb: 4.9, prot: 3.3, fat: 1.6 },
+      { id: 'f22', name: 'Pane Comune', kcal: 275, carb: 58, prot: 8.6, fat: 1 }
+    ];
+
     const App = {
       state: {
-        pin: null, lastCronRun: null, 
-        inventory: [], calendarTasks: [], journal: [], maintenances: [], accounts: [], transactions: [], healthNutrition: [], healthWeight: [], healthMedical: [], habits: [],
-        settings: { inventoryCategories: { 'Elettronica': ['Smartphone', 'Computer', 'Casa'], 'Veicoli': ['Auto', 'Moto'], 'Casa': ['Elettrodomestici', 'Mobili'] }, maintenanceCategories: ['Casa', 'Auto', 'Salute', 'Altro'], hapticEnabled: false }
+        pin: null, lastCronRun: null,
+        inventory: [], calendarTasks: [], journal: [], maintenances: [],
+        accounts: [], transactions: [], subs: [],
+        healthNutrition: [], healthWeight: [], healthMedical: [], habits: [],
+        foodLibrary: DEFAULT_FOODS,
+        nutritionGoals: { kcal: 2100, carb: 230, prot: 140, fat: 70 },
+        garageConfig: { name: 'Il Mio Veicolo', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 },
+        garageMaint: [],
+        settings: {
+          inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
+          maintenanceCategories: ['Casa', 'Altro'],
+          hapticEnabled: true
+        }
       },
-      currentDate: new Date(), selectedDate: new Date(), activeInvTab: 'garanzie', charts: {}, html5QrcodeScanner: null,
+      currentDate: new Date(),
+      selectedDate: new Date(),
+      activeInvTab: 'archivio',
+      charts: {},
+      html5QrcodeScanner: null,
+      pomoTimer: null,
+      pomoSeconds: 1500,
 
-      // === SISTEMA DI MIGRAZIONE (V5 -> V7) E SCUDO ANTI-CRASH ===
+      setElText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; },
+      setElHTML(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; },
+
       sanitizeData() {
         const today = new Date().toISOString().slice(0, 10);
-        
-        if (this.state.vault) { this.state.inventory = this.state.vault.map(v => ({ id: v.id || this.generateId(), type: 'Archivio', name: v.title || 'Oggetto', category: v.cat || 'Generale', subcategory: 'Generale', price: parseFloat(v.price) || 0, date: v.date || today, warranty: '', location: '', notes: v.notes || '', addedAt: new Date().toISOString() })); delete this.state.vault; }
-        if (this.state.financeTx) { this.state.transactions = this.state.financeTx.map(t => ({ id: t.id || this.generateId(), type: t.type === 'expense' ? 'EXPENSE' : (t.type === 'income' ? 'INCOME' : 'TRANSFER'), amount: parseFloat(t.amount) || 0, accountId: t.accountId || 'acc-main', desc: t.desc || 'Movimento', category: t.cat || 'Generale', date: t.date || today, recurrence: 'Singola', timestamp: new Date().toISOString() })); delete this.state.financeTx; }
-        if (this.state.maint) { this.state.maintenances = this.state.maint.map(m => ({ id: m.id || this.generateId(), title: m.task || 'Manutenzione', category: m.asset || 'Altro', dueDate: m.date || today, cost: parseFloat(m.cost) || 0, recurrence: 'Singola', status: 'In attesa', notes: m.parts || '' })); delete this.state.maint; }
-        if (this.state.crmTasks) { this.state.calendarTasks = this.state.crmTasks.map(c => ({ id: c.id || this.generateId(), date: today, title: c.title || 'Task', type: 'Attività', priority: 'Normale' })); delete this.state.crmTasks; }
-        if (this.state.weightLogs) { this.state.healthWeight = this.state.weightLogs.map(w => ({ id: w.id || this.generateId(), value: parseFloat(w.kg) || 0, date: w.date || today })); delete this.state.weightLogs; }
-        if (this.state.foodLogs) { this.state.healthNutrition = this.state.foodLogs.map(f => ({ id: f.id || this.generateId(), meal: f.meal + ' - ' + f.name, date: f.date || today, kcal: parseFloat(f.kcal) || 0, prot: parseFloat(f.prot) || 0, carbs: parseFloat(f.carb) || 0, fat: parseFloat(f.fat) || 0 })); delete this.state.foodLogs; }
-        if (this.state.medRecords) { this.state.healthMedical = this.state.medRecords.map(m => ({ id: m.id || this.generateId(), type: m.type || 'Referto', date: m.date || today, title: m.title || 'Referto', notes: m.notes || '', therapy: '', fileData: m.fileData || null })); delete this.state.medRecords; }
+        const cleanNumber = (val) => {
+          if (typeof val === 'number' && !isNaN(val)) return val;
+          if (!val) return 0;
+          let s = String(val).replace(/[^0-9.,-]/g, '').replace(',', '.');
+          return parseFloat(s) || 0;
+        };
 
-        if (this.state.accounts && Array.isArray(this.state.accounts)) { this.state.accounts = this.state.accounts.map(a => { if (a.baseBalance !== undefined && a.balance === undefined) { a.balance = parseFloat(a.baseBalance) || 0; delete a.baseBalance; } return a; }); } 
-        else { this.state.accounts = []; }
+        if (Array.isArray(this.state.vault) && this.state.vault.length > 0) {
+          this.state.inventory = this.state.vault.map(v => ({ id: v.id || this.generateId(), type: (v.months && Number(v.months) > 0) ? 'Garanzia' : 'Archivio', name: v.title || v.name || 'Oggetto', category: v.cat || 'Elettrodomestici', subcategory: v.serial || 'Generale', price: cleanNumber(v.price), date: v.date || today, warranty: '', location: v.serial || '', notes: v.notes || '', addedAt: v.date ? new Date(v.date).toISOString() : new Date().toISOString() }));
+          delete this.state.vault;
+        }
+        if (Array.isArray(this.state.financeTx) && this.state.financeTx.length > 0) {
+          this.state.transactions = this.state.financeTx.map(t => ({ id: t.id || this.generateId(), type: String(t.type).toLowerCase() === 'income' ? 'INCOME' : (String(t.type).toLowerCase() === 'transfer' ? 'TRANSFER' : 'EXPENSE'), amount: cleanNumber(t.amount), accountId: t.accountId || 'acc-main', desc: t.desc || 'Movimento', category: t.cat || 'Generale', date: t.date || today, recurrence: 'Singola', timestamp: t.date ? new Date(t.date).toISOString() : new Date().toISOString() }));
+          delete this.state.financeTx;
+        }
+        if (Array.isArray(this.state.maint) && this.state.maint.length > 0) {
+          this.state.maintenances = this.state.maint.map(m => ({ id: m.id || this.generateId(), title: m.task || m.title || 'Manutenzione', category: m.asset || 'Casa', dueDate: m.date || today, cost: cleanNumber(m.cost), recurrence: m.nextMonths === 12 ? 'Annuale' : 'Singola', status: 'In attesa', notes: m.parts || '' }));
+          delete this.state.maint;
+        }
+        if (Array.isArray(this.state.crmTasks) && this.state.crmTasks.length > 0) {
+          this.state.calendarTasks = this.state.crmTasks.map(c => ({ id: c.id || this.generateId(), date: today, title: c.title || 'Attività', type: 'Attività', priority: c.pinned ? 'Alta' : 'Normale' }));
+          delete this.state.crmTasks;
+        }
+        if (Array.isArray(this.state.weightLogs) && this.state.weightLogs.length > 0) {
+          this.state.healthWeight = this.state.weightLogs.map(w => ({ id: w.id || this.generateId(), value: cleanNumber(w.kg || w.value), date: w.date || today }));
+          delete this.state.weightLogs;
+        }
+        if (Array.isArray(this.state.foodLogs) && this.state.foodLogs.length > 0) {
+          this.state.healthNutrition = this.state.foodLogs.map(f => ({ id: f.id || this.generateId(), meal: `${f.meal || 'Pasto'}: ${f.name || 'Alimento'} (${f.grams || 100}g)`, date: f.date || today, kcal: Math.round(cleanNumber(f.kcal)), prot: cleanNumber(f.prot), carbs: cleanNumber(f.carb || f.carbs), fat: cleanNumber(f.fat) }));
+          delete this.state.foodLogs;
+        }
+        if (Array.isArray(this.state.medRecords) && this.state.medRecords.length > 0) {
+          this.state.healthMedical = this.state.medRecords.map(m => ({ id: m.id || this.generateId(), type: (m.type && m.type.includes('Visita')) ? 'Visita Medica' : 'Referto', date: m.date || today, title: m.title || 'Referto', notes: [m.doctor ? `Dott. ${m.doctor}` : '', m.notes || ''].filter(Boolean).join(' — '), therapy: m.therapy || '', fileData: m.fileData || null }));
+          delete this.state.medRecords;
+        }
 
-        const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits'];
-        arrays.forEach(key => { if (!Array.isArray(this.state[key])) this.state[key] = []; });
+        const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'garageMaint'];
+        arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
+        if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
+        if (!this.state.nutritionGoals) this.state.nutritionGoals = { kcal: 2100, carb: 230, prot: 140, fat: 70 };
+        if (!this.state.garageConfig) this.state.garageConfig = { name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 };
         if (!this.state.settings) this.state.settings = {};
 
-        const cleanNumber = (val) => { if (typeof val === 'number' && !isNaN(val)) return val; if (!val) return 0; let s = String(val).replace(/[^0-9,-]/g, '').replace(',', '.'); return parseFloat(s) || 0; };
-
-        this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.timestamp = t.timestamp || new Date().toISOString(); t.desc = t.desc || 'Transazione'; t.type = t.type || 'EXPENSE'; });
-        this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
-        this.state.calendarTasks.forEach(t => { t.date = t.date || today; t.title = t.title || 'Attività'; });
-        this.state.maintenances.forEach(m => { m.dueDate = m.dueDate || today; m.cost = cleanNumber(m.cost); m.title = m.title || 'Manutenzione'; });
-        this.state.healthMedical.forEach(m => { m.date = m.date || today; m.title = m.title || 'Referto'; });
-        this.state.healthWeight.forEach(w => w.date = w.date || today);
-        this.state.healthNutrition.forEach(n => n.date = n.date || today);
-        this.state.inventory.forEach(i => { i.addedAt = i.addedAt || new Date().toISOString(); i.price = cleanNumber(i.price); i.name = i.name || 'Oggetto'; });
-        this.state.journal.forEach(j => j.date = j.date || today);
+        this.state.accounts = this.state.accounts.map(a => {
+          const bal = (a.baseBalance !== undefined && a.balance === undefined) ? cleanNumber(a.baseBalance) : cleanNumber(a.balance);
+          return { id: a.id || this.generateId(), name: a.name || 'Conto', type: a.type || 'Carta', balance: bal };
+        });
+        this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || t.cat || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(t.type) ? t.type : 'EXPENSE'; });
       },
 
-      // === IMPORTAZIONE ===
       async importBackupFile(event) {
         const file = event.target.files[0]; if (!file) return;
         try {
-          let parsed = null; const fileName = file.name.toLowerCase();
-          if (fileName.endsWith('.zip')) {
+          let parsed = null;
+          if (file.name.toLowerCase().endsWith('.zip')) {
             const zip = new JSZip(); const loadedZip = await zip.loadAsync(file);
             for (const relativePath of Object.keys(loadedZip.files)) {
-              if (loadedZip.files[relativePath].dir) continue;
-              if (relativePath.endsWith('.csv')) continue; 
+              if (loadedZip.files[relativePath].dir || relativePath.endsWith('.csv')) continue;
               try {
                 const content = await loadedZip.files[relativePath].async('text');
                 let testParse = JSON.parse(content);
@@ -504,147 +721,261 @@
                 if (testParse && typeof testParse === 'object' && !Array.isArray(testParse)) { parsed = testParse; break; }
               } catch (e) {}
             }
-            if (!parsed) throw new Error("Nessun dato LifeOS trovato nello ZIP.");
+            if (!parsed) throw new Error("JSON non trovato nello ZIP");
           } else {
             const jsonString = await new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = e => rej(e); r.readAsText(file); });
             parsed = JSON.parse(jsonString); if (parsed.state) parsed = parsed.state;
           }
+
           if (parsed) {
             this.state = { ...this.state, ...parsed }; this.sanitizeData(); await localforage.setItem('appData', this.state);
-            this.closeModal('settingsModal'); this.showToast('Backup ripristinato! Riavvio...', 'success'); setTimeout(() => location.reload(), 1200);
+            this.closeModal('settingsModal'); this.showToast('Archivio importato!', 'success'); setTimeout(() => location.reload(), 1000);
           }
-        } catch (err) { this.showToast('Errore lettura backup.', 'danger'); }
+        } catch (err) { this.showToast('Errore lettura file.', 'danger'); }
         event.target.value = '';
       },
-      
-      async save() { try { this.sanitizeData(); await localforage.setItem('appData', this.state); this.renderDashboard(); } catch (e) { this.showToast('Errore salvataggio', 'danger'); } },
-      async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; this.sanitizeData(); } } catch (e) {} },
-      
-      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse forwards'; setTimeout(() => toast.remove(), 300); }, 3500); },
-      openModal(id) { document.getElementById(id).classList.add('open'); if(id === 'searchModal') setTimeout(()=>document.getElementById('globalSearchInput').focus(), 100); },
-      closeModal(id) { document.getElementById(id).classList.remove('open'); },
-      switchModule(modId) { document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active')); document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active')); const target = document.getElementById(modId); if(target) target.classList.add('active'); const tab = document.querySelector(`.nav-tab[data-target="${modId}"]`); if (tab) tab.classList.add('active'); if (modId === 'mod-dashboard') this.renderDashboard(); if (modId === 'mod-calendar') this.renderCalendar(); if (modId === 'mod-finance') { this.populateAccountSelects(); this.renderFinance(); } },
-      openHubModule(hubId) { document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active')); document.getElementById(hubId).classList.add('active'); if (hubId === 'mod-inventory') { this.populateCategorySelects(); this.renderInventory(); } if (hubId === 'mod-maintenance') { this.populateMaintenanceSelects(); this.renderMaintenances(); } if (hubId === 'mod-health') this.renderHealth(); },
-      switchInvTab(tabId) { this.activeInvTab = tabId; document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`).classList.add('active'); this.renderInventory(); },
+
+      async forceUpdateCache() {
+        try {
+          if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); for (let reg of regs) await reg.unregister(); }
+          if ('caches' in window) { const keys = await caches.keys(); for (let k of keys) await caches.delete(k); }
+          this.showToast('Cache pulita! Ricarico...', 'info'); setTimeout(() => location.reload(true), 800);
+        } catch (e) { location.reload(); }
+      },
+      async save() { try { this.sanitizeData(); await localforage.setItem('appData', this.state); this.renderActiveModule(); } catch (e) { this.showToast('Errore salvataggio', 'danger'); } },
+      async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; this.sanitizeData(); await localforage.setItem('appData', this.state); } } catch (e) {} },
+
+      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3200); },
+      openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('open'); if (id === 'searchModal') setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100); if (id === 'garageConfigModal') this.loadGarageConfig(); },
+      closeModal(id) { document.getElementById(id)?.classList.remove('open'); },
+
+      switchModule(modId) {
+        document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(modId)?.classList.add('active');
+        document.querySelector(`.nav-tab[data-target="${modId}"]`)?.classList.add('active');
+        this.renderActiveModule();
+      },
+      openHubModule(hubId) {
+        document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
+        document.getElementById(hubId)?.classList.add('active');
+        this.renderActiveModule();
+      },
+      switchInvTab(tabId) { this.activeInvTab = tabId; document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`)?.classList.add('active'); this.renderInventory(); },
+
+      renderActiveModule() {
+        if(document.getElementById('mod-dashboard').classList.contains('active')) this.renderDashboard();
+        if(document.getElementById('mod-calendar').classList.contains('active')) this.renderCalendar();
+        if(document.getElementById('mod-finance').classList.contains('active')) { this.populateAccountSelects(); this.renderFinance(); }
+        if(document.getElementById('mod-garage').classList.contains('active')) this.renderGarage();
+        if(document.getElementById('sub-inventory').classList.contains('active')) { this.populateCategorySelects(); this.renderInventory(); }
+        if(document.getElementById('sub-maintenance').classList.contains('active')) { this.populateMaintenanceSelects(); this.renderGeneralMaintenances(); }
+        if(document.getElementById('sub-health').classList.contains('active')) { this.populateFoodLibrarySelect(); this.renderHealth(); }
+      },
 
       toggleTheme() { const html = document.documentElement; const current = html.getAttribute('data-theme'); const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark'; html.setAttribute('data-theme', nextTheme); this.save(); this.showToast(`Tema: ${nextTheme.toUpperCase()}`); },
-      toggleHaptic() { if (this.state.settings.hapticEnabled === undefined) this.state.settings.hapticEnabled = false; this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled; this.save(); if (this.state.settings.hapticEnabled) this.vibrate(20); this.showToast(this.state.settings.hapticEnabled ? 'Vibrazione Attivata' : 'Vibrazione Disattivata'); this.updateHapticButton(); },
-      updateHapticButton() { const btn = document.getElementById('hapticBtn'); if (btn) btn.innerText = (this.state.settings.hapticEnabled) ? '📳 Disattiva Vibrazione' : '🔕 Attiva Vibrazione'; },
-      vibrate(ms = 10) { if (this.state.settings.hapticEnabled && navigator.vibrate) navigator.vibrate(ms); },
-      toggleFab() { document.getElementById('fabMenu').classList.toggle('open'); this.vibrate(10); },
-      quickAdd(inputId) { this.toggleFab(); if (inputId === 'txAmount') this.switchModule('mod-finance'); else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar'); else if (inputId === 'weightValue') this.openHubModule('mod-health'); setTimeout(() => { const input = document.getElementById(inputId); if(input) { input.focus(); input.scrollIntoView({behavior: 'smooth', block: 'center'}); } }, 350); },
+      toggleHaptic() { this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled; this.save(); if (this.state.settings.hapticEnabled) this.vibrate(25); this.updateHapticButton(); },
+      updateHapticButton() { this.setElText('hapticBtn', this.state.settings.hapticEnabled ? '📳 Vibrazione ON' : '🔕 Vibrazione OFF'); },
+      vibrate(ms = 12) { if (this.state.settings?.hapticEnabled && navigator.vibrate) navigator.vibrate(ms); },
+      toggleFab() { document.getElementById('fabMenu')?.classList.toggle('open'); this.vibrate(12); },
+      quickAdd(inputId) { this.toggleFab(); if (inputId === 'txAmount') this.switchModule('mod-finance'); else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar'); else if (inputId === 'weightValue' || inputId === 'nutriGrams') this.openHubModule('sub-health'); setTimeout(() => { const input = document.getElementById(inputId); if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 300); },
 
-      formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount); },
+      formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(amount) || 0); },
       formatDate(dateStr) { return dateStr ? new Date(dateStr).toLocaleDateString('it-IT') : '--'; },
       generateId() { return Math.random().toString(36).substr(2, 9); },
-      fileToBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); }); },
+      fileToBase64(file) { return new Promise((res, rej) => { const r = new FileReader(); r.readAsDataURL(file); r.onload = () => res(r.result); r.onerror = e => rej(e); }); },
 
-      savePin() { const pin = document.getElementById('setupPinInput').value; if (pin.length === 4) { this.state.pin = pin; this.save(); document.getElementById('setupPinInput').value = ''; this.showToast('PIN Salvato.'); } else this.showToast('Il PIN deve essere di 4 cifre', 'warning'); },
-      removePin() { this.state.pin = null; this.save(); this.showToast('PIN rimosso.'); },
-      verifyPin() { const input = document.getElementById('loginPinInput').value; if (input === this.state.pin) { document.getElementById('lockScreen').classList.add('hidden'); this.runCronJobs(); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
-      togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); document.getElementById('privacyBtn').innerHTML = isActive ? '🔒' : '👁️'; this.showToast(isActive ? 'Dati oscurati' : 'Dati in chiaro', 'info'); },
+      togglePomodoro() { if (this.pomoTimer) { clearInterval(this.pomoTimer); this.pomoTimer = null; this.setElText('pomoBtn', '▶️ Riprendi'); } else { this.setElText('pomoBtn', '⏸️ Pausa'); this.pomoTimer = setInterval(() => { if (this.pomoSeconds > 0) { this.pomoSeconds--; const m = String(Math.floor(this.pomoSeconds / 60)).padStart(2, '0'); const s = String(this.pomoSeconds % 60).padStart(2, '0'); this.setElText('pomoDisplay', `${m}:${s}`); } else { clearInterval(this.pomoTimer); this.pomoTimer = null; this.vibrate([100, 50, 100]); this.showToast('Sessione Completata! 🎉'); } }, 1000); } },
+      resetPomodoro() { clearInterval(this.pomoTimer); this.pomoTimer = null; this.pomoSeconds = 1500; this.setElText('pomoDisplay', '25:00'); this.setElText('pomoBtn', '▶️ Avvia Focus'); },
 
-      runCronJobs() { const currentMonth = new Date().toISOString().slice(0, 7); if (!this.state.lastCronRun) { this.state.lastCronRun = currentMonth; this.save(); return; } if (this.state.lastCronRun < currentMonth) { let tasksRun = 0; this.state.transactions.filter(t => t.recurrence === 'Mensile').forEach(tx => { const acc = this.state.accounts.find(a => a.id === tx.accountId); if(acc) { const newTx = { ...tx, id: this.generateId(), date: new Date().toISOString().slice(0,10), timestamp: new Date().toISOString() }; if(newTx.type === 'EXPENSE') acc.balance -= newTx.amount; if(newTx.type === 'INCOME') acc.balance += newTx.amount; this.state.transactions.push(newTx); tasksRun++; } }); this.state.maintenances.filter(m => m.recurrence === 'Mensile' && m.status === 'Completata').forEach(m => { let d = new Date(m.dueDate); d.setMonth(d.getMonth() + 1); m.dueDate = d.toISOString().slice(0,10); m.status = 'In attesa'; tasksRun++; }); this.state.lastCronRun = currentMonth; this.save(); if(tasksRun > 0) this.showToast(`Automazioni: ${tasksRun} task generati.`, 'info'); } },
-      exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_Backup.json`; document.body.appendChild(a); a.click(); a.remove(); this.showToast('Backup salvato.'); },
-      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},${acc ? acc.name : 'N/D'},${t.category},${t.desc}\n`; }); } else if (type === 'health') { csv = 'Data,Peso (kg),Kcal,Proteine,Carboidrati,Grassi\n'; const days = [...new Set([...this.state.healthWeight.map(w=>w.date), ...this.state.healthNutrition.map(n=>n.date)])]; days.forEach(d => { const w = this.state.healthWeight.find(x => x.date === d)?.value || ''; const nLogs = this.state.healthNutrition.filter(x => x.date === d); csv += `${d},${w},${nLogs.reduce((s,x)=>s+x.kcal,0)},${nLogs.reduce((s,x)=>s+x.prot,0)},${nLogs.reduce((s,x)=>s+x.carbs,0)},${nLogs.reduce((s,x)=>s+x.fat,0)}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `Export_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
-      async resetAllData() { if(confirm("Cancellare tutti i dati permanentemente?")) { await localforage.clear(); location.reload(); } },
-
-      executeSearch() {
-        const query = document.getElementById('globalSearchInput').value.toLowerCase().trim(); const resBox = document.getElementById('globalSearchResults');
-        if(!query || query.length < 2) { resBox.innerHTML = '<div class="text-muted" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'; return; }
-        let html = ''; let count = 0;
-        this.state.inventory.forEach(i => { if((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>📦 ${i.name}</strong><br><small class="text-secondary">${i.category} | ${this.formatMoney(i.price)}</small></div></div>`; count++; } });
-        this.state.transactions.forEach(t => { if((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="text-secondary">${this.formatDate(t.date)}</small></div><strong style="color:${t.type==='EXPENSE'?'var(--danger)':'var(--success)'}">${t.amount}€</strong></div>`; count++; } });
-        this.state.healthMedical.forEach(m => { if((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="text-secondary">${this.formatDate(m.date)}</small></div></div>`; count++; } });
-        this.state.calendarTasks.forEach(t => { if((t.title||'').toLowerCase().includes(query)) { html += `<div class="list-row"><div><strong>📌 ${t.title}</strong><br><small class="text-secondary">${this.formatDate(t.date)}</small></div></div>`; count++; } });
-        resBox.innerHTML = count > 0 ? html : `<div class="text-muted" style="text-align:center; padding: 2rem 0;">Nessun risultato.</div>`;
-      },
-
-      addHabit() { const name = prompt("Nome della nuova abitudine (es. Lettura, Palestra):"); if(name && name.trim()) { this.state.habits.push({ id: this.generateId(), name: name.trim(), streak: 0, lastDone: null }); this.save(); } },
-      deleteHabit(id) { if(confirm("Eliminare abitudine?")) { this.state.habits = this.state.habits.filter(h => h.id !== id); this.save(); } },
-      toggleHabit(id) { const habit = this.state.habits.find(h => h.id === id); if(!habit) return; const today = new Date().toISOString().slice(0,10); if(habit.lastDone === today) { habit.lastDone = null; habit.streak = Math.max(0, habit.streak - 1); } else { let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); if(habit.lastDone === yesterday.toISOString().slice(0,10)) habit.streak++; else habit.streak = 1; habit.lastDone = today; this.vibrate(30); } this.save(); },
+      savePin() { const pin = document.getElementById('setupPinInput')?.value || ''; if (pin.length === 4) { this.state.pin = pin; this.save(); document.getElementById('setupPinInput').value = ''; this.showToast('PIN Attivato.'); } else this.showToast('Inserisci 4 cifre', 'warning'); },
+      removePin() { this.state.pin = null; this.save(); this.showToast('PIN Disattivato.'); },
+      verifyPin() { const input = document.getElementById('loginPinInput')?.value; if (input === this.state.pin) { document.getElementById('lockScreen')?.classList.add('hidden'); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
+      togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); this.setElHTML('privacyBtn', isActive ? '🔒' : '👁️'); },
 
       renderDashboard() {
-        const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0); 
-        document.getElementById('dashNetWorth').innerText = this.formatMoney(total); 
-        document.getElementById('dashAccountsCount').innerText = `${this.state.accounts.length} conti`;
-        
-        const therapies = this.state.healthMedical.filter(m => m.type === 'Visita Medica' && m.therapy); document.getElementById('dashPillReminders').innerHTML = therapies.length ? therapies.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>💊 ${t.therapy}</strong><br><small class="text-secondary">${t.title}</small></div></div>`).join('') : '<div class="list-row text-muted">Nessuna terapia.</div>';
-        
-        const todayStr = this.currentDate.toISOString().slice(0,10);
-        const upcoming = this.state.calendarTasks.filter(t => t.date >= todayStr).sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(0, 5); document.getElementById('dashUpcomingTasks').innerHTML = upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-warning'}">${t.type}</span></div>`).join('') : '<div class="list-row text-muted">Nessuna attività in programma.</div>';
-        
-        document.getElementById('habitList').innerHTML = this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone?0.6:1};"><div style="display:flex; align-items:center; gap:0.5rem;"><button class="btn btn-sm ${isDone?'btn-primary':''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone?'✓':''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.5rem;"><span class="badge badge-info">🔥 ${h.streak}</span><button class="btn btn-sm text-muted" style="padding:0.2rem 0.4rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : '<div class="list-row text-muted">Aggiungi la tua prima abitudine.</div>';
+        const hour = new Date().getHours(); const greet = hour < 12 ? 'Buongiorno ✨' : hour < 18 ? 'Buon pomeriggio ☀️' : 'Buonasera 🌙';
+        this.setElText('greetingTitle', greet); this.setElText('greetingDate', new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+        const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0);
+        this.setElText('dashNetWorth', this.formatMoney(total)); this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length; const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
+        const score = Math.min(100, Math.max(25, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15))));
+        this.setElText('lifeScoreValue', `${score}%`);
+        const circle = document.getElementById('lifeScoreCircle'); if (circle) circle.style.strokeDashoffset = 150 - (150 * score) / 100;
 
+        const txCount = this.state.transactions.length; const lastWeight = [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||''))[0];
+        this.setElText('smartInsightText', txCount > 0 ? `Hai ${txCount} movimenti registrati, ${this.state.inventory.length} beni in archivio${lastWeight ? ` e ultimo peso a ${lastWeight.value} kg` : ''}.` : `Il tuo ecosistema LifeOS è pronto. Tocca + per registrare i tuoi dati.`);
+
+        const medItems = this.state.healthMedical.slice(0, 4);
+        this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + t.therapy : '🩺 ' + t.title}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + t.notes : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia registrata.</div>');
+        const upcoming = [...this.state.calendarTasks].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5);
+        this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in programma.</div>');
+        this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : '<div class="list-row stat-label">Tocca "+ Nuova" per creare un'abitudine.</div>');
         this.renderFinanceChart();
       },
+
       renderFinanceChart() {
         const ctx = document.getElementById('dashboardChart'); if (!ctx) return;
-        const currentMonth = new Date().toISOString().slice(0, 7); let income = 0; let expense = 0;
-        this.state.transactions.filter(t => (t.date||'').startsWith(currentMonth)).forEach(t => { if (t.type === 'INCOME') income += t.amount; if (t.type === 'EXPENSE') expense += t.amount; });
-        if(this.charts.finance) this.charts.finance.destroy();
-        this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Mese Corrente'], datasets: [ { label: 'Entrate', data: [income], backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Uscite', data: [expense], backgroundColor: '#ef4444', borderRadius: 6 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
+        let income = 0, expense = 0;
+        this.state.transactions.forEach(t => { if (t.type === 'INCOME') income += t.amount; if (t.type === 'EXPENSE') expense += t.amount; });
+        if (this.charts.finance) this.charts.finance.destroy();
+        this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Entrate', 'Uscite'], datasets: [{ data: [income, expense], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } } } });
       },
 
-      startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) { this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 150}, aspectRatio: 1.0 }, false); } this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(50); this.showToast('Barcode letto!'); this.closeScanner(); }, (error) => {}); },
-      closeScanner() { if (this.html5QrcodeScanner) { this.html5QrcodeScanner.clear().catch(e => console.error(e)); } this.closeModal('scannerModal'); },
+      // === GARAGE OS (NEW) ===
+      loadGarageConfig() {
+        document.getElementById('gConfName').value = this.state.garageConfig.name;
+        document.getElementById('gConfPlate').value = this.state.garageConfig.plate;
+        document.getElementById('gConfBollo').value = this.state.garageConfig.bollo;
+        document.getElementById('gConfAssic').value = this.state.garageConfig.assic;
+        document.getElementById('gConfRevis').value = this.state.garageConfig.revis;
+        document.getElementById('gConfKm').value = this.state.garageConfig.km;
+      },
+      saveGarageConfig(e) {
+        e.preventDefault();
+        this.state.garageConfig = {
+          name: document.getElementById('gConfName').value, plate: document.getElementById('gConfPlate').value.toUpperCase(),
+          bollo: document.getElementById('gConfBollo').value, assic: document.getElementById('gConfAssic').value,
+          revis: document.getElementById('gConfRevis').value, km: parseFloat(document.getElementById('gConfKm').value) || 0
+        };
+        this.save(); this.closeModal('garageConfigModal'); this.showToast('Veicolo Aggiornato!');
+      },
+      updateGarageKm() {
+        const newKm = prompt("Inserisci chilometraggio attuale:", this.state.garageConfig.km);
+        if(newKm && !isNaN(newKm)) { this.state.garageConfig.km = parseFloat(newKm); this.save(); }
+      },
+      addGarageMaintenance(e) {
+        e.preventDefault();
+        this.state.garageMaint.push({
+          id: this.generateId(), title: document.getElementById('gMaintTitle').value,
+          date: document.getElementById('gMaintDate').value, cost: parseFloat(document.getElementById('gMaintCost').value) || 0,
+          kmAtMaint: this.state.garageConfig.km
+        });
+        this.save(); e.target.reset(); document.getElementById('gMaintDate').value = new Date().toISOString().slice(0, 10);
+      },
+      deleteGarageMaint(id) { if(confirm("Eliminare lavoro?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
+      renderGarage() {
+        const conf = this.state.garageConfig;
+        this.setElText('garageCarName', conf.name);
+        this.setElText('garageCarPlate', conf.plate);
+        this.setElText('garageKmOdo', `${conf.km.toLocaleString('it-IT')} km`);
 
-      populateCategorySelects() { const html = Object.keys(this.state.settings.inventoryCategories).map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('invCategory').innerHTML = html; document.getElementById('invFilterCat').innerHTML = '<option value="ALL">Tutte</option>' + html; this.updateInvSubcategories(); },
-      updateInvSubcategories() { const cat = document.getElementById('invCategory').value; if(cat && this.state.settings.inventoryCategories[cat]) document.getElementById('invSubcategory').innerHTML = this.state.settings.inventoryCategories[cat].map(s => `<option value="${s}">${s}</option>`).join(''); },
-      addInventoryCategory() { const c = document.getElementById('newInvCatInput').value.trim(); if(c && !this.state.settings.inventoryCategories[c]) { this.state.settings.inventoryCategories[c] = ['Generale']; this.save(); this.populateCategorySelects(); } },
-      addInventorySubcategory() { const c = document.getElementById('invCategory').value; const s = document.getElementById('newInvSubInput').value.trim(); if(c && s && !this.state.settings.inventoryCategories[c].includes(s)) { this.state.settings.inventoryCategories[c].push(s); this.save(); this.updateInvSubcategories(); } },
-      addInventoryItem(e) { e.preventDefault(); this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: document.getElementById('invPrice').value, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString() }); this.save(); e.target.reset(); this.renderInventory(); },
-      deleteInventoryItem(id) { if(confirm('Eliminare?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
-      renderInventory() { const filterCat = document.getElementById('invFilterCat').value; const search = document.getElementById('invSearchInput').value.toLowerCase(); let filtered = this.state.inventory.filter(i => i.type === (this.activeInvTab === 'garanzie' ? 'Garanzia' : 'Archivio')); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search)); document.getElementById('inventoryList').innerHTML = filtered.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)).map(item => { let wBadge = ''; if(item.warranty) { const exp = new Date(item.warranty) < new Date(); wBadge = `<span class="badge ${exp ? 'badge-danger' : 'badge-success'}">${exp?'Scaduta':'Attiva'}: ${this.formatDate(item.warranty)}</span>`; } return `<div class="list-row"><div style="flex:1;"><strong>${item.name}</strong> <span class="badge">${item.category}</span><br><small class="text-secondary">${item.subcategory} | Pos: ${item.location||'-'}</small><div style="margin-top:4px;">${wBadge}</div></div><div style="text-align:right;"><div style="font-weight:700; color:var(--accent-primary); margin-bottom:4px;">${this.formatMoney(item.price)}</div><button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div></div>`; }).join('') || '<div class="list-row text-muted">Nessun elemento.</div>'; },
+        const today = new Date();
+        const setTrafficLight = (idDate, idTl, dateStr) => {
+          this.setElText(idDate, this.formatDate(dateStr));
+          const el = document.getElementById(idTl);
+          if(!el) return;
+          el.className = 'tl-indicator'; // reset
+          if(!dateStr) { el.classList.add('tl-red'); return; }
+          const diffDays = Math.floor((new Date(dateStr) - today) / (1000 * 60 * 60 * 24));
+          if(diffDays < 0) el.classList.add('tl-red');
+          else if (diffDays <= 30) el.classList.add('tl-yellow');
+          else el.classList.add('tl-green');
+        };
 
-      changeMonth(dir) { this.currentDate.setMonth(this.currentDate.getMonth() + dir); this.renderCalendar(); },
-      selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
-      selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
-      renderCalendar() { const y = this.currentDate.getFullYear(); const m = this.currentDate.getMonth(); document.getElementById('calMonthTitle').innerText = new Date(y, m, 1).toLocaleDateString('it-IT', {month:'long', year:'numeric'}).toUpperCase(); document.getElementById('calSelectedDateLabel').innerText = this.selectedDate.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}); const grid = document.getElementById('calendarDaysGrid'); grid.innerHTML = ''; let start = new Date(y, m, 1).getDay(); start = start === 0 ? 7 : start; for (let i = 1; i < start; i++) { const el = document.createElement('div'); el.className = 'cal-day'; el.style.visibility = 'hidden'; grid.appendChild(el); } const todayStr = new Date().toISOString().slice(0, 10); const selStr = this.selectedDate.toISOString().slice(0, 10); const last = new Date(y, m+1, 0).getDate(); for (let d = 1; d <= last; d++) { const dateStr = new Date(y, m, d, 12).toISOString().slice(0, 10); const el = document.createElement('div'); el.className = 'cal-day'; if (dateStr === todayStr) el.classList.add('today'); if (dateStr === selStr) el.classList.add('active'); el.innerHTML = `<div>${d}</div>`; const tasks = this.state.calendarTasks.filter(t => t.date === dateStr); if (tasks.length > 0) { const dots = document.createElement('div'); dots.style.display = 'flex'; dots.style.gap = '2px'; for(let i=0; i<Math.min(3,tasks.length); i++) dots.innerHTML += `<div class="cal-dot"></div>`; el.appendChild(dots); } el.onclick = () => this.selectDate(dateStr); grid.appendChild(el); } this.renderCalendarTasks(); this.renderJournalHistory(); },
-      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.selectedDate.toISOString().slice(0, 10), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
-      deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
-      renderCalendarTasks() { const tasks = this.state.calendarTasks.filter(t => t.date === this.selectedDate.toISOString().slice(0, 10)); document.getElementById('calTaskCountBadge').innerText = tasks.length; document.getElementById('calendarTasksList').innerHTML = tasks.length ? tasks.map(t => `<div class="list-row"><div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div><button class="btn btn-sm btn-danger" onclick="App.deleteCalendarTask('${t.id}')">✕</button></div>`).join('') : '<div class="list-row text-muted">Nessuna attività programmata.</div>'; },
-      saveJournalEntry(e) { e.preventDefault(); const date = this.selectedDate.toISOString().slice(0, 10); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
-      renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); document.getElementById('journalHistoryList').innerHTML = hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row text-muted">Nessun diario salvato.</div>'; },
+        setTrafficLight('date-assicurazione', 'tl-assicurazione', conf.assic);
+        setTrafficLight('date-bollo', 'tl-bollo', conf.bollo);
+        setTrafficLight('date-revisione', 'tl-revisione', conf.revis);
 
-      populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('maintCategory').innerHTML = html; document.getElementById('maintFilterCat').innerHTML = '<option value="ALL">Tutte</option>' + html; },
-      addMaintenanceCategory() { const c = document.getElementById('newMaintCatInput').value.trim(); if(c && !this.state.settings.maintenanceCategories.includes(c)) { this.state.settings.maintenanceCategories.push(c); this.save(); this.populateMaintenanceSelects(); } },
-      addMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: document.getElementById('maintCost').value, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); this.renderMaintenances(); },
-      deleteMaintenance(id) { if(confirm('Eliminare?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderMaintenances(); } },
-      renderMaintenances() { let filtered = this.state.maintenances; const fCat = document.getElementById('maintFilterCat').value; const fStat = document.getElementById('maintFilterStatus').value; if(fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if(fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); document.getElementById('maintenanceList').innerHTML = filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).map(m => `<div class="list-row" style="border-left: 4px solid ${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};"><div style="flex:1;"><strong>${m.title}</strong> <span class="badge">${m.category}</span> ${m.recurrence!=='Singola'?`<span class="badge badge-info">🔄 ${m.recurrence}</span>`:''}<div style="font-size:0.8rem; color:var(--text-muted);">${m.notes || ''}</div></div><div style="text-align:right;">Scad: <strong>${this.formatDate(m.dueDate)}</strong><br>${parseFloat(m.cost)>0?`<span style="color:var(--danger); font-weight:600;">${this.formatMoney(m.cost)}</span>`:''}<button class="btn btn-sm btn-danger" onclick="App.deleteMaintenance('${m.id}')">🗑</button></div></div>`).join('') || '<div class="list-row text-muted">Nessuna manutenzione.</div>'; },
+        // Calcolo spese auto mensili
+        const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        let fuelCost = 0;
+        this.state.transactions.filter(t => t.type === 'EXPENSE' && t.category.includes('Auto') && new Date(t.date) >= thirtyDaysAgo).forEach(t => fuelCost += t.amount);
+        this.setElText('garageFuelMonth', this.formatMoney(fuelCost));
 
-      populateAccountSelects() { const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join(''); document.getElementById('txAccount').innerHTML = '<option value="">Conto Origine *</option>' + html; document.getElementById('txTargetAccount').innerHTML = '<option value="">Conto Dest *</option>' + html; document.getElementById('reconcileAccountSelect').innerHTML = html; document.getElementById('txFilterAccount').innerHTML = '<option value="ALL">Tutti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
+        // Storico
+        const sorted = [...this.state.garageMaint].sort((a,b) => new Date(b.date) - new Date(a.date));
+        this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => `
+          <div class="list-row">
+            <div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div>
+            <div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><button class="btn btn-sm btn-danger" style="margin-top:4px;" onclick="App.deleteGarageMaint('${m.id}')">🗑</button></div>
+          </div>
+        `).join('') : '<div class="list-row stat-label">Nessun lavoro meccanico registrato.</div>');
+      },
+
+      // === FINANZE ===
+      populateAccountSelects() {
+        const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join('');
+        this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html); this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html); this.setElHTML('reconcileAccountSelect', html);
+        const filterEl = document.getElementById('txFilterAccount'); const currentFilter = filterEl?.value || 'ALL';
+        this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''));
+        if (filterEl) filterEl.value = currentFilter;
+      },
+      selectWalletCard(accId) { const filterEl = document.getElementById('txFilterAccount'); if (!filterEl) return; filterEl.value = (filterEl.value === accId) ? 'ALL' : accId; this.renderFinance(); },
+      renderFinance() {
+        const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0); this.setElText('finTotalBalanceBadge', this.formatMoney(total));
+        const fAcc = document.getElementById('txFilterAccount')?.value || 'ALL';
+        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => `<div class="wallet-card wallet-card-${idx % 4} ${fAcc === a.id ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${a.name}</span><div class="wallet-chip"></div></div><div><div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div></div></div>`).join('') : '<div class="stat-label">Nessun conto presente.</div>');
+        let filtered = [...this.state.transactions]; if (fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc); filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => { const acc = this.state.accounts.find(a => a.id === tx.accountId); const isExp = tx.type === 'EXPENSE'; const color = isExp ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; const prefix = isExp ? '-' : tx.type === 'INCOME' ? '+' : ''; return `<div class="list-row"><div><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong>${tx.desc}</strong> <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right; display:flex; align-items:center; gap:0.6rem;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteTransaction('${tx.id}')">🗑</button></div></div>`; }).join('') : '<div class="list-row stat-label">Nessuna transazione per questo filtro.</div>');
+        const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0); this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
+        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => `<div class="list-row"><div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><div style="display:flex; align-items:center; gap:0.5rem;"><strong>${this.formatMoney(s.cost)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteSubscription('${s.id}')">✕</button></div></div>`).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
+        this.renderExpenseCategoryChart();
+      },
+      renderExpenseCategoryChart() { const ctx = document.getElementById('expenseCatChart'); if (!ctx) return; const catTotals = {}; this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => { const c = t.category || 'Altro'; catTotals[c] = (catTotals[c] || 0) + t.amount; }); const labels = Object.keys(catTotals); const data = Object.values(catTotals); if (this.charts.expCat) this.charts.expCat.destroy(); this.charts.expCat = new Chart(ctx, { type: 'doughnut', data: { labels: labels.length ? labels : ['Nessuna spesa'], datasets: [{ data: data.length ? data : [1], backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } } } } }); },
       addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
       toggleTransferFields() { document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none'; },
-      addTransaction(e) { e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value; if(!srcId) return this.showToast('Seleziona conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId); const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value, date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence').value, timestamp: new Date().toISOString() }; if(t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { const trg = this.state.accounts.find(x => x.id === trgId); src.balance -= a; trg.balance += a; tx.targetAccountId = trgId; } this.state.transactions.push(tx); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
-      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if(!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); const diff = tar - acc.balance; if(diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff>0?'INCOME':'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Rettifica', date: new Date().toISOString().slice(0,10), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value=''; this.populateAccountSelects(); this.renderFinance(); },
-      deleteTransaction(id) { const tx = this.state.transactions.find(t => t.id === id); if(!tx) return; if(confirm('Eliminare? I saldi saranno ricalcolati.')) { const src = this.state.accounts.find(a => a.id === tx.accountId); if(tx.type === 'EXPENSE') src.balance += tx.amount; else if(tx.type === 'INCOME') src.balance -= tx.amount; else if(tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => a.id === tx.targetAccountId); if(trg) trg.balance -= tx.amount; } this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.save(); this.populateAccountSelects(); this.renderFinance(); } },
-      renderFinance() { const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance)||0), 0); document.getElementById('finTotalBalanceBadge').innerText = this.formatMoney(total); document.getElementById('financeAccountsList').innerHTML = this.state.accounts.map(a => `<div class="list-row"><strong>🏦 ${a.name}</strong><span style="font-weight:700;">${this.formatMoney(a.balance)}</span></div>`).join(''); let filtered = this.state.transactions; const fAcc = document.getElementById('txFilterAccount').value; if(fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc); document.getElementById('financeTransactionsList').innerHTML = filtered.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).map(tx => { let icon = tx.type === 'EXPENSE' ? '📉' : tx.type === 'INCOME' ? '📈' : '🔄'; let color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; let prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : ''; return `<div class="list-row"><div><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(tx.date)}</span><br><strong>${icon} ${tx.desc}</strong> ${tx.recurrence!=='Singola'?`<span class="badge" style="font-size:0.6rem;">🔄 ${tx.recurrence}</span>`:''}</div><div style="text-align:right;"><div style="font-weight:700; color:${color};">${prefix}${this.formatMoney(tx.amount)}</div><button class="btn btn-sm" onclick="App.deleteTransaction('${tx.id}')">🗑</button></div></div>`; }).join('') || '<div class="list-row text-muted">Nessuna transazione.</div>'; },
+      addTransaction(e) { e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value; if (!srcId) return this.showToast('Seleziona un conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId); const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence').value, timestamp: new Date().toISOString() }; if (src) { if (t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { src.balance -= a; const trg = this.state.accounts.find(x => x.id === trgId); if (trg) trg.balance += a; tx.targetAccountId = trgId; } } this.state.transactions.push(tx); this.save(); e.target.reset(); document.getElementById('txDate').value = new Date().toISOString().slice(0, 10); this.populateAccountSelects(); this.renderFinance(); },
+      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: new Date().toISOString().slice(0, 10), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
+      deleteTransaction(id) { const tx = this.state.transactions.find(t => t.id === id); if (!tx || !confirm('Eliminare movimento?')) return; const src = this.state.accounts.find(a => a.id === tx.accountId); if (src) { if (tx.type === 'EXPENSE') src.balance += tx.amount; else if (tx.type === 'INCOME') src.balance -= tx.amount; else if (tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => a.id === tx.targetAccountId); if (trg) trg.balance -= tx.amount; } } this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.save(); this.populateAccountSelects(); this.renderFinance(); },
+      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: new Date().toISOString().slice(0, 10) }); this.save(); e.target.reset(); this.renderFinance(); },
+      deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
 
-      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseInt(document.getElementById('nutriKcal').value)||0, prot: parseInt(document.getElementById('nutriProt').value)||0, carbs: parseInt(document.getElementById('nutriCarbs').value)||0, fat: parseInt(document.getElementById('nutriFat').value)||0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0,10); this.renderHealth(); },
+      // === SALUTE OS ===
+      populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${f.name} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
+      AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => f.id === foodId); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
+      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0,10); this.renderHealth(); },
+      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
       deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
-      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if(type === 'Referto' && document.getElementById('medFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch(err) { return this.showToast('Errore lettura file', 'danger'); } } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth(); this.showToast('Salvato nel DB.'); },
+      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth(); },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      renderHealth() { document.getElementById('healthNutritionList').innerHTML = this.state.healthNutrition.sort((a,b) => new Date(b.date) - new Date(a.date)).map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="text-secondary">${this.formatDate(n.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun pasto.</div>'; document.getElementById('healthWeightList').innerHTML = this.state.healthWeight.sort((a,b) => new Date(b.date) - new Date(a.date)).map(w => `<div class="list-row"><div><strong>${w.value} kg</strong><br><small class="text-secondary">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row text-muted">Nessun peso.</div>'; const ctxW = document.getElementById('weightChart'); if(ctxW) { const sortedW = [...this.state.healthWeight].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-10); if(this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w=>this.formatDate(w.date).slice(0,5)), datasets: [{ label: 'Peso', data: sortedW.map(w=>w.value), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.2)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); } document.getElementById('healthMedicalList').innerHTML = this.state.healthMedical.sort((a, b) => new Date(b.date) - new Date(a.date)).map(m => { let extra = m.type === 'Visita Medica' && m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; let file = m.type === 'Referto' && m.fileData ? `<div><a href="${m.fileData}" download="Referto_${m.title}" class="badge" style="text-decoration:none; background:rgba(16, 185, 129, 0.15); color:var(--success);">📥 Scarica Referto</a></div>` : ''; return `<div class="list-row" style="align-items:flex-start;"><div style="flex:1;"><span style="font-size:0.8rem; color:var(--text-muted);">${this.formatDate(m.date)}</span><br><strong>${m.type==='Visita Medica'?'👨‍⚕️':m.type==='Referto'?'📄':'🌡️'} ${m.title}</strong>${extra}<div style="font-size:0.8rem; color:var(--text-secondary);">${m.notes||''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`; }).join('') || '<div class="list-row text-muted">Nessun record clinico.</div>'; },
+      renderHealth() {
+        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||'')); const latestDay = sortedNutri[0]?.date || new Date().toISOString().slice(0, 10); const dayLogs = sortedNutri.filter(n => n.date === latestDay);
+        const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)), totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)), totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)), totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)), goalKcal = this.state.nutritionGoals?.kcal || 2100;
+        this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
+        this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`); this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`); this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
+        this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
+        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => `<div class="list-row"><div><strong>⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
+        const ctxW = document.getElementById('weightChart'); if (ctxW) { const sortedW = [...this.state.healthWeight].sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(-10); if (this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w => this.formatDate(w.date).slice(0, 5)), datasets: [{ label: 'Peso', data: sortedW.map(w => w.value), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.2)', tension: 0.35, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
+        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => { const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; const file = m.fileData ? `<div><a href="${m.fileData}" download="Referto_${m.title}" class="badge badge-success" style="text-decoration:none; margin-top:4px;">📥 Scarica Allegato</a></div>` : ''; return `<div class="list-row"><div style="flex:1;"><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${m.title}</strong>${extra}<div class="stat-label">${m.notes || ''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`; }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
+      },
+
+      // === HUB EXTRA: INVENTARIO, MANUTENZIONI, RICERCA ===
+      populateCategorySelects() { const cats = Object.keys(this.state.settings.inventoryCategories); const html = cats.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('invCategory', html); this.setElHTML('invFilterCat', '<option value="ALL">Tutte</option>' + html); this.updateInvSubcategories(); },
+      updateInvSubcategories() { const cat = document.getElementById('invCategory')?.value; const subs = this.state.settings.inventoryCategories[cat] || ['Generale']; this.setElHTML('invSubcategory', subs.map(s => `<option value="${s}">${s}</option>`).join('')); },
+      addInventoryItem(e) { e.preventDefault(); this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString() }); this.save(); e.target.reset(); this.renderInventory(); },
+      deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
+      renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => `<div class="list-row"><div><strong>📦 ${item.name}</strong> <span class="badge">${item.category}</span><br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div style="text-align:right; display:flex; align-items:center; gap:0.6rem;"><strong>${this.formatMoney(item.price)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div></div>`).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
+
+      populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('maintCategory', html); this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html); },
+      addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); this.renderGeneralMaintenances(); },
+      deleteGeneralMaintenance(id) { if (confirm('Eliminare manutenzione?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderGeneralMaintenances(); } },
+      renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => `<div class="list-row" style="border-left:4px solid ${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};"><div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteGeneralMaintenance('${m.id}')">🗑</button></div>`).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
+
+      executeSearch() { const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim(); if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'); let html = ''; this.state.transactions.forEach(t => { if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${t.category}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`; }); this.state.inventory.forEach(i => { if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>📦 ${i.name}</strong><br><small class="stat-label">${i.category}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`; }); this.state.healthMedical.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${m.notes}</small></div></div>`; }); this.state.maintenances.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🔧 ${m.title}</strong><br><small class="stat-label">${m.category} • ${this.formatDate(m.dueDate)}</small></div></div>`; }); this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`); },
+
+      startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
+      closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
+
+      exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v9_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); },
+      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${t.desc}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${n.meal}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
+      async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo?")) { await localforage.clear(); location.reload(); } },
 
       async init() {
         await this.load();
-        const todayStr = this.currentDate.toISOString().slice(0, 10);
-        ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate'].forEach(id => { const el = document.getElementById(id); if(el) el.value = todayStr; });
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.setAttribute('data-theme', 'light');
-
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW fail', err)); }
-
-        if (this.state.pin) { document.getElementById('lockScreen').classList.remove('hidden'); } 
-        else { this.runCronJobs(); document.getElementById('lockScreen').classList.add('hidden'); this.switchModule('mod-dashboard'); }
+        const todayStr = new Date().toISOString().slice(0, 10);
+        ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => { const el = document.getElementById(id); if (el) el.value = todayStr; });
+        this.populateAccountSelects(); this.populateCategorySelects(); this.populateMaintenanceSelects(); this.populateFoodLibrarySelect(); this.updateHapticButton();
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+        if (this.state.pin) document.getElementById('lockScreen')?.classList.remove('hidden'); else { document.getElementById('lockScreen')?.classList.add('hidden'); this.switchModule('mod-dashboard'); }
       }
     };
 
-    document.addEventListener('DOMContentLoaded', () => { App.init(); App.updateHapticButton(); });
-    document.addEventListener('click', (e) => { if(e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card')) App.vibrate(10); });
+    document.addEventListener('DOMContentLoaded', () => App.init());
+    document.addEventListener('click', (e) => { if (e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card, .wallet-card')) App.vibrate(10); });
   </script>
 </body>
 </html>
