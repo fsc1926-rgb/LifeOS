@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#070a12">
-  <title>LifeOS v9.6 — Ultimate Edition</title>
+  <title>LifeOS v9.7 — Ultimate Edition</title>
   
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L9">
@@ -110,7 +110,7 @@
     .wallet-arrows button { background:rgba(0,0,0,0.3); border:none; color:#fff; border-radius:6px; padding:0.2rem 0.45rem; cursor:pointer; font-size:0.72rem; }
 
     /* ==========================================
-       3. GARAGE OS - STILI DEDICATI (FIX CLICK)
+       3. GARAGE OS - STILI DEDICATI & TCO
        ========================================== */
     .vehicle-selector { display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem; margin-bottom:1rem; }
     .vehicle-chip { padding:0.5rem 1rem; border-radius:999px; background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-secondary); font-weight:700; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
@@ -130,6 +130,14 @@
     .tl-red { background: #ef4444; color: #ef4444; }
     .tl-yellow { background: #f59e0b; color: #f59e0b; }
     .tl-green { background: #10b981; color: #10b981; }
+
+    .tco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.85rem; }
+    .tco-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 0.75rem 0.85rem; }
+    .tco-box.highlight { border-color: var(--border-highlight); background: rgba(99, 102, 241, 0.1); }
+    .tco-val { font-size: 1.25rem; font-weight: 900; font-family: 'JetBrains Mono', monospace; margin-top: 0.15rem; }
+    .tco-split-bar { width: 100%; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; display: flex; margin: 0.5rem 0 0.35rem; }
+    .tco-split-fuel { height: 100%; background: #f59e0b; transition: width 0.4s ease; }
+    .tco-split-maint { height: 100%; background: #6366f1; transition: width 0.4s ease; }
 
     /* MACRO NUTRIZIONE */
     .macro-bar-bg { width: 100%; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; margin-top: 4px; }
@@ -386,7 +394,7 @@
         <div class="card-title" style="font-size: 1.25rem; margin-bottom: 0.3rem;">⚡ Hub Ecosistemi</div>
         <div class="stat-label">Sottomoduli specializzati:</div>
         <div class="hub-grid">
-          <div class="hub-card" onclick="App.openHubModule('sub-garage')"><div class="hub-icon">🏎️</div><div class="card-title" style="justify-content:center;">Garage OS</div><div class="stat-label" style="margin-top:0.35rem;">Veicoli, Scadenze & Tagliandi</div></div>
+          <div class="hub-card" onclick="App.openHubModule('sub-garage')"><div class="hub-icon">🏎️</div><div class="card-title" style="justify-content:center;">Garage OS</div><div class="stat-label" style="margin-top:0.35rem;">Veicoli, Scadenze, TCO & €/km</div></div>
           <div class="hub-card" onclick="App.openHubModule('sub-health')"><div class="hub-icon">❤️</div><div class="card-title" style="justify-content:center;">Salute & Dieta</div><div class="stat-label" style="margin-top:0.35rem;">Macro, Peso & Cartella Clinica</div></div>
           <div class="hub-card" onclick="App.openHubModule('sub-inventory')"><div class="hub-icon">📦</div><div class="card-title" style="justify-content:center;">Inventario</div><div class="stat-label" style="margin-top:0.35rem;">Beni, Valore & Garanzie</div></div>
           <div class="hub-card" onclick="App.openHubModule('sub-maintenance')"><div class="hub-icon">🔧</div><div class="card-title" style="justify-content:center;">Manutenzioni Casa</div><div class="stat-label" style="margin-top:0.35rem;">Scadenziario & Lavori</div></div>
@@ -443,28 +451,78 @@
           </div>
         </div>
 
-        <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">⛽ Consumi & Chilometri</div></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-            <div><div class="stat-label">Chilometri Attuali</div><div class="stat-value" id="garageKmOdo" style="font-size:1.6rem;">0 km</div></div>
-            <button class="btn btn-sm" onclick="App.updateGarageKm()">Aggiorna</button>
+        <!-- CARD TCO & COSTO AL CHILOMETRO (€/KM) -->
+        <div class="bento-card col-span-5">
+          <div class="card-header">
+            <div class="card-title">⛽ TCO, Consumi & Costo/km</div>
+            <button class="btn btn-sm" onclick="App.updateGarageKm()">🛣️ Aggiorna Km</button>
           </div>
-          <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:12px; padding:0.8rem; margin-bottom:1rem;">
-            <div class="stat-label">Spesa Carburante (Ultimi 30g)</div>
-            <div style="font-size:1.2rem; font-weight:800; color:var(--danger);" id="garageFuelMonth">€ 0,00</div>
+
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.85rem;">
+            <div>
+              <div class="stat-label">Odometro Attuale</div>
+              <div class="stat-value" id="garageKmOdo" style="font-size:1.65rem; margin:0;">0 km</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="stat-label">Km Percorsi Tracciati</div>
+              <strong id="garageKmDriven" style="font-family:'JetBrains Mono',monospace; font-size:0.95rem; color:var(--text-primary);">0 km</strong>
+            </div>
           </div>
-          <div class="stat-label" style="text-align:center;">Registra i rifornimenti in <strong>Finanze</strong> con categoria "Auto & Trasporti".</div>
+
+          <div class="tco-grid sensitive">
+            <div class="tco-box highlight">
+              <div class="stat-label">Costo al Chilometro</div>
+              <div class="tco-val" id="garageCostPerKm" style="color:var(--accent-primary);">€ 0,00 / km</div>
+              <div class="stat-label" style="font-size:0.7rem; margin-top:2px;">Carburante + Interventi</div>
+            </div>
+            <div class="tco-box">
+              <div class="stat-label">Costo Totale (TCO)</div>
+              <div class="tco-val" id="garageTotalTCO" style="color:var(--text-primary);">€ 0,00</div>
+              <div class="stat-label" style="font-size:0.7rem; margin-top:2px;">Spesa complessiva</div>
+            </div>
+            <div class="tco-box">
+              <div class="stat-label">⛽ Carburante (Tot / 30g)</div>
+              <div style="font-weight:800; font-size:0.95rem; color:var(--warning); margin-top:2px;" id="garageFuelTotal">€ 0,00</div>
+              <div class="stat-label" style="font-size:0.72rem;">Ultimi 30g: <strong id="garageFuelMonth">€ 0,00</strong></div>
+            </div>
+            <div class="tco-box">
+              <div class="stat-label">🔧 Tagliandi & Spese</div>
+              <div style="font-weight:800; font-size:0.95rem; color:var(--info); margin-top:2px;" id="garageMaintTotal">€ 0,00</div>
+              <div class="stat-label" style="font-size:0.72rem;" id="garageMaintCount">0 interventi</div>
+            </div>
+          </div>
+
+          <div class="sensitive" style="margin-top:0.2rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.72rem;" class="stat-label">
+              <span id="garageSplitFuelLabel">⛽ Carburante: 0%</span>
+              <span id="garageSplitMaintLabel">🔧 Manutenzione: 0%</span>
+            </div>
+            <div class="tco-split-bar">
+              <div id="garageSplitFuelBar" class="tco-split-fuel" style="width:50%;"></div>
+              <div id="garageSplitMaintBar" class="tco-split-maint" style="width:50%;"></div>
+            </div>
+          </div>
         </div>
 
-        <div class="bento-card col-span-8">
-          <div class="card-header"><div class="card-title">🔧 Storico Interventi (Tagliandi, Gomme)</div></div>
-          <form onsubmit="App.addGarageMaintenance(event)" style="display:flex; gap:0.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
-            <input type="text" id="gMaintTitle" class="input" placeholder="Lavoro..." required style="margin:0; flex:2; min-width:200px;">
-            <input type="date" id="gMaintDate" class="input" required style="margin:0; flex:1; min-width:120px;">
-            <input type="number" id="gMaintCost" class="input" step="0.01" placeholder="Costo €" style="margin:0; flex:1; min-width:100px;">
-            <button type="submit" class="btn btn-primary" style="white-space:nowrap;">+ Aggiungi</button>
+        <div class="bento-card col-span-7">
+          <div class="card-header"><div class="card-title">🔧 Registro Interventi, Tagliandi & Rifornimenti</div></div>
+          <form onsubmit="App.addGarageMaintenance(event)" style="margin-bottom:1.15rem;">
+            <div class="form-row">
+              <select id="gMaintType" class="input" required>
+                <option value="Manutenzione">🔧 Tagliando / Riparazione</option>
+                <option value="Rifornimento">⛽ Rifornimento Carburante</option>
+                <option value="Pneumatici">🛞 Cambio / Acquisto Gomme</option>
+                <option value="Tasse">📄 Bollo / Assicurazione / Revisione</option>
+              </select>
+              <input type="text" id="gMaintTitle" class="input" placeholder="Descrizione (es. Tagliando 60k, Pieno...)" required>
+            </div>
+            <div class="form-row">
+              <input type="date" id="gMaintDate" class="input" required>
+              <input type="number" id="gMaintCost" class="input" step="0.01" min="0" placeholder="Costo € *" required>
+              <button type="submit" class="btn btn-primary" style="white-space:nowrap;">+ Registra Voce</button>
+            </div>
           </form>
-          <div id="garageMaintList" class="item-list" style="max-height:300px;"></div>
+          <div id="garageMaintList" class="item-list sensitive" style="max-height:310px;"></div>
         </div>
       </div>
     </section>
@@ -599,7 +657,7 @@
   <div id="garageConfigModal" class="modal-backdrop" onclick="if(event.target===this) App.closeModal('garageConfigModal')">
     <div class="modal-content">
       <div class="card-header">
-        <div class="card-title">⚙️ Configura Veicolo e Scadenze</div>
+        <div class="card-title">⚙️ Configura Veicolo, Scadenze e Km</div>
         <button type="button" class="btn btn-sm" onclick="App.closeModal('garageConfigModal')">✕</button>
       </div>
       <form onsubmit="App.saveGarageConfig(event)">
@@ -629,7 +687,13 @@
             <input type="date" id="gConfRevis" class="input">
           </div>
           <div>
-            <label class="stat-label">🛣️ Chilometri Attuali</label>
+            <label class="stat-label">🏁 Km Iniziali / Acquisto</label>
+            <input type="number" id="gConfKmStart" class="input" value="0" min="0" step="1" title="Inserisci 0 se acquistata nuova, oppure i km che aveva quando hai iniziato a tracciare i costi">
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="stat-label">🛣️ Chilometri Attuali (Odometro)</label>
             <input type="number" id="gConfKm" class="input" value="0" min="0" step="1">
           </div>
         </div>
@@ -774,10 +838,9 @@
           delete this.state.garageConfig;
         }
         if (this.state.vehicles.length === 0) {
-          this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
+          this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0, kmStart: 0 });
         }
 
-        // Ripara sempre ID e campi di tutti i veicoli
         this.state.vehicles.forEach((v, idx) => {
           if (!v.id) v.id = 'veh_' + idx + '_' + this.generateId();
           v.name = v.name || `Veicolo ${idx + 1}`;
@@ -786,22 +849,26 @@
           v.assic = this.normalizeDate(v.assic || v.scadenzaAssicurazione || '');
           v.revis = this.normalizeDate(v.revis || v.scadenzaRevisione || '');
           v.km = cleanNumber(v.km);
+          v.kmStart = cleanNumber(v.kmStart);
         });
 
         if (!this.activeVehicleId || !this.state.vehicles.find(v => v.id === this.activeVehicleId)) {
           this.activeVehicleId = this.state.vehicles[0].id;
         }
-        this.state.garageMaint.forEach(m => { if (!m.vehicleId) m.vehicleId = this.state.vehicles[0].id; });
+        this.state.garageMaint.forEach(m => {
+          if (!m.vehicleId) m.vehicleId = this.state.vehicles[0].id;
+          m.cost = cleanNumber(m.cost);
+          m.type = m.type || 'Manutenzione';
+        });
 
         this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
         this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(t.type) ? t.type : 'EXPENSE'; });
         this.state.calendarTasks.forEach(t => { if (!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
       },
 
-      // Restituisce sempre un veicolo valido anche se activeVehicleId fosse disallineato
       getActiveVehicle() {
         if (!Array.isArray(this.state.vehicles) || this.state.vehicles.length === 0) {
-          this.state.vehicles = [{ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 }];
+          this.state.vehicles = [{ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0, kmStart: 0 }];
         }
         let v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
         if (!v) {
@@ -1241,12 +1308,12 @@
       saveJournalEntry(e) { e.preventDefault(); const date = this.toLocalISO(this.selectedDate); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); this.showToast('Diario salvato!'); this.renderJournalHistory(); },
       renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row clickable" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
 
-      // === GARAGE OS (MULTI-VEHICLE & CONFIGURAZIONE SBLOCCATA) ===
+      // === GARAGE OS (MULTI-VEHICLE, TCO & COSTO AL KM) ===
       switchVehicle(id) { this.activeVehicleId = id; this.renderGarage(); },
       addVehicle() {
         const name = prompt("Inserisci marca/modello del nuovo veicolo (es. Moto Honda):");
         if (name && name.trim()) {
-          const newV = { id: this.generateId(), name: name.trim(), plate: '', bollo: '', assic: '', revis: '', km: 0 };
+          const newV = { id: this.generateId(), name: name.trim(), plate: '', bollo: '', assic: '', revis: '', km: 0, kmStart: 0 };
           this.state.vehicles.push(newV);
           this.activeVehicleId = newV.id;
           this.save();
@@ -1281,6 +1348,7 @@
         document.getElementById('gConfBollo').value = this.normalizeDate(v.bollo);
         document.getElementById('gConfAssic').value = this.normalizeDate(v.assic);
         document.getElementById('gConfRevis').value = this.normalizeDate(v.revis);
+        document.getElementById('gConfKmStart').value = v.kmStart || 0;
         document.getElementById('gConfKm').value = v.km || 0;
       },
       saveGarageConfig(e) {
@@ -1292,6 +1360,7 @@
         v.bollo = this.normalizeDate(document.getElementById('gConfBollo').value);
         v.assic = this.normalizeDate(document.getElementById('gConfAssic').value);
         v.revis = this.normalizeDate(document.getElementById('gConfRevis').value);
+        v.kmStart = parseFloat(document.getElementById('gConfKmStart').value) || 0;
         v.km = parseFloat(document.getElementById('gConfKm').value) || 0;
         this.save();
         this.closeModal('garageConfigModal');
@@ -1301,23 +1370,29 @@
       updateGarageKm() {
         const v = this.getActiveVehicle();
         if (!v) return;
-        const newKm = prompt("Inserisci chilometraggio attuale:", v.km);
+        const newKm = prompt("Inserisci chilometraggio attuale sull'odometro:", v.km);
         if (newKm !== null && newKm !== '' && !isNaN(newKm)) { v.km = parseFloat(newKm); this.save(); }
       },
       addGarageMaintenance(e) {
         e.preventDefault();
         const v = this.getActiveVehicle();
         if (!v) return;
+        const type = document.getElementById('gMaintType')?.value || 'Manutenzione';
         this.state.garageMaint.push({
-          id: this.generateId(), vehicleId: v.id,
+          id: this.generateId(),
+          vehicleId: v.id,
+          type,
           title: document.getElementById('gMaintTitle').value,
           date: document.getElementById('gMaintDate').value,
           cost: parseFloat(document.getElementById('gMaintCost').value) || 0,
           kmAtMaint: v.km
         });
-        this.save(); e.target.reset(); document.getElementById('gMaintDate').value = this.toLocalISO();
+        this.save();
+        e.target.reset();
+        document.getElementById('gMaintDate').value = this.toLocalISO();
+        this.showToast(`${type} registrato nel Garage!`);
       },
-      deleteGarageMaint(id) { if (confirm("Eliminare lavoro?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
+      deleteGarageMaint(id) { if (confirm("Eliminare questa voce dal Garage?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
       renderGarage() {
         const v = this.getActiveVehicle();
         this.setElHTML('garageVehicleTabs', this.state.vehicles.map(veh => `<div class="vehicle-chip ${veh.id === v.id ? 'active' : ''}" onclick="App.switchVehicle('${veh.id}')">${veh.name}</div>`).join('') + `<div class="vehicle-chip" style="background:transparent; border-style:dashed;" onclick="App.addVehicle()">+ Nuovo</div>`);
@@ -1325,6 +1400,9 @@
         this.setElText('garageCarName', v.name);
         this.setElText('garageCarPlate', v.plate || 'Targa N/D');
         this.setElText('garageKmOdo', `${(v.km || 0).toLocaleString('it-IT')} km`);
+
+        const kmDriven = Math.max(0, (parseFloat(v.km) || 0) - (parseFloat(v.kmStart) || 0));
+        this.setElText('garageKmDriven', v.kmStart > 0 ? `${kmDriven.toLocaleString('it-IT')} km (da ${v.kmStart.toLocaleString('it-IT')})` : `${kmDriven.toLocaleString('it-IT')} km`);
 
         const setTrafficLight = (idDate, idTl, dateStr) => {
           this.setElText(idDate, dateStr ? this.formatDate(dateStr) : 'Tocca per inserire');
@@ -1342,18 +1420,78 @@
         setTrafficLight('date-bollo', 'tl-bollo', v.bollo);
         setTrafficLight('date-revisione', 'tl-revisione', v.revis);
 
-        const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        let fuelCost = 0;
-        this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category||'').includes('Auto') && new Date(t.date) >= thirtyDaysAgo).forEach(t => fuelCost += t.amount);
-        this.setElText('garageFuelMonth', this.formatMoney(fuelCost));
+        // Calcolo Spesa Carburante (30gg e Totale) da Finanze + Rifornimenti Garage OS
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        const sorted = this.state.garageMaint.filter(m => m.vehicleId === v.id).sort((a,b) => new Date(b.date) - new Date(a.date));
+        const vehicleEntries = this.state.garageMaint.filter(m => m.vehicleId === v.id);
+        const garageFuelEntries = vehicleEntries.filter(m => m.type === 'Rifornimento');
+        const garageServiceEntries = vehicleEntries.filter(m => m.type !== 'Rifornimento');
+
+        const financeFuelTx = this.state.transactions.filter(t => {
+          if (t.type !== 'EXPENSE') return false;
+          const cat = (t.category || '').toLowerCase();
+          const desc = (t.desc || '').toLowerCase();
+          return cat.includes('auto') || cat.includes('carburante') || desc.includes('benzina') || desc.includes('diesel') || desc.includes('rifornimento');
+        });
+
+        let fuelMonth = 0;
+        let fuelTotal = 0;
+
+        financeFuelTx.forEach(t => {
+          const amt = parseFloat(t.amount) || 0;
+          fuelTotal += amt;
+          if (new Date(t.date) >= thirtyDaysAgo) fuelMonth += amt;
+        });
+
+        garageFuelEntries.forEach(f => {
+          const amt = parseFloat(f.cost) || 0;
+          fuelTotal += amt;
+          if (new Date(f.date) >= thirtyDaysAgo) fuelMonth += amt;
+        });
+
+        const maintTotal = garageServiceEntries.reduce((sum, m) => sum + (parseFloat(m.cost) || 0), 0);
+        const totalTCO = fuelTotal + maintTotal;
+        const costPerKm = kmDriven > 0 ? (totalTCO / kmDriven) : 0;
+
+        this.setElText('garageFuelMonth', this.formatMoney(fuelMonth));
+        this.setElText('garageFuelTotal', this.formatMoney(fuelTotal));
+        this.setElText('garageMaintTotal', this.formatMoney(maintTotal));
+        this.setElText('garageMaintCount', `${garageServiceEntries.length} ${garageServiceEntries.length === 1 ? 'intervento' : 'interventi'}`);
+        this.setElText('garageTotalTCO', this.formatMoney(totalTCO));
+        this.setElText('garageCostPerKm', kmDriven > 0 ? `${this.formatMoney(costPerKm)} / km` : 'Imposta Km');
+
+        // Barra proporzione Carburante vs Manutenzioni
+        const fuelPct = totalTCO > 0 ? Math.round((fuelTotal / totalTCO) * 100) : 50;
+        const maintPct = totalTCO > 0 ? (100 - fuelPct) : 50;
+        this.setElText('garageSplitFuelLabel', `⛽ Carburante: ${totalTCO > 0 ? fuelPct : 0}%`);
+        this.setElText('garageSplitMaintLabel', `🔧 Manutenzione: ${totalTCO > 0 ? maintPct : 0}%`);
+        const fBar = document.getElementById('garageSplitFuelBar');
+        const mBar = document.getElementById('garageSplitMaintBar');
+        if (fBar) fBar.style.width = `${fuelPct}%`;
+        if (mBar) mBar.style.width = `${maintPct}%`;
+
+        const typeIcon = (type) => {
+          if (type === 'Rifornimento') return '⛽';
+          if (type === 'Pneumatici') return '🛞';
+          if (type === 'Tasse') return '📄';
+          return '🔧';
+        };
+
+        const sorted = [...vehicleEntries].sort((a,b) => new Date(b.date) - new Date(a.date));
         this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => `
           <div class="list-row">
-            <div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div>
-            <div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><button class="btn btn-sm btn-danger" style="margin-top:4px;" onclick="App.deleteGarageMaint('${m.id}')">🗑</button></div>
+            <div>
+              <span class="stat-label">${this.formatDate(m.date)} • <span class="badge" style="font-size:0.65rem;">${m.type || 'Manutenzione'}</span></span><br>
+              <strong>${typeIcon(m.type)} ${m.title}</strong>
+              <div class="stat-label">${m.kmAtMaint > 0 ? 'Odometro: ' + m.kmAtMaint.toLocaleString('it-IT') + ' km' : ''}</div>
+            </div>
+            <div style="text-align:right; display:flex; align-items:center; gap:0.6rem;">
+              <strong style="font-family:'JetBrains Mono',monospace;">${this.formatMoney(m.cost)}</strong>
+              <button class="btn btn-sm btn-danger" onclick="App.deleteGarageMaint('${m.id}')">🗑</button>
+            </div>
           </div>
-        `).join('') : '<div class="list-row stat-label">Nessun lavoro meccanico registrato su questo veicolo.</div>');
+        `).join('') : '<div class="list-row stat-label">Nessun intervento o rifornimento registrato su questo veicolo.</div>');
       },
 
       // === FINANZE WALLET ===
