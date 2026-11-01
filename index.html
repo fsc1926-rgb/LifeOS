@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#070a12">
-  <title>LifeOS v9.3 — Ultimate Edition</title>
+  <title>LifeOS v9.5 — Ultimate Edition</title>
   
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L9">
@@ -53,6 +53,8 @@
 
     .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; padding-right: 2px; }
     .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); transition: transform 0.15s ease, border-color 0.2s ease; }
+    .list-row.clickable { cursor: pointer; }
+    .list-row.clickable:hover { border-color: var(--accent-primary); }
     
     .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
     .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 700; font-size: 0.9rem; cursor: pointer; padding: 0.35rem 0.75rem; border-radius: 8px; }
@@ -73,12 +75,23 @@
     .stat-value { font-size: 2rem; font-weight: 900; letter-spacing: -0.03em; font-family: 'JetBrains Mono', monospace; margin: 0.25rem 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
 
-    /* HERO E WALLET */
+    /* HERO, ALERT RADAR E WALLET */
     .hero-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(139, 92, 246, 0.12) 50%, rgba(236, 72, 153, 0.15) 100%); border: 1px solid var(--border-highlight); padding: 1.4rem; }
     .hero-content { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap; }
+    .hero-greeting { flex: 1; min-width: 260px; }
     .hero-greeting h1 { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
     .hero-insight { margin-top: 0.75rem; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem; border-radius: 12px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-primary); }
     
+    .hero-alerts-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .hero-alerts-bar:empty { display: none; }
+    .alert-pill { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.38rem 0.75rem; border-radius: 10px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: transform 0.15s ease, filter 0.2s ease; border: 1px solid transparent; }
+    .alert-pill:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .alert-pill:active { transform: scale(0.96); }
+    .alert-pill.danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); }
+    .alert-pill.warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border-color: rgba(245, 158, 11, 0.45); }
+    :root[data-theme="light"] .alert-pill.danger { color: #b91c1c; background: rgba(239, 68, 68, 0.15); }
+    :root[data-theme="light"] .alert-pill.warning { color: #b45309; background: rgba(245, 158, 11, 0.15); }
+
     .score-ring-box { display: flex; align-items: center; gap: 0.85rem; background: rgba(0,0,0,0.25); padding: 0.65rem 1rem; border-radius: 18px; border: 1px solid var(--border-color); }
     .score-svg { width: 58px; height: 58px; transform: rotate(-90deg); }
     .score-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
@@ -93,9 +106,8 @@
     .wallet-card-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
     .wallet-card-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
     .wallet-card-4 { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
-    .wallet-chip { width: 28px; height: 20px; border-radius: 5px; background: rgba(255,255,255,0.28); border: 1px solid rgba(255,255,255,0.4); }
-    .wallet-arrows { display:flex; gap:0.3rem; }
-    .wallet-arrows button { background:rgba(0,0,0,0.3); border:none; color:#fff; border-radius:4px; padding:0.1rem 0.4rem; cursor:pointer; font-size:0.7rem; }
+    .wallet-arrows { display:flex; gap:0.3rem; align-items:center; }
+    .wallet-arrows button { background:rgba(0,0,0,0.3); border:none; color:#fff; border-radius:6px; padding:0.2rem 0.45rem; cursor:pointer; font-size:0.72rem; }
 
     /* ==========================================
        3. GARAGE OS - STILI DEDICATI
@@ -106,7 +118,7 @@
 
     .garage-car-header { position: relative; background: linear-gradient(45deg, #0f172a 0%, #1e1b4b 100%); border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-highlight); display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
     .garage-car-header::after { content: '🚘'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-size: 8rem; opacity: 0.15; filter: blur(2px); }
-    .car-brand-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; z-index: 1; }
+    .car-brand-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; z-index: 1; color: #fff; }
     .car-plate { display: inline-block; background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 6px; border: 2px solid #3b82f6; z-index: 1; }
     
     .traffic-light-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
@@ -123,7 +135,7 @@
     /* NAV, HEADER & MODALI */
     .app-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 0.8rem 1.25rem; }
     .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: nowrap; }
-    .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 900; font-size: 1.15rem; letter-spacing: -0.03em; white-space: nowrap; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 900; font-size: 1.15rem; letter-spacing: -0.03em; white-space: nowrap; cursor: pointer; }
     .brand-logo { width: 34px; height: 34px; border-radius: 10px; background: var(--accent-gradient); display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
     
     .nav-tabs { max-width: 1440px; margin: 0.85rem auto 0; display: flex; gap: 0.5rem; padding: 0 1.25rem; }
@@ -169,7 +181,6 @@
       .form-row { grid-template-columns: 1fr !important; gap: 0.5rem; }
       .app-header { padding: 0.7rem 0.9rem; }
 
-      /* NAVBAR A 4 PULSANTI (PULITA E SPAZIOSA) */
       .nav-tabs { display: grid !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; background: var(--bg-glass) !important; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid var(--border-color) !important; margin: 0 !important; padding: 0.45rem 0.5rem calc(0.45rem + env(safe-area-inset-bottom)) !important; z-index: 9999 !important; grid-template-columns: repeat(4, 1fr) !important; gap: 0.25rem !important; }
       .nav-tab { background: transparent !important; border: none !important; padding: 0.45rem 0.2rem !important; font-size: 0.65rem !important; display: flex; flex-direction: column; align-items: center; gap: 0.15rem; line-height: 1.15; white-space: normal; box-shadow: none !important; }
       .nav-tab.active { color: var(--accent-primary) !important; background: rgba(99, 102, 241, 0.12) !important; transform: translateY(-2px); }
@@ -190,7 +201,7 @@
       <div class="brand-logo" style="margin: 0 auto 1rem; width: 54px; height: 54px; font-size: 1.4rem;">L9</div>
       <h2>LifeOS Ultimate</h2>
       <p class="stat-label">Inserisci il PIN per sbloccare l'ecosistema</p>
-      <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="4" placeholder="••••">
+      <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter') App.verifyPin()">
       <button class="btn btn-primary" style="width: 100%;" onclick="App.verifyPin()">Sblocca</button>
     </div>
   </div>
@@ -200,7 +211,7 @@
   <!-- HEADER PRINCIPALE -->
   <header class="app-header">
     <div class="header-top">
-      <div class="brand">
+      <div class="brand" onclick="App.switchModule('mod-dashboard')">
         <div class="brand-logo">L9</div>
         <div class="brand-text"><span>LifeOS</span><span class="badge" style="font-size:0.6rem; padding: 0.15rem 0.45rem; margin-left:4px;">ULTIMATE</span></div>
       </div>
@@ -233,6 +244,8 @@
               <div class="stat-label" id="greetingDate" style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">OGGI</div>
               <h1 id="greetingTitle">Buongiorno ✨</h1>
               <div class="hero-insight"><span>🧠</span><span id="smartInsightText">Analisi in corso...</span></div>
+              <!-- RADAR SCADENZE UNIFICATO (PILLOLE CLICCABILI) -->
+              <div id="heroAlertsBar" class="hero-alerts-bar"></div>
             </div>
             <div class="score-ring-box">
               <div style="position:relative; display:grid; place-items:center;">
@@ -264,8 +277,8 @@
         </div>
 
         <div class="bento-card col-span-12">
-          <div class="card-header"><span class="card-title">📌 Prossime Attività & Scadenze</span><button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Apri Calendario →</button></div>
-          <div id="dashUpcomingTasks" class="item-list" style="max-height: 220px;"></div>
+          <div class="card-header"><span class="card-title">📌 Prossime Attività & Radar Scadenze (30gg)</span><button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Apri Calendario →</button></div>
+          <div id="dashUpcomingTasks" class="item-list" style="max-height: 240px;"></div>
         </div>
       </div>
     </section>
@@ -294,7 +307,7 @@
           <div class="card-header"><div class="card-title">📓 Diario & Mood</div></div>
           <form onsubmit="App.saveJournalEntry(event)">
             <select id="journalMood" class="input"><option value="🚀 Eccellente">🚀 Eccellente</option><option value="😊 Sereno">😊 Sereno</option><option value="😐 Neutro">😐 Neutro</option><option value="⚡ Stressato">⚡ Stressato</option><option value="🔋 Stanco">🔋 Stanco</option></select>
-            <textarea id="journalText" rows="5" class="input" placeholder="Pensieri, gratitudine o note di oggi..."></textarea>
+            <textarea id="journalText" rows="5" class="input" placeholder="Pensieri, gratitudine o note del giorno selezionato..."></textarea>
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva nel Diario</button>
           </form>
           <div style="margin-top: 1rem;"><div class="stat-label" style="margin-bottom: 0.4rem;">Storico Diario:</div><div id="journalHistoryList" class="item-list" style="max-height: 180px;"></div></div>
@@ -371,10 +384,10 @@
         <div class="card-title" style="font-size: 1.25rem; margin-bottom: 0.3rem;">⚡ Hub Ecosistemi</div>
         <div class="stat-label">Sottomoduli specializzati:</div>
         <div class="hub-grid">
-          <div class="hub-card" onclick="App.openHubModule('sub-garage')"><div class="hub-icon">🏎️</div><div class="card-title" style="justify-content:center;">Garage OS</div></div>
-          <div class="hub-card" onclick="App.openHubModule('sub-health')"><div class="hub-icon">❤️</div><div class="card-title" style="justify-content:center;">Salute & Dieta</div></div>
-          <div class="hub-card" onclick="App.openHubModule('sub-inventory')"><div class="hub-icon">📦</div><div class="card-title" style="justify-content:center;">Inventario</div></div>
-          <div class="hub-card" onclick="App.openHubModule('sub-maintenance')"><div class="hub-icon">🔧</div><div class="card-title" style="justify-content:center;">Manutenzioni Casa</div></div>
+          <div class="hub-card" onclick="App.openHubModule('sub-garage')"><div class="hub-icon">🏎️</div><div class="card-title" style="justify-content:center;">Garage OS</div><div class="stat-label" style="margin-top:0.35rem;">Veicoli, Scadenze & Tagliandi</div></div>
+          <div class="hub-card" onclick="App.openHubModule('sub-health')"><div class="hub-icon">❤️</div><div class="card-title" style="justify-content:center;">Salute & Dieta</div><div class="stat-label" style="margin-top:0.35rem;">Macro, Peso & Cartella Clinica</div></div>
+          <div class="hub-card" onclick="App.openHubModule('sub-inventory')"><div class="hub-icon">📦</div><div class="card-title" style="justify-content:center;">Inventario</div><div class="stat-label" style="margin-top:0.35rem;">Beni, Valore & Garanzie</div></div>
+          <div class="hub-card" onclick="App.openHubModule('sub-maintenance')"><div class="hub-icon">🔧</div><div class="card-title" style="justify-content:center;">Manutenzioni Casa</div><div class="stat-label" style="margin-top:0.35rem;">Scadenziario & Lavori</div></div>
         </div>
       </div>
     </section>
@@ -393,7 +406,7 @@
         <div class="col-span-12">
           <div class="garage-car-header">
             <div>
-              <div class="stat-label" style="color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Veicolo Selezionato</div>
+              <div class="stat-label" style="color:#cbd5e1; text-transform:uppercase; font-weight:700;">Veicolo Selezionato</div>
               <div class="car-brand-title" id="garageCarName">--</div>
               <div class="car-plate" id="garageCarPlate">--</div>
             </div>
@@ -492,7 +505,7 @@
       <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">❤️ Salute OS: Nutrizione, Peso & Cartella Clinica</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
       <div class="bento-grid">
         <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">🍎 Diario Alimentare</div><span class="badge badge-info" id="kcalProgressText">0 / 2100 kcal</span></div>
+          <div class="card-header"><div class="card-title">🍎 Diario Alimentare</div><span class="badge badge-info" id="kcalProgressText" style="cursor:pointer;" title="Tocca per modificare il target Kcal" onclick="App.configureNutritionGoals()">0 / 2100 kcal ✏️</span></div>
           <div style="margin-bottom: 1rem; background: var(--bg-secondary); padding: 0.85rem; border-radius: 14px; border: 1px solid var(--border-color);">
             <div class="macro-bar-bg" style="height:10px; margin-bottom:0.6rem;"><div id="kcalProgressBar" class="macro-bar-fill" style="width:0%;"></div></div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; text-align:center; font-size:0.75rem;"><div><span class="stat-label">Proteine</span><br><strong id="protProgressText" style="color:#10b981;">0g</strong></div><div><span class="stat-label">Carbo</span><br><strong id="carbProgressText" style="color:#3b82f6;">0g</strong></div><div><span class="stat-label">Grassi</span><br><strong id="fatProgressText" style="color:#f59e0b;">0g</strong></div></div>
@@ -500,12 +513,12 @@
           <div style="margin-bottom:0.75rem; padding:0.75rem; border-radius:12px; border:1px dashed var(--border-highlight);">
             <div class="stat-label" style="margin-bottom:0.4rem; color:var(--accent-primary); font-weight:700;">⚡ Calcolo Rapido Cibi:</div>
             <select id="nutriFoodSelect" class="input" style="margin-bottom:0.5rem;" onchange="App.AutoCalcFood()"></select>
-            <div style="display:flex; gap:0.5rem;"><select id="nutriMealType" class="input" style="margin:0;"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntino">🍎 Spuntino</option></select><input type="number" id="nutriGrams" class="input" placeholder="Grammi (g)" value="100" oninput="App.AutoCalcFood()" style="margin:0; max-width:110px;"></div>
+            <div style="display:flex; gap:0.5rem;"><select id="nutriMealType" class="input" style="margin:0;" onchange="App.AutoCalcFood()"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntino">🍎 Spuntino</option></select><input type="number" id="nutriGrams" class="input" placeholder="Grammi (g)" value="100" oninput="App.AutoCalcFood()" style="margin:0; max-width:110px;"></div>
           </div>
           <form onsubmit="App.addNutritionLog(event)" style="margin-bottom: 1rem;">
             <input type="text" id="nutriMeal" class="input" placeholder="Pasto manuale..." required>
             <div class="form-row"><input type="number" id="nutriKcal" class="input" min="0" placeholder="Kcal *" required><input type="date" id="nutriDate" class="input" required></div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-bottom:0.75rem;"><input type="number" id="nutriProt" class="input" step="0.1" placeholder="Prot" style="margin:0;"><input type="number" id="nutriCarbs" class="input" step="0.1" placeholder="Carb" style="margin:0;"><input type="number" id="nutriFat" class="input" step="0.1" placeholder="Gras" style="margin:0;"></div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-bottom:0.75rem;"><input type="number" id="nutriProt" class="input" step="0.1" placeholder="Prot (g)" style="margin:0;"><input type="number" id="nutriCarbs" class="input" step="0.1" placeholder="Carb (g)" style="margin:0;"><input type="number" id="nutriFat" class="input" step="0.1" placeholder="Gras (g)" style="margin:0;"></div>
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra Pasto</button>
           </form>
           <div id="healthNutritionList" class="item-list" style="max-height: 240px;"></div>
@@ -522,7 +535,10 @@
             <div class="form-row"><select id="medType" class="input" onchange="App.toggleMedFields()" required><option value="Visita Medica">👨‍⚕️ Visita Specialistica</option><option value="Referto">📄 Referto (Upload PDF/Img)</option><option value="Sintomo">🌡️ Sintomo / Evento</option></select><input type="date" id="medDate" class="input" required></div>
             <input type="text" id="medTitle" class="input" placeholder="Oggetto *" required>
             <div id="medTherapyGroup"><input type="text" id="medTherapy" class="input" placeholder="Terapia prescritta (mostrata in Dashboard)"></div>
-            <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.6rem; border-radius: 10px; margin-bottom: 0.75rem;"><label class="stat-label" style="display:block; margin-bottom:0.3rem;">Allega Documento (Salvato nel DB)</label><input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png" style="margin:0; padding:0.3rem;"></div>
+            <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.6rem; border-radius: 10px; margin-bottom: 0.75rem;">
+              <label class="stat-label" style="display:block; margin-bottom:0.3rem;">Allega Foto o PDF (Compressione Smart attiva per le foto)</label>
+              <input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png, image/webp" style="margin:0; padding:0.3rem;">
+            </div>
             <input type="text" id="medNotes" class="input" placeholder="Note cliniche...">
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella</button>
           </form>
@@ -532,7 +548,7 @@
     </section>
   </main>
 
-  <!-- MODALI -->
+  <!-- MODALI & FAB -->
   <div class="fab-container">
     <div class="fab-menu" id="fabMenu">
       <div class="fab-item" onclick="App.quickAdd('txAmount')">💸 Nuova Spesa</div>
@@ -553,7 +569,7 @@
 
   <div id="searchModal" class="modal-backdrop">
     <div class="modal-content" style="align-self: flex-start; margin-top: 3.5rem;">
-      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><input type="text" id="globalSearchInput" class="input" placeholder="Cerca ovunque..." style="margin:0; font-size:1rem; border-color:var(--accent-primary);" oninput="App.executeSearch()"><button class="btn btn-sm" onclick="App.closeModal('searchModal')">✕</button></div>
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><input type="text" id="globalSearchInput" class="input" placeholder="Cerca transazioni, task, beni, visite, manutenzioni..." style="margin:0; font-size:1rem; border-color:var(--accent-primary);" oninput="App.executeSearch()"><button class="btn btn-sm" onclick="App.closeModal('searchModal')">✕</button></div>
       <div id="globalSearchResults" class="item-list" style="max-height: 60vh;"><div class="stat-label" style="text-align:center; padding: 2rem 0;">Digita almeno 2 caratteri...</div></div>
     </div>
   </div>
@@ -596,8 +612,12 @@
           <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Rimuovi PIN</button>
         </div>
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
-          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">📊 Backup & Ripristino</div>
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">📊 Backup, Esportazione & Ripristino</div>
           <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem;">💾 Esporta Backup Completo (JSON)</button>
+          <div style="display:flex; gap:0.5rem; margin-bottom: 0.5rem;">
+            <button class="btn btn-sm" onclick="App.exportCSV('finance')" style="flex:1;">📈 CSV Finanze</button>
+            <button class="btn btn-sm" onclick="App.exportCSV('nutrition')" style="flex:1;">🍎 CSV Nutrizione</button>
+          </div>
           <label class="btn btn-sm" style="width:100%; margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">📂 Ripristina Backup (JSON o ZIP)<input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;"></label>
           <button class="btn btn-sm" onclick="App.forceUpdateCache()" style="width:100%; margin-bottom: 1rem; border-color: var(--accent-primary); color: var(--accent-primary);">🔄 Svuota Cache PWA</button>
           <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
@@ -623,6 +643,17 @@
       { id: 'f22', name: 'Pane Comune', kcal: 275, carb: 58, prot: 8.6, fat: 1 }
     ];
 
+    const DEFAULT_SETTINGS = {
+      inventoryCategories: {
+        'Elettrodomestici': ['Generale', 'Cucina', 'Clima'],
+        'Casa/Impianti': ['Mobili', 'Impianti'],
+        'Elettronica': ['Smartphone', 'Computer'],
+        'Veicoli': ['Auto', 'Moto']
+      },
+      maintenanceCategories: ['Casa', 'Salute', 'Altro'],
+      hapticEnabled: true
+    };
+
     const App = {
       state: {
         pin: null, lastCronRun: null,
@@ -630,12 +661,9 @@
         accounts: [], transactions: [], subs: [],
         healthNutrition: [], healthWeight: [], healthMedical: [], habits: [],
         foodLibrary: DEFAULT_FOODS,
+        nutritionGoals: { kcal: 2100, prot: 140, carb: 230, fat: 70 },
         vehicles: [], garageMaint: [],
-        settings: {
-          inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
-          maintenanceCategories: ['Casa', 'Salute', 'Altro'],
-          hapticEnabled: true
-        }
+        settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS))
       },
       currentDate: new Date(),
       selectedDate: new Date(),
@@ -646,11 +674,31 @@
       pomoTimer: null,
       pomoSeconds: 1500,
 
+      toLocalISO(d = new Date()) {
+        const dateObj = (d instanceof Date && !isNaN(d)) ? d : new Date(d);
+        if (isNaN(dateObj)) return new Date().toISOString().slice(0, 10);
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      },
+
+      // Calcola i giorni di distanza tra una data YYYY-MM-DD e oggi (a mezzanotte locale)
+      daysFromToday(dateStr) {
+        if (!dateStr || typeof dateStr !== 'string') return null;
+        const parts = dateStr.slice(0, 10).split('-').map(Number);
+        if (parts.length !== 3 || parts.some(isNaN)) return null;
+        const target = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        return Math.round((target - today) / (1000 * 60 * 60 * 24));
+      },
+
       setElText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; },
       setElHTML(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; },
 
       sanitizeData() {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = this.toLocalISO();
         const cleanNumber = (val) => {
           if (typeof val === 'number' && !isNaN(val)) return val;
           if (!val) return 0;
@@ -661,24 +709,167 @@
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'vehicles', 'garageMaint'];
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
         if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
-        if (!this.state.settings) this.state.settings = {};
+        if (!this.state.nutritionGoals) this.state.nutritionGoals = { kcal: 2100, prot: 140, carb: 230, fat: 70 };
+        if (!this.state.settings) this.state.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+        if (!this.state.settings.inventoryCategories) this.state.settings.inventoryCategories = DEFAULT_SETTINGS.inventoryCategories;
+        if (!Array.isArray(this.state.settings.maintenanceCategories)) this.state.settings.maintenanceCategories = DEFAULT_SETTINGS.maintenanceCategories;
 
         if (this.state.garageConfig && !this.state.vehicles.length) {
-           this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
-           delete this.state.garageConfig;
+          this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
+          delete this.state.garageConfig;
         }
         if (this.state.vehicles.length === 0) {
-           this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
+          this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
         }
         if (!this.activeVehicleId || !this.state.vehicles.find(v => v.id === this.activeVehicleId)) {
-           this.activeVehicleId = this.state.vehicles[0].id;
+          this.activeVehicleId = this.state.vehicles[0].id;
         }
         this.state.garageMaint.forEach(m => { if (!m.vehicleId) m.vehicleId = this.state.vehicles[0].id; });
 
         this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
         this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(t.type) ? t.type : 'EXPENSE'; });
-        
-        this.state.calendarTasks.forEach(t => { if(!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
+        this.state.calendarTasks.forEach(t => { if (!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
+      },
+
+      // ==========================================================
+      // 2. COMPRESSIONE SMART IMMAGINI E ALLEGATI (CARTELLA CLINICA)
+      // ==========================================================
+      fileToBase64(file) {
+        return new Promise((res, rej) => {
+          const r = new FileReader();
+          r.readAsDataURL(file);
+          r.onload = () => res(r.result);
+          r.onerror = e => rej(e);
+        });
+      },
+
+      compressImageFile(file, maxDim = 1600, quality = 0.75) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              let width = img.width;
+              let height = img.height;
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height * maxDim) / width);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width * maxDim) / height);
+                  height = maxDim;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, width, height);
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = (err) => reject(err);
+            img.src = e.target.result;
+          };
+          reader.onerror = (err) => reject(err);
+          reader.readAsDataURL(file);
+        });
+      },
+
+      async processMedicalAttachment(file) {
+        if (!file) return null;
+        const origKB = Math.round(file.size / 1024);
+        if (file.type.startsWith('image/')) {
+          const compressedDataUrl = await this.compressImageFile(file, 1600, 0.75);
+          const compKB = Math.round((compressedDataUrl.length * 0.75) / 1024);
+          this.showToast(`Foto compressa: da ${origKB}KB a ~${compKB}KB`, 'info');
+          return compressedDataUrl;
+        }
+        if (file.size > 12 * 1024 * 1024) {
+          this.showToast('Attenzione: PDF molto grande (>12MB)', 'warning');
+        }
+        return await this.fileToBase64(file);
+      },
+
+      // ==========================================================
+      // 3. RADAR SCADENZE UNIFICATO (GARAGE, GARANZIE, MANUTENZIONI)
+      // ==========================================================
+      getSystemAlerts(daysThreshold = 15) {
+        const alerts = [];
+
+        // A. Controllo Veicoli in Garage OS (Bollo, Assicurazione, Revisione)
+        this.state.vehicles.forEach(v => {
+          const checks = [
+            { label: 'Assicurazione', date: v.assic },
+            { label: 'Bollo', date: v.bollo },
+            { label: 'Revisione', date: v.revis }
+          ];
+          checks.forEach(c => {
+            if (!c.date) return;
+            const diff = this.daysFromToday(c.date);
+            if (diff !== null && diff <= daysThreshold) {
+              alerts.push({
+                id: `gar_${v.id}_${c.label}`,
+                icon: '🏎️',
+                category: 'Garage OS',
+                title: `${c.label} ${v.name}`,
+                date: c.date,
+                diffDays: diff,
+                severity: diff < 0 ? 'danger' : 'warning',
+                statusText: diff < 0 ? `Scaduta da ${Math.abs(diff)}g` : (diff === 0 ? 'Scade OGGI' : `Tra ${diff}g`),
+                action: () => { this.activeVehicleId = v.id; this.openHubModule('sub-garage'); }
+              });
+            }
+          });
+        });
+
+        // B. Controllo Garanzie in Inventario
+        this.state.inventory.forEach(item => {
+          if (!item.warranty) return;
+          const diff = this.daysFromToday(item.warranty);
+          // Mostra garanzie in scadenza entro daysThreshold o scadute da non più di 15 giorni
+          if (diff !== null && diff >= -15 && diff <= daysThreshold) {
+            alerts.push({
+              id: `inv_${item.id}`,
+              icon: '🛡️',
+              category: 'Garanzia',
+              title: `Garanzia: ${item.name}`,
+              date: item.warranty,
+              diffDays: diff,
+              severity: diff < 0 ? 'danger' : 'warning',
+              statusText: diff < 0 ? `Scaduta da ${Math.abs(diff)}g` : (diff === 0 ? 'Scade OGGI' : `Tra ${diff}g`),
+              action: () => { this.openHubModule('sub-inventory'); this.switchInvTab('garanzie'); }
+            });
+          }
+        });
+
+        // C. Controllo Manutenzioni Casa (In attesa)
+        this.state.maintenances.forEach(m => {
+          if (m.status === 'Completata' || !m.dueDate) return;
+          const diff = this.daysFromToday(m.dueDate);
+          if (diff !== null && diff <= daysThreshold) {
+            alerts.push({
+              id: `mnt_${m.id}`,
+              icon: '🔧',
+              category: `Manutenzione ${m.category || 'Casa'}`,
+              title: m.title,
+              date: m.dueDate,
+              diffDays: diff,
+              severity: diff < 0 ? 'danger' : 'warning',
+              statusText: diff < 0 ? `In ritardo di ${Math.abs(diff)}g` : (diff === 0 ? 'Oggi' : `Tra ${diff}g`),
+              action: () => { this.openHubModule('sub-maintenance'); }
+            });
+          }
+        });
+
+        return alerts.sort((a, b) => a.diffDays - b.diffDays);
+      },
+
+      triggerAlertAction(alertId) {
+        const allAlerts = this.getSystemAlerts(365);
+        const found = allAlerts.find(a => a.id === alertId);
+        if (found && typeof found.action === 'function') found.action();
       },
 
       async importBackupFile(event) {
@@ -733,9 +924,9 @@
       showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3200); },
       
       openModal(id) { 
-          const el = document.getElementById(id); if (el) el.classList.add('open'); 
-          if (id === 'searchModal') setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100); 
-          if (id === 'garageConfigModal') this.loadGarageConfig(); 
+        const el = document.getElementById(id); if (el) el.classList.add('open'); 
+        if (id === 'searchModal') setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100); 
+        if (id === 'garageConfigModal') this.loadGarageConfig(); 
       },
       closeModal(id) { document.getElementById(id)?.classList.remove('open'); },
 
@@ -744,23 +935,27 @@
         document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
         document.getElementById(modId)?.classList.add('active');
         document.querySelector(`.nav-tab[data-target="${modId}"]`)?.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.renderActiveModule();
       },
       openHubModule(hubId) {
         document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
         document.getElementById(hubId)?.classList.add('active');
+        document.querySelector('.nav-tab[data-target="mod-hub"]')?.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.renderActiveModule();
       },
       switchInvTab(tabId) { this.activeInvTab = tabId; document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`)?.classList.add('active'); this.renderInventory(); },
 
       renderActiveModule() {
-        if(document.getElementById('mod-dashboard').classList.contains('active')) this.renderDashboard();
-        if(document.getElementById('mod-calendar').classList.contains('active')) this.renderCalendar();
-        if(document.getElementById('mod-finance').classList.contains('active')) { this.populateAccountSelects(); this.renderFinance(); }
-        if(document.getElementById('sub-garage').classList.contains('active')) this.renderGarage();
-        if(document.getElementById('sub-inventory').classList.contains('active')) { this.populateCategorySelects(); this.renderInventory(); }
-        if(document.getElementById('sub-maintenance').classList.contains('active')) { this.populateMaintenanceSelects(); this.renderGeneralMaintenances(); }
-        if(document.getElementById('sub-health').classList.contains('active')) { this.populateFoodLibrarySelect(); this.renderHealth(); }
+        if (document.getElementById('mod-dashboard')?.classList.contains('active')) this.renderDashboard();
+        if (document.getElementById('mod-calendar')?.classList.contains('active')) this.renderCalendar();
+        if (document.getElementById('mod-finance')?.classList.contains('active')) { this.populateAccountSelects(); this.renderFinance(); }
+        if (document.getElementById('sub-garage')?.classList.contains('active')) this.renderGarage();
+        if (document.getElementById('sub-inventory')?.classList.contains('active')) { this.populateCategorySelects(); this.renderInventory(); }
+        if (document.getElementById('sub-maintenance')?.classList.contains('active')) { this.populateMaintenanceSelects(); this.renderGeneralMaintenances(); }
+        if (document.getElementById('sub-health')?.classList.contains('active')) { this.populateFoodLibrarySelect(); this.renderHealth(); }
       },
 
       toggleTheme() { const html = document.documentElement; const current = html.getAttribute('data-theme'); const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark'; html.setAttribute('data-theme', nextTheme); this.save(); this.showToast(`Tema: ${nextTheme.toUpperCase()}`); },
@@ -771,9 +966,8 @@
       quickAdd(inputId) { this.toggleFab(); if (inputId === 'txAmount') this.switchModule('mod-finance'); else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar'); else if (inputId === 'weightValue' || inputId === 'nutriGrams') this.openHubModule('sub-health'); setTimeout(() => { const input = document.getElementById(inputId); if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 300); },
 
       formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(amount) || 0); },
-      formatDate(dateStr) { return dateStr ? new Date(dateStr).toLocaleDateString('it-IT') : '--'; },
+      formatDate(dateStr) { if (!dateStr) return '--'; const parts = dateStr.split('-'); if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`; return new Date(dateStr).toLocaleDateString('it-IT'); },
       generateId() { return Math.random().toString(36).substr(2, 9); },
-      fileToBase64(file) { return new Promise((res, rej) => { const r = new FileReader(); r.readAsDataURL(file); r.onload = () => res(r.result); r.onerror = e => rej(e); }); },
 
       togglePomodoro() { if (this.pomoTimer) { clearInterval(this.pomoTimer); this.pomoTimer = null; this.setElText('pomoBtn', '▶️ Riprendi'); } else { this.setElText('pomoBtn', '⏸️ Pausa'); this.pomoTimer = setInterval(() => { if (this.pomoSeconds > 0) { this.pomoSeconds--; const m = String(Math.floor(this.pomoSeconds / 60)).padStart(2, '0'); const s = String(this.pomoSeconds % 60).padStart(2, '0'); this.setElText('pomoDisplay', `${m}:${s}`); } else { clearInterval(this.pomoTimer); this.pomoTimer = null; this.vibrate([100, 50, 100]); this.showToast('Sessione Completata! 🎉'); } }, 1000); } },
       resetPomodoro() { clearInterval(this.pomoTimer); this.pomoTimer = null; this.pomoSeconds = 1500; this.setElText('pomoDisplay', '25:00'); this.setElText('pomoBtn', '▶️ Avvia Focus'); },
@@ -783,26 +977,129 @@
       verifyPin() { const input = document.getElementById('loginPinInput')?.value; if (input === this.state.pin) { document.getElementById('lockScreen')?.classList.add('hidden'); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
       togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); this.setElHTML('privacyBtn', isActive ? '🔒' : '👁️'); },
 
+      // === ABITUDINI & STREAK ===
+      addHabit() {
+        const name = prompt("Nome della nuova abitudine giornaliera (es. Bere 2L d'acqua, Lettura, Allenamento):");
+        if (name && name.trim()) {
+          this.state.habits.push({ id: this.generateId(), name: name.trim(), streak: 0, lastDone: null });
+          this.save();
+          this.showToast('Abitudine creata!');
+        }
+      },
+      toggleHabit(id) {
+        const h = this.state.habits.find(x => x.id === id);
+        if (!h) return;
+        const todayStr = this.toLocalISO();
+        if (h.lastDone === todayStr) {
+          h.lastDone = null;
+          h.streak = Math.max(0, (h.streak || 1) - 1);
+        } else {
+          h.lastDone = todayStr;
+          h.streak = (h.streak || 0) + 1;
+          this.vibrate(25);
+        }
+        this.save();
+      },
+      deleteHabit(id) {
+        if (confirm("Eliminare questa abitudine?")) {
+          this.state.habits = this.state.habits.filter(x => x.id !== id);
+          this.save();
+        }
+      },
+
+      // === DASHBOARD CON RADAR SCADENZE UNIFICATO ===
       renderDashboard() {
-        const hour = new Date().getHours(); const greet = hour < 12 ? 'Buongiorno ✨' : hour < 18 ? 'Buon pomeriggio ☀️' : 'Buonasera 🌙';
-        this.setElText('greetingTitle', greet); this.setElText('greetingDate', new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+        const hour = new Date().getHours();
+        const greet = hour < 12 ? 'Buongiorno ✨' : hour < 18 ? 'Buon pomeriggio ☀️' : 'Buonasera 🌙';
+        this.setElText('greetingTitle', greet);
+        this.setElText('greetingDate', new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+
         const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0);
-        this.setElText('dashNetWorth', this.formatMoney(total)); this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length; const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
-        const score = Math.min(100, Math.max(25, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15))));
+        this.setElText('dashNetWorth', this.formatMoney(total));
+        this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
+
+        const todayStr = this.toLocalISO();
+        const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length;
+        const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
+
+        // Scansione urgenze entro 15 giorni per Hero Card
+        const urgentAlerts = this.getSystemAlerts(15);
+        const expiredCount = urgentAlerts.filter(a => a.diffDays < 0).length;
+
+        // Il Life Score tiene conto anche di eventuali scadenze superate
+        const penalty = expiredCount * 8;
+        const score = Math.min(100, Math.max(20, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15) - penalty)));
         this.setElText('lifeScoreValue', `${score}%`);
-        const circle = document.getElementById('lifeScoreCircle'); if (circle) circle.style.strokeDashoffset = 150 - (150 * score) / 100;
+        const circle = document.getElementById('lifeScoreCircle');
+        if (circle) circle.style.strokeDashoffset = 150 - (150 * score) / 100;
 
-        const txCount = this.state.transactions.length; const lastWeight = [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||''))[0];
-        this.setElText('smartInsightText', txCount > 0 ? `Hai ${txCount} movimenti, ${this.state.inventory.length} beni${lastWeight ? ` e ultimo peso a ${lastWeight.value} kg` : ''}.` : `Tocca + per registrare i tuoi dati.`);
+        // Popola Smart Insight + Pillole di Urgenza nella Hero Card
+        const txCount = this.state.transactions.length;
+        const lastWeight = [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||''))[0];
 
+        if (urgentAlerts.length > 0) {
+          this.setElText(
+            'smartInsightText',
+            `⚠️ Radar Ecosistema: hai ${urgentAlerts.length} ${urgentAlerts.length === 1 ? 'scadenza ravvicinata' : 'scadenze ravvicinate'} (Garage, Garanzie o Casa). Tocca un avviso qui sotto:`
+          );
+          this.setElHTML('heroAlertsBar', urgentAlerts.slice(0, 6).map(a => `
+            <div class="alert-pill ${a.severity}" onclick="App.triggerAlertAction('${a.id}')" title="Vai a ${a.category}">
+              <span>${a.icon}</span>
+              <span>${a.title}</span>
+              <span style="opacity:0.85; font-family:'JetBrains Mono',monospace;">• ${a.statusText}</span>
+            </div>
+          `).join(''));
+        } else {
+          this.setElText(
+            'smartInsightText',
+            txCount > 0
+              ? `Nessuna scadenza urgente nei prossimi 15g. Hai ${txCount} movimenti, ${this.state.inventory.length} beni${lastWeight ? ` e ultimo peso a ${lastWeight.value} kg` : ''}.`
+              : `Tutto sotto controllo! Tocca il pulsante + per registrare i tuoi primi dati.`
+          );
+          this.setElHTML('heroAlertsBar', '');
+        }
+
+        // Promemoria Clinici
         const medItems = this.state.healthMedical.slice(0, 4);
         this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + t.therapy : '🩺 ' + t.title}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + t.notes : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
-        const upcoming = [...this.state.calendarTasks].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5);
-        this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in programma.</div>');
         
-        // CORRETTO: rimosso apostrofo da testo codice HTML
+        // Unione Prossime Attività Calendario + Scadenze Ecosistema entro 30 giorni
+        const alerts30 = this.getSystemAlerts(30);
+        const upcomingTasks = this.state.calendarTasks
+          .filter(t => t.date >= todayStr)
+          .map(t => ({
+            isTask: true,
+            date: t.date,
+            title: t.title,
+            badgeText: t.type || 'Task',
+            badgeClass: t.priority === 'Alta' ? 'badge-danger' : 'badge-info',
+            onClick: `App.switchModule('mod-calendar'); App.selectDate('${t.date}');`
+          }));
+
+        const upcomingAlerts = alerts30.map(a => ({
+          isTask: false,
+          date: a.date,
+          title: `${a.icon} ${a.title}`,
+          subtitle: `${a.category} • ${a.statusText}`,
+          badgeText: a.statusText,
+          badgeClass: a.severity === 'danger' ? 'badge-danger' : 'badge-warning',
+          onClick: `App.triggerAlertAction('${a.id}')`
+        }));
+
+        const combinedUpcoming = [...upcomingAlerts, ...upcomingTasks]
+          .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
+          .slice(0, 7);
+
+        this.setElHTML('dashUpcomingTasks', combinedUpcoming.length ? combinedUpcoming.map(item => `
+          <div class="list-row clickable" onclick="${item.onClick}">
+            <div>
+              <span class="stat-label">${this.formatDate(item.date)}${item.subtitle ? ' • ' + item.subtitle : ''}</span><br>
+              <strong>${item.title}</strong>
+            </div>
+            <span class="badge ${item.badgeClass}">${item.badgeText}</span>
+          </div>
+        `).join('') : '<div class="list-row stat-label">Nessuna attività o scadenza nei prossimi 30 giorni.</div>');
+        
         this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
         this.renderFinanceChart();
       },
@@ -815,14 +1112,19 @@
         this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Entrate', 'Uscite'], datasets: [{ data: [income, expense], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } } } });
       },
 
-      // === CALENDARIO (ANTI-CRASH FIX) ===
+      // === CALENDARIO ===
       changeMonth(dir) {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         this.currentDate.setMonth(this.currentDate.getMonth() + dir);
         this.renderCalendar();
       },
       selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
-      selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
+      selectDate(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        this.selectedDate = new Date(y, m - 1, d, 12, 0, 0);
+        this.currentDate = new Date(y, m - 1, 1);
+        this.renderCalendar();
+      },
       renderCalendar() {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         if (!(this.selectedDate instanceof Date) || isNaN(this.selectedDate)) this.selectedDate = new Date();
@@ -840,12 +1142,12 @@
         let start = new Date(y, m, 1).getDay(); start = start === 0 ? 7 : start;
         for (let i = 1; i < start; i++) { const el = document.createElement('div'); el.className = 'cal-day'; el.style.visibility = 'hidden'; grid.appendChild(el); }
         
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const selStr = this.selectedDate.toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
+        const selStr = this.toLocalISO(this.selectedDate);
         const last = new Date(y, m + 1, 0).getDate();
         
         for (let d = 1; d <= last; d++) {
-          const dateStr = new Date(y, m, d, 12).toISOString().slice(0, 10);
+          const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
           const el = document.createElement('div'); el.className = 'cal-day';
           if (dateStr === todayStr) el.classList.add('today');
           if (dateStr === selStr) el.classList.add('active');
@@ -856,41 +1158,47 @@
         }
         this.renderCalendarTasks();
         this.renderJournalHistory();
+
+        const existingEntry = this.state.journal.find(j => j.date === selStr);
+        const jText = document.getElementById('journalText');
+        const jMood = document.getElementById('journalMood');
+        if (jText) jText.value = existingEntry ? existingEntry.text : '';
+        if (jMood && existingEntry) jMood.value = existingEntry.mood;
       },
-      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.selectedDate.toISOString().slice(0, 10), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
+      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.toLocalISO(this.selectedDate), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
       deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
       renderCalendarTasks() {
-        const selStr = (this.selectedDate instanceof Date && !isNaN(this.selectedDate)) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+        const selStr = this.toLocalISO(this.selectedDate);
         const tasks = this.state.calendarTasks.filter(t => t.date === selStr);
         this.setElText('calTaskCountBadge', tasks.length);
         this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => `<div class="list-row"><div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div><button class="btn btn-sm btn-danger" onclick="App.deleteCalendarTask('${t.id}')">✕</button></div>`).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
       },
-      saveJournalEntry(e) { e.preventDefault(); const date = (this.selectedDate instanceof Date) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
-      renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
+      saveJournalEntry(e) { e.preventDefault(); const date = this.toLocalISO(this.selectedDate); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); this.showToast('Diario salvato!'); this.renderJournalHistory(); },
+      renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row clickable" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
 
       // === GARAGE OS (MULTI-VEHICLE) ===
       switchVehicle(id) { this.activeVehicleId = id; this.renderGarage(); },
       addVehicle() {
-         const name = prompt("Inserisci marca/modello del nuovo veicolo (es. Moto Honda):");
-         if(name && name.trim()) {
-            const newV = { id: this.generateId(), name: name.trim(), plate: '', bollo: '', assic: '', revis: '', km: 0 };
-            this.state.vehicles.push(newV);
-            this.activeVehicleId = newV.id;
-            this.save();
-         }
+        const name = prompt("Inserisci marca/modello del nuovo veicolo (es. Moto Honda):");
+        if (name && name.trim()) {
+          const newV = { id: this.generateId(), name: name.trim(), plate: '', bollo: '', assic: '', revis: '', km: 0 };
+          this.state.vehicles.push(newV);
+          this.activeVehicleId = newV.id;
+          this.save();
+        }
       },
       deleteActiveVehicle() {
-         if (this.state.vehicles.length <= 1) return this.showToast("Devi avere almeno un veicolo.", "warning");
-         if (confirm("Sei sicuro di eliminare questo veicolo e tutto il suo storico tagliandi?")) {
-            this.state.garageMaint = this.state.garageMaint.filter(m => m.vehicleId !== this.activeVehicleId);
-            this.state.vehicles = this.state.vehicles.filter(v => v.id !== this.activeVehicleId);
-            this.activeVehicleId = this.state.vehicles[0].id;
-            this.save();
-         }
+        if (this.state.vehicles.length <= 1) return this.showToast("Devi avere almeno un veicolo.", "warning");
+        if (confirm("Sei sicuro di eliminare questo veicolo e tutto il suo storico tagliandi?")) {
+          this.state.garageMaint = this.state.garageMaint.filter(m => m.vehicleId !== this.activeVehicleId);
+          this.state.vehicles = this.state.vehicles.filter(v => v.id !== this.activeVehicleId);
+          this.activeVehicleId = this.state.vehicles[0].id;
+          this.save();
+        }
       },
       loadGarageConfig() {
         const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
-        if(!v) return;
+        if (!v) return;
         document.getElementById('gConfName').value = v.name || '';
         document.getElementById('gConfPlate').value = v.plate || '';
         document.getElementById('gConfBollo').value = v.bollo || '';
@@ -901,7 +1209,7 @@
       saveGarageConfig(e) {
         e.preventDefault();
         const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
-        if(!v) return;
+        if (!v) return;
         v.name = document.getElementById('gConfName').value;
         v.plate = document.getElementById('gConfPlate').value.toUpperCase();
         v.bollo = document.getElementById('gConfBollo').value;
@@ -912,14 +1220,14 @@
       },
       updateGarageKm() {
         const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
-        if(!v) return;
+        if (!v) return;
         const newKm = prompt("Inserisci chilometraggio attuale:", v.km);
-        if(newKm && !isNaN(newKm)) { v.km = parseFloat(newKm); this.save(); }
+        if (newKm && !isNaN(newKm)) { v.km = parseFloat(newKm); this.save(); }
       },
       addGarageMaintenance(e) {
         e.preventDefault();
         const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
-        if(!v) return;
+        if (!v) return;
         this.state.garageMaint.push({
           id: this.generateId(), vehicleId: v.id,
           title: document.getElementById('gMaintTitle').value,
@@ -927,28 +1235,27 @@
           cost: parseFloat(document.getElementById('gMaintCost').value) || 0,
           kmAtMaint: v.km
         });
-        this.save(); e.target.reset(); document.getElementById('gMaintDate').value = new Date().toISOString().slice(0, 10);
+        this.save(); e.target.reset(); document.getElementById('gMaintDate').value = this.toLocalISO();
       },
-      deleteGarageMaint(id) { if(confirm("Eliminare lavoro?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
+      deleteGarageMaint(id) { if (confirm("Eliminare lavoro?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
       renderGarage() {
         this.setElHTML('garageVehicleTabs', this.state.vehicles.map(v => `<div class="vehicle-chip ${v.id === this.activeVehicleId ? 'active' : ''}" onclick="App.switchVehicle('${v.id}')">${v.name}</div>`).join('') + `<div class="vehicle-chip" style="background:transparent; border-style:dashed;" onclick="App.addVehicle()">+ Nuovo</div>`);
 
         const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
-        if(!v) return;
+        if (!v) return;
 
         this.setElText('garageCarName', v.name);
         this.setElText('garageCarPlate', v.plate || 'Targa N/D');
-        this.setElText('garageKmOdo', `${v.km.toLocaleString('it-IT')} km`);
+        this.setElText('garageKmOdo', `${(v.km || 0).toLocaleString('it-IT')} km`);
 
-        const today = new Date();
         const setTrafficLight = (idDate, idTl, dateStr) => {
           this.setElText(idDate, this.formatDate(dateStr));
           const el = document.getElementById(idTl);
-          if(!el) return;
+          if (!el) return;
           el.className = 'tl-indicator'; 
-          if(!dateStr) { el.classList.add('tl-red'); return; }
-          const diffDays = Math.floor((new Date(dateStr) - today) / (1000 * 60 * 60 * 24));
-          if(diffDays < 0) el.classList.add('tl-red');
+          if (!dateStr) { el.classList.add('tl-red'); return; }
+          const diffDays = this.daysFromToday(dateStr);
+          if (diffDays === null || diffDays < 0) el.classList.add('tl-red');
           else if (diffDays <= 30) el.classList.add('tl-yellow');
           else el.classList.add('tl-green');
         };
@@ -971,7 +1278,7 @@
         `).join('') : '<div class="list-row stat-label">Nessun lavoro meccanico registrato su questo veicolo.</div>');
       },
 
-      // === FINANZE WALLET REORDER ===
+      // === FINANZE WALLET ===
       moveAccount(id, dir) {
         const idx = this.state.accounts.findIndex(a => a.id === id);
         if (idx < 0) return;
@@ -981,6 +1288,16 @@
         this.state.accounts[idx] = this.state.accounts[newIdx];
         this.state.accounts[newIdx] = temp;
         this.save();
+      },
+      deleteFinanceAccount(id) {
+        const acc = this.state.accounts.find(a => a.id === id);
+        if (!acc) return;
+        if (confirm(`Eliminare il conto "${acc.name}" dal Wallet?`)) {
+          this.state.accounts = this.state.accounts.filter(a => a.id !== id);
+          this.save();
+          this.populateAccountSelects();
+          this.renderFinance();
+        }
       },
 
       populateAccountSelects() {
@@ -1000,80 +1317,186 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-weight:800; font-size:0.95rem;">${a.name}</span>
               <div class="wallet-arrows">
-                ${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}
-                ${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}
+                ${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)" title="Sposta a sinistra">◀</button>` : ''}
+                ${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)" title="Sposta a destra">▶</button>` : ''}
+                <button onclick="event.stopPropagation(); App.deleteFinanceAccount('${a.id}')" title="Elimina conto">✕</button>
               </div>
             </div>
             <div>
               <div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div>
               <div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div>
             </div>
-          </div>`).join('') : '<div class="stat-label">Nessun conto presente.</div>');
+          </div>`).join('') : '<div class="stat-label">Nessun conto presente. Creane uno qui sotto.</div>');
         
         let filtered = [...this.state.transactions]; if (fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc); filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => { const acc = this.state.accounts.find(a => a.id === tx.accountId); const isExp = tx.type === 'EXPENSE'; const color = isExp ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; const prefix = isExp ? '-' : tx.type === 'INCOME' ? '+' : ''; return `<div class="list-row"><div><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong>${tx.desc}</strong> <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right; display:flex; align-items:center; gap:0.6rem;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteTransaction('${tx.id}')">🗑</button></div></div>`; }).join('') : '<div class="list-row stat-label">Nessuna transazione per questo filtro.</div>');
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0); this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
-        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => `<div class="list-row"><div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><div style="display:flex; align-items:center; gap:0.5rem;"><strong>${this.formatMoney(s.cost)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteSubscription('${s.id}')">✕</button></div></div>`).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
+        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => `<div class="list-row"><div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Attivo dal: ${this.formatDate(s.next)}</small></div><div style="display:flex; align-items:center; gap:0.5rem;"><strong>${this.formatMoney(s.cost)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteSubscription('${s.id}')">✕</button></div></div>`).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
         this.renderExpenseCategoryChart();
       },
       renderExpenseCategoryChart() { const ctx = document.getElementById('expenseCatChart'); if (!ctx || typeof Chart === 'undefined') return; const catTotals = {}; this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => { const c = t.category || 'Altro'; catTotals[c] = (catTotals[c] || 0) + t.amount; }); const labels = Object.keys(catTotals); const data = Object.values(catTotals); if (this.charts.expCat) this.charts.expCat.destroy(); this.charts.expCat = new Chart(ctx, { type: 'doughnut', data: { labels: labels.length ? labels : ['Nessuna spesa'], datasets: [{ data: data.length ? data : [1], backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } } } } }); },
       addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
       toggleTransferFields() { document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none'; },
-      addTransaction(e) { e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value; if (!srcId) return this.showToast('Seleziona un conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId); const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence').value, timestamp: new Date().toISOString() }; if (src) { if (t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { src.balance -= a; const trg = this.state.accounts.find(x => x.id === trgId); if (trg) trg.balance += a; tx.targetAccountId = trgId; } } this.state.transactions.push(tx); this.save(); e.target.reset(); document.getElementById('txDate').value = new Date().toISOString().slice(0, 10); this.populateAccountSelects(); this.renderFinance(); },
-      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: new Date().toISOString().slice(0, 10), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
+      addTransaction(e) { e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value; if (!srcId) return this.showToast('Seleziona un conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId); const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence').value, timestamp: new Date().toISOString() }; if (src) { if (t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { src.balance -= a; const trg = this.state.accounts.find(x => x.id === trgId); if (trg) trg.balance += a; tx.targetAccountId = trgId; } } this.state.transactions.push(tx); this.save(); e.target.reset(); document.getElementById('txDate').value = this.toLocalISO(); this.populateAccountSelects(); this.renderFinance(); },
+      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: this.toLocalISO(), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
       deleteTransaction(id) { const tx = this.state.transactions.find(t => t.id === id); if (!tx || !confirm('Eliminare movimento?')) return; const src = this.state.accounts.find(a => a.id === tx.accountId); if (src) { if (tx.type === 'EXPENSE') src.balance += tx.amount; else if (tx.type === 'INCOME') src.balance -= tx.amount; else if (tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => a.id === tx.targetAccountId); if (trg) trg.balance -= tx.amount; } } this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.save(); this.populateAccountSelects(); this.renderFinance(); },
-      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: new Date().toISOString().slice(0, 10) }); this.save(); e.target.reset(); this.renderFinance(); },
+      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: this.toLocalISO() }); this.save(); e.target.reset(); this.renderFinance(); },
       deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
 
-      // === SALUTE OS ===
+      // === SALUTE OS (CON COMPRESSIONE SMART REFERTI) ===
+      configureNutritionGoals() {
+        const g = this.state.nutritionGoals || { kcal: 2100, prot: 140, carb: 230, fat: 70 };
+        const kcal = prompt("Inserisci obiettivo Kcal giornaliere:", g.kcal);
+        if (!kcal || isNaN(kcal)) return;
+        const prot = prompt("Obiettivo Proteine (g):", g.prot);
+        const carb = prompt("Obiettivo Carboidrati (g):", g.carb);
+        const fat = prompt("Obiettivo Grassi (g):", g.fat);
+        this.state.nutritionGoals = {
+          kcal: parseInt(kcal) || 2100,
+          prot: parseInt(prot) || 140,
+          carb: parseInt(carb) || 230,
+          fat: parseInt(fat) || 70
+        };
+        this.save();
+        this.showToast('Obiettivi nutrizionali aggiornati!');
+      },
       populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${f.name} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
       AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => f.id === foodId); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
-      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
+      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = this.toLocalISO(); this.renderHealth(); },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
+      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = this.toLocalISO(); this.renderHealth(); },
       deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
-      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth(); },
+      async addMedicalRecord(e) {
+        e.preventDefault();
+        const type = document.getElementById('medType').value;
+        let fileData = null;
+        const fileInput = document.getElementById('medFile');
+        if (type === 'Referto' && fileInput.files.length > 0) {
+          try {
+            fileData = await this.processMedicalAttachment(fileInput.files[0]);
+          } catch (err) {
+            this.showToast('Errore elaborazione allegato', 'danger');
+          }
+        }
+        this.state.healthMedical.push({
+          id: this.generateId(),
+          type,
+          date: document.getElementById('medDate').value,
+          title: document.getElementById('medTitle').value,
+          notes: document.getElementById('medNotes').value,
+          therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '',
+          fileData
+        });
+        this.save();
+        e.target.reset();
+        document.getElementById('medDate').value = this.toLocalISO();
+        this.toggleMedFields();
+        this.renderHealth();
+      },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       renderHealth() {
-        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||'')); const latestDay = sortedNutri[0]?.date || new Date().toISOString().slice(0, 10); const dayLogs = sortedNutri.filter(n => n.date === latestDay);
+        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||'')); const latestDay = sortedNutri[0]?.date || this.toLocalISO(); const dayLogs = sortedNutri.filter(n => n.date === latestDay);
         const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)), totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)), totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)), totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)), goalKcal = this.state.nutritionGoals?.kcal || 2100;
-        this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
+        this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal ✏️`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
         this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`); this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`); this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
         this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => `<div class="list-row"><div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteNutritionLog('${n.id}')">✕</button></div>`).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
         this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => `<div class="list-row"><div><strong>⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteWeightLog('${w.id}')">✕</button></div>`).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
         const ctxW = document.getElementById('weightChart'); if (ctxW && typeof Chart !== 'undefined') { const sortedW = [...this.state.healthWeight].sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(-10); if (this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w => this.formatDate(w.date).slice(0, 5)), datasets: [{ label: 'Peso', data: sortedW.map(w => w.value), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.2)', tension: 0.35, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
-        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => { const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; const file = m.fileData ? `<div><a href="${m.fileData}" download="Referto_${m.title}" class="badge badge-success" style="text-decoration:none; margin-top:4px;">📥 Scarica Allegato</a></div>` : ''; return `<div class="list-row"><div style="flex:1;"><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${m.title}</strong>${extra}<div class="stat-label">${m.notes || ''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`; }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
+        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => {
+          const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : '';
+          let file = '';
+          if (m.fileData) {
+            const isPdf = m.fileData.startsWith('data:application/pdf');
+            const ext = isPdf ? '.pdf' : '.jpg';
+            const cleanName = (m.title || 'Referto').replace(/[^a-zA-Z0-9_-]/g, '_');
+            file = `<div><a href="${m.fileData}" download="Referto_${cleanName}${ext}" class="badge badge-success" style="text-decoration:none; margin-top:4px;">📥 Scarica Allegato (${isPdf ? 'PDF' : 'IMG'})</a></div>`;
+          }
+          return `<div class="list-row"><div style="flex:1;"><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${m.title}</strong>${extra}<div class="stat-label">${m.notes || ''}</div>${file}</div><button class="btn btn-sm btn-danger" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button></div>`;
+        }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
       },
 
       // === HUB EXTRA: INVENTARIO, MANUTENZIONI, RICERCA ===
       populateCategorySelects() { const cats = Object.keys(this.state.settings.inventoryCategories); const html = cats.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('invCategory', html); this.setElHTML('invFilterCat', '<option value="ALL">Tutte</option>' + html); this.updateInvSubcategories(); },
       updateInvSubcategories() { const cat = document.getElementById('invCategory')?.value; const subs = this.state.settings.inventoryCategories[cat] || ['Generale']; this.setElHTML('invSubcategory', subs.map(s => `<option value="${s}">${s}</option>`).join('')); },
-      addInventoryItem(e) { e.preventDefault(); this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString() }); this.save(); e.target.reset(); this.renderInventory(); },
+      addInventoryItem(e) { e.preventDefault(); this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString() }); this.save(); e.target.reset(); document.getElementById('invDate').value = this.toLocalISO(); this.renderInventory(); },
       deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
-      renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => `<div class="list-row"><div><strong>📦 ${item.name}</strong> <span class="badge">${item.category}</span><br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div style="text-align:right; display:flex; align-items:center; gap:0.6rem;"><strong>${this.formatMoney(item.price)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div></div>`).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
+      renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => `<div class="list-row"><div><strong>📦 ${item.name}</strong> <span class="badge">${item.category}</span> ${item.warranty ? `<span class="badge badge-warning">Garanzia: ${this.formatDate(item.warranty)}</span>` : ''}<br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div style="text-align:right; display:flex; align-items:center; gap:0.6rem;"><strong>${this.formatMoney(item.price)}</strong><button class="btn btn-sm btn-danger" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div></div>`).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
 
       populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('maintCategory', html); this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html); },
-      addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); this.renderGeneralMaintenances(); },
+      addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); document.getElementById('maintDueDate').value = this.toLocalISO(); this.renderGeneralMaintenances(); },
+      toggleMaintenanceStatus(id) {
+        const m = this.state.maintenances.find(x => x.id === id);
+        if (!m) return;
+        m.status = m.status === 'Completata' ? 'In attesa' : 'Completata';
+        if (m.status === 'Completata' && m.recurrence && m.recurrence !== 'Singola' && m.dueDate) {
+          const nextDate = new Date(m.dueDate);
+          if (m.recurrence === 'Mensile') nextDate.setMonth(nextDate.getMonth() + 1);
+          else if (m.recurrence === 'Semestrale') nextDate.setMonth(nextDate.getMonth() + 6);
+          else if (m.recurrence === 'Annuale') nextDate.setFullYear(nextDate.getFullYear() + 1);
+          this.state.maintenances.push({
+            ...m,
+            id: this.generateId(),
+            dueDate: this.toLocalISO(nextDate),
+            status: 'In attesa'
+          });
+          this.showToast(`Prossima scadenza (${m.recurrence}) programmata!`);
+        }
+        this.save();
+        this.renderGeneralMaintenances();
+      },
       deleteGeneralMaintenance(id) { if (confirm('Eliminare manutenzione?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderGeneralMaintenances(); } },
-      renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => `<div class="list-row" style="border-left:4px solid ${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};"><div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><button class="btn btn-sm btn-danger" onclick="App.deleteGeneralMaintenance('${m.id}')">🗑</button></div>`).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
+      renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => `<div class="list-row" style="border-left:4px solid ${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};"><div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span> <span class="badge ${m.status === 'Completata' ? 'badge-success' : 'badge-warning'}">${m.status}</span><br><small class="stat-label">Scadenza: ${this.formatDate(m.dueDate)} ${m.cost ? '• ' + this.formatMoney(m.cost) : ''} ${m.notes ? '— ' + m.notes : ''}</small></div><div style="display:flex; gap:0.4rem;"><button class="btn btn-sm ${m.status === 'Completata' ? '' : 'btn-primary'}" onclick="App.toggleMaintenanceStatus('${m.id}')" title="Cambia stato">${m.status === 'Completata' ? '↩' : '✓'}</button><button class="btn btn-sm btn-danger" onclick="App.deleteGeneralMaintenance('${m.id}')">🗑</button></div></div>`).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
 
-      executeSearch() { const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim(); if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'); let html = ''; this.state.transactions.forEach(t => { if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${t.category}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`; }); this.state.inventory.forEach(i => { if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>📦 ${i.name}</strong><br><small class="stat-label">${i.category}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`; }); this.state.healthMedical.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${m.notes}</small></div></div>`; }); this.state.maintenances.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🔧 ${m.title}</strong><br><small class="stat-label">${m.category} • ${this.formatDate(m.dueDate)}</small></div></div>`; }); this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`); },
+      navigateFromSearch(target, isHub = false) {
+        this.closeModal('searchModal');
+        if (isHub) this.openHubModule(target);
+        else this.switchModule(target);
+      },
+
+      executeSearch() {
+        const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim();
+        if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>');
+        let html = '';
+        this.state.transactions.forEach(t => { if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) html += `<div class="list-row clickable" onclick="App.navigateFromSearch('mod-finance')"><div><strong>💸 ${t.desc}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${t.category}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`; });
+        this.state.calendarTasks.forEach(t => { if ((t.title||'').toLowerCase().includes(query)) html += `<div class="list-row clickable" onclick="App.navigateFromSearch('mod-calendar'); App.selectDate('${t.date}');"><div><strong>📅 ${t.title}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${t.type}</small></div><span class="badge">${t.priority}</span></div>`; });
+        this.state.inventory.forEach(i => { if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) html += `<div class="list-row clickable" onclick="App.navigateFromSearch('sub-inventory', true)"><div><strong>📦 ${i.name}</strong><br><small class="stat-label">${i.category}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`; });
+        this.state.healthMedical.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) html += `<div class="list-row clickable" onclick="App.navigateFromSearch('sub-health', true)"><div><strong>🩺 ${m.title}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${m.notes || ''}</small></div></div>`; });
+        this.state.maintenances.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) html += `<div class="list-row clickable" onclick="App.navigateFromSearch('sub-maintenance', true)"><div><strong>🔧 ${m.title}</strong><br><small class="stat-label">${m.category} • ${this.formatDate(m.dueDate)}</small></div></div>`; });
+        this.state.garageMaint.forEach(g => { if ((g.title||'').toLowerCase().includes(query)) html += `<div class="list-row clickable" onclick="App.navigateFromSearch('sub-garage', true)"><div><strong>🏎️ ${g.title}</strong><br><small class="stat-label">${this.formatDate(g.date)}</small></div><strong>${this.formatMoney(g.cost)}</strong></div>`; });
+        this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`);
+      },
 
       startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
       closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
 
-      exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v9_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); },
-      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione
-'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${t.desc}"
-`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi
-'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${n.meal}",${n.kcal},${n.prot},${n.carbs},${n.fat}
-`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
+      exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v9_Backup_${this.toLocalISO()}.json`; document.body.appendChild(a); a.click(); a.remove(); },
+      exportCSV(type) {
+        let csv = '';
+        if (type === 'finance') {
+          csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n';
+          this.state.transactions.forEach(t => {
+            const acc = this.state.accounts.find(a => a.id === t.accountId);
+            csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${(t.desc || '').replace(/"/g, '""')}"\n`;
+          });
+        } else {
+          csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n';
+          this.state.healthNutrition.forEach(n => {
+            csv += `${n.date},"${(n.meal || '').replace(/"/g, '""')}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`;
+          });
+        }
+        const a = document.createElement('a');
+        a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+        a.download = `LifeOS_${type}_${this.toLocalISO()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      },
       async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo?")) { await localforage.clear(); location.reload(); } },
 
       async init() {
         await this.load();
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => { const el = document.getElementById(id); if (el) el.value = todayStr; });
         this.populateAccountSelects(); this.populateCategorySelects(); this.populateMaintenanceSelects(); this.populateFoodLibrarySelect(); this.updateHapticButton();
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -1082,7 +1505,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
-    document.addEventListener('click', (e) => { if (e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card, .wallet-card, .vehicle-chip')) App.vibrate(10); });
+    document.addEventListener('click', (e) => { if (e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card, .wallet-card, .vehicle-chip, .alert-pill')) App.vibrate(10); });
   </script>
 </body>
 </html>
