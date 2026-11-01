@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#070a12">
-  <title>LifeOS v9.1 — Ultimate Edition</title>
+  <title>LifeOS v9.2 — Ultimate Edition</title>
   
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L9">
@@ -314,7 +314,7 @@
       <div class="bento-grid">
         <div class="bento-card col-span-12">
           <div class="card-header">
-            <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti</div></div>
+            <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti (Usa ◀ ▶ per riordinare)</div></div>
             <span class="badge badge-success sensitive" id="finTotalBalanceBadge" style="font-size:0.95rem; padding:0.35rem 0.85rem;">€ 0,00</span>
           </div>
           <div id="financeAccountsList" class="wallet-carousel sensitive"></div>
@@ -612,9 +612,6 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       MOTORE JAVASCRIPT LIFEOS V9.1 AURORA
-       ========================================== -->
   <script>
     localforage.config({ driver: localforage.INDEXEDDB, name: 'LifeOS_v7', version: 1.0, storeName: 'lifeos_data' });
 
@@ -627,7 +624,7 @@
       { id: 'f8', name: 'Tonno al Naturale', kcal: 108, carb: 0, prot: 25.1, fat: 0.8 },
       { id: 'f15', name: 'Yogurt Greco 0%', kcal: 59, carb: 3.6, prot: 10.3, fat: 0.4 },
       { id: 'f18', name: 'Mozzarella Fior di Latte', kcal: 253, carb: 0.7, prot: 18.7, fat: 19.5 },
-      { id: 'f20', name: 'Latte Parzialmente Scremato', kcal: 46, carb: 4.9, prot: 3.3, fat: 1.6 },
+      { id: 'f20', name: 'Latte Parz. Scremato', kcal: 46, carb: 4.9, prot: 3.3, fat: 1.6 },
       { id: 'f22', name: 'Pane Comune', kcal: 275, carb: 58, prot: 8.6, fat: 1 }
     ];
 
@@ -667,32 +664,28 @@
           return parseFloat(s) || 0;
         };
 
-        // Arrays base
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'vehicles', 'garageMaint'];
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
         if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
         if (!this.state.settings) this.state.settings = {};
 
-        // Migrazione Vecchio Garage Singolo a Multi-Veicolo
+        // Migrazione Garage Singolo a Multi-Veicolo (v9.0 -> v9.2)
         if (this.state.garageConfig && !this.state.vehicles.length) {
            this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
            delete this.state.garageConfig;
         }
-        // Se non ci sono veicoli, creane uno base
         if (this.state.vehicles.length === 0) {
            this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
         }
         if (!this.activeVehicleId || !this.state.vehicles.find(v => v.id === this.activeVehicleId)) {
            this.activeVehicleId = this.state.vehicles[0].id;
         }
-        
-        // Assicura che le manutenzioni garage abbiano un vehicleId
         this.state.garageMaint.forEach(m => { if (!m.vehicleId) m.vehicleId = this.state.vehicles[0].id; });
 
         this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
         this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(t.type) ? t.type : 'EXPENSE'; });
         
-        // Fix Crash Calendario: Assicura che t.date sia valido
+        // FIX: Assicura validità data calendario 
         this.state.calendarTasks.forEach(t => { if(!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
       },
 
@@ -830,7 +823,7 @@
         this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Entrate', 'Uscite'], datasets: [{ data: [income, expense], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } } } });
       },
 
-      // === CALENDARIO (ANTI-CRASH) ===
+      // === CALENDARIO (ANTI-CRASH FIX) ===
       changeMonth(dir) {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         this.currentDate.setMonth(this.currentDate.getMonth() + dir);
@@ -839,7 +832,6 @@
       selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
       selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
       renderCalendar() {
-        // Fix preventivo per assicurare che siano Oggetti Data validi
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         if (!(this.selectedDate instanceof Date) || isNaN(this.selectedDate)) this.selectedDate = new Date();
 
@@ -964,7 +956,7 @@
           this.setElText(idDate, this.formatDate(dateStr));
           const el = document.getElementById(idTl);
           if(!el) return;
-          el.className = 'tl-indicator'; 
+          el.className = 'tl-indicator'; // reset
           if(!dateStr) { el.classList.add('tl-red'); return; }
           const diffDays = Math.floor((new Date(dateStr) - today) / (1000 * 60 * 60 * 24));
           if(diffDays < 0) el.classList.add('tl-red');
@@ -976,7 +968,7 @@
         setTrafficLight('date-bollo', 'tl-bollo', v.bollo);
         setTrafficLight('date-revisione', 'tl-revisione', v.revis);
 
-        // Calcolo spese carburante (generico su tutte le auto, non divisibile facilmente per ora a meno di usare categorie dedicate, lo lasciamo globale per l'utente)
+        // Calcolo spese carburante globali auto ultimi 30g
         const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         let fuelCost = 0;
         this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category||'').includes('Auto') && new Date(t.date) >= thirtyDaysAgo).forEach(t => fuelCost += t.amount);
@@ -984,7 +976,12 @@
 
         // Storico
         const sorted = this.state.garageMaint.filter(m => m.vehicleId === v.id).sort((a,b) => new Date(b.date) - new Date(a.date));
-        this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => `<div class="list-row"><div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><button class="btn btn-sm btn-danger" style="margin-top:4px;" onclick="App.deleteGarageMaint('${m.id}')">🗑</button></div></div>`).join('') : '<div class="list-row stat-label">Nessun lavoro meccanico registrato su questo veicolo.</div>');
+        this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => `
+          <div class="list-row">
+            <div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div>
+            <div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><button class="btn btn-sm btn-danger" style="margin-top:4px;" onclick="App.deleteGarageMaint('${m.id}')">🗑</button></div>
+          </div>
+        `).join('') : '<div class="list-row stat-label">Nessun lavoro meccanico registrato su questo veicolo.</div>');
       },
 
       // === FINANZE WALLET REORDER ===
