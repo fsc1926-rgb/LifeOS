@@ -115,7 +115,10 @@
     .file-upload-box input[type="file"] { display: none; }
 
     .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
-    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); } .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); } .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); } .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--info); }
 
     .item-list { display: flex; flex-direction: column; gap: 0.65rem; max-height: 420px; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; }
     
@@ -280,7 +283,7 @@
         <button class="btn btn-sm" onclick="App.openModal('pomodoroModal')" title="Focus Timer">⏱️</button>
         <button class="btn btn-sm" onclick="App.openModal('searchModal')" title="Ricerca Globale">🔍</button>
         <button class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Privacy">👁️</button>
-        <button class="btn btn-sm" onclick="App.openModal('settingsModal')">⚙️</button>
+        <button class="btn btn-sm" onclick="App.openModal('settingsModal')" title="Impostazioni">⚙️</button>
       </div>
     </div>
   </header>
@@ -367,7 +370,7 @@
           <div class="card-header"><div class="card-title">📓 Diario & Mood</div></div>
           <form onsubmit="App.saveJournalEntry(event)">
             <select id="journalMood" class="input"><option value="🚀 Eccellente">🚀 Eccellente</option><option value="😊 Sereno">😊 Sereno</option><option value="😐 Neutro">😐 Neutro</option><option value="⚡ Stressato">⚡ Stressato</option><option value="🔋 Stanco">🔋 Stanco</option></select>
-            <textarea id="journalText" rows="5" class="input" placeholder="Pensieri, gratitudine o note di oggi..."></textarea>
+            <textarea id="journalText" rows="5" class="input" placeholder="Pensieri, gratitudine o note del giorno selezionato..."></textarea>
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva nel Diario</button>
           </form>
           <div style="margin-top: 1rem;"><div class="stat-label" style="margin-bottom: 0.4rem;">Storico Diario:</div><div id="journalHistoryList" class="item-list" style="max-height: 180px;"></div></div>
@@ -383,7 +386,10 @@
         <div class="bento-card col-span-12">
           <div class="card-header">
             <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti (Usa ◀ ▶ per riordinare o ✕ per eliminare)</div></div>
-            <span class="badge badge-success sensitive" id="finTotalBalanceBadge" style="font-size:0.95rem; padding:0.35rem 0.85rem;">€ 0,00</span>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <button class="btn btn-sm" onclick="App.exportCSV('finance')" title="Esporta CSV">📊 CSV</button>
+              <span class="badge badge-success sensitive" id="finTotalBalanceBadge" style="font-size:0.95rem; padding:0.35rem 0.85rem;">€ 0,00</span>
+            </div>
           </div>
           <div id="financeAccountsList" class="wallet-carousel"></div>
           <div class="form-row" style="margin-top:0.5rem; margin-bottom:0;">
@@ -477,7 +483,7 @@
       </div>
     </section>
 
-    <!-- SUB: DEEP VAULT (REVISIONATO E CORRETTO) -->
+    <!-- SUB: DEEP VAULT -->
     <section id="sub-vault" class="module-section">
       <div class="card-header" style="margin-bottom: 1rem;">
         <div class="card-title">🔐 Deep Vault (Cassaforte Cifrata)</div>
@@ -643,10 +649,19 @@
 
     <!-- SUB: SALUTE OS -->
     <section id="sub-health" class="module-section">
-      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">❤️ Salute OS: Nutrizione, Peso & Cartella Clinica</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
+      <div class="card-header" style="margin-bottom: 1rem;">
+        <div class="card-title">❤️ Salute OS: Nutrizione, Peso & Cartella Clinica</div>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-sm" onclick="App.exportCSV('health')">📊 CSV Dieta</button>
+          <button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
+        </div>
+      </div>
       <div class="bento-grid">
         <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">🍎 Diario Alimentare</div><span class="badge badge-info" id="kcalProgressText">0 / 2100 kcal</span></div>
+          <div class="card-header">
+            <div class="card-title">🍎 Diario Alimentare</div>
+            <span class="badge badge-info" id="kcalProgressText" style="cursor:pointer;" onclick="App.editNutritionGoals()" title="Tocca per modificare il target Kcal">0 / 2100 kcal ✏️</span>
+          </div>
           <div style="margin-bottom: 1rem; background: var(--bg-solid); padding: 0.85rem; border-radius: 14px; border: 1px solid var(--border-color);">
             <div class="macro-bar-bg" style="height:10px; margin-bottom:0.6rem;"><div id="kcalProgressBar" class="macro-bar-fill" style="width:0%;"></div></div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; text-align:center; font-size:0.75rem;"><div><span class="stat-label">Proteine</span><br><strong id="protProgressText" style="color:#10b981;">0g</strong></div><div><span class="stat-label">Carbo</span><br><strong id="carbProgressText" style="color:#3b82f6;">0g</strong></div><div><span class="stat-label">Grassi</span><br><strong id="fatProgressText" style="color:#f59e0b;">0g</strong></div></div>
@@ -654,11 +669,11 @@
           <div style="margin-bottom:0.75rem; padding:0.75rem; border-radius:12px; border:1px dashed var(--border-highlight);">
             <div class="stat-label" style="margin-bottom:0.4rem; color:var(--accent-primary); font-weight:700;">⚡ Calcolo Rapido Cibi:</div>
             <select id="nutriFoodSelect" class="input" style="margin-bottom:0.5rem;" onchange="App.AutoCalcFood()"></select>
-            <div style="display:flex; gap:0.5rem;"><select id="nutriMealType" class="input" style="margin:0;"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntino">🍎 Spuntino</option></select><input type="number" id="nutriGrams" class="input" placeholder="Grammi (g)" value="100" oninput="App.AutoCalcFood()" style="margin:0; max-width:110px;"></div>
+            <div style="display:flex; gap:0.5rem;"><select id="nutriMealType" class="input" style="margin:0;" onchange="App.AutoCalcFood()"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntino">🍎 Spuntino</option></select><input type="number" id="nutriGrams" class="input" placeholder="Grammi (g)" value="100" oninput="App.AutoCalcFood()" style="margin:0; max-width:110px;"></div>
           </div>
           <form onsubmit="App.addNutritionLog(event)" style="margin-bottom: 1rem;">
             <input type="text" id="nutriMeal" class="input" placeholder="Pasto manuale..." required>
-            <div class="form-row"><input type="number" id="nutriKcal" class="input" min="0" placeholder="Kcal *" required><input type="date" id="nutriDate" class="input" required></div>
+            <div class="form-row"><input type="number" id="nutriKcal" class="input" min="0" placeholder="Kcal *" required><input type="date" id="nutriDate" class="input" onchange="App.renderHealth()" required></div>
             <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-bottom:0.75rem;"><input type="number" id="nutriProt" class="input" step="0.1" placeholder="Prot" style="margin:0;"><input type="number" id="nutriCarbs" class="input" step="0.1" placeholder="Carb" style="margin:0;"><input type="number" id="nutriFat" class="input" step="0.1" placeholder="Gras" style="margin:0;"></div>
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra Pasto</button>
           </form>
@@ -834,8 +849,10 @@
         accounts: [], transactions: [], subs: [],
         healthNutrition: [], healthWeight: [], healthMedical: [], habits: [], vaultData: [],
         foodLibrary: DEFAULT_FOODS,
+        nutritionGoals: { kcal: 2100, prot: 140, carb: 230, fat: 70 },
         vehicles: [], garageMaint: [],
         settings: {
+          theme: 'dark',
           inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
           maintenanceCategories: ['Casa', 'Salute', 'Altro'],
           hapticEnabled: true
@@ -863,43 +880,57 @@
         return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
       },
 
-      // === GESTURES SWIPE NATIVO ===
+      // === GESTURES SWIPE NATIVO (CON CONTROLLO ASSE VERTICALE) ===
       swipeStartX: null,
+      swipeStartY: null,
       navStartX: null,
+      navStartY: null,
 
       initGestures() {
         const main = document.getElementById('swipeArea');
         
         document.addEventListener('touchstart', e => {
           const sc = e.target.closest('.swipe-container');
-          if (sc) this.swipeStartX = e.touches[0].clientX;
+          if (sc) {
+            this.swipeStartX = e.touches[0].clientX;
+            this.swipeStartY = e.touches[0].clientY;
+          }
         }, {passive: true});
         
         document.addEventListener('touchend', e => {
           const sc = e.target.closest('.swipe-container');
-          if (sc && this.swipeStartX !== null) {
-            const endX = e.changedTouches[0].clientX;
+          if (sc && this.swipeStartX !== null && this.swipeStartY !== null) {
+            const diffX = this.swipeStartX - e.changedTouches[0].clientX;
+            const diffY = Math.abs(this.swipeStartY - e.changedTouches[0].clientY);
             const content = sc.querySelector('.swipe-content');
-            if(content) {
-              if (this.swipeStartX - endX > 50) content.style.transform = 'translateX(-75px)';
-              else content.style.transform = 'translateX(0)';
+            if (content && Math.abs(diffX) > diffY * 1.3) {
+              if (diffX > 50) {
+                document.querySelectorAll('.swipe-content').forEach(el => { if (el !== content) el.style.transform = 'translateX(0)'; });
+                content.style.transform = 'translateX(-75px)';
+              } else if (diffX < -30) {
+                content.style.transform = 'translateX(0)';
+              }
             }
             this.swipeStartX = null;
+            this.swipeStartY = null;
           }
         }, {passive: true});
 
         main.addEventListener('touchstart', e => {
           if (e.target.closest('input, textarea, select, button, .swipe-container, .wallet-carousel, .vehicle-selector, canvas, .modal-backdrop')) return;
           this.navStartX = e.touches[0].clientX;
+          this.navStartY = e.touches[0].clientY;
         }, {passive: true});
         
         main.addEventListener('touchend', e => {
-          if (this.navStartX === null) return;
-          const endX = e.changedTouches[0].clientX;
-          const diff = this.navStartX - endX;
+          if (this.navStartX === null || this.navStartY === null) return;
+          const diffX = this.navStartX - e.changedTouches[0].clientX;
+          const diffY = Math.abs(this.navStartY - e.changedTouches[0].clientY);
           this.navStartX = null;
+          this.navStartY = null;
 
-          if (Math.abs(diff) < 80) return;
+          // Evita cambio scheda accidentale durante lo scroll verticale
+          if (Math.abs(diffX) < 85 || Math.abs(diffX) < diffY * 1.8) return;
 
           const tabs = ['mod-dashboard', 'mod-calendar', 'mod-finance', 'mod-hub'];
           const activeSec = document.querySelector('.module-section.active');
@@ -907,8 +938,8 @@
           let idx = tabs.indexOf(activeSec.id);
           
           if (idx !== -1) {
-            if (diff > 0 && idx < tabs.length - 1) this.switchModule(tabs[idx + 1]);
-            else if (diff < 0 && idx > 0) this.switchModule(tabs[idx - 1]);
+            if (diffX > 0 && idx < tabs.length - 1) this.switchModule(tabs[idx + 1]);
+            else if (diffX < 0 && idx > 0) this.switchModule(tabs[idx - 1]);
           }
         }, {passive: true});
       },
@@ -937,7 +968,6 @@
           return parseFloat(s) || 0;
         };
 
-        // Recupero compatibilità da vecchi backup per Garage e Vault
         if (Array.isArray(this.state.cars) && (!Array.isArray(this.state.vehicles) || !this.state.vehicles.length)) {
           this.state.vehicles = this.state.cars;
         }
@@ -955,7 +985,11 @@
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'vehicles', 'garageMaint', 'vaultData'];
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
         if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
+        if (!this.state.nutritionGoals || typeof this.state.nutritionGoals !== 'object') {
+          this.state.nutritionGoals = { kcal: 2100, prot: 140, carb: 230, fat: 70 };
+        }
         if (!this.state.settings) this.state.settings = {};
+        if (!this.state.settings.theme) this.state.settings.theme = 'dark';
         if (!this.state.settings.inventoryCategories) {
           this.state.settings.inventoryCategories = { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] };
         }
@@ -1012,8 +1046,9 @@
 
         this.state.calendarTasks.forEach(t => {
           t.id = String(t.id || this.generateId());
-          if(!t.date || t.date.length < 10) t.date = today;
+          if (!t.date || t.date.length < 10) t.date = today;
           t.title = String(t.title || t.desc || 'Attività');
+          t.done = Boolean(t.done);
         });
 
         this.state.habits.forEach(h => {
@@ -1074,13 +1109,13 @@
         try {
           if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); for (let reg of regs) await reg.unregister(); }
           if ('caches' in window) { const keys = await caches.keys(); for (let k of keys) await caches.delete(k); }
-          this.showToast('Cache pulita! Ricarico...', 'info'); setTimeout(() => location.reload(true), 800);
+          this.showToast('Cache pulita! Ricarico...', 'info'); setTimeout(() => location.reload(), 800);
         } catch (e) { location.reload(); }
       },
       async save() { try { this.sanitizeData(); await localforage.setItem('appData', this.state); this.renderActiveModule(); } catch (e) { console.error(e); this.showToast('Errore salvataggio', 'danger'); } },
       async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; } this.sanitizeData(); await localforage.setItem('appData', this.state); } catch (e) { this.sanitizeData(); } },
 
-      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3200); },
+      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${this.escapeHTML(msg)}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3200); },
       
       openModal(id) { 
         const el = document.getElementById(id); if (el) el.classList.add('open'); 
@@ -1092,8 +1127,17 @@
       openImageViewer(src) {
         if (!src) return;
         if (src.startsWith('data:application/pdf')) {
-          const win = window.open();
-          if (win) win.document.write(`<iframe src="${src}" style="width:100%; height:100vh; border:none;"></iframe>`);
+          try {
+            const base64Data = src.split(',')[1];
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
+            const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank');
+          } catch (e) {
+            this.showToast('Errore apertura PDF', 'danger');
+          }
           return;
         }
         document.getElementById('photoModalImg').src = src;
@@ -1134,14 +1178,22 @@
         if(document.getElementById('sub-vault')?.classList.contains('active')) this.renderVault();
       },
 
-      toggleTheme() { const html = document.documentElement; const current = html.getAttribute('data-theme'); const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark'; html.setAttribute('data-theme', nextTheme); this.save(); this.showToast(`Tema: ${nextTheme.toUpperCase()}`); },
+      toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme') || 'dark';
+        const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark';
+        html.setAttribute('data-theme', nextTheme);
+        this.state.settings.theme = nextTheme;
+        this.save();
+        this.showToast(`Tema: ${nextTheme.toUpperCase()}`);
+      },
       toggleHaptic() { this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled; this.save(); if (this.state.settings.hapticEnabled) this.vibrate(25); this.updateHapticButton(); },
       updateHapticButton() { this.setElText('hapticBtn', this.state.settings.hapticEnabled ? '📳 Vibrazione ON' : '🔕 Vibrazione OFF'); },
       vibrate(ms = 12) { if (this.state.settings?.hapticEnabled && navigator.vibrate) navigator.vibrate(ms); },
       toggleFab() { document.getElementById('fabMenu')?.classList.toggle('open'); this.vibrate(12); },
       
       quickAdd(inputId) { 
-        this.toggleFab(); 
+        document.getElementById('fabMenu')?.classList.remove('open');
         if (inputId === 'txAmount') this.switchModule('mod-finance'); 
         else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar'); 
         else if (inputId === 'weightValue' || inputId === 'nutriGrams') this.openHubModule('sub-health'); 
@@ -1187,7 +1239,15 @@
       resetPomodoro() { clearInterval(this.pomoTimer); this.pomoTimer = null; this.pomoSeconds = 1500; this.setElText('pomoDisplay', '25:00'); this.setElText('pomoBtn', '▶️ Avvia Focus'); },
 
       savePin() { const pin = document.getElementById('setupPinInput')?.value || ''; if (pin.length === 4) { this.state.pin = pin; this.save(); document.getElementById('setupPinInput').value = ''; this.showToast('PIN Avvio Attivato.'); } else this.showToast('Inserisci 4 cifre', 'warning'); },
-      removePin() { this.state.pin = null; this.save(); this.showToast('PIN Avvio Disattivato.'); },
+      removePin() {
+        if (this.state.pin) {
+          const old = prompt('Inserisci il PIN attuale per rimuoverlo:');
+          if (old !== this.state.pin) return this.showToast('PIN errato!', 'danger');
+        }
+        this.state.pin = null;
+        this.save();
+        this.showToast('PIN Avvio Disattivato.');
+      },
       verifyPin() { const input = document.getElementById('loginPinInput')?.value; if (input === this.state.pin) { document.getElementById('lockScreen')?.classList.add('hidden'); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
       togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); this.setElHTML('privacyBtn', isActive ? '🔒' : '👁️'); },
 
@@ -1221,7 +1281,7 @@
         }
       },
 
-      // === DEEP VAULT (CRITTOGRAFIA UTF-8 SICURA + GESTIONE PIN AUTOMATICA) ===
+      // === DEEP VAULT (CON VERIFICA PIN VECCHIO OBBLIGATORIA) ===
       cryptoObfuscate(text, pin) {
         const cleanPin = String(pin || '0000');
         const utf8 = encodeURIComponent(String(text || ''));
@@ -1237,7 +1297,6 @@
         const cleanPin = String(pin || '0000');
         const str = String(payload);
 
-        // Formato V2 UTF-8 sicuro
         if (str.startsWith('V2:')) {
           try {
             const raw = atob(str.slice(3));
@@ -1251,7 +1310,6 @@
           }
         }
 
-        // Compatibilità retroattiva con formato V1
         try {
           const text = decodeURIComponent(escape(atob(str)));
           let res = '';
@@ -1260,12 +1318,19 @@
           }
           return res;
         } catch (e) {
-          // Fallback nel caso fosse testo non codificato
           return str;
         }
       },
 
       openVaultSetupModal() {
+        // Sicurezza: se esiste già un PIN Vault e non è sbloccato, chiedilo prima di permettere il cambio
+        if (this.state.vaultPinHash && !this.vaultUnlockedPIN) {
+          const currentPin = prompt('Inserisci il PIN attuale del Vault per poterlo modificare:');
+          if (!currentPin || btoa(currentPin.trim()) !== this.state.vaultPinHash) {
+            return this.showToast('PIN attuale errato! Impossibile cambiare PIN.', 'danger');
+          }
+          this.vaultUnlockedPIN = currentPin.trim();
+        }
         this.closeModal('settingsModal');
         const input = document.getElementById('vaultSetupPinInput');
         if (input) input.value = '';
@@ -1279,20 +1344,20 @@
           return this.showToast('Inserisci un PIN da 4 a 6 cifre', 'warning');
         }
 
-        // Se c'erano già segreti cifrati col vecchio PIN, li ricripta col nuovo PIN
         if (this.state.vaultPinHash && this.state.vaultData.length > 0) {
-          try {
-            const oldPin = this.vaultUnlockedPIN || atob(this.state.vaultPinHash);
-            this.state.vaultData = this.state.vaultData.map(v => {
-              const plainTitle = this.cryptoDeobfuscate(v.title, oldPin);
-              const plainData = this.cryptoDeobfuscate(v.data, oldPin);
-              return {
-                ...v,
-                title: this.cryptoObfuscate(plainTitle, pin),
-                data: this.cryptoObfuscate(plainData, pin)
-              };
-            });
-          } catch (e) {}
+          if (!this.vaultUnlockedPIN) {
+            return this.showToast('Devi prima sbloccare il Vault col vecchio PIN!', 'danger');
+          }
+          const oldPin = this.vaultUnlockedPIN;
+          this.state.vaultData = this.state.vaultData.map(v => {
+            const plainTitle = this.cryptoDeobfuscate(v.title, oldPin);
+            const plainData = this.cryptoDeobfuscate(v.data, oldPin);
+            return {
+              ...v,
+              title: this.cryptoObfuscate(plainTitle, pin),
+              data: this.cryptoObfuscate(plainData, pin)
+            };
+          });
         }
 
         this.state.vaultPinHash = btoa(pin);
@@ -1304,12 +1369,10 @@
       },
 
       promptVaultAccess() {
-        // Se il PIN non è mai stato impostato, apre direttamente il modale di creazione PIN!
         if (!this.state.vaultPinHash) {
           this.showToast("Configura il tuo PIN per attivare il Deep Vault", "info");
           return this.openVaultSetupModal();
         }
-        // Se è già sbloccato nella sessione corrente, entra subito
         if (this.vaultUnlockedPIN && btoa(this.vaultUnlockedPIN) === this.state.vaultPinHash) {
           return this.openHubModule('sub-vault');
         }
@@ -1430,7 +1493,8 @@
         const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0);
         this.setElText('dashNetWorth', this.formatMoney(total)); this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
         const todayStr = this.toLocalISO();
-        const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length; const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
+        const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length;
+        const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
         const score = Math.min(100, Math.max(25, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15))));
         this.setElText('lifeScoreValue', `${score}%`);
         const circle = document.getElementById('lifeScoreCircle'); if (circle) circle.style.strokeDashoffset = 150 - (150 * score) / 100;
@@ -1440,8 +1504,8 @@
 
         const medItems = this.state.healthMedical.slice(0, 4);
         this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + this.escapeHTML(t.therapy) : '🩺 ' + this.escapeHTML(t.title)}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + this.escapeHTML(t.notes) : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
-        const upcoming = [...this.state.calendarTasks].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5);
-        this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${this.escapeHTML(t.title)}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in programma.</div>');
+        const upcoming = [...this.state.calendarTasks].filter(t => !t.done).sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(0, 5);
+        this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${this.escapeHTML(t.title)}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in sospeso.</div>');
         
         this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${this.escapeHTML(h.name)}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
         this.renderFinanceChart();
@@ -1455,14 +1519,19 @@
         this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Entrate', 'Uscite'], datasets: [{ data: [income, expense], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } } } });
       },
 
-      // === CALENDARIO ===
+      // === CALENDARIO & DIARIO ===
       changeMonth(dir) {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         this.currentDate.setMonth(this.currentDate.getMonth() + dir);
         this.renderCalendar();
       },
       selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
-      selectDate(dateStr) { const [y, m, d] = dateStr.split('-').map(Number); this.selectedDate = new Date(y, m - 1, d, 12); this.renderCalendar(); },
+      selectDate(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        this.selectedDate = new Date(y, m - 1, d, 12);
+        this.currentDate = new Date(y, m - 1, 1, 12);
+        this.renderCalendar();
+      },
       renderCalendar() {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         if (!(this.selectedDate instanceof Date) || isNaN(this.selectedDate)) this.selectedDate = new Date();
@@ -1486,22 +1555,70 @@
           if (dateStr === todayStr) el.classList.add('today');
           if (dateStr === selStr) el.classList.add('active');
           el.innerHTML = `<div>${d}</div>`;
-          if (this.state.calendarTasks.some(t => t.date === dateStr)) { el.innerHTML += `<div class="cal-dot"></div>`; }
+          if (this.state.calendarTasks.some(t => t.date === dateStr) || this.state.journal.some(j => j.date === dateStr)) {
+            el.innerHTML += `<div class="cal-dot"></div>`;
+          }
           el.onclick = () => this.selectDate(dateStr);
           grid.appendChild(el);
         }
-        this.renderCalendarTasks(); this.renderJournalHistory();
+
+        // Carica la nota del diario per il giorno selezionato
+        const dayJournal = this.state.journal.find(j => j.date === selStr);
+        const jTextEl = document.getElementById('journalText');
+        const jMoodEl = document.getElementById('journalMood');
+        if (jTextEl) jTextEl.value = dayJournal ? dayJournal.text : '';
+        if (jMoodEl && dayJournal) jMoodEl.value = dayJournal.mood;
+
+        this.renderCalendarTasks();
+        this.renderJournalHistory();
       },
-      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.toLocalISO(this.selectedDate), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
+      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.toLocalISO(this.selectedDate), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value, done: false }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
+      toggleCalendarTask(id) {
+        const task = this.state.calendarTasks.find(t => String(t.id) === String(id));
+        if (task) {
+          task.done = !task.done;
+          this.vibrate(15);
+          this.save();
+        }
+      },
       deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
       renderCalendarTasks() {
         const selStr = this.toLocalISO(this.selectedDate);
         const tasks = this.state.calendarTasks.filter(t => t.date === selStr);
         this.setElText('calTaskCountBadge', tasks.length);
-        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${this.escapeHTML(t.title)}</div></div>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
+        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(
+          `<div style="display:flex; align-items:center; gap:0.65rem; opacity:${t.done ? 0.55 : 1};">
+            <button type="button" class="btn btn-sm ${t.done ? 'btn-primary' : ''}" style="width:28px; height:28px; padding:0; border-radius:50%; flex-shrink:0;" onclick="event.stopPropagation(); App.toggleCalendarTask('${t.id}')">${t.done ? '✓' : ''}</button>
+            <div>
+              <span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span>
+              <div style="margin-top:4px; font-weight:600; ${t.done ? 'text-decoration:line-through;' : ''}">${this.escapeHTML(t.title)}</div>
+            </div>
+          </div>`,
+          `App.deleteCalendarTask('${t.id}')`
+        )).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
       },
-      saveJournalEntry(e) { e.preventDefault(); const date = this.toLocalISO(this.selectedDate); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
-      renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${this.escapeHTML(j.text)}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
+      saveJournalEntry(e) {
+        e.preventDefault();
+        const date = this.toLocalISO(this.selectedDate);
+        const text = document.getElementById('journalText').value.trim();
+        if (!text) return;
+        const entry = { date, mood: document.getElementById('journalMood').value, text };
+        const idx = this.state.journal.findIndex(j => j.date === date);
+        if (idx >= 0) this.state.journal[idx] = entry;
+        else this.state.journal.push(entry);
+        this.save();
+        this.showToast('Nota del diario salvata!');
+      },
+      deleteJournalEntry(date) {
+        if (confirm('Eliminare questa pagina del diario?')) {
+          this.state.journal = this.state.journal.filter(j => j.date !== date);
+          this.save();
+        }
+      },
+      renderJournalHistory() {
+        const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 10);
+        this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start; cursor:pointer;" onclick="App.selectDate('${j.date}')"><div style="flex:1; min-width:0;"><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${this.escapeHTML(j.text)}</div></div><button type="button" class="btn btn-sm btn-danger" style="padding:0.2rem 0.45rem;" onclick="event.stopPropagation(); App.deleteJournalEntry('${j.date}')">✕</button></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>');
+      },
 
       // === GARAGE OS ===
       ensureActiveVehicle() {
@@ -1739,6 +1856,8 @@
         if (!acc) return;
         if (confirm(`Eliminare il conto "${acc.name}"?`)) {
           this.state.accounts = this.state.accounts.filter(a => String(a.id) !== String(id));
+          const filterEl = document.getElementById('txFilterAccount');
+          if (filterEl && String(filterEl.value) === String(id)) filterEl.value = 'ALL';
           this.save();
           this.populateAccountSelects();
           this.renderFinance();
@@ -1746,10 +1865,15 @@
       },
       populateAccountSelects() {
         const html = this.state.accounts.map(a => `<option value="${a.id}">${this.escapeHTML(a.name)} (${this.formatMoney(a.balance)})</option>`).join('');
-        this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html); this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html); this.setElHTML('reconcileAccountSelect', html);
-        const filterEl = document.getElementById('txFilterAccount'); const currentFilter = filterEl?.value || 'ALL';
+        this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html);
+        this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html);
+        this.setElHTML('reconcileAccountSelect', html);
+        const filterEl = document.getElementById('txFilterAccount');
+        const currentFilter = filterEl?.value || 'ALL';
         this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${this.escapeHTML(a.name)}</option>`).join(''));
-        if (filterEl) filterEl.value = currentFilter;
+        if (filterEl) {
+          filterEl.value = this.state.accounts.some(a => String(a.id) === String(currentFilter)) ? currentFilter : 'ALL';
+        }
       },
       selectWalletCard(accId) { const filterEl = document.getElementById('txFilterAccount'); if (!filterEl) return; filterEl.value = (filterEl.value === accId) ? 'ALL' : accId; this.renderFinance(); },
       renderFinance() {
@@ -1764,33 +1888,66 @@
         
         this.setElText('txCountBadge', filtered.length);
         this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => { 
-          const acc = this.state.accounts.find(a => String(a.id) === String(tx.accountId)); 
+          const acc = this.state.accounts.find(a => String(a.id) === String(tx.accountId));
+          const trgAcc = tx.targetAccountId ? this.state.accounts.find(a => String(a.id) === String(tx.targetAccountId)) : null;
           const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; 
-          const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : ''; 
+          const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '⇄ '; 
           const imgHtml = tx.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('tx', '${tx.id}')">📎 Scontrino</button>` : '';
+          const accLabel = tx.type === 'TRANSFER' ? `${acc ? this.escapeHTML(acc.name) : 'Origine'} → ${trgAcc ? this.escapeHTML(trgAcc.name) : 'Destinazione'}` : (acc ? this.escapeHTML(acc.name) : 'Conto');
           return this.createSwipeRow(
-            `<div style="min-width:0;"><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? this.escapeHTML(acc.name) : 'Conto'}</strong></span><br><strong style="word-break:break-word;">${this.escapeHTML(tx.desc || 'Movimento')}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${this.escapeHTML(tx.category || 'Altro')}</span></div><div class="sensitive" style="text-align:right; flex-shrink:0;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace; font-size:0.95rem;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`,
+            `<div style="min-width:0;"><span class="stat-label">${this.formatDate(tx.date)} • <strong>${accLabel}</strong></span><br><strong style="word-break:break-word;">${this.escapeHTML(tx.desc || 'Movimento')}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${this.escapeHTML(tx.category || 'Altro')}</span></div><div class="sensitive" style="text-align:right; flex-shrink:0;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace; font-size:0.95rem;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`,
             `App.deleteTransaction('${tx.id}')`
           ); 
         }).join('') : '<div class="list-row stat-label">Nessuna transazione registrata.</div>');
 
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0); this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
-        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${this.escapeHTML(s.name)}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><strong class="sensitive">${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
+        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${this.escapeHTML(s.name)}</strong><br><small class="stat-label">Attivo dal: ${this.formatDate(s.next)}</small></div><strong class="sensitive">${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
         this.renderExpenseCategoryChart();
       },
       renderExpenseCategoryChart() { const ctx = document.getElementById('expenseCatChart'); if (!ctx || typeof Chart === 'undefined') return; const catTotals = {}; this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => { const c = t.category || 'Altro'; catTotals[c] = (catTotals[c] || 0) + t.amount; }); const labels = Object.keys(catTotals); const data = Object.values(catTotals); if (this.charts.expCat) this.charts.expCat.destroy(); this.charts.expCat = new Chart(ctx, { type: 'doughnut', data: { labels: labels.length ? labels : ['Nessuna spesa'], datasets: [{ data: data.length ? data : [1], backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } } } } }); },
       addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
-      toggleTransferFields() { document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none'; },
+      toggleTransferFields() {
+        const isTransfer = document.getElementById('txType')?.value === 'TRANSFER';
+        const trgEl = document.getElementById('txTargetAccount');
+        if (trgEl) {
+          trgEl.style.display = isTransfer ? 'block' : 'none';
+          trgEl.required = isTransfer;
+        }
+      },
       async addTransaction(e) { 
-        e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value; 
-        if (!srcId) return this.showToast('Seleziona un conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId); 
+        e.preventDefault();
+        const t = document.getElementById('txType').value;
+        const a = parseFloat(document.getElementById('txAmount').value);
+        const srcId = document.getElementById('txAccount').value;
+        const trgId = document.getElementById('txTargetAccount').value; 
+        if (!srcId) return this.showToast('Seleziona un conto di origine', 'danger');
+        if (t === 'TRANSFER') {
+          if (!trgId) return this.showToast('Seleziona un conto di destinazione per il giroconto', 'warning');
+          if (srcId === trgId) return this.showToast('I conti di origine e destinazione devono essere diversi', 'warning');
+        }
+        const src = this.state.accounts.find(x => x.id === srcId); 
         let fileData = null; if (document.getElementById('txFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('txFile').files[0]); } catch (err) {} }
         const recurrence = document.getElementById('txRecurrence')?.value || 'Singola';
-        const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence, timestamp: new Date().toISOString(), fileData }; 
-        if (src) { if (t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { src.balance -= a; const trg = this.state.accounts.find(x => x.id === trgId); if (trg) trg.balance += a; tx.targetAccountId = trgId; } } 
-        this.state.transactions.push(tx); this.save(); e.target.reset();
+        const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || (t === 'TRANSFER' ? 'Giroconto' : 'Generale'), date: document.getElementById('txDate').value, recurrence, timestamp: new Date().toISOString(), fileData }; 
+        if (src) {
+          if (t === 'EXPENSE') src.balance -= a;
+          else if (t === 'INCOME') src.balance += a;
+          else if (t === 'TRANSFER') {
+            src.balance -= a;
+            const trg = this.state.accounts.find(x => x.id === trgId);
+            if (trg) trg.balance += a;
+            tx.targetAccountId = trgId;
+          }
+        } 
+        this.state.transactions.push(tx);
+        this.save();
+        e.target.reset();
+        this.toggleTransferFields();
         this.setElText('txFileLabel', '📷 Allega Scontrino (opz.)');
-        document.getElementById('txDate').value = this.toLocalISO(); this.populateAccountSelects(); this.renderFinance(); this.showToast('Transazione registrata!');
+        document.getElementById('txDate').value = this.toLocalISO();
+        this.populateAccountSelects();
+        this.renderFinance();
+        this.showToast('Transazione registrata!');
       },
       reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: this.toLocalISO(), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
       deleteTransaction(id) { const tx = this.state.transactions.find(t => String(t.id) === String(id)); if (!tx || !confirm('Eliminare movimento?')) return; const src = this.state.accounts.find(a => String(a.id) === String(tx.accountId)); if (src) { if (tx.type === 'EXPENSE') src.balance += tx.amount; else if (tx.type === 'INCOME') src.balance -= tx.amount; else if (tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => String(a.id) === String(tx.targetAccountId)); if (trg) trg.balance -= tx.amount; } } this.state.transactions = this.state.transactions.filter(t => String(t.id) !== String(id)); this.save(); this.populateAccountSelects(); this.renderFinance(); },
@@ -1798,9 +1955,25 @@
       deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
 
       // === SALUTE OS ===
+      editNutritionGoals() {
+        const cur = this.state.nutritionGoals || { kcal: 2100, prot: 140, carb: 230, fat: 70 };
+        const newKcal = prompt('Obiettivo Kcal giornaliere:', cur.kcal);
+        if (newKcal === null) return;
+        const k = parseInt(newKcal, 10);
+        if (!isNaN(k) && k > 500) {
+          this.state.nutritionGoals = {
+            kcal: k,
+            prot: Math.round((k * 0.25) / 4),
+            carb: Math.round((k * 0.45) / 4),
+            fat: Math.round((k * 0.30) / 9)
+          };
+          this.save();
+          this.showToast('Obiettivi nutrizionali aggiornati!');
+        }
+      },
       populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${this.escapeHTML(f.name)} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
       AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => f.id === foodId); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
-      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = this.toLocalISO(); this.renderHealth(); },
+      addNutritionLog(e) { e.preventDefault(); const selectedDay = document.getElementById('nutriDate').value || this.toLocalISO(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: selectedDay, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = selectedDay; this.renderHealth(); },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = this.toLocalISO(); this.renderHealth(); },
       deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
@@ -1808,9 +1981,11 @@
       async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.setElText('medFileLabel', '📄 Allega Referto PDF o Foto'); document.getElementById('medDate').value = this.toLocalISO(); this.toggleMedFields(); this.renderHealth(); },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       renderHealth() {
-        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||'')); const latestDay = sortedNutri[0]?.date || this.toLocalISO(); const dayLogs = sortedNutri.filter(n => n.date === latestDay);
+        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+        const activeNutriDate = document.getElementById('nutriDate')?.value || this.toLocalISO();
+        const dayLogs = sortedNutri.filter(n => n.date === activeNutriDate);
         const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)), totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)), totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)), totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)), goalKcal = this.state.nutritionGoals?.kcal || 2100;
-        this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
+        this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal ✏️`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
         this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`); this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`); this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
         this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => this.createSwipeRow(`<div><strong>${this.escapeHTML(n.meal)}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div>`, `App.deleteNutritionLog('${n.id}')`)).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
         this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => this.createSwipeRow(`<div><strong class="sensitive">⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
@@ -1829,12 +2004,56 @@
         this.save(); e.target.reset(); this.setElText('invFileLabel', '📷 Allega Foto'); document.getElementById('invDate').value = this.toLocalISO(); this.populateCategorySelects(); this.renderInventory(); this.showToast('Bene salvato!');
       },
       deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
-      renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search) || (i.location||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => { const imgHtml = item.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('inv', '${item.id}')">📎 Foto</button>` : ''; return this.createSwipeRow(`<div><strong>📦 ${this.escapeHTML(item.name)}</strong> ${imgHtml} <span class="badge">${this.escapeHTML(item.category)}</span><br><small class="stat-label">${this.escapeHTML(item.location || '')} ${item.notes ? '— ' + this.escapeHTML(item.notes) : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`, `App.deleteInventoryItem('${item.id}')`); }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
+      renderInventory() {
+        const filterCat = document.getElementById('invFilterCat')?.value || 'ALL';
+        const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase();
+        let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? (i.type === 'Garanzia' || Boolean(i.warranty)) : true);
+        if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat);
+        if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search) || (i.location||'').toLowerCase().includes(search));
+        
+        const today = new Date(); today.setHours(0,0,0,0);
+        this.setElHTML('inventoryList', filtered.map(item => {
+          const imgHtml = item.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('inv', '${item.id}')">📎 Foto</button>` : '';
+          let warrantyBadge = '';
+          if (item.warranty) {
+            const wDate = new Date(item.warranty);
+            const diffDays = Math.ceil((wDate - today) / (1000 * 60 * 60 * 24));
+            const bClass = diffDays < 0 ? 'badge-danger' : diffDays <= 30 ? 'badge-warning' : 'badge-success';
+            const bText = diffDays < 0 ? `Garanzia scaduta (${this.formatDate(item.warranty)})` : `Garanzia fino al ${this.formatDate(item.warranty)}`;
+            warrantyBadge = `<span class="badge ${bClass}">${bText}</span>`;
+          }
+          return this.createSwipeRow(
+            `<div><strong>📦 ${this.escapeHTML(item.name)}</strong> ${imgHtml} <span class="badge">${this.escapeHTML(item.category)}</span> ${warrantyBadge}<br><small class="stat-label">${item.date ? 'Acq: ' + this.formatDate(item.date) + ' • ' : ''}${this.escapeHTML(item.location || '')} ${item.notes ? '— ' + this.escapeHTML(item.notes) : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`,
+            `App.deleteInventoryItem('${item.id}')`
+          );
+        }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>');
+      },
 
       populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('maintCategory', html); this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html); },
       addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); document.getElementById('maintDueDate').value = this.toLocalISO(); this.renderGeneralMaintenances(); },
+      toggleMaintenanceStatus(id) {
+        const m = this.state.maintenances.find(x => String(x.id) === String(id));
+        if (!m) return;
+        m.status = m.status === 'Completata' ? 'In attesa' : 'Completata';
+        this.vibrate(20);
+        this.save();
+      },
       deleteGeneralMaintenance(id) { if (confirm('Eliminare manutenzione?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderGeneralMaintenances(); } },
-      renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${this.escapeHTML(m.title)}</strong> <span class="badge">${this.escapeHTML(m.category)}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + this.escapeHTML(m.notes) : ''}</small></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
+      renderGeneralMaintenances() {
+        let filtered = [...this.state.maintenances];
+        const fCat = document.getElementById('maintFilterCat')?.value || 'ALL';
+        const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL';
+        if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat);
+        if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat);
+        this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(
+          `<div><strong>🔧 ${this.escapeHTML(m.title)}</strong> <span class="badge">${this.escapeHTML(m.category)}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} (${m.recurrence || 'Singola'}) ${m.notes ? '— ' + this.escapeHTML(m.notes) : ''}</small></div>
+          <div style="text-align:right; display:flex; align-items:center; gap:0.5rem;">
+            <div><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>
+            <button type="button" class="btn btn-sm ${m.status === 'Completata' ? 'btn-primary' : ''}" onclick="event.stopPropagation(); App.toggleMaintenanceStatus('${m.id}')" title="Cambia stato">${m.status === 'Completata' ? '✓' : '⏳'}</button>
+          </div>`,
+          `App.deleteGeneralMaintenance('${m.id}')`
+        )).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>');
+      },
 
       renderGallery() {
         let images = [];
@@ -1849,17 +2068,61 @@
         }).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
       },
 
-      executeSearch() { const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim(); if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'); let html = ''; this.state.transactions.forEach(t => { if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>💸 ${this.escapeHTML(t.desc)}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${this.escapeHTML(t.category)}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`; }); this.state.inventory.forEach(i => { if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>📦 ${this.escapeHTML(i.name)}</strong><br><small class="stat-label">${this.escapeHTML(i.category)}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`; }); this.state.healthMedical.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🩺 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${this.escapeHTML(m.notes)}</small></div></div>`; }); this.state.maintenances.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🔧 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.escapeHTML(m.category)} • ${this.formatDate(m.dueDate)}</small></div></div>`; }); this.state.garageMaint.forEach(m => { if ((m.title||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🏎️ ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)}</small></div><strong>${this.formatMoney(m.cost)}</strong></div>`; }); this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${this.escapeHTML(query)}"</div>`); },
+      executeSearch() {
+        const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim();
+        if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>');
+        let html = '';
+        this.state.transactions.forEach(t => {
+          if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) {
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.switchModule('mod-finance');"><div><strong>💸 ${this.escapeHTML(t.desc)}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${this.escapeHTML(t.category)}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`;
+          }
+        });
+        this.state.inventory.forEach(i => {
+          if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) {
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-inventory');"><div><strong>📦 ${this.escapeHTML(i.name)}</strong><br><small class="stat-label">${this.escapeHTML(i.category)}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`;
+          }
+        });
+        this.state.healthMedical.forEach(m => {
+          if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) {
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-health');"><div><strong>🩺 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${this.escapeHTML(m.notes)}</small></div></div>`;
+          }
+        });
+        this.state.maintenances.forEach(m => {
+          if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) {
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-maintenance');"><div><strong>🔧 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.escapeHTML(m.category)} • ${this.formatDate(m.dueDate)}</small></div></div>`;
+          }
+        });
+        this.state.garageMaint.forEach(m => {
+          if ((m.title||'').toLowerCase().includes(query)) {
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-garage');"><div><strong>🏎️ ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)}</small></div><strong>${this.formatMoney(m.cost)}</strong></div>`;
+          }
+        });
+        this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${this.escapeHTML(query)}"</div>`);
+      },
 
-      startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
-      closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
+      startScanner() {
+        if (typeof Html5QrcodeScanner === 'undefined') return this.showToast('Libreria Scanner non disponibile offline', 'warning');
+        this.openModal('scannerModal');
+        if (this.html5QrcodeScanner) {
+          try { this.html5QrcodeScanner.clear(); } catch (e) {}
+        }
+        this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false);
+        this.html5QrcodeScanner.render((decodedText) => {
+          document.getElementById('invName').value = decodedText;
+          this.vibrate(40);
+          this.showToast('Codice acquisito!');
+          this.closeScanner();
+        }, () => {});
+      },
+      closeScanner() { if (this.html5QrcodeScanner) { this.html5QrcodeScanner.clear().catch(() => {}); this.html5QrcodeScanner = null; } this.closeModal('scannerModal'); },
 
       exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v10_Backup_${this.toLocalISO()}.json`; document.body.appendChild(a); a.click(); a.remove(); },
-      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${t.desc}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${n.meal}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
+      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${(t.desc||'').replace(/"/g, '""')}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${(n.meal||'').replace(/"/g, '""')}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}_${this.toLocalISO()}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
       async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo?")) { await localforage.clear(); location.reload(); } },
 
       async init() {
         await this.load();
+        document.documentElement.setAttribute('data-theme', this.state.settings?.theme || 'dark');
         const todayStr = this.toLocalISO();
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => { const el = document.getElementById(id); if (el) el.value = todayStr; });
         this.populateAccountSelects(); this.populateCategorySelects(); this.populateMaintenanceSelects(); this.populateFoodLibrarySelect(); this.updateHapticButton();
