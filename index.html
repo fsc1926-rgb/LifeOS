@@ -99,7 +99,7 @@
     /* ==========================================
        2. COMPONENTI UI & SWIPE-TO-DELETE
        ========================================== */
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; user-select: none; }
     .btn:active { transform: scale(0.96); }
     .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
     .btn-danger { background: rgba(239, 68, 68, 0.14); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
@@ -211,8 +211,8 @@
     .pin-box { background: var(--bg-card); padding: 2.5rem; border-radius: 24px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-lg); width: 90%; max-width: 400px; }
     .pin-input { width: 100%; text-align: center; font-size: 2.5rem; letter-spacing: 0.5rem; background: transparent; border: none; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); margin: 1.5rem 0; outline: none; }
 
-    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100000; display: flex; flex-direction: column; gap: 0.6rem; }
-    .toast { padding: 0.85rem 1.15rem; border-radius: 14px; background: var(--bg-solid); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 600; animation: slideIn 0.25s ease; }
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100000; display: flex; flex-direction: column; gap: 0.6rem; pointer-events: none; }
+    .toast { padding: 0.85rem 1.15rem; border-radius: 14px; background: var(--bg-solid); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 600; animation: slideIn 0.25s ease; pointer-events: auto; }
     @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
     .fab-container { position: fixed; bottom: 2rem; right: 1.25rem; z-index: 9000; display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
@@ -266,7 +266,7 @@
       <h2>LifeOS Masterpiece</h2>
       <p class="stat-label">Inserisci il PIN per sbloccare l'ecosistema</p>
       <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter') App.verifyPin()">
-      <button class="btn btn-primary" style="width: 100%;" onclick="App.verifyPin()">Sblocca</button>
+      <button type="button" class="btn btn-primary" style="width: 100%;" onclick="App.verifyPin()">Sblocca</button>
     </div>
   </div>
 
@@ -280,19 +280,19 @@
         <div class="brand-text"><span>LifeOS</span><span class="badge" style="font-size:0.6rem; padding: 0.15rem 0.45rem; margin-left:4px;">MASTERPIECE</span></div>
       </div>
       <div>
-        <button class="btn btn-sm" onclick="App.openModal('pomodoroModal')" title="Focus Timer">⏱️</button>
-        <button class="btn btn-sm" onclick="App.openModal('searchModal')" title="Ricerca Globale">🔍</button>
-        <button class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Privacy">👁️</button>
-        <button class="btn btn-sm" onclick="App.openModal('settingsModal')" title="Impostazioni">⚙️</button>
+        <button type="button" class="btn btn-sm" onclick="App.openModal('pomodoroModal')" title="Focus Timer">⏱️</button>
+        <button type="button" class="btn btn-sm" onclick="App.openModal('searchModal')" title="Ricerca Globale">🔍</button>
+        <button type="button" class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Privacy">👁️</button>
+        <button type="button" class="btn btn-sm" onclick="App.openModal('settingsModal')" title="Impostazioni">⚙️</button>
       </div>
     </div>
   </header>
   
   <nav class="nav-tabs" id="mainNavTabs" role="tablist">
-    <button class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
-    <button class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Agenda</button>
-    <button class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💳 Finanze</button>
-    <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">⚡ Hub Extra</button>
+    <button type="button" class="nav-tab active" data-target="mod-dashboard" onclick="App.switchModule('mod-dashboard')">🏠 Dashboard</button>
+    <button type="button" class="nav-tab" data-target="mod-calendar" onclick="App.switchModule('mod-calendar')">📅 Agenda</button>
+    <button type="button" class="nav-tab" data-target="mod-finance" onclick="App.switchModule('mod-finance')">💳 Finanze</button>
+    <button type="button" class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">⚡ Hub Extra</button>
   </nav>
 
   <!-- CONTAINER CON SWIPE TO NAVIGATE -->
@@ -321,27 +321,33 @@
         </div>
 
         <div class="bento-card col-span-4">
-          <div class="card-header"><span class="card-title">💰 Patrimonio Liquido</span><button class="btn btn-sm" onclick="App.switchModule('mod-finance')">Wallet →</button></div>
+          <div class="card-header"><span class="card-title">💰 Patrimonio Liquido</span><button type="button" class="btn btn-sm" onclick="App.switchModule('mod-finance')">Wallet →</button></div>
           <div class="stat-value sensitive" id="dashNetWorth">€ 0,00</div>
           <div class="stat-label" id="dashAccountsCount">0 conti attivi</div>
           <div style="margin-top: 1rem; height: 150px; position: relative;"><canvas id="dashboardChart"></canvas></div>
         </div>
 
         <div class="bento-card col-span-4">
-          <div class="card-header"><span class="card-title">🔥 Abitudini & Streak</span><button class="btn btn-sm btn-primary" onclick="App.addHabit()">+ Nuova</button></div>
+          <div class="card-header"><span class="card-title">🔥 Abitudini & Streak</span><button type="button" class="btn btn-sm btn-primary" onclick="App.addHabit()">+ Nuova</button></div>
           <div class="stat-label" style="margin-bottom:0.5rem;">Tocca per completare oggi:</div>
           <div id="habitList" class="item-list" style="max-height: 210px;"></div>
         </div>
 
         <div class="bento-card col-span-4">
-          <div class="card-header"><span class="card-title">💊 Terapie & Salute</span><button class="btn btn-sm" onclick="App.openHubModule('sub-health')">Salute OS →</button></div>
+          <div class="card-header"><span class="card-title">💊 Terapie & Salute</span><button type="button" class="btn btn-sm" onclick="App.openHubModule('sub-health')">Salute OS →</button></div>
           <div class="stat-label" style="margin-bottom:0.5rem;">Promemoria clinici & nutrizione:</div>
           <div id="dashPillReminders" class="item-list" style="max-height: 210px;"></div>
         </div>
 
         <div class="bento-card col-span-12">
-          <div class="card-header"><span class="card-title">📌 Prossime Attività & Scadenze</span><button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Apri Calendario →</button></div>
-          <div id="dashUpcomingTasks" class="item-list" style="max-height: 220px; overflow-x:hidden;"></div>
+          <div class="card-header">
+            <span class="card-title">📌 Prossime Attività & Scadenze (Agenda + Manutenzioni)</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button type="button" class="btn btn-sm" onclick="App.openHubModule('sub-maintenance')">Manutenzioni →</button>
+              <button type="button" class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Agenda →</button>
+            </div>
+          </div>
+          <div id="dashUpcomingTasks" class="item-list" style="max-height: 260px; overflow-x:hidden;"></div>
         </div>
       </div>
     </section>
@@ -352,8 +358,8 @@
     <section id="mod-calendar" class="module-section">
       <div class="bento-grid">
         <div class="bento-card col-span-5">
-          <div class="card-header"><button class="btn btn-sm" onclick="App.changeMonth(-1)">◀</button><div class="card-title" id="calMonthTitle">Mese Anno</div><button class="btn btn-sm" onclick="App.changeMonth(1)">▶</button></div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;"><span class="stat-label">Giorno: <strong id="calSelectedDateLabel" style="color: var(--accent-primary);">Oggi</strong></span><button class="btn btn-sm" onclick="App.selectToday()">Oggi</button></div>
+          <div class="card-header"><button type="button" class="btn btn-sm" onclick="App.changeMonth(-1)">◀</button><div class="card-title" id="calMonthTitle">Mese Anno</div><button type="button" class="btn btn-sm" onclick="App.changeMonth(1)">▶</button></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;"><span class="stat-label">Giorno: <strong id="calSelectedDateLabel" style="color: var(--accent-primary);">Oggi</strong></span><button type="button" class="btn btn-sm" onclick="App.selectToday()">Oggi</button></div>
           <div class="calendar-grid"><div class="cal-day-header">Lun</div><div class="cal-day-header">Mar</div><div class="cal-day-header">Mer</div><div class="cal-day-header">Gio</div><div class="cal-day-header">Ven</div><div class="cal-day-header">Sab</div><div class="cal-day-header">Dom</div></div>
           <div class="calendar-grid" id="calendarDaysGrid"></div>
         </div>
@@ -387,7 +393,7 @@
           <div class="card-header">
             <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti (Usa ◀ ▶ per riordinare o ✕ per eliminare)</div></div>
             <div style="display:flex; gap:0.5rem; align-items:center;">
-              <button class="btn btn-sm" onclick="App.exportCSV('finance')" title="Esporta CSV">📊 CSV</button>
+              <button type="button" class="btn btn-sm" onclick="App.exportCSV('finance')" title="Esporta CSV">📊 CSV</button>
               <span class="badge badge-success sensitive" id="finTotalBalanceBadge" style="font-size:0.95rem; padding:0.35rem 0.85rem;">€ 0,00</span>
             </div>
           </div>
@@ -476,7 +482,7 @@
 
     <!-- SUB: MEDIA GALLERY -->
     <section id="sub-gallery" class="module-section">
-      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">🖼️ Smart Media Hub</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
+      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">🖼️ Smart Media Hub</div><button type="button" class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
       <div class="bento-card col-span-12">
         <div class="stat-label" style="margin-bottom:1rem;">Qui trovi tutti i referti, le foto degli scontrini e delle garanzie caricati nell'ecosistema.</div>
         <div id="galleryGrid" class="gallery-grid sensitive"></div>
@@ -517,7 +523,7 @@
     <section id="sub-garage" class="module-section">
       <div class="card-header" style="margin-bottom: 1rem;">
         <div class="card-title">🏎️ Garage OS</div>
-        <button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
+        <button type="button" class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
       </div>
       
       <div class="vehicle-selector" id="garageVehicleTabs"></div>
@@ -594,7 +600,7 @@
 
     <!-- SUB: INVENTARIO -->
     <section id="sub-inventory" class="module-section">
-      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">📦 Inventario, Beni & Garanzie</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
+      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">📦 Inventario, Beni & Garanzie</div><button type="button" class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
       <div class="bento-grid">
         <div class="bento-card col-span-4">
           <div class="card-header"><div class="card-title">➕ Registra Oggetto</div></div>
@@ -616,31 +622,42 @@
           </form>
         </div>
         <div class="bento-card col-span-8">
-          <div class="inner-tabs"><button class="inner-tab active" id="tab-archivio" onclick="App.switchInvTab('archivio')">📦 Archivio Oggetti</button><button class="inner-tab" id="tab-garanzie" onclick="App.switchInvTab('garanzie')">🛡️ Garanzie</button></div>
+          <div class="inner-tabs"><button type="button" class="inner-tab active" id="tab-archivio" onclick="App.switchInvTab('archivio')">📦 Archivio Oggetti</button><button type="button" class="inner-tab" id="tab-garanzie" onclick="App.switchInvTab('garanzie')">🛡️ Garanzie</button></div>
           <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><select id="invFilterCat" class="input" style="width: auto; margin:0;" onchange="App.renderInventory()"><option value="ALL">Tutte</option></select><input type="text" id="invSearchInput" class="input" style="margin:0;" placeholder="Cerca bene, seriale o nota..." oninput="App.renderInventory()"></div>
           <div id="inventoryList" class="item-list" style="max-height: 480px; overflow-x:hidden;"></div>
         </div>
       </div>
     </section>
 
-    <!-- SUB: MANUTENZIONI CASA -->
+    <!-- SUB: MANUTENZIONI CASA/VARIE -->
     <section id="sub-maintenance" class="module-section">
-      <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">🔧 Scadenziario Manutenzioni Casa/Varie</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
+      <div class="card-header" style="margin-bottom: 1rem;">
+        <div class="card-title">🔧 Scadenziario Manutenzioni Casa / Animali / Varie</div>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" class="btn btn-sm" onclick="App.addMaintenanceCategory()">+ Nuova Categoria</button>
+          <button type="button" class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
+        </div>
+      </div>
       <div class="bento-grid">
         <div class="bento-card col-span-4">
           <div class="card-header"><div class="card-title">➕ Nuovo Intervento</div></div>
           <form onsubmit="App.addGeneralMaintenance(event)">
-            <input type="text" id="maintTitle" class="input" placeholder="Intervento *" required>
+            <input type="text" id="maintTitle" class="input" placeholder="Intervento (es. Pulizia griglia coniglio) *" required>
             <div class="form-row"><select id="maintCategory" class="input" required></select><input type="date" id="maintDueDate" class="input" required></div>
-            <div class="form-row"><input type="number" id="maintCost" class="input" step="0.01" placeholder="Costo €"><select id="maintRecurrence" class="input"><option value="Singola">Singolo</option><option value="Mensile">Mensile</option><option value="Semestrale">Semestrale</option><option value="Annuale">Annuale</option></select></div>
+            <div class="form-row"><input type="number" id="maintCost" class="input" step="0.01" placeholder="Costo €"><select id="maintRecurrence" class="input"><option value="Singola">Singolo</option><option value="Settimanale">Settimanale</option><option value="Mensile">Mensile</option><option value="Semestrale">Semestrale</option><option value="Annuale">Annuale</option></select></div>
             <select id="maintStatus" class="input"><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completata</option></select>
             <input type="text" id="maintNotes" class="input" placeholder="Note o ricambi...">
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra Manutenzione</button>
           </form>
         </div>
         <div class="bento-card col-span-8">
-          <div class="card-header" style="margin-bottom: 0.75rem;"><div class="card-title">🛠️ Storico & Scadenze</div>
-            <div style="display:flex; gap:0.5rem;"><select id="maintFilterCat" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"></select><select id="maintFilterStatus" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"><option value="ALL">Tutti</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option></select></div>
+          <div class="card-header" style="margin-bottom: 0.75rem;">
+            <div class="card-title">🛠️ Storico & Scadenze <span class="badge" id="maintCountBadge">0</span></div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <input type="text" id="maintSearchInput" class="input" style="margin:0; width:160px;" placeholder="Cerca..." oninput="App.renderGeneralMaintenances()">
+              <select id="maintFilterCat" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"></select>
+              <select id="maintFilterStatus" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"><option value="ALL">Tutti</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option></select>
+            </div>
           </div>
           <div id="maintenanceList" class="item-list" style="max-height: 500px; overflow-x:hidden;"></div>
         </div>
@@ -652,8 +669,8 @@
       <div class="card-header" style="margin-bottom: 1rem;">
         <div class="card-title">❤️ Salute OS: Nutrizione, Peso & Cartella Clinica</div>
         <div style="display:flex; gap:0.5rem;">
-          <button class="btn btn-sm" onclick="App.exportCSV('health')">📊 CSV Dieta</button>
-          <button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
+          <button type="button" class="btn btn-sm" onclick="App.exportCSV('health')">📊 CSV Dieta</button>
+          <button type="button" class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button>
         </div>
       </div>
       <div class="bento-grid">
@@ -712,29 +729,30 @@
     <div class="fab-menu" id="fabMenu">
       <div class="fab-item" onclick="App.quickAdd('txAmount')">💸 Nuova Spesa</div>
       <div class="fab-item" onclick="App.quickAdd('calTaskTitle')">📌 Nuovo Task</div>
+      <div class="fab-item" onclick="App.quickAdd('maintTitle')">🔧 Nuova Manutenzione</div>
       <div class="fab-item" onclick="App.quickAdd('nutriGrams')">🍎 Registra Pasto</div>
       <div class="fab-item" onclick="App.quickAdd('weightValue')">⚖️ Registra Peso</div>
     </div>
-    <button class="fab-btn" onclick="App.toggleFab()">+</button>
+    <button type="button" class="fab-btn" onclick="App.toggleFab()">+</button>
   </div>
 
   <div id="pomodoroModal" class="modal-backdrop">
     <div class="modal-content" style="text-align:center; max-width:380px;">
-      <div class="card-header"><div class="card-title">⏱️ Deep Focus Timer</div><button class="btn btn-sm" onclick="App.closeModal('pomodoroModal')">✕</button></div>
+      <div class="card-header"><div class="card-title">⏱️ Deep Focus Timer</div><button type="button" class="btn btn-sm" onclick="App.closeModal('pomodoroModal')">✕</button></div>
       <div id="pomoDisplay" style="font-size:3.5rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin:1.5rem 0;">25:00</div>
-      <div style="display:flex; gap:0.5rem; justify-content:center;"><button class="btn btn-primary" onclick="App.togglePomodoro()" id="pomoBtn">▶️ Avvia Focus</button><button class="btn" onclick="App.resetPomodoro()">🔄 Reset</button></div>
+      <div style="display:flex; gap:0.5rem; justify-content:center;"><button type="button" class="btn btn-primary" onclick="App.togglePomodoro()" id="pomoBtn">▶️ Avvia Focus</button><button type="button" class="btn" onclick="App.resetPomodoro()">🔄 Reset</button></div>
     </div>
   </div>
 
   <div id="searchModal" class="modal-backdrop">
     <div class="modal-content" style="align-self: flex-start; margin-top: 3.5rem;">
-      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><input type="text" id="globalSearchInput" class="input" placeholder="Cerca ovunque..." style="margin:0; font-size:1rem; border-color:var(--accent-primary);" oninput="App.executeSearch()"><button class="btn btn-sm" onclick="App.closeModal('searchModal')">✕</button></div>
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><input type="text" id="globalSearchInput" class="input" placeholder="Cerca ovunque (anche per eliminare)..." style="margin:0; font-size:1rem; border-color:var(--accent-primary);" oninput="App.executeSearch()"><button type="button" class="btn btn-sm" onclick="App.closeModal('searchModal')">✕</button></div>
       <div id="globalSearchResults" class="item-list" style="max-height: 60vh;"><div class="stat-label" style="text-align:center; padding: 2rem 0;">Digita almeno 2 caratteri...</div></div>
     </div>
   </div>
 
   <div id="scannerModal" class="modal-backdrop">
-    <div class="modal-content"><div class="card-header"><div class="card-title">📷 Scanner Barcode</div><button class="btn btn-sm" onclick="App.closeScanner()">✕</button></div><div id="reader" style="width:100%; border-radius:14px; overflow:hidden;"></div></div>
+    <div class="modal-content"><div class="card-header"><div class="card-title">📷 Scanner Barcode</div><button type="button" class="btn btn-sm" onclick="App.closeScanner()">✕</button></div><div id="reader" style="width:100%; border-radius:14px; overflow:hidden;"></div></div>
   </div>
 
   <div id="photoModal" class="modal-backdrop" onclick="App.closeModal('photoModal')">
@@ -798,29 +816,29 @@
   <!-- MODALE IMPOSTAZIONI GLOBALI -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal-content">
-      <div class="card-header"><div class="card-title">⚙️ Impostazioni Ecosistema</div><button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button></div>
+      <div class="card-header"><div class="card-title">⚙️ Impostazioni Ecosistema</div><button type="button" class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button></div>
       <div class="bento-grid">
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
           <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">🎨 Estetica & Display</div>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;"><button class="btn btn-sm" onclick="App.toggleTheme()" style="flex:1;">🌓 Cambia Tema</button><button class="btn btn-sm" id="hapticBtn" onclick="App.toggleHaptic()" style="flex:1;">📳 Vibrazione Aptica</button></div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;"><button type="button" class="btn btn-sm" onclick="App.toggleTheme()" style="flex:1;">🌓 Cambia Tema</button><button type="button" class="btn btn-sm" id="hapticBtn" onclick="App.toggleHaptic()" style="flex:1;">📳 Vibrazione Aptica</button></div>
         </div>
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
           <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">🔒 Sicurezza PIN Avvio</div>
-          <div class="form-row" style="margin-bottom: 0.5rem;"><input type="password" id="setupPinInput" class="input" maxlength="4" placeholder="Nuovo PIN (4 cifre)..." inputmode="numeric"><button class="btn btn-sm btn-primary" onclick="App.savePin()">Attiva PIN</button></div>
-          <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Rimuovi PIN</button>
+          <div class="form-row" style="margin-bottom: 0.5rem;"><input type="password" id="setupPinInput" class="input" maxlength="4" placeholder="Nuovo PIN (4 cifre)..." inputmode="numeric"><button type="button" class="btn btn-sm btn-primary" onclick="App.savePin()">Attiva PIN</button></div>
+          <button type="button" class="btn btn-sm btn-danger" style="width:100%;" onclick="App.removePin()">Rimuovi PIN</button>
         </div>
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
           <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">🔐 PIN Cassaforte (Deep Vault)</div>
-          <button class="btn btn-sm btn-primary" style="width:100%; margin-bottom:0.5rem;" onclick="App.openVaultSetupModal()">🔑 Imposta/Cambia PIN Vault</button>
-          <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.resetVault()">🗑️ Distruggi Cassaforte (Cancella dati cifrati)</button>
+          <button type="button" class="btn btn-sm btn-primary" style="width:100%; margin-bottom:0.5rem;" onclick="App.openVaultSetupModal()">🔑 Imposta/Cambia PIN Vault</button>
+          <button type="button" class="btn btn-sm btn-danger" style="width:100%;" onclick="App.resetVault()">🗑️ Distruggi Cassaforte (Cancella dati cifrati)</button>
         </div>
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
           <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">📊 Backup & Ripristino</div>
-          <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem;">💾 Esporta Backup Completo (JSON)</button>
+          <button type="button" class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem;">💾 Esporta Backup Completo (JSON)</button>
           <label class="btn btn-sm" style="width:100%; margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">📂 Ripristina Backup (JSON o ZIP)<input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;"></label>
-          <button class="btn btn-sm" onclick="App.forceUpdateCache()" style="width:100%; margin-bottom: 1rem; border-color: var(--accent-primary); color: var(--accent-primary);">🔄 Svuota Cache PWA</button>
+          <button type="button" class="btn btn-sm" onclick="App.forceUpdateCache()" style="width:100%; margin-bottom: 1rem; border-color: var(--accent-primary); color: var(--accent-primary);">🔄 Svuota Cache PWA</button>
           <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
-          <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Reset Totale App</button>
+          <button type="button" class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Reset Totale App</button>
         </div>
       </div>
     </div>
@@ -853,8 +871,13 @@
         vehicles: [], garageMaint: [],
         settings: {
           theme: 'dark',
-          inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
-          maintenanceCategories: ['Casa', 'Salute', 'Altro'],
+          inventoryCategories: {
+            'Elettrodomestici': ['Generale', 'Cucina', 'Clima', 'Pulizia'],
+            'Casa/Impianti': ['Mobili', 'Impianti', 'Giardino', 'Animali'],
+            'Elettronica': ['Smartphone', 'Computer', 'Audio/Video'],
+            'Veicoli': ['Auto', 'Moto', 'Accessori']
+          },
+          maintenanceCategories: ['Casa', 'Animali', 'Giardino', 'Salute', 'Altro'],
           hapticEnabled: true
         }
       },
@@ -868,6 +891,7 @@
       pomoTimer: null,
       pomoSeconds: 1500,
 
+      // === UTILITÀ DATE E STRINGHE SICURE ===
       toLocalISO(d = new Date()) {
         const date = (d instanceof Date && !isNaN(d)) ? d : new Date();
         const y = date.getFullYear();
@@ -876,11 +900,36 @@
         return `${y}-${m}-${day}`;
       },
 
+      parseLocalDate(dateStr) {
+        if (!dateStr) return null;
+        const s = String(dateStr).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          const [y, m, d] = s.split('-').map(Number);
+          return new Date(y, m - 1, d, 12, 0, 0);
+        }
+        const parsed = new Date(s);
+        return isNaN(parsed) ? null : parsed;
+      },
+
+      formatDate(dateStr) {
+        const d = this.parseLocalDate(dateStr);
+        return d ? d.toLocaleDateString('it-IT') : '--/--/----';
+      },
+
       escapeHTML(str) {
         return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
       },
 
-      // === GESTURES SWIPE NATIVO (CON CONTROLLO ASSE VERTICALE) ===
+      // Escaping sicuro per ID passati dentro attributi onclick="..."
+      safeJSArg(id) {
+        return String(id ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      },
+
+      generateId() {
+        return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 8);
+      },
+
+      // === GESTURES SWIPE NATIVO (NON INTERFERISCE CON I BOTTONI) ===
       swipeStartX: null,
       swipeStartY: null,
       navStartX: null,
@@ -890,6 +939,7 @@
         const main = document.getElementById('swipeArea');
         
         document.addEventListener('touchstart', e => {
+          if (e.target.closest('button, a, input, select, textarea')) return;
           const sc = e.target.closest('.swipe-container');
           if (sc) {
             this.swipeStartX = e.touches[0].clientX;
@@ -898,13 +948,18 @@
         }, {passive: true});
         
         document.addEventListener('touchend', e => {
+          if (e.target.closest('button, a, input, select, textarea')) {
+            this.swipeStartX = null;
+            this.swipeStartY = null;
+            return;
+          }
           const sc = e.target.closest('.swipe-container');
           if (sc && this.swipeStartX !== null && this.swipeStartY !== null) {
             const diffX = this.swipeStartX - e.changedTouches[0].clientX;
             const diffY = Math.abs(this.swipeStartY - e.changedTouches[0].clientY);
             const content = sc.querySelector('.swipe-content');
-            if (content && Math.abs(diffX) > diffY * 1.3) {
-              if (diffX > 50) {
+            if (content && Math.abs(diffX) > 45 && Math.abs(diffX) > diffY * 1.4) {
+              if (diffX > 45) {
                 document.querySelectorAll('.swipe-content').forEach(el => { if (el !== content) el.style.transform = 'translateX(0)'; });
                 content.style.transform = 'translateX(-75px)';
               } else if (diffX < -30) {
@@ -929,8 +984,7 @@
           this.navStartX = null;
           this.navStartY = null;
 
-          // Evita cambio scheda accidentale durante lo scroll verticale
-          if (Math.abs(diffX) < 85 || Math.abs(diffX) < diffY * 1.8) return;
+          if (Math.abs(diffX) < 90 || Math.abs(diffX) < diffY * 2) return;
 
           const tabs = ['mod-dashboard', 'mod-calendar', 'mod-finance', 'mod-hub'];
           const activeSec = document.querySelector('.module-section.active');
@@ -944,12 +998,15 @@
         }, {passive: true});
       },
 
-      createSwipeRow(contentHTML, deleteActionJS) {
+      createSwipeRow(contentHTML, deleteActionJS, extraButtonsHTML = '') {
         return `
           <div class="swipe-container">
             <div class="swipe-content">
               <div style="flex:1; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; min-width:0;">${contentHTML}</div>
-              <button type="button" class="btn btn-sm btn-danger" style="padding:0.25rem 0.5rem; font-size:0.75rem; flex-shrink:0;" onclick="event.stopPropagation(); ${deleteActionJS}" title="Elimina">✕</button>
+              <div style="display:flex; align-items:center; gap:0.35rem; flex-shrink:0;">
+                ${extraButtonsHTML}
+                <button type="button" class="btn btn-sm btn-danger" style="padding:0.25rem 0.55rem; font-size:0.78rem; flex-shrink:0;" onclick="event.stopPropagation(); ${deleteActionJS}" title="Elimina">✕</button>
+              </div>
             </div>
             <div class="swipe-action" onclick="event.stopPropagation(); ${deleteActionJS}">🗑️</div>
           </div>
@@ -959,8 +1016,18 @@
       setElText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; },
       setElHTML(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; },
 
+      // === SANITIZZAZIONE TOTALE DI TUTTI GLI ARRAY E DEGLI ID UNIVOCI ===
       sanitizeData() {
         const today = this.toLocalISO();
+        const seenIds = new Set();
+        const ensureUniqueId = (rawId) => {
+          let sid = String(rawId ?? '').trim();
+          if (!sid || sid === 'undefined' || sid === 'null' || seenIds.has(sid)) {
+            sid = this.generateId();
+          }
+          seenIds.add(sid);
+          return sid;
+        };
         const cleanNumber = (val) => {
           if (typeof val === 'number' && !isNaN(val)) return val;
           if (!val) return 0;
@@ -968,14 +1035,22 @@
           return parseFloat(s) || 0;
         };
 
+        // Migrazione chiavi legacy da vecchi backup
         if (Array.isArray(this.state.cars) && (!Array.isArray(this.state.vehicles) || !this.state.vehicles.length)) {
           this.state.vehicles = this.state.cars;
+          delete this.state.cars;
         }
         if (Array.isArray(this.state.garageMaintenances) && (!Array.isArray(this.state.garageMaint) || !this.state.garageMaint.length)) {
           this.state.garageMaint = this.state.garageMaintenances;
+          delete this.state.garageMaintenances;
         }
         if (Array.isArray(this.state.vault) && (!Array.isArray(this.state.vaultData) || !this.state.vaultData.length)) {
           this.state.vaultData = this.state.vault;
+          delete this.state.vault;
+        }
+        if (Array.isArray(this.state.tasks) && (!Array.isArray(this.state.calendarTasks) || !this.state.calendarTasks.length)) {
+          this.state.calendarTasks = this.state.tasks;
+          delete this.state.tasks;
         }
         if (this.state.vaultPin && !this.state.vaultPinHash) {
           this.state.vaultPinHash = btoa(String(this.state.vaultPin));
@@ -984,19 +1059,35 @@
 
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'vehicles', 'garageMaint', 'vaultData'];
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
-        if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
+
+        if (this.state.foodLibrary.length === 0) this.state.foodLibrary = JSON.parse(JSON.stringify(DEFAULT_FOODS));
+        this.state.foodLibrary = this.state.foodLibrary.filter(f => f && typeof f === 'object').map(f => ({
+          id: ensureUniqueId(f.id),
+          name: String(f.name || 'Alimento').trim(),
+          kcal: cleanNumber(f.kcal),
+          carb: cleanNumber(f.carb),
+          prot: cleanNumber(f.prot),
+          fat: cleanNumber(f.fat)
+        }));
+
         if (!this.state.nutritionGoals || typeof this.state.nutritionGoals !== 'object') {
           this.state.nutritionGoals = { kcal: 2100, prot: 140, carb: 230, fat: 70 };
         }
-        if (!this.state.settings) this.state.settings = {};
+        if (!this.state.settings || typeof this.state.settings !== 'object') this.state.settings = {};
         if (!this.state.settings.theme) this.state.settings.theme = 'dark';
-        if (!this.state.settings.inventoryCategories) {
-          this.state.settings.inventoryCategories = { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] };
+        if (!this.state.settings.inventoryCategories || typeof this.state.settings.inventoryCategories !== 'object') {
+          this.state.settings.inventoryCategories = {
+            'Elettrodomestici': ['Generale', 'Cucina', 'Clima', 'Pulizia'],
+            'Casa/Impianti': ['Mobili', 'Impianti', 'Giardino', 'Animali'],
+            'Elettronica': ['Smartphone', 'Computer', 'Audio/Video'],
+            'Veicoli': ['Auto', 'Moto', 'Accessori']
+          };
         }
-        if (!Array.isArray(this.state.settings.maintenanceCategories)) {
-          this.state.settings.maintenanceCategories = ['Casa', 'Salute', 'Altro'];
+        if (!Array.isArray(this.state.settings.maintenanceCategories) || this.state.settings.maintenanceCategories.length === 0) {
+          this.state.settings.maintenanceCategories = ['Casa', 'Animali', 'Giardino', 'Salute', 'Altro'];
         }
 
+        // Veicoli e Garage
         if (this.state.garageConfig && typeof this.state.garageConfig === 'object' && this.state.vehicles.length === 0) {
           this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
           delete this.state.garageConfig;
@@ -1005,7 +1096,7 @@
           this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'AA 000 AA', bollo: '', assic: '', revis: '', km: 0 });
         }
         this.state.vehicles = this.state.vehicles.filter(v => v && typeof v === 'object').map(v => ({
-          id: String(v.id || this.generateId()),
+          id: ensureUniqueId(v.id),
           name: String(v.name || v.brand || v.model || 'Veicolo').trim(),
           plate: String(v.plate || v.targa || '').trim().toUpperCase(),
           bollo: v.bollo || v.taxExpiry || '',
@@ -1014,51 +1105,149 @@
           km: cleanNumber(v.km || v.odometer)
         }));
 
-        if (!this.activeVehicleId || !this.state.vehicles.some(v => v.id === this.activeVehicleId)) {
+        if (!this.activeVehicleId || !this.state.vehicles.some(v => v.id === String(this.activeVehicleId))) {
           this.activeVehicleId = this.state.vehicles[0].id;
         }
 
         this.state.garageMaint = this.state.garageMaint.filter(m => m && typeof m === 'object').map(m => ({
-          id: String(m.id || this.generateId()),
+          id: ensureUniqueId(m.id),
           vehicleId: (m.vehicleId && this.state.vehicles.some(v => v.id === String(m.vehicleId))) ? String(m.vehicleId) : this.state.vehicles[0].id,
-          title: String(m.title || m.desc || m.description || 'Intervento'),
+          title: String(m.title || m.desc || m.description || 'Intervento').trim(),
           date: m.date || today,
           cost: cleanNumber(m.cost || m.amount),
           kmAtMaint: cleanNumber(m.kmAtMaint || m.km)
         }));
 
-        this.state.accounts.forEach(a => {
-          a.id = String(a.id || this.generateId());
-          a.balance = cleanNumber(a.balance);
-          a.name = String(a.name || 'Conto').trim();
-        });
+        // Conti, Transazioni e Abbonamenti
+        this.state.accounts = this.state.accounts.filter(a => a && typeof a === 'object').map(a => ({
+          id: ensureUniqueId(a.id),
+          balance: cleanNumber(a.balance),
+          name: String(a.name || 'Conto').trim(),
+          type: String(a.type || 'Conto')
+        }));
 
-        this.state.transactions.forEach(t => {
-          t.id = String(t.id || this.generateId());
-          t.amount = cleanNumber(t.amount || t.value);
-          t.date = t.date || today;
-          t.desc = String(t.desc || t.description || t.title || t.note || 'Movimento').trim();
-          t.category = String(t.category || 'Generale').trim();
-          t.accountId = String(t.accountId || t.account || (this.state.accounts[0]?.id || ''));
+        this.state.transactions = this.state.transactions.filter(t => t && typeof t === 'object').map(t => {
           const rawType = String(t.type || '').toUpperCase();
-          t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(rawType) ? rawType : (rawType === 'USCITA' ? 'EXPENSE' : rawType === 'ENTRATA' ? 'INCOME' : 'EXPENSE');
+          return {
+            id: ensureUniqueId(t.id),
+            amount: cleanNumber(t.amount || t.value),
+            date: t.date || today,
+            desc: String(t.desc || t.description || t.title || t.note || 'Movimento').trim(),
+            category: String(t.category || 'Generale').trim(),
+            accountId: String(t.accountId || t.account || (this.state.accounts[0]?.id || '')),
+            targetAccountId: t.targetAccountId ? String(t.targetAccountId) : undefined,
+            type: ['EXPENSE', 'INCOME', 'TRANSFER'].includes(rawType) ? rawType : (rawType === 'USCITA' ? 'EXPENSE' : rawType === 'ENTRATA' ? 'INCOME' : 'EXPENSE'),
+            recurrence: String(t.recurrence || 'Singola'),
+            timestamp: t.timestamp || new Date().toISOString(),
+            fileData: t.fileData || null
+          };
         });
 
-        this.state.calendarTasks.forEach(t => {
-          t.id = String(t.id || this.generateId());
-          if (!t.date || t.date.length < 10) t.date = today;
-          t.title = String(t.title || t.desc || 'Attività');
-          t.done = Boolean(t.done);
+        this.state.subs = this.state.subs.filter(s => s && typeof s === 'object').map(s => ({
+          id: ensureUniqueId(s.id),
+          name: String(s.name || s.title || 'Abbonamento').trim(),
+          cost: cleanNumber(s.cost || s.amount || s.price),
+          cycle: s.cycle || 'monthly',
+          next: s.next || s.date || today
+        }));
+
+        // Agenda, Diario e Abitudini
+        this.state.calendarTasks = this.state.calendarTasks.filter(t => t && typeof t === 'object').map(t => ({
+          id: ensureUniqueId(t.id),
+          date: (t.date && String(t.date).length >= 10) ? String(t.date).slice(0, 10) : today,
+          title: String(t.title || t.desc || t.name || 'Attività').trim(),
+          type: String(t.type || 'Attività'),
+          priority: String(t.priority || 'Normale'),
+          done: Boolean(t.done || t.completed)
+        }));
+
+        this.state.journal = this.state.journal.filter(j => j && typeof j === 'object').map(j => ({
+          id: ensureUniqueId(j.id),
+          date: (j.date && String(j.date).length >= 10) ? String(j.date).slice(0, 10) : today,
+          mood: String(j.mood || '😊 Sereno'),
+          text: String(j.text || j.note || j.content || '').trim()
+        })).filter(j => j.text.length > 0);
+
+        this.state.habits = this.state.habits.filter(h => h && typeof h === 'object').map(h => ({
+          id: ensureUniqueId(h.id),
+          name: String(h.name || h.title || 'Abitudine').trim(),
+          streak: cleanNumber(h.streak),
+          lastDone: h.lastDone || null
+        }));
+
+        // Inventario & Garanzie (Con auto-registrazione categorie custom)
+        this.state.inventory = this.state.inventory.filter(i => i && typeof i === 'object').map(i => {
+          const cat = String(i.category || 'Elettrodomestici').trim();
+          const sub = String(i.subcategory || 'Generale').trim();
+          if (!this.state.settings.inventoryCategories[cat]) {
+            this.state.settings.inventoryCategories[cat] = [sub];
+          } else if (!this.state.settings.inventoryCategories[cat].includes(sub)) {
+            this.state.settings.inventoryCategories[cat].push(sub);
+          }
+          return {
+            id: ensureUniqueId(i.id),
+            type: String(i.type || 'Archivio'),
+            name: String(i.name || i.title || 'Oggetto').trim(),
+            category: cat,
+            subcategory: sub,
+            price: cleanNumber(i.price || i.cost || i.value),
+            date: i.date || '',
+            warranty: i.warranty || i.warrantyDate || '',
+            location: String(i.location || '').trim(),
+            notes: String(i.notes || i.desc || '').trim(),
+            addedAt: i.addedAt || new Date().toISOString(),
+            fileData: i.fileData || null
+          };
         });
 
-        this.state.habits.forEach(h => {
-          h.id = String(h.id || this.generateId());
-          h.name = String(h.name || h.title || 'Abitudine');
-          h.streak = cleanNumber(h.streak);
+        // Manutenzioni Casa/Animali/Varie (Risolve definitivamente il bug della "griglia del coniglio")
+        this.state.maintenances = this.state.maintenances.filter(m => m && typeof m === 'object').map(m => {
+          const cat = String(m.category || 'Casa').trim();
+          if (cat && !this.state.settings.maintenanceCategories.includes(cat)) {
+            this.state.settings.maintenanceCategories.push(cat);
+          }
+          return {
+            id: ensureUniqueId(m.id),
+            title: String(m.title || m.name || m.desc || 'Manutenzione').trim(),
+            category: cat,
+            dueDate: (m.dueDate || m.date || today).slice(0, 10),
+            cost: cleanNumber(m.cost || m.amount || m.price),
+            recurrence: String(m.recurrence || 'Singola'),
+            status: (m.status === 'Completata' || m.done === true) ? 'Completata' : 'In attesa',
+            notes: String(m.notes || m.note || '').trim()
+          };
         });
 
+        // Salute OS (Nutrizione, Peso, Cartella Clinica)
+        this.state.healthNutrition = this.state.healthNutrition.filter(n => n && typeof n === 'object').map(n => ({
+          id: ensureUniqueId(n.id),
+          meal: String(n.meal || n.name || n.title || 'Pasto').trim(),
+          date: (n.date || today).slice(0, 10),
+          kcal: cleanNumber(n.kcal || n.calories),
+          prot: cleanNumber(n.prot || n.proteins),
+          carbs: cleanNumber(n.carbs || n.carb || n.carbohydrates),
+          fat: cleanNumber(n.fat || n.fats)
+        }));
+
+        this.state.healthWeight = this.state.healthWeight.filter(w => w && typeof w === 'object').map(w => ({
+          id: ensureUniqueId(w.id),
+          value: cleanNumber(w.value || w.weight),
+          date: (w.date || today).slice(0, 10)
+        })).filter(w => w.value > 0);
+
+        this.state.healthMedical = this.state.healthMedical.filter(m => m && typeof m === 'object').map(m => ({
+          id: ensureUniqueId(m.id),
+          type: String(m.type || 'Visita Medica'),
+          date: (m.date || today).slice(0, 10),
+          title: String(m.title || m.name || m.desc || 'Record Medico').trim(),
+          notes: String(m.notes || m.note || '').trim(),
+          therapy: String(m.therapy || '').trim(),
+          fileData: m.fileData || null
+        }));
+
+        // Deep Vault
         this.state.vaultData = this.state.vaultData.filter(v => v && typeof v === 'object').map(v => ({
-          id: String(v.id || this.generateId()),
+          id: ensureUniqueId(v.id),
           title: String(v.title || v.name || ''),
           data: String(v.data || v.secret || v.value || ''),
           date: v.date || new Date().toISOString()
@@ -1089,6 +1278,7 @@
             });
             parsed = JSON.parse(jsonString);
             if (parsed.state) parsed = parsed.state;
+            else if (parsed.lifeos_data) parsed = parsed.lifeos_data;
           }
 
           if (parsed) {
@@ -1096,11 +1286,11 @@
             this.sanitizeData();
             await localforage.setItem('appData', this.state);
             this.closeModal('settingsModal');
-            this.showToast('Archivio importato!', 'success');
-            setTimeout(() => location.reload(), 1000);
+            this.showToast('Archivio importato e riparato!', 'success');
+            setTimeout(() => location.reload(), 900);
           }
         } catch (err) {
-          this.showToast('Errore lettura file.', 'danger');
+          this.showToast('Errore lettura file di backup.', 'danger');
         }
         event.target.value = '';
       },
@@ -1112,10 +1302,39 @@
           this.showToast('Cache pulita! Ricarico...', 'info'); setTimeout(() => location.reload(), 800);
         } catch (e) { location.reload(); }
       },
-      async save() { try { this.sanitizeData(); await localforage.setItem('appData', this.state); this.renderActiveModule(); } catch (e) { console.error(e); this.showToast('Errore salvataggio', 'danger'); } },
-      async load() { try { const data = await localforage.getItem('appData'); if (data) { this.state = { ...this.state, ...data }; } this.sanitizeData(); await localforage.setItem('appData', this.state); } catch (e) { this.sanitizeData(); } },
+      async save() {
+        try {
+          this.sanitizeData();
+          await localforage.setItem('appData', this.state);
+          this.renderActiveModule();
+          if (document.getElementById('searchModal')?.classList.contains('open')) {
+            this.executeSearch();
+          }
+        } catch (e) {
+          console.error(e);
+          this.showToast('Errore salvataggio dati', 'danger');
+        }
+      },
+      async load() {
+        try {
+          const data = await localforage.getItem('appData');
+          if (data) { this.state = { ...this.state, ...data }; }
+          this.sanitizeData();
+          await localforage.setItem('appData', this.state);
+        } catch (e) {
+          this.sanitizeData();
+        }
+      },
 
-      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${this.escapeHTML(msg)}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3200); },
+      showToast(msg, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${this.escapeHTML(msg)}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      },
       
       openModal(id) { 
         const el = document.getElementById(id); if (el) el.classList.add('open'); 
@@ -1161,10 +1380,17 @@
       },
       openHubModule(hubId) {
         document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+        document.querySelector('.nav-tab[data-target="mod-hub"]')?.classList.add('active');
         document.getElementById(hubId)?.classList.add('active');
         this.renderActiveModule();
       },
-      switchInvTab(tabId) { this.activeInvTab = tabId; document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`)?.classList.add('active'); this.renderInventory(); },
+      switchInvTab(tabId) {
+        this.activeInvTab = tabId;
+        document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`)?.classList.add('active');
+        this.renderInventory();
+      },
 
       renderActiveModule() {
         if(document.getElementById('mod-dashboard')?.classList.contains('active')) this.renderDashboard();
@@ -1196,13 +1422,12 @@
         document.getElementById('fabMenu')?.classList.remove('open');
         if (inputId === 'txAmount') this.switchModule('mod-finance'); 
         else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar'); 
+        else if (inputId === 'maintTitle') this.openHubModule('sub-maintenance');
         else if (inputId === 'weightValue' || inputId === 'nutriGrams') this.openHubModule('sub-health'); 
         setTimeout(() => { const input = document.getElementById(inputId); if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 300); 
       },
 
       formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(amount) || 0); },
-      formatDate(dateStr) { if (!dateStr) return '--/--/----'; const d = new Date(dateStr); return isNaN(d) ? '--/--/----' : d.toLocaleDateString('it-IT'); },
-      generateId() { return Math.random().toString(36).substr(2, 9); },
       
       async fileToBase64(file) { 
         return new Promise((resolve, reject) => { 
@@ -1261,7 +1486,7 @@
         }
       },
       toggleHabit(id) {
-        const h = this.state.habits.find(x => x.id === id);
+        const h = this.state.habits.find(x => String(x.id) === String(id));
         if (!h) return;
         const todayStr = this.toLocalISO();
         if (h.lastDone === todayStr) {
@@ -1275,13 +1500,12 @@
         this.save();
       },
       deleteHabit(id) {
-        if (confirm("Eliminare questa abitudine?")) {
-          this.state.habits = this.state.habits.filter(x => x.id !== id);
-          this.save();
-        }
+        this.state.habits = this.state.habits.filter(x => String(x.id) !== String(id));
+        this.save();
+        this.showToast("Abitudine eliminata.", "info");
       },
 
-      // === DEEP VAULT (CON VERIFICA PIN VECCHIO OBBLIGATORIA) ===
+      // === DEEP VAULT ===
       cryptoObfuscate(text, pin) {
         const cleanPin = String(pin || '0000');
         const utf8 = encodeURIComponent(String(text || ''));
@@ -1323,7 +1547,6 @@
       },
 
       openVaultSetupModal() {
-        // Sicurezza: se esiste già un PIN Vault e non è sbloccato, chiedilo prima di permettere il cambio
         if (this.state.vaultPinHash && !this.vaultUnlockedPIN) {
           const currentPin = prompt('Inserisci il PIN attuale del Vault per poterlo modificare:');
           if (!currentPin || btoa(currentPin.trim()) !== this.state.vaultPinHash) {
@@ -1442,11 +1665,9 @@
       },
 
       deleteVaultSecret(id) {
-        if (confirm('Eliminare definitivamente questo segreto dalla cassaforte?')) {
-          this.state.vaultData = this.state.vaultData.filter(v => String(v.id) !== String(id));
-          this.save();
-          this.renderVault();
-        }
+        this.state.vaultData = this.state.vaultData.filter(v => String(v.id) !== String(id));
+        this.save();
+        this.showToast('Segreto rimosso dal Vault.', 'info');
       },
 
       exportVaultTXT() {
@@ -1472,21 +1693,22 @@
         }
         this.setElText('vaultCountBadge', this.state.vaultData.length);
         const html = this.state.vaultData.length ? this.state.vaultData.map(v => {
+          const sid = this.safeJSArg(v.id);
           const dTitle = this.escapeHTML(this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN));
           const dData = this.escapeHTML(this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN));
           return this.createSwipeRow(
             `<div style="flex:1; min-width:0;">
               <strong>🔐 ${dTitle}</strong> <span class="stat-label" style="font-size:0.7rem;">• ${this.formatDate(v.date)}</span>
               <div class="sensitive" style="margin-top:0.35rem; padding:0.5rem 0.7rem; background:rgba(0,0,0,0.25); border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--text-primary); user-select:all; white-space:pre-wrap; word-break:break-word;">${dData}</div>
-            </div>
-            <button type="button" class="btn btn-sm" onclick="event.stopPropagation(); App.copyVaultSecret('${v.id}')" title="Copia">📋</button>`,
-            `App.deleteVaultSecret('${v.id}')`
+            </div>`,
+            `App.deleteVaultSecret('${sid}')`,
+            `<button type="button" class="btn btn-sm" onclick="event.stopPropagation(); App.copyVaultSecret('${sid}')" title="Copia">📋</button>`
           );
         }).join('') : '<div class="list-row stat-label">La cassaforte è vuota. Usa il modulo a sinistra per criptare il tuo primo segreto.</div>';
         this.setElHTML('vaultList', html);
       },
 
-      // === DASHBOARD ===
+      // === DASHBOARD (ORA PERMETTE DI COMPLETARE O ELIMINARE DIRETTAMENTE TASK E MANUTENZIONI) ===
       renderDashboard() {
         const hour = new Date().getHours(); const greet = hour < 12 ? 'Buongiorno ✨' : hour < 18 ? 'Buon pomeriggio ☀️' : 'Buonasera 🌙';
         this.setElText('greetingTitle', greet); this.setElText('greetingDate', new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
@@ -1503,11 +1725,46 @@
         this.setElText('smartInsightText', txCount > 0 ? `Hai ${txCount} movimenti, ${this.state.inventory.length} beni${lastWeight ? ` e ultimo peso a ${lastWeight.value} kg` : ''}.` : `Tocca + per registrare i tuoi dati.`);
 
         const medItems = this.state.healthMedical.slice(0, 4);
-        this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + this.escapeHTML(t.therapy) : '🩺 ' + this.escapeHTML(t.title)}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + this.escapeHTML(t.notes) : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
-        const upcoming = [...this.state.calendarTasks].filter(t => !t.done).sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(0, 5);
-        this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${this.escapeHTML(t.title)}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in sospeso.</div>');
+        this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => {
+          const sid = this.safeJSArg(t.id);
+          return `<div class="list-row" style="border-left:3px solid var(--accent-primary);">
+            <div style="flex:1; min-width:0;"><strong>${t.therapy ? '💊 ' + this.escapeHTML(t.therapy) : '🩺 ' + this.escapeHTML(t.title)}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + this.escapeHTML(t.notes) : ''}</small></div>
+            <button type="button" class="btn btn-sm btn-danger" style="padding:0.2rem 0.45rem;" onclick="App.deleteMedicalRecord('${sid}')" title="Elimina">✕</button>
+          </div>`;
+        }).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
+
+        // Unisce sia i Task dell'Agenda non completati sia le Manutenzioni Casa "In attesa" così puoi gestirle e cancellarle direttamente dalla Dashboard!
+        const combinedUpcoming = [
+          ...this.state.calendarTasks.filter(t => !t.done).map(t => ({
+            id: t.id, source: 'task', date: t.date, title: t.title, badge: t.type || 'Task', badgeClass: t.priority === 'Alta' ? 'badge-danger' : 'badge-info'
+          })),
+          ...this.state.maintenances.filter(m => m.status !== 'Completata').map(m => ({
+            id: m.id, source: 'maint', date: m.dueDate, title: m.title, badge: `🔧 ${m.category}`, badgeClass: 'badge-warning'
+          }))
+        ].sort((a, b) => (a.date || '').localeCompare(b.date || '')).slice(0, 8);
+
+        this.setElHTML('dashUpcomingTasks', combinedUpcoming.length ? combinedUpcoming.map(item => {
+          const sid = this.safeJSArg(item.id);
+          const toggleFn = item.source === 'task' ? `App.toggleCalendarTask('${sid}')` : `App.toggleMaintenanceStatus('${sid}')`;
+          const deleteFn = item.source === 'task' ? `App.deleteCalendarTask('${sid}')` : `App.deleteGeneralMaintenance('${sid}')`;
+          return this.createSwipeRow(
+            `<div style="display:flex; align-items:center; gap:0.65rem; min-width:0;">
+              <button type="button" class="btn btn-sm" style="width:28px; height:28px; padding:0; border-radius:50%; flex-shrink:0;" onclick="event.stopPropagation(); ${toggleFn}" title="Segna completato">✓</button>
+              <div style="min-width:0;">
+                <span class="stat-label">${this.formatDate(item.date)}</span><br>
+                <strong style="word-break:break-word;">${this.escapeHTML(item.title)}</strong>
+              </div>
+            </div>
+            <span class="badge ${item.badgeClass}" style="flex-shrink:0;">${this.escapeHTML(item.badge)}</span>`,
+            deleteFn
+          );
+        }).join('') : '<div class="list-row stat-label">Nessuna attività o manutenzione in sospeso.</div>');
         
-        this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${this.escapeHTML(h.name)}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
+        this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => {
+          const sid = this.safeJSArg(h.id);
+          const isDone = h.lastDone === todayStr;
+          return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button type="button" class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${sid}')">${isDone ? '✓' : ''}</button><strong>${this.escapeHTML(h.name)}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button type="button" class="btn btn-sm btn-danger" style="padding:0.2rem 0.45rem;" onclick="App.deleteHabit('${sid}')">✕</button></div></div>`;
+        }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
         this.renderFinanceChart();
       },
 
@@ -1555,14 +1812,14 @@
           if (dateStr === todayStr) el.classList.add('today');
           if (dateStr === selStr) el.classList.add('active');
           el.innerHTML = `<div>${d}</div>`;
-          if (this.state.calendarTasks.some(t => t.date === dateStr) || this.state.journal.some(j => j.date === dateStr)) {
-            el.innerHTML += `<div class="cal-dot"></div>`;
-          }
+          const hasEvent = this.state.calendarTasks.some(t => t.date === dateStr) ||
+                           this.state.maintenances.some(mt => mt.dueDate === dateStr && mt.status !== 'Completata') ||
+                           this.state.journal.some(j => j.date === dateStr);
+          if (hasEvent) el.innerHTML += `<div class="cal-dot"></div>`;
           el.onclick = () => this.selectDate(dateStr);
           grid.appendChild(el);
         }
 
-        // Carica la nota del diario per il giorno selezionato
         const dayJournal = this.state.journal.find(j => j.date === selStr);
         const jTextEl = document.getElementById('journalText');
         const jMoodEl = document.getElementById('journalMood');
@@ -1572,7 +1829,20 @@
         this.renderCalendarTasks();
         this.renderJournalHistory();
       },
-      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.toLocalISO(this.selectedDate), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value, done: false }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
+      addCalendarTask(e) {
+        e.preventDefault();
+        this.state.calendarTasks.push({
+          id: this.generateId(),
+          date: this.toLocalISO(this.selectedDate),
+          title: document.getElementById('calTaskTitle').value.trim(),
+          type: document.getElementById('calTaskType').value,
+          priority: document.getElementById('calTaskPriority').value,
+          done: false
+        });
+        this.save();
+        document.getElementById('calTaskTitle').value = '';
+        this.showToast('Task aggiunto al giorno selezionato!');
+      },
       toggleCalendarTask(id) {
         const task = this.state.calendarTasks.find(t => String(t.id) === String(id));
         if (task) {
@@ -1581,43 +1851,87 @@
           this.save();
         }
       },
-      deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
+      editCalendarTask(id) {
+        const task = this.state.calendarTasks.find(t => String(t.id) === String(id));
+        if (!task) return;
+        const newTitle = prompt('Modifica testo attività:', task.title);
+        if (newTitle !== null && newTitle.trim() !== '') {
+          task.title = newTitle.trim();
+          this.save();
+          this.showToast('Attività aggiornata!');
+        }
+      },
+      deleteCalendarTask(id) {
+        this.state.calendarTasks = this.state.calendarTasks.filter(t => String(t.id) !== String(id));
+        this.save();
+        this.showToast('Attività eliminata.', 'info');
+      },
       renderCalendarTasks() {
         const selStr = this.toLocalISO(this.selectedDate);
-        const tasks = this.state.calendarTasks.filter(t => t.date === selStr);
-        this.setElText('calTaskCountBadge', tasks.length);
-        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(
-          `<div style="display:flex; align-items:center; gap:0.65rem; opacity:${t.done ? 0.55 : 1};">
-            <button type="button" class="btn btn-sm ${t.done ? 'btn-primary' : ''}" style="width:28px; height:28px; padding:0; border-radius:50%; flex-shrink:0;" onclick="event.stopPropagation(); App.toggleCalendarTask('${t.id}')">${t.done ? '✓' : ''}</button>
-            <div>
-              <span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span>
-              <div style="margin-top:4px; font-weight:600; ${t.done ? 'text-decoration:line-through;' : ''}">${this.escapeHTML(t.title)}</div>
-            </div>
-          </div>`,
-          `App.deleteCalendarTask('${t.id}')`
-        )).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
+        const dayTasks = this.state.calendarTasks.filter(t => t.date === selStr);
+        const dayMaint = this.state.maintenances.filter(m => m.dueDate === selStr);
+        this.setElText('calTaskCountBadge', dayTasks.length + dayMaint.length);
+
+        const tasksHTML = dayTasks.map(t => {
+          const sid = this.safeJSArg(t.id);
+          return this.createSwipeRow(
+            `<div style="display:flex; align-items:center; gap:0.65rem; opacity:${t.done ? 0.55 : 1}; min-width:0;">
+              <button type="button" class="btn btn-sm ${t.done ? 'btn-primary' : ''}" style="width:28px; height:28px; padding:0; border-radius:50%; flex-shrink:0;" onclick="event.stopPropagation(); App.toggleCalendarTask('${sid}')">${t.done ? '✓' : ''}</button>
+              <div style="min-width:0;">
+                <span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${this.escapeHTML(t.type)}</span>
+                <div style="margin-top:4px; font-weight:600; word-break:break-word; ${t.done ? 'text-decoration:line-through;' : ''}">${this.escapeHTML(t.title)}</div>
+              </div>
+            </div>`,
+            `App.deleteCalendarTask('${sid}')`,
+            `<button type="button" class="btn btn-sm" style="padding:0.25rem 0.5rem;" onclick="event.stopPropagation(); App.editCalendarTask('${sid}')" title="Modifica">✏️</button>`
+          );
+        });
+
+        const maintHTML = dayMaint.map(m => {
+          const sid = this.safeJSArg(m.id);
+          const isDone = m.status === 'Completata';
+          return this.createSwipeRow(
+            `<div style="display:flex; align-items:center; gap:0.65rem; opacity:${isDone ? 0.55 : 1}; min-width:0;">
+              <button type="button" class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:28px; height:28px; padding:0; border-radius:50%; flex-shrink:0;" onclick="event.stopPropagation(); App.toggleMaintenanceStatus('${sid}')">${isDone ? '✓' : '🔧'}</button>
+              <div style="min-width:0;">
+                <span class="badge badge-warning">Manutenzione • ${this.escapeHTML(m.category)}</span>
+                <div style="margin-top:4px; font-weight:600; word-break:break-word; ${isDone ? 'text-decoration:line-through;' : ''}">${this.escapeHTML(m.title)}</div>
+              </div>
+            </div>`,
+            `App.deleteGeneralMaintenance('${sid}')`,
+            `<button type="button" class="btn btn-sm" style="padding:0.25rem 0.5rem;" onclick="event.stopPropagation(); App.editGeneralMaintenance('${sid}')" title="Modifica">✏️</button>`
+          );
+        });
+
+        const combined = [...tasksHTML, ...maintHTML].join('');
+        this.setElHTML('calendarTasksList', combined || '<div class="list-row stat-label">Nessuna attività programmata in questa data.</div>');
       },
       saveJournalEntry(e) {
         e.preventDefault();
         const date = this.toLocalISO(this.selectedDate);
         const text = document.getElementById('journalText').value.trim();
         if (!text) return;
-        const entry = { date, mood: document.getElementById('journalMood').value, text };
         const idx = this.state.journal.findIndex(j => j.date === date);
-        if (idx >= 0) this.state.journal[idx] = entry;
-        else this.state.journal.push(entry);
+        if (idx >= 0) {
+          this.state.journal[idx].mood = document.getElementById('journalMood').value;
+          this.state.journal[idx].text = text;
+        } else {
+          this.state.journal.push({ id: this.generateId(), date, mood: document.getElementById('journalMood').value, text });
+        }
         this.save();
         this.showToast('Nota del diario salvata!');
       },
-      deleteJournalEntry(date) {
-        if (confirm('Eliminare questa pagina del diario?')) {
-          this.state.journal = this.state.journal.filter(j => j.date !== date);
-          this.save();
-        }
+      deleteJournalEntry(idOrDate) {
+        this.state.journal = this.state.journal.filter(j => String(j.id) !== String(idOrDate) && String(j.date) !== String(idOrDate));
+        this.save();
+        this.showToast('Pagina del diario eliminata.', 'info');
       },
       renderJournalHistory() {
         const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 10);
-        this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start; cursor:pointer;" onclick="App.selectDate('${j.date}')"><div style="flex:1; min-width:0;"><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${this.escapeHTML(j.text)}</div></div><button type="button" class="btn btn-sm btn-danger" style="padding:0.2rem 0.45rem;" onclick="event.stopPropagation(); App.deleteJournalEntry('${j.date}')">✕</button></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>');
+        this.setElHTML('journalHistoryList', hist.length ? hist.map(j => {
+          const sDate = this.safeJSArg(j.date);
+          return `<div class="list-row" style="align-items:flex-start; cursor:pointer;" onclick="App.selectDate('${sDate}')"><div style="flex:1; min-width:0;"><strong>${this.formatDate(j.date)}</strong> <span class="badge">${this.escapeHTML(j.mood)}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${this.escapeHTML(j.text)}</div></div><button type="button" class="btn btn-sm btn-danger" style="padding:0.2rem 0.45rem;" onclick="event.stopPropagation(); App.deleteJournalEntry('${sDate}')">✕</button></div>`;
+        }).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>');
       },
 
       // === GARAGE OS ===
@@ -1654,10 +1968,6 @@
           this.loadGarageConfig();
         }
         this.openModal('garageConfigModal');
-      },
-
-      addVehicle() {
-        this.openGarageEditModal(true);
       },
 
       deleteActiveVehicle() {
@@ -1754,10 +2064,9 @@
       },
 
       deleteGarageMaint(id) {
-        if (confirm("Eliminare questo intervento dallo storico?")) {
-          this.state.garageMaint = this.state.garageMaint.filter(m => String(m.id) !== String(id));
-          this.save();
-        }
+        this.state.garageMaint = this.state.garageMaint.filter(m => String(m.id) !== String(id));
+        this.save();
+        this.showToast('Intervento rimosso dallo storico.', 'info');
       },
 
       renderGarage() {
@@ -1791,25 +2100,19 @@
         if (gMaintKmInput && !gMaintKmInput.value) gMaintKmInput.placeholder = `Km (att: ${safeKm})`;
 
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setHours(12, 0, 0, 0);
 
         const setTrafficLight = (idDate, idTl, dateStr) => {
           const el = document.getElementById(idTl);
           if (!el) return;
           el.className = 'tl-indicator';
-          if (!dateStr) {
+          const target = this.parseLocalDate(dateStr);
+          if (!target) {
             this.setElText(idDate, 'Non impostata');
             el.classList.add('tl-red');
             return;
           }
-          const target = new Date(dateStr);
-          if (isNaN(target)) {
-            this.setElText(idDate, 'Data errata');
-            el.classList.add('tl-red');
-            return;
-          }
-          target.setHours(0, 0, 0, 0);
-          const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+          const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
           const formatted = target.toLocaleDateString('it-IT');
 
           if (diffDays < 0) {
@@ -1831,7 +2134,7 @@
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         let fuelCost = 0;
-        this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category || '').toLowerCase().includes('auto') && new Date(t.date) >= thirtyDaysAgo).forEach(t => {
+        this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category || '').toLowerCase().includes('auto') && (this.parseLocalDate(t.date) || new Date(0)) >= thirtyDaysAgo).forEach(t => {
           fuelCost += (Number(t.amount) || 0);
         });
         this.setElText('garageFuelMonth', this.formatMoney(fuelCost));
@@ -1841,16 +2144,17 @@
           .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
         this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => {
+          const sid = this.safeJSArg(m.id);
           const kmLabel = Number(m.kmAtMaint) > 0 ? `<span class="badge badge-info">${Number(m.kmAtMaint).toLocaleString('it-IT')} km</span>` : '';
           return this.createSwipeRow(
             `<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${this.escapeHTML(m.title)}</strong> ${kmLabel}</div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong></div>`,
-            `App.deleteGarageMaint('${m.id}')`
+            `App.deleteGarageMaint('${sid}')`
           );
         }).join('') : '<div class="list-row stat-label">Nessun intervento registrato per questo veicolo.</div>');
       },
 
       // === FINANZE WALLET ===
-      moveAccount(id, dir) { const idx = this.state.accounts.findIndex(a => a.id === id); if (idx < 0) return; const newIdx = idx + dir; if (newIdx < 0 || newIdx >= this.state.accounts.length) return; const temp = this.state.accounts[idx]; this.state.accounts[idx] = this.state.accounts[newIdx]; this.state.accounts[newIdx] = temp; this.save(); },
+      moveAccount(id, dir) { const idx = this.state.accounts.findIndex(a => String(a.id) === String(id)); if (idx < 0) return; const newIdx = idx + dir; if (newIdx < 0 || newIdx >= this.state.accounts.length) return; const temp = this.state.accounts[idx]; this.state.accounts[idx] = this.state.accounts[newIdx]; this.state.accounts[newIdx] = temp; this.save(); },
       deleteFinanceAccount(id) {
         const acc = this.state.accounts.find(a => String(a.id) === String(id));
         if (!acc) return;
@@ -1861,26 +2165,30 @@
           this.save();
           this.populateAccountSelects();
           this.renderFinance();
+          this.showToast('Conto eliminato.', 'info');
         }
       },
       populateAccountSelects() {
-        const html = this.state.accounts.map(a => `<option value="${a.id}">${this.escapeHTML(a.name)} (${this.formatMoney(a.balance)})</option>`).join('');
+        const html = this.state.accounts.map(a => `<option value="${this.escapeHTML(a.id)}">${this.escapeHTML(a.name)} (${this.formatMoney(a.balance)})</option>`).join('');
         this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html);
         this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html);
         this.setElHTML('reconcileAccountSelect', html);
         const filterEl = document.getElementById('txFilterAccount');
         const currentFilter = filterEl?.value || 'ALL';
-        this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${this.escapeHTML(a.name)}</option>`).join(''));
+        this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${this.escapeHTML(a.id)}">${this.escapeHTML(a.name)}</option>`).join(''));
         if (filterEl) {
           filterEl.value = this.state.accounts.some(a => String(a.id) === String(currentFilter)) ? currentFilter : 'ALL';
         }
       },
-      selectWalletCard(accId) { const filterEl = document.getElementById('txFilterAccount'); if (!filterEl) return; filterEl.value = (filterEl.value === accId) ? 'ALL' : accId; this.renderFinance(); },
+      selectWalletCard(accId) { const filterEl = document.getElementById('txFilterAccount'); if (!filterEl) return; filterEl.value = (String(filterEl.value) === String(accId)) ? 'ALL' : accId; this.renderFinance(); },
       renderFinance() {
         const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0); this.setElText('finTotalBalanceBadge', this.formatMoney(total));
         const fAcc = document.getElementById('txFilterAccount')?.value || 'ALL';
         
-        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === a.id ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${this.escapeHTML(a.name)}</span><div class="wallet-arrows">${idx > 0 ? `<button type="button" onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}${idx < this.state.accounts.length - 1 ? `<button type="button" onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}<button type="button" onclick="event.stopPropagation(); App.deleteFinanceAccount('${a.id}')" title="Elimina conto">✕</button></div></div><div><div class="sensitive" style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div></div></div>`).join('') : '<div class="stat-label">Nessun conto presente. Aggiungine uno qui sotto.</div>');
+        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => {
+          const sid = this.safeJSArg(a.id);
+          return `<div class="wallet-card wallet-card-${idx % 5} ${String(fAcc) === String(a.id) ? 'selected' : ''}" onclick="App.selectWalletCard('${sid}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${this.escapeHTML(a.name)}</span><div class="wallet-arrows">${idx > 0 ? `<button type="button" onclick="event.stopPropagation(); App.moveAccount('${sid}', -1)">◀</button>` : ''}${idx < this.state.accounts.length - 1 ? `<button type="button" onclick="event.stopPropagation(); App.moveAccount('${sid}', 1)">▶</button>` : ''}<button type="button" onclick="event.stopPropagation(); App.deleteFinanceAccount('${sid}')" title="Elimina conto">✕</button></div></div><div><div class="sensitive" style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${this.escapeHTML(a.type || 'Conto')} • Tocca per filtrare</div></div></div>`;
+        }).join('') : '<div class="stat-label">Nessun conto presente. Aggiungine uno qui sotto.</div>');
         
         let filtered = [...this.state.transactions];
         if (fAcc !== 'ALL') filtered = filtered.filter(t => String(t.accountId) === String(fAcc) || String(t.targetAccountId) === String(fAcc));
@@ -1888,24 +2196,28 @@
         
         this.setElText('txCountBadge', filtered.length);
         this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => { 
+          const sid = this.safeJSArg(tx.id);
           const acc = this.state.accounts.find(a => String(a.id) === String(tx.accountId));
           const trgAcc = tx.targetAccountId ? this.state.accounts.find(a => String(a.id) === String(tx.targetAccountId)) : null;
           const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; 
           const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '⇄ '; 
-          const imgHtml = tx.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('tx', '${tx.id}')">📎 Scontrino</button>` : '';
+          const imgHtml = tx.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('tx', '${sid}')">📎 Scontrino</button>` : '';
           const accLabel = tx.type === 'TRANSFER' ? `${acc ? this.escapeHTML(acc.name) : 'Origine'} → ${trgAcc ? this.escapeHTML(trgAcc.name) : 'Destinazione'}` : (acc ? this.escapeHTML(acc.name) : 'Conto');
           return this.createSwipeRow(
             `<div style="min-width:0;"><span class="stat-label">${this.formatDate(tx.date)} • <strong>${accLabel}</strong></span><br><strong style="word-break:break-word;">${this.escapeHTML(tx.desc || 'Movimento')}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${this.escapeHTML(tx.category || 'Altro')}</span></div><div class="sensitive" style="text-align:right; flex-shrink:0;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace; font-size:0.95rem;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`,
-            `App.deleteTransaction('${tx.id}')`
+            `App.deleteTransaction('${sid}')`
           ); 
         }).join('') : '<div class="list-row stat-label">Nessuna transazione registrata.</div>');
 
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0); this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
-        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${this.escapeHTML(s.name)}</strong><br><small class="stat-label">Attivo dal: ${this.formatDate(s.next)}</small></div><strong class="sensitive">${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
+        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => {
+          const sid = this.safeJSArg(s.id);
+          return this.createSwipeRow(`<div><strong>🔄 ${this.escapeHTML(s.name)}</strong><br><small class="stat-label">Attivo dal: ${this.formatDate(s.next)}</small></div><strong class="sensitive">${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${sid}')`);
+        }).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
         this.renderExpenseCategoryChart();
       },
       renderExpenseCategoryChart() { const ctx = document.getElementById('expenseCatChart'); if (!ctx || typeof Chart === 'undefined') return; const catTotals = {}; this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => { const c = t.category || 'Altro'; catTotals[c] = (catTotals[c] || 0) + t.amount; }); const labels = Object.keys(catTotals); const data = Object.values(catTotals); if (this.charts.expCat) this.charts.expCat.destroy(); this.charts.expCat = new Chart(ctx, { type: 'doughnut', data: { labels: labels.length ? labels : ['Nessuna spesa'], datasets: [{ data: data.length ? data : [1], backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } } } } }); },
-      addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
+      addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value.trim(), balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); this.showToast('Conto aggiunto!'); },
       toggleTransferFields() {
         const isTransfer = document.getElementById('txType')?.value === 'TRANSFER';
         const trgEl = document.getElementById('txTargetAccount');
@@ -1925,16 +2237,16 @@
           if (!trgId) return this.showToast('Seleziona un conto di destinazione per il giroconto', 'warning');
           if (srcId === trgId) return this.showToast('I conti di origine e destinazione devono essere diversi', 'warning');
         }
-        const src = this.state.accounts.find(x => x.id === srcId); 
+        const src = this.state.accounts.find(x => String(x.id) === String(srcId)); 
         let fileData = null; if (document.getElementById('txFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('txFile').files[0]); } catch (err) {} }
         const recurrence = document.getElementById('txRecurrence')?.value || 'Singola';
-        const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || (t === 'TRANSFER' ? 'Giroconto' : 'Generale'), date: document.getElementById('txDate').value, recurrence, timestamp: new Date().toISOString(), fileData }; 
+        const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value.trim(), category: document.getElementById('txCategory').value.trim() || (t === 'TRANSFER' ? 'Giroconto' : 'Generale'), date: document.getElementById('txDate').value, recurrence, timestamp: new Date().toISOString(), fileData }; 
         if (src) {
           if (t === 'EXPENSE') src.balance -= a;
           else if (t === 'INCOME') src.balance += a;
           else if (t === 'TRANSFER') {
             src.balance -= a;
-            const trg = this.state.accounts.find(x => x.id === trgId);
+            const trg = this.state.accounts.find(x => String(x.id) === String(trgId));
             if (trg) trg.balance += a;
             tx.targetAccountId = trgId;
           }
@@ -1949,10 +2261,28 @@
         this.renderFinance();
         this.showToast('Transazione registrata!');
       },
-      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: this.toLocalISO(), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
-      deleteTransaction(id) { const tx = this.state.transactions.find(t => String(t.id) === String(id)); if (!tx || !confirm('Eliminare movimento?')) return; const src = this.state.accounts.find(a => String(a.id) === String(tx.accountId)); if (src) { if (tx.type === 'EXPENSE') src.balance += tx.amount; else if (tx.type === 'INCOME') src.balance -= tx.amount; else if (tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => String(a.id) === String(tx.targetAccountId)); if (trg) trg.balance -= tx.amount; } } this.state.transactions = this.state.transactions.filter(t => String(t.id) !== String(id)); this.save(); this.populateAccountSelects(); this.renderFinance(); },
-      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: this.toLocalISO() }); this.save(); e.target.reset(); this.renderFinance(); },
-      deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
+      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => String(a.id) === String(id)); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: this.toLocalISO(), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); this.showToast('Saldo conto allineato!'); },
+      deleteTransaction(id) {
+        const tx = this.state.transactions.find(t => String(t.id) === String(id));
+        if (!tx) return;
+        const src = this.state.accounts.find(a => String(a.id) === String(tx.accountId));
+        if (src) {
+          if (tx.type === 'EXPENSE') src.balance += tx.amount;
+          else if (tx.type === 'INCOME') src.balance -= tx.amount;
+          else if (tx.type === 'TRANSFER') {
+            src.balance += tx.amount;
+            const trg = this.state.accounts.find(a => String(a.id) === String(tx.targetAccountId));
+            if (trg) trg.balance -= tx.amount;
+          }
+        }
+        this.state.transactions = this.state.transactions.filter(t => String(t.id) !== String(id));
+        this.save();
+        this.populateAccountSelects();
+        this.renderFinance();
+        this.showToast('Movimento eliminato e saldo ripristinato.', 'info');
+      },
+      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value.trim(), cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: this.toLocalISO() }); this.save(); e.target.reset(); this.renderFinance(); this.showToast('Abbonamento aggiunto!'); },
+      deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => String(s.id) !== String(id)); this.save(); this.renderFinance(); this.showToast('Abbonamento rimosso.', 'info'); },
 
       // === SALUTE OS ===
       editNutritionGoals() {
@@ -1971,15 +2301,15 @@
           this.showToast('Obiettivi nutrizionali aggiornati!');
         }
       },
-      populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${this.escapeHTML(f.name)} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
-      AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => f.id === foodId); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
-      addNutritionLog(e) { e.preventDefault(); const selectedDay = document.getElementById('nutriDate').value || this.toLocalISO(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: selectedDay, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = selectedDay; this.renderHealth(); },
-      deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = this.toLocalISO(); this.renderHealth(); },
-      deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
+      populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${this.escapeHTML(f.id)}">${this.escapeHTML(f.name)} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
+      AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => String(f.id) === String(foodId)); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
+      addNutritionLog(e) { e.preventDefault(); const selectedDay = document.getElementById('nutriDate').value || this.toLocalISO(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value.trim(), date: selectedDay, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = selectedDay; this.renderHealth(); this.showToast('Pasto registrato!'); },
+      deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => String(x.id) !== String(id)); this.save(); this.renderHealth(); this.showToast('Pasto rimosso.', 'info'); },
+      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = this.toLocalISO(); this.renderHealth(); this.showToast('Peso salvato!'); },
+      deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => String(x.id) !== String(id)); this.save(); this.renderHealth(); this.showToast('Registrazione peso rimossa.', 'info'); },
       toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
-      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.setElText('medFileLabel', '📄 Allega Referto PDF o Foto'); document.getElementById('medDate').value = this.toLocalISO(); this.toggleMedFields(); this.renderHealth(); },
-      deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
+      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value.trim(), notes: document.getElementById('medNotes').value.trim(), therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value.trim() : '', fileData }); this.save(); e.target.reset(); this.setElText('medFileLabel', '📄 Allega Referto PDF o Foto'); document.getElementById('medDate').value = this.toLocalISO(); this.toggleMedFields(); this.renderHealth(); this.showToast('Record salvato in cartella clinica!'); },
+      deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => String(x.id) !== String(id)); this.save(); this.renderHealth(); this.showToast('Record clinico eliminato.', 'info'); },
       renderHealth() {
         const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||''));
         const activeNutriDate = document.getElementById('nutriDate')?.value || this.toLocalISO();
@@ -1987,72 +2317,213 @@
         const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)), totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)), totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)), totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)), goalKcal = this.state.nutritionGoals?.kcal || 2100;
         this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal ✏️`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
         this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`); this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`); this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
-        this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => this.createSwipeRow(`<div><strong>${this.escapeHTML(n.meal)}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div>`, `App.deleteNutritionLog('${n.id}')`)).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
-        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => this.createSwipeRow(`<div><strong class="sensitive">⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
+        this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => {
+          const sid = this.safeJSArg(n.id);
+          return this.createSwipeRow(`<div><strong>${this.escapeHTML(n.meal)}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div>`, `App.deleteNutritionLog('${sid}')`);
+        }).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
+        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => {
+          const sid = this.safeJSArg(w.id);
+          return this.createSwipeRow(`<div><strong class="sensitive">⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${sid}')`);
+        }).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
         const ctxW = document.getElementById('weightChart'); if (ctxW && typeof Chart !== 'undefined') { const sortedW = [...this.state.healthWeight].sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(-10); if (this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w => this.formatDate(w.date).slice(0, 5)), datasets: [{ label: 'Peso', data: sortedW.map(w => w.value), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.2)', tension: 0.35, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
-        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => { const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${this.escapeHTML(m.therapy)}</div>` : ''; const file = m.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('med', '${m.id}')">📎 Allegato</button>` : ''; return this.createSwipeRow(`<div class="sensitive"><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${this.escapeHTML(m.title)}</strong> ${file}${extra}<div class="stat-label">${this.escapeHTML(m.notes || '')}</div></div>`, `App.deleteMedicalRecord('${m.id}')`); }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
+        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => {
+          const sid = this.safeJSArg(m.id);
+          const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${this.escapeHTML(m.therapy)}</div>` : '';
+          const file = m.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('med', '${sid}')">📎 Allegato</button>` : '';
+          return this.createSwipeRow(`<div class="sensitive"><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${this.escapeHTML(m.title)}</strong> ${file}${extra}<div class="stat-label">${this.escapeHTML(m.notes || '')}</div></div>`, `App.deleteMedicalRecord('${sid}')`);
+        }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
       },
 
       // === HUB EXTRA: INVENTARIO, MANUTENZIONI, RICERCA, GALLERIA ===
-      populateCategorySelects() { const cats = Object.keys(this.state.settings.inventoryCategories); const html = cats.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('invCategory', html); this.setElHTML('invFilterCat', '<option value="ALL">Tutte</option>' + html); this.updateInvSubcategories(); },
-      updateInvSubcategories() { const cat = document.getElementById('invCategory')?.value; const subs = this.state.settings.inventoryCategories[cat] || ['Generale']; this.setElHTML('invSubcategory', subs.map(s => `<option value="${s}">${s}</option>`).join('')); },
+      populateCategorySelects() {
+        const cats = Object.keys(this.state.settings.inventoryCategories);
+        const curFilter = document.getElementById('invFilterCat')?.value || 'ALL';
+        const html = cats.map(c => `<option value="${this.escapeHTML(c)}">${this.escapeHTML(c)}</option>`).join('');
+        this.setElHTML('invCategory', html);
+        this.setElHTML('invFilterCat', '<option value="ALL">Tutte</option>' + html);
+        const filterEl = document.getElementById('invFilterCat');
+        if (filterEl && (curFilter === 'ALL' || cats.includes(curFilter))) filterEl.value = curFilter;
+        this.updateInvSubcategories();
+      },
+      updateInvSubcategories() {
+        const cat = document.getElementById('invCategory')?.value;
+        const subs = this.state.settings.inventoryCategories[cat] || ['Generale'];
+        this.setElHTML('invSubcategory', subs.map(s => `<option value="${this.escapeHTML(s)}">${this.escapeHTML(s)}</option>`).join(''));
+      },
       async addInventoryItem(e) { 
         e.preventDefault(); 
         let fileData = null; if (document.getElementById('invFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('invFile').files[0]); } catch (err) {} }
-        const locationVal = document.getElementById('invLocation')?.value || '';
-        this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: locationVal, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString(), fileData }); 
+        const locationVal = (document.getElementById('invLocation')?.value || '').trim();
+        this.state.inventory.push({
+          id: this.generateId(),
+          type: document.getElementById('invType').value,
+          name: document.getElementById('invName').value.trim(),
+          category: document.getElementById('invCategory').value,
+          subcategory: document.getElementById('invSubcategory').value,
+          price: parseFloat(document.getElementById('invPrice').value) || 0,
+          date: document.getElementById('invDate').value,
+          warranty: document.getElementById('invWarranty').value,
+          location: locationVal,
+          notes: document.getElementById('invNotes').value.trim(),
+          addedAt: new Date().toISOString(),
+          fileData
+        }); 
         this.save(); e.target.reset(); this.setElText('invFileLabel', '📷 Allega Foto'); document.getElementById('invDate').value = this.toLocalISO(); this.populateCategorySelects(); this.renderInventory(); this.showToast('Bene salvato!');
       },
-      deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
+      editInventoryItem(id) {
+        const item = this.state.inventory.find(i => String(i.id) === String(id));
+        if (!item) return;
+        const newName = prompt('Modifica nome oggetto:', item.name);
+        if (newName === null || !newName.trim()) return;
+        const newLoc = prompt('Modifica posizione (es. Studio, Garage):', item.location || '');
+        const newNotes = prompt('Modifica note/seriale:', item.notes || '');
+        item.name = newName.trim();
+        if (newLoc !== null) item.location = newLoc.trim();
+        if (newNotes !== null) item.notes = newNotes.trim();
+        this.save();
+        this.showToast('Oggetto aggiornato!');
+      },
+      deleteInventoryItem(id) {
+        this.state.inventory = this.state.inventory.filter(i => String(i.id) !== String(id));
+        this.save();
+        this.showToast('Oggetto eliminato dall\'inventario.', 'info');
+      },
       renderInventory() {
         const filterCat = document.getElementById('invFilterCat')?.value || 'ALL';
-        const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase();
+        const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase().trim();
         let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? (i.type === 'Garanzia' || Boolean(i.warranty)) : true);
         if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat);
-        if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search) || (i.location||'').toLowerCase().includes(search));
+        if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search) || (i.location||'').toLowerCase().includes(search) || (i.category||'').toLowerCase().includes(search));
         
-        const today = new Date(); today.setHours(0,0,0,0);
+        const today = new Date(); today.setHours(12,0,0,0);
         this.setElHTML('inventoryList', filtered.map(item => {
-          const imgHtml = item.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('inv', '${item.id}')">📎 Foto</button>` : '';
+          const sid = this.safeJSArg(item.id);
+          const imgHtml = item.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('inv', '${sid}')">📎 Foto</button>` : '';
           let warrantyBadge = '';
           if (item.warranty) {
-            const wDate = new Date(item.warranty);
-            const diffDays = Math.ceil((wDate - today) / (1000 * 60 * 60 * 24));
-            const bClass = diffDays < 0 ? 'badge-danger' : diffDays <= 30 ? 'badge-warning' : 'badge-success';
-            const bText = diffDays < 0 ? `Garanzia scaduta (${this.formatDate(item.warranty)})` : `Garanzia fino al ${this.formatDate(item.warranty)}`;
-            warrantyBadge = `<span class="badge ${bClass}">${bText}</span>`;
+            const wDate = this.parseLocalDate(item.warranty);
+            if (wDate) {
+              const diffDays = Math.round((wDate - today) / (1000 * 60 * 60 * 24));
+              const bClass = diffDays < 0 ? 'badge-danger' : diffDays <= 30 ? 'badge-warning' : 'badge-success';
+              const bText = diffDays < 0 ? `Garanzia scaduta (${this.formatDate(item.warranty)})` : `Garanzia fino al ${this.formatDate(item.warranty)}`;
+              warrantyBadge = `<span class="badge ${bClass}">${bText}</span>`;
+            }
           }
           return this.createSwipeRow(
-            `<div><strong>📦 ${this.escapeHTML(item.name)}</strong> ${imgHtml} <span class="badge">${this.escapeHTML(item.category)}</span> ${warrantyBadge}<br><small class="stat-label">${item.date ? 'Acq: ' + this.formatDate(item.date) + ' • ' : ''}${this.escapeHTML(item.location || '')} ${item.notes ? '— ' + this.escapeHTML(item.notes) : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`,
-            `App.deleteInventoryItem('${item.id}')`
+            `<div style="min-width:0;"><strong>📦 ${this.escapeHTML(item.name)}</strong> ${imgHtml} <span class="badge">${this.escapeHTML(item.category)}</span> ${warrantyBadge}<br><small class="stat-label">${item.date ? 'Acq: ' + this.formatDate(item.date) + ' • ' : ''}${this.escapeHTML(item.location || '')} ${item.notes ? '— ' + this.escapeHTML(item.notes) : ''}</small></div><div style="flex-shrink:0;"><strong>${this.formatMoney(item.price)}</strong></div>`,
+            `App.deleteInventoryItem('${sid}')`,
+            `<button type="button" class="btn btn-sm" style="padding:0.25rem 0.5rem;" onclick="event.stopPropagation(); App.editInventoryItem('${sid}')" title="Modifica">✏️</button>`
           );
         }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>');
       },
 
-      populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('maintCategory', html); this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html); },
-      addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); document.getElementById('maintDueDate').value = this.toLocalISO(); this.renderGeneralMaintenances(); },
+      // === MANUTENZIONI CASA / ANIMALI / VARIE ===
+      addMaintenanceCategory() {
+        const newCat = prompt('Inserisci il nome della nuova categoria Manutenzioni (es. Coniglio, Giardino, Piscina):');
+        if (newCat && newCat.trim()) {
+          const clean = newCat.trim();
+          if (!this.state.settings.maintenanceCategories.includes(clean)) {
+            this.state.settings.maintenanceCategories.push(clean);
+            this.save();
+            this.populateMaintenanceSelects();
+            this.showToast(`Categoria "${clean}" aggiunta!`);
+          }
+        }
+      },
+      populateMaintenanceSelects() {
+        const curFilter = document.getElementById('maintFilterCat')?.value || 'ALL';
+        const curFormCat = document.getElementById('maintCategory')?.value;
+        const cats = this.state.settings.maintenanceCategories;
+        const html = cats.map(c => `<option value="${this.escapeHTML(c)}">${this.escapeHTML(c)}</option>`).join('');
+        this.setElHTML('maintCategory', html);
+        this.setElHTML('maintFilterCat', '<option value="ALL">Tutte le Categorie</option>' + html);
+        const filterEl = document.getElementById('maintFilterCat');
+        if (filterEl && (curFilter === 'ALL' || cats.includes(curFilter))) filterEl.value = curFilter;
+        const formEl = document.getElementById('maintCategory');
+        if (formEl && curFormCat && cats.includes(curFormCat)) formEl.value = curFormCat;
+      },
+      addGeneralMaintenance(e) {
+        e.preventDefault();
+        this.state.maintenances.push({
+          id: this.generateId(),
+          title: document.getElementById('maintTitle').value.trim(),
+          category: document.getElementById('maintCategory').value,
+          dueDate: document.getElementById('maintDueDate').value || this.toLocalISO(),
+          cost: parseFloat(document.getElementById('maintCost').value) || 0,
+          recurrence: document.getElementById('maintRecurrence').value,
+          status: document.getElementById('maintStatus').value,
+          notes: document.getElementById('maintNotes').value.trim()
+        });
+        this.save();
+        e.target.reset();
+        document.getElementById('maintDueDate').value = this.toLocalISO();
+        this.renderGeneralMaintenances();
+        this.showToast('Manutenzione registrata!');
+      },
       toggleMaintenanceStatus(id) {
         const m = this.state.maintenances.find(x => String(x.id) === String(id));
         if (!m) return;
+        if (m.status !== 'Completata' && m.recurrence && m.recurrence !== 'Singola') {
+          const baseDate = this.parseLocalDate(m.dueDate) || new Date();
+          if (m.recurrence === 'Settimanale') baseDate.setDate(baseDate.getDate() + 7);
+          else if (m.recurrence === 'Mensile') baseDate.setMonth(baseDate.getMonth() + 1);
+          else if (m.recurrence === 'Semestrale') baseDate.setMonth(baseDate.getMonth() + 6);
+          else if (m.recurrence === 'Annuale') baseDate.setFullYear(baseDate.getFullYear() + 1);
+          m.dueDate = this.toLocalISO(baseDate);
+          this.vibrate(25);
+          this.save();
+          this.showToast(`Rinnovata al ${this.formatDate(m.dueDate)} (${m.recurrence})!`);
+          return;
+        }
         m.status = m.status === 'Completata' ? 'In attesa' : 'Completata';
         this.vibrate(20);
         this.save();
+        this.showToast(m.status === 'Completata' ? 'Manutenzione completata!' : 'Manutenzione riportata in attesa.');
       },
-      deleteGeneralMaintenance(id) { if (confirm('Eliminare manutenzione?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderGeneralMaintenances(); } },
+      editGeneralMaintenance(id) {
+        const m = this.state.maintenances.find(x => String(x.id) === String(id));
+        if (!m) return;
+        const newTitle = prompt('Modifica titolo intervento:', m.title);
+        if (newTitle === null || !newTitle.trim()) return;
+        const newDate = prompt('Modifica data (AAAA-MM-GG):', m.dueDate);
+        const newNotes = prompt('Modifica note:', m.notes || '');
+        m.title = newTitle.trim();
+        if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate.trim())) m.dueDate = newDate.trim();
+        if (newNotes !== null) m.notes = newNotes.trim();
+        this.save();
+        this.showToast('Manutenzione aggiornata!');
+      },
+      deleteGeneralMaintenance(id) {
+        const beforeCount = this.state.maintenances.length;
+        this.state.maintenances = this.state.maintenances.filter(m => String(m.id) !== String(id));
+        if (this.state.maintenances.length < beforeCount) {
+          this.save();
+          this.showToast('Manutenzione eliminata.', 'info');
+        }
+      },
       renderGeneralMaintenances() {
         let filtered = [...this.state.maintenances];
         const fCat = document.getElementById('maintFilterCat')?.value || 'ALL';
         const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL';
+        const search = (document.getElementById('maintSearchInput')?.value || '').toLowerCase().trim();
         if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat);
         if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat);
-        this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(
-          `<div><strong>🔧 ${this.escapeHTML(m.title)}</strong> <span class="badge">${this.escapeHTML(m.category)}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} (${m.recurrence || 'Singola'}) ${m.notes ? '— ' + this.escapeHTML(m.notes) : ''}</small></div>
-          <div style="text-align:right; display:flex; align-items:center; gap:0.5rem;">
-            <div><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>
-            <button type="button" class="btn btn-sm ${m.status === 'Completata' ? 'btn-primary' : ''}" onclick="event.stopPropagation(); App.toggleMaintenanceStatus('${m.id}')" title="Cambia stato">${m.status === 'Completata' ? '✓' : '⏳'}</button>
-          </div>`,
-          `App.deleteGeneralMaintenance('${m.id}')`
-        )).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>');
+        if (search) filtered = filtered.filter(m => (m.title||'').toLowerCase().includes(search) || (m.notes||'').toLowerCase().includes(search) || (m.category||'').toLowerCase().includes(search));
+        filtered.sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
+
+        this.setElText('maintCountBadge', filtered.length);
+        this.setElHTML('maintenanceList', filtered.map(m => {
+          const sid = this.safeJSArg(m.id);
+          return this.createSwipeRow(
+            `<div style="min-width:0;"><strong>🔧 ${this.escapeHTML(m.title)}</strong> <span class="badge">${this.escapeHTML(m.category)}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} (${this.escapeHTML(m.recurrence || 'Singola')}) ${m.notes ? '— ' + this.escapeHTML(m.notes) : ''}</small></div>
+            <div style="text-align:right; flex-shrink:0;">
+              <strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${this.escapeHTML(m.status)}</span>
+            </div>`,
+            `App.deleteGeneralMaintenance('${sid}')`,
+            `<button type="button" class="btn btn-sm ${m.status === 'Completata' ? 'btn-primary' : ''}" style="padding:0.25rem 0.5rem;" onclick="event.stopPropagation(); App.toggleMaintenanceStatus('${sid}')" title="Completa / Rinnova">${m.status === 'Completata' ? '✓' : '⏳'}</button>
+             <button type="button" class="btn btn-sm" style="padding:0.25rem 0.5rem;" onclick="event.stopPropagation(); App.editGeneralMaintenance('${sid}')" title="Modifica">✏️</button>`
+          );
+        }).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata in questa vista.</div>');
       },
 
       renderGallery() {
@@ -2060,43 +2531,82 @@
         this.state.transactions.forEach(t => { if(t.fileData) images.push({id: t.id, mod: 'tx', src: t.fileData, title: t.desc, date: t.date, type: 'Spesa'}); });
         this.state.inventory.forEach(i => { if(i.fileData) images.push({id: i.id, mod: 'inv', src: i.fileData, title: i.name, date: i.date, type: 'Inventario'}); });
         this.state.healthMedical.forEach(m => { if(m.fileData) images.push({id: m.id, mod: 'med', src: m.fileData, title: m.title, date: m.date, type: 'Referto'}); });
-        images.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+        images.sort((a,b) => (b.date || '').localeCompare(a.date || ''));
         this.setElHTML('galleryGrid', images.length ? images.map(img => {
+          const sid = this.safeJSArg(img.id);
           const isPdf = img.src.startsWith('data:application/pdf');
           const preview = isPdf ? `<div style="font-size:2.5rem;">📄</div>` : `<img src="${img.src}" alt="${this.escapeHTML(img.title)}">`;
-          return `<div class="gallery-item" onclick="App.openMediaById('${img.mod}', '${img.id}')">${preview}<div class="gallery-overlay"><strong>${img.type}</strong><br>${this.escapeHTML(img.title)}</div></div>`;
+          return `<div class="gallery-item" onclick="App.openMediaById('${img.mod}', '${sid}')">${preview}<div class="gallery-overlay"><strong>${img.type}</strong><br>${this.escapeHTML(img.title)}</div></div>`;
         }).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
       },
 
+      // === RICERCA GLOBALE (ORA CON TASTO ELIMINA DIRETTO SU OGNI RISULTATO) ===
       executeSearch() {
         const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim();
         if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>');
         let html = '';
+
+        this.state.calendarTasks.forEach(t => {
+          if ((t.title||'').toLowerCase().includes(query) || (t.type||'').toLowerCase().includes(query)) {
+            const sid = this.safeJSArg(t.id);
+            const sDate = this.safeJSArg(t.date);
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.switchModule('mod-calendar'); App.selectDate('${sDate}');">
+              <div style="flex:1; min-width:0;"><strong>📌 ${this.escapeHTML(t.title)}</strong><br><small class="stat-label">Agenda • ${this.formatDate(t.date)}</small></div>
+              <button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation(); App.deleteCalendarTask('${sid}')">✕</button>
+            </div>`;
+          }
+        });
+
+        this.state.maintenances.forEach(m => {
+          if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) {
+            const sid = this.safeJSArg(m.id);
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-maintenance');">
+              <div style="flex:1; min-width:0;"><strong>🔧 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">Manutenzione (${this.escapeHTML(m.category)}) • ${this.formatDate(m.dueDate)}</small></div>
+              <button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation(); App.deleteGeneralMaintenance('${sid}')">✕</button>
+            </div>`;
+          }
+        });
+
+        this.state.inventory.forEach(i => {
+          if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query) || (i.location||'').toLowerCase().includes(query)) {
+            const sid = this.safeJSArg(i.id);
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-inventory');">
+              <div style="flex:1; min-width:0;"><strong>📦 ${this.escapeHTML(i.name)}</strong><br><small class="stat-label">Inventario (${this.escapeHTML(i.category)})</small></div>
+              <div style="display:flex; align-items:center; gap:0.5rem;"><strong>${this.formatMoney(i.price)}</strong><button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation(); App.deleteInventoryItem('${sid}')">✕</button></div>
+            </div>`;
+          }
+        });
+
         this.state.transactions.forEach(t => {
           if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) {
-            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.switchModule('mod-finance');"><div><strong>💸 ${this.escapeHTML(t.desc)}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${this.escapeHTML(t.category)}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`;
+            const sid = this.safeJSArg(t.id);
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.switchModule('mod-finance');">
+              <div style="flex:1; min-width:0;"><strong>💸 ${this.escapeHTML(t.desc)}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${this.escapeHTML(t.category)}</small></div>
+              <div style="display:flex; align-items:center; gap:0.5rem;"><strong>${this.formatMoney(t.amount)}</strong><button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation(); App.deleteTransaction('${sid}')">✕</button></div>
+            </div>`;
           }
         });
-        this.state.inventory.forEach(i => {
-          if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) {
-            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-inventory');"><div><strong>📦 ${this.escapeHTML(i.name)}</strong><br><small class="stat-label">${this.escapeHTML(i.category)}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`;
-          }
-        });
+
         this.state.healthMedical.forEach(m => {
-          if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) {
-            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-health');"><div><strong>🩺 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${this.escapeHTML(m.notes)}</small></div></div>`;
+          if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query) || (m.therapy||'').toLowerCase().includes(query)) {
+            const sid = this.safeJSArg(m.id);
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-health');">
+              <div style="flex:1; min-width:0;"><strong>🩺 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${this.escapeHTML(m.notes)}</small></div>
+              <button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation(); App.deleteMedicalRecord('${sid}')">✕</button>
+            </div>`;
           }
         });
-        this.state.maintenances.forEach(m => {
-          if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) {
-            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-maintenance');"><div><strong>🔧 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.escapeHTML(m.category)} • ${this.formatDate(m.dueDate)}</small></div></div>`;
-          }
-        });
+
         this.state.garageMaint.forEach(m => {
           if ((m.title||'').toLowerCase().includes(query)) {
-            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-garage');"><div><strong>🏎️ ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)}</small></div><strong>${this.formatMoney(m.cost)}</strong></div>`;
+            const sid = this.safeJSArg(m.id);
+            html += `<div class="list-row" style="cursor:pointer;" onclick="App.closeModal('searchModal'); App.openHubModule('sub-garage');">
+              <div style="flex:1; min-width:0;"><strong>🏎️ ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">Garage • ${this.formatDate(m.date)}</small></div>
+              <div style="display:flex; align-items:center; gap:0.5rem;"><strong>${this.formatMoney(m.cost)}</strong><button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation(); App.deleteGarageMaint('${sid}')">✕</button></div>
+            </div>`;
           }
         });
+
         this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${this.escapeHTML(query)}"</div>`);
       },
 
@@ -2117,7 +2627,7 @@
       closeScanner() { if (this.html5QrcodeScanner) { this.html5QrcodeScanner.clear().catch(() => {}); this.html5QrcodeScanner = null; } this.closeModal('scannerModal'); },
 
       exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v10_Backup_${this.toLocalISO()}.json`; document.body.appendChild(a); a.click(); a.remove(); },
-      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${(t.desc||'').replace(/"/g, '""')}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${(n.meal||'').replace(/"/g, '""')}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}_${this.toLocalISO()}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
+      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => String(a.id) === String(t.accountId)); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${(t.desc||'').replace(/"/g, '""')}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${(n.meal||'').replace(/"/g, '""')}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}_${this.toLocalISO()}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
       async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo?")) { await localforage.clear(); location.reload(); } },
 
       async init() {
