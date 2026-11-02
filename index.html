@@ -19,9 +19,75 @@
     /* ==========================================
        1. TEMI E VARIABILI GLOBALI
        ========================================== */
-    :root[data-theme="dark"] { --bg-primary: #070a12; --bg-secondary: rgba(17, 24, 39, 0.85); --bg-card: rgba(24, 33, 52, 0.62); --bg-glass: rgba(10, 15, 28, 0.82); --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b; --border-color: rgba(255, 255, 255, 0.08); --border-highlight: rgba(139, 92, 246, 0.45); --accent-primary: #6366f1; --accent-secondary: #ec4899; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.3); --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55); --aurora-1: rgba(99, 102, 241, 0.16); --aurora-2: rgba(236, 72, 153, 0.12); }
-    :root[data-theme="oled"] { --bg-primary: #000000; --bg-secondary: #08080c; --bg-card: rgba(14, 14, 20, 0.88); --bg-glass: rgba(0, 0, 0, 0.9); --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #52525b; --border-color: rgba(255, 255, 255, 0.11); --border-highlight: rgba(139, 92, 246, 0.6); --accent-primary: #818cf8; --accent-secondary: #f472b6; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #e11d48 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.8); --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.95); --aurora-1: rgba(99, 102, 241, 0.12); --aurora-2: rgba(236, 72, 153, 0.08); }
-    :root[data-theme="light"] { --bg-primary: #f1f5f9; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.88); --bg-glass: rgba(255, 255, 255, 0.88); --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; --border-color: rgba(15, 23, 42, 0.08); --border-highlight: rgba(99, 102, 241, 0.45); --accent-primary: #4f46e5; --accent-secondary: #db2777; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%); --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb; --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.06); --shadow-lg: 0 16px 32px rgba(15, 23, 42, 0.12); --aurora-1: rgba(99, 102, 241, 0.1); --aurora-2: rgba(236, 72, 153, 0.08); }
+    :root[data-theme="dark"] {
+      --bg-primary: #070a12;
+      --bg-secondary: rgba(17, 24, 39, 0.85);
+      --bg-solid: #111827;
+      --bg-card: rgba(24, 33, 52, 0.62);
+      --bg-glass: rgba(10, 15, 28, 0.82);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(139, 92, 246, 0.45);
+      --accent-primary: #6366f1;
+      --accent-secondary: #ec4899;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55);
+      --aurora-1: rgba(99, 102, 241, 0.16);
+      --aurora-2: rgba(236, 72, 153, 0.12);
+    }
+    :root[data-theme="oled"] {
+      --bg-primary: #000000;
+      --bg-secondary: #0b0b12;
+      --bg-solid: #0b0b12;
+      --bg-card: rgba(14, 14, 20, 0.88);
+      --bg-glass: rgba(0, 0, 0, 0.9);
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --border-color: rgba(255, 255, 255, 0.11);
+      --border-highlight: rgba(139, 92, 246, 0.6);
+      --accent-primary: #818cf8;
+      --accent-secondary: #f472b6;
+      --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #e11d48 100%);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.8);
+      --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.95);
+      --aurora-1: rgba(99, 102, 241, 0.12);
+      --aurora-2: rgba(236, 72, 153, 0.08);
+    }
+    :root[data-theme="light"] {
+      --bg-primary: #f1f5f9;
+      --bg-secondary: #ffffff;
+      --bg-solid: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.88);
+      --bg-glass: rgba(255, 255, 255, 0.88);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-color: rgba(15, 23, 42, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.45);
+      --accent-primary: #4f46e5;
+      --accent-secondary: #db2777;
+      --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --info: #2563eb;
+      --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 16px 32px rgba(15, 23, 42, 0.12);
+      --aurora-1: rgba(99, 102, 241, 0.1);
+      --aurora-2: rgba(236, 72, 153, 0.08);
+    }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body, html { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; width: 100%; max-width: 100vw; overscroll-behavior-x: none; }
@@ -31,7 +97,7 @@
     body.privacy-active .sensitive { filter: blur(8px); opacity: 0.4; user-select: none; pointer-events: none; }
 
     /* ==========================================
-       2. COMPONENTI UI & SWIPE-TO-DELETE
+       2. COMPONENTI UI & SWIPE-TO-DELETE (FIXATO)
        ========================================== */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
     .btn:active { transform: scale(0.96); }
@@ -39,20 +105,25 @@
     .btn-danger { background: rgba(239, 68, 68, 0.14); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
     .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.78rem; border-radius: 10px; }
     
-    .input, select, textarea { width: 100%; padding: 0.7rem 0.95rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; transition: border-color 0.2s ease; outline: none; }
+    .input, select, textarea { width: 100%; padding: 0.7rem 0.95rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-solid); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; transition: border-color 0.2s ease; outline: none; }
     .input:focus, select:focus, textarea:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; } .form-row .input, .form-row select { margin-bottom: 0; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+    .form-row .input, .form-row select { margin-bottom: 0; }
     
+    .file-upload-box { display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--bg-solid); border: 1px dashed var(--border-highlight); border-radius: 12px; padding: 0.65rem 0.9rem; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); text-align: center; transition: border-color 0.2s; }
+    .file-upload-box:hover { border-color: var(--accent-primary); color: var(--text-primary); }
+    .file-upload-box input[type="file"] { display: none; }
+
     .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
     .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); } .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); } .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); } .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--info); }
 
-    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; padding-right: 2px; }
+    .item-list { display: flex; flex-direction: column; gap: 0.65rem; max-height: 420px; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; }
     
-    /* GESTURES NATIVE SWIPE-TO-DELETE */
-    .swipe-container { position: relative; overflow: hidden; border-radius: 14px; margin-bottom: 0.1rem; }
-    .swipe-content { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); position: relative; z-index: 2; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    /* FIX CRITICO: flex-shrink: 0 impedisce lo schiacciamento delle righe e --bg-solid copre il rosso sotto */
+    .swipe-container { position: relative; overflow: hidden; border-radius: 14px; flex-shrink: 0; width: 100%; background: var(--bg-solid); }
+    .swipe-content { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.9rem 1rem; border-radius: 14px; background: var(--bg-solid); border: 1px solid var(--border-color); position: relative; z-index: 2; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); min-height: 60px; width: 100%; }
     .swipe-action { position: absolute; right: 0; top: 0; bottom: 0; width: 75px; background: var(--danger); color: #fff; display: grid; place-items: center; z-index: 1; border-radius: 0 14px 14px 0; cursor: pointer; font-size: 1.2rem; }
-    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); }
+    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.9rem 1rem; border-radius: 14px; background: var(--bg-solid); border: 1px solid var(--border-color); flex-shrink: 0; min-height: 56px; width: 100%; }
     
     .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
     .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 700; font-size: 0.9rem; cursor: pointer; padding: 0.35rem 0.75rem; border-radius: 8px; }
@@ -68,7 +139,7 @@
     .col-span-12 { grid-column: span 12; } .col-span-9 { grid-column: span 9; } .col-span-8 { grid-column: span 8; } .col-span-6 { grid-column: span 6; } .col-span-5 { grid-column: span 5; } .col-span-4 { grid-column: span 4; } .col-span-3 { grid-column: span 3; }
 
     .bento-card { background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-top: 1px solid rgba(255, 255, 255, 0.14); border-radius: 22px; padding: 1.35rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; position: relative; overflow: hidden; }
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; flex-wrap: wrap; }
     .card-title { font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.02em; }
     .stat-value { font-size: 2rem; font-weight: 900; letter-spacing: -0.03em; font-family: 'JetBrains Mono', monospace; margin: 0.25rem 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
@@ -84,7 +155,7 @@
     .score-progress { fill: none; stroke: url(#auroraGrad); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 150; stroke-dashoffset: 150; transition: stroke-dashoffset 1s ease; }
     
     .wallet-carousel { display: flex; gap: 0.85rem; overflow-x: auto; padding-bottom: 0.6rem; margin-bottom: 1rem; scroll-snap-type: x mandatory; }
-    .wallet-card { min-width: 230px; flex: 1; scroll-snap-align: start; padding: 1.15rem; border-radius: 18px; color: #fff; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: transform 0.2s ease, outline 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px; }
+    .wallet-card { min-width: 230px; flex: 1; scroll-snap-align: start; padding: 1.15rem; border-radius: 18px; color: #fff; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: transform 0.2s ease, outline 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px; flex-shrink: 0; }
     .wallet-card:active { transform: scale(0.97); }
     .wallet-card.selected { outline: 3px solid #ffffff; }
     .wallet-card-0 { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
@@ -97,14 +168,14 @@
 
     /* GARAGE OS */
     .vehicle-selector { display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem; margin-bottom:1rem; align-items:center; }
-    .vehicle-chip { padding:0.55rem 1.1rem; border-radius:999px; background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-secondary); font-weight:700; font-size:0.85rem; cursor:pointer; white-space:nowrap; transition: all 0.2s ease; }
+    .vehicle-chip { padding:0.55rem 1.1rem; border-radius:999px; background:var(--bg-solid); border:1px solid var(--border-color); color:var(--text-secondary); font-weight:700; font-size:0.85rem; cursor:pointer; white-space:nowrap; transition: all 0.2s ease; flex-shrink: 0; }
     .vehicle-chip.active { background:var(--accent-gradient); color:#fff; border-color:transparent; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35); }
     .garage-car-header { position: relative; background: linear-gradient(45deg, #0f172a 0%, #1e1b4b 100%); border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-highlight); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; overflow: hidden; }
     .garage-car-header::after { content: '🚘'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-size: 8rem; opacity: 0.15; filter: blur(2px); pointer-events: none; }
     .car-brand-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.35rem; z-index: 1; color: #fff; }
     .car-plate { display: inline-block; background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 6px; border: 2px solid #3b82f6; z-index: 1; }
     .traffic-light-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
-    .tl-card { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; }
+    .tl-card { background: var(--bg-solid); padding: 1rem; border-radius: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; }
     .tl-indicator { width: 14px; height: 14px; border-radius: 50%; margin-bottom: 0.5rem; box-shadow: 0 0 10px currentColor; }
     .tl-red { background: #ef4444; color: #ef4444; } .tl-yellow { background: #f59e0b; color: #f59e0b; } .tl-green { background: #10b981; color: #10b981; }
 
@@ -114,7 +185,7 @@
 
     /* MEDIA GALLERY */
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem; }
-    .gallery-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-secondary); display: grid; place-items: center; }
+    .gallery-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-solid); display: grid; place-items: center; }
     .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
     .gallery-item:active img { transform: scale(1.05); }
     .gallery-overlay { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.75); color: #fff; font-size: 0.65rem; padding: 0.3rem; text-align: center; backdrop-filter: blur(4px); }
@@ -131,7 +202,7 @@
 
     .modal-backdrop { position: fixed !important; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 99999; display: none !important; place-items: center; padding: 1rem; }
     .modal-backdrop.open { display: grid !important; }
-    .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+    .modal-content { background: var(--bg-solid); border: 1px solid var(--border-color); border-radius: 24px; width: 100%; max-width: 600px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
     
     #lockScreen { position: fixed; inset: 0; background: var(--bg-primary); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s; }
     #lockScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -139,7 +210,7 @@
     .pin-input { width: 100%; text-align: center; font-size: 2.5rem; letter-spacing: 0.5rem; background: transparent; border: none; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); margin: 1.5rem 0; outline: none; }
 
     #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 99999; display: flex; flex-direction: column; gap: 0.6rem; }
-    .toast { padding: 0.85rem 1.15rem; border-radius: 14px; background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 600; animation: slideIn 0.25s ease; }
+    .toast { padding: 0.85rem 1.15rem; border-radius: 14px; background: var(--bg-solid); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 600; animation: slideIn 0.25s ease; }
     @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
     .fab-container { position: fixed; bottom: 2rem; right: 1.25rem; z-index: 9000; display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
@@ -147,17 +218,17 @@
     .fab-btn:active { transform: scale(0.9); }
     .fab-menu { display: none; flex-direction: column; gap: 0.5rem; }
     .fab-menu.open { display: flex; }
-    .fab-item { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-secondary); padding: 0.65rem 1.2rem; border-radius: 999px; border: 1px solid var(--border-highlight); color: var(--text-primary); font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: var(--shadow-lg); }
+    .fab-item { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-solid); padding: 0.65rem 1.2rem; border-radius: 999px; border: 1px solid var(--border-highlight); color: var(--text-primary); font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: var(--shadow-lg); }
 
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-top: 0.75rem; }
     .cal-day-header { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .cal-day { aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
+    .cal-day { aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-solid); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
     .cal-day.active { background: var(--accent-gradient); color: #fff; border: none; }
     .cal-day.today { border: 2px solid var(--accent-primary); }
     .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); margin-top: 3px; }
     
     .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    .hub-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .hub-card { background: var(--bg-solid); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
     .hub-card:hover, .hub-card:active { border-color: var(--accent-primary); transform: translateY(-3px); }
     .hub-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
 
@@ -349,15 +420,18 @@
             <div class="form-row">
               <input type="date" id="txDate" class="input" required>
               <select id="txRecurrence" class="input"><option value="Singola">Singola</option><option value="Mensile">Mensile</option><option value="Annuale">Annuale</option></select>
-              <div style="display:flex; align-items:center; background:var(--bg-secondary); border:1px dashed var(--border-highlight); border-radius:12px; padding:0 0.5rem; overflow:hidden;">
-                <label style="font-size:0.75rem; color:var(--text-secondary); white-space:nowrap;">📷 Scontrino</label>
-                <input type="file" id="txFile" class="input" accept="image/*" style="margin:0; border:none; padding:0.4rem;">
-              </div>
+              <label class="file-upload-box">
+                <span id="txFileLabel">📷 Allega Scontrino (opz.)</span>
+                <input type="file" id="txFile" accept="image/*" onchange="document.getElementById('txFileLabel').innerText = this.files[0] ? '✅ ' + this.files[0].name : '📷 Allega Scontrino (opz.)'">
+              </label>
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra nel Libro Mastro</button>
           </form>
-          <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">📜 Libro Mastro Storico</div><select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select></div>
-          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 380px; overflow-x:hidden;"></div>
+          <div class="card-header" style="margin-bottom: 0.75rem;">
+            <div class="card-title">📜 Libro Mastro Storico <span class="badge" id="txCountBadge">0</span></div>
+            <select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select>
+          </div>
+          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 420px; overflow-x:hidden;"></div>
         </div>
 
         <div class="bento-card col-span-4">
@@ -430,7 +504,7 @@
       </div>
     </section>
 
-    <!-- SUB: GARAGE OS (REVISIONATO E CORRETTO) -->
+    <!-- SUB: GARAGE OS -->
     <section id="sub-garage" class="module-section">
       <div class="card-header" style="margin-bottom: 1rem;">
         <div class="card-title">🏎️ Garage OS</div>
@@ -458,7 +532,7 @@
         <div class="bento-card col-span-12">
           <div class="card-header" style="margin-bottom:0.5rem;">
             <div class="card-title">🚦 Semafori Scadenze</div>
-            <span class="stat-label">Verde: oltre 30gg • Giallo: entro 30gg • Rosso: scaduto o non impostato</span>
+            <span class="stat-label">Tocca un semaforo per impostare la data</span>
           </div>
           <div class="traffic-light-grid">
             <div class="tl-card" onclick="App.openGarageEditModal(false)" style="cursor:pointer;">
@@ -488,7 +562,7 @@
             </div>
             <button type="button" class="btn btn-sm btn-primary" onclick="App.updateGarageKm()">✏️ Aggiorna Km</button>
           </div>
-          <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:12px; padding:0.8rem; margin-bottom:1rem;">
+          <div style="background:var(--bg-solid); border:1px solid var(--border-color); border-radius:12px; padding:0.8rem; margin-bottom:1rem;">
             <div class="stat-label">Spesa Auto & Carburante (Ultimi 30g)</div>
             <div style="font-size:1.2rem; font-weight:800; color:var(--danger);" id="garageFuelMonth">€ 0,00</div>
           </div>
@@ -504,7 +578,7 @@
             <input type="number" id="gMaintKm" class="input" step="1" placeholder="Km veicolo" style="margin:0; flex:1; min-width:105px;">
             <button type="submit" class="btn btn-primary" style="white-space:nowrap;">+ Registra</button>
           </form>
-          <div id="garageMaintList" class="item-list" style="max-height:300px; overflow-x:hidden;"></div>
+          <div id="garageMaintList" class="item-list" style="max-height:320px; overflow-x:hidden;"></div>
         </div>
       </div>
     </section>
@@ -522,10 +596,10 @@
             <div class="form-row"><div><label class="stat-label">Acquisto</label><input type="date" id="invDate" class="input"></div><div><label class="stat-label">Fine Garanzia</label><input type="date" id="invWarranty" class="input"></div></div>
             <div class="form-row">
               <input type="number" id="invPrice" class="input" step="0.01" placeholder="Valore (€)">
-              <div style="display:flex; align-items:center; background:var(--bg-secondary); border:1px dashed var(--border-highlight); border-radius:12px; padding:0 0.5rem; overflow:hidden;">
-                <label style="font-size:0.75rem; color:var(--text-secondary); white-space:nowrap;">📷 Foto</label>
-                <input type="file" id="invFile" class="input" accept="image/*" style="margin:0; border:none; padding:0.4rem;">
-              </div>
+              <label class="file-upload-box">
+                <span id="invFileLabel">📷 Allega Foto</span>
+                <input type="file" id="invFile" accept="image/*" onchange="document.getElementById('invFileLabel').innerText = this.files[0] ? '✅ ' + this.files[0].name : '📷 Allega Foto'">
+              </label>
             </div>
             <input type="text" id="invLocation" class="input" placeholder="Posizione (es. Studio, Garage, Cassetto)...">
             <input type="text" id="invNotes" class="input" placeholder="Seriale, modello, note...">
@@ -570,7 +644,7 @@
       <div class="bento-grid">
         <div class="bento-card col-span-4">
           <div class="card-header"><div class="card-title">🍎 Diario Alimentare</div><span class="badge badge-info" id="kcalProgressText">0 / 2100 kcal</span></div>
-          <div style="margin-bottom: 1rem; background: var(--bg-secondary); padding: 0.85rem; border-radius: 14px; border: 1px solid var(--border-color);">
+          <div style="margin-bottom: 1rem; background: var(--bg-solid); padding: 0.85rem; border-radius: 14px; border: 1px solid var(--border-color);">
             <div class="macro-bar-bg" style="height:10px; margin-bottom:0.6rem;"><div id="kcalProgressBar" class="macro-bar-fill" style="width:0%;"></div></div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; text-align:center; font-size:0.75rem;"><div><span class="stat-label">Proteine</span><br><strong id="protProgressText" style="color:#10b981;">0g</strong></div><div><span class="stat-label">Carbo</span><br><strong id="carbProgressText" style="color:#3b82f6;">0g</strong></div><div><span class="stat-label">Grassi</span><br><strong id="fatProgressText" style="color:#f59e0b;">0g</strong></div></div>
           </div>
@@ -599,7 +673,12 @@
             <div class="form-row"><select id="medType" class="input" onchange="App.toggleMedFields()" required><option value="Visita Medica">👨‍⚕️ Visita Specialistica</option><option value="Referto">📄 Referto (Upload PDF/Img)</option><option value="Sintomo">🌡️ Sintomo / Evento</option></select><input type="date" id="medDate" class="input" required></div>
             <input type="text" id="medTitle" class="input" placeholder="Oggetto *" required>
             <div id="medTherapyGroup"><input type="text" id="medTherapy" class="input" placeholder="Terapia prescritta (mostrata in Dashboard)"></div>
-            <div id="medFileGroup" style="display:none; border: 1px dashed var(--border-highlight); padding: 0.6rem; border-radius: 10px; margin-bottom: 0.75rem;"><label class="stat-label" style="display:block; margin-bottom:0.3rem;">Allega Documento (Salvato nel DB)</label><input type="file" id="medFile" class="input" accept=".pdf, image/jpeg, image/png" style="margin:0; padding:0.3rem;"></div>
+            <div id="medFileGroup" style="display:none; margin-bottom: 0.75rem;">
+              <label class="file-upload-box">
+                <span id="medFileLabel">📄 Allega Referto PDF o Foto</span>
+                <input type="file" id="medFile" accept=".pdf, image/jpeg, image/png" onchange="document.getElementById('medFileLabel').innerText = this.files[0] ? '✅ ' + this.files[0].name : '📄 Allega Referto PDF o Foto'">
+              </label>
+            </div>
             <input type="text" id="medNotes" class="input" placeholder="Note cliniche...">
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella</button>
           </form>
@@ -768,6 +847,15 @@
       pomoTimer: null,
       pomoSeconds: 1500,
 
+      // === DATA LOCALE SICURA (EVITA BUG FUSO ORARIO UTC) ===
+      toLocalISO(d = new Date()) {
+        const date = (d instanceof Date && !isNaN(d)) ? d : new Date();
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      },
+
       // === GESTURES SWIPE NATIVO ===
       swipeStartX: null,
       navStartX: null,
@@ -822,7 +910,7 @@
         return `
           <div class="swipe-container">
             <div class="swipe-content">
-              <div style="flex:1; display:flex; align-items:center; justify-content:space-between; gap:0.75rem;">${contentHTML}</div>
+              <div style="flex:1; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; min-width:0;">${contentHTML}</div>
               <button type="button" class="btn btn-sm btn-danger" style="padding:0.25rem 0.5rem; font-size:0.75rem; flex-shrink:0;" onclick="event.stopPropagation(); ${deleteActionJS}" title="Elimina">✕</button>
             </div>
             <div class="swipe-action" onclick="event.stopPropagation(); ${deleteActionJS}">🗑️</div>
@@ -834,13 +922,21 @@
       setElHTML(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; },
 
       sanitizeData() {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = this.toLocalISO();
         const cleanNumber = (val) => {
           if (typeof val === 'number' && !isNaN(val)) return val;
           if (!val) return 0;
           let s = String(val).replace(/[^0-9.,-]/g, '').replace(',', '.');
           return parseFloat(s) || 0;
         };
+
+        // Recupero compatibilità da vecchi backup
+        if (Array.isArray(this.state.cars) && (!Array.isArray(this.state.vehicles) || !this.state.vehicles.length)) {
+          this.state.vehicles = this.state.cars;
+        }
+        if (Array.isArray(this.state.garageMaintenances) && (!Array.isArray(this.state.garageMaint) || !this.state.garageMaint.length)) {
+          this.state.garageMaint = this.state.garageMaintenances;
+        }
 
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'vehicles', 'garageMaint', 'vaultData'];
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
@@ -863,12 +959,12 @@
         }
         this.state.vehicles = this.state.vehicles.filter(v => v && typeof v === 'object').map(v => ({
           id: String(v.id || this.generateId()),
-          name: String(v.name || 'Veicolo').trim(),
-          plate: String(v.plate || '').trim().toUpperCase(),
-          bollo: v.bollo || '',
-          assic: v.assic || '',
-          revis: v.revis || '',
-          km: cleanNumber(v.km)
+          name: String(v.name || v.brand || v.model || 'Veicolo').trim(),
+          plate: String(v.plate || v.targa || '').trim().toUpperCase(),
+          bollo: v.bollo || v.taxExpiry || '',
+          assic: v.assic || v.insuranceExpiry || '',
+          revis: v.revis || v.inspectionExpiry || '',
+          km: cleanNumber(v.km || v.odometer)
         }));
 
         if (!this.activeVehicleId || !this.state.vehicles.some(v => v.id === this.activeVehicleId)) {
@@ -878,16 +974,40 @@
         this.state.garageMaint = this.state.garageMaint.filter(m => m && typeof m === 'object').map(m => ({
           id: String(m.id || this.generateId()),
           vehicleId: (m.vehicleId && this.state.vehicles.some(v => v.id === String(m.vehicleId))) ? String(m.vehicleId) : this.state.vehicles[0].id,
-          title: String(m.title || 'Intervento'),
+          title: String(m.title || m.desc || m.description || 'Intervento'),
           date: m.date || today,
-          cost: cleanNumber(m.cost),
-          kmAtMaint: cleanNumber(m.kmAtMaint)
+          cost: cleanNumber(m.cost || m.amount),
+          kmAtMaint: cleanNumber(m.kmAtMaint || m.km)
         }));
 
-        this.state.accounts.forEach(a => { a.id = String(a.id || this.generateId()); a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
-        this.state.transactions.forEach(t => { t.id = String(t.id || this.generateId()); t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(t.type) ? t.type : 'EXPENSE'; });
-        this.state.calendarTasks.forEach(t => { t.id = String(t.id || this.generateId()); if(!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
-        this.state.habits.forEach(h => { h.id = String(h.id || this.generateId()); h.name = h.name || 'Abitudine'; h.streak = cleanNumber(h.streak); });
+        this.state.accounts.forEach(a => {
+          a.id = String(a.id || this.generateId());
+          a.balance = cleanNumber(a.balance);
+          a.name = String(a.name || 'Conto').trim();
+        });
+
+        this.state.transactions.forEach(t => {
+          t.id = String(t.id || this.generateId());
+          t.amount = cleanNumber(t.amount || t.value);
+          t.date = t.date || today;
+          t.desc = String(t.desc || t.description || t.title || t.note || 'Movimento').trim();
+          t.category = String(t.category || 'Generale').trim();
+          t.accountId = String(t.accountId || t.account || (this.state.accounts[0]?.id || ''));
+          const rawType = String(t.type || '').toUpperCase();
+          t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(rawType) ? rawType : (rawType === 'USCITA' ? 'EXPENSE' : rawType === 'ENTRATA' ? 'INCOME' : 'EXPENSE');
+        });
+
+        this.state.calendarTasks.forEach(t => {
+          t.id = String(t.id || this.generateId());
+          if(!t.date || t.date.length < 10) t.date = today;
+          t.title = String(t.title || t.desc || 'Attività');
+        });
+
+        this.state.habits.forEach(h => {
+          h.id = String(h.id || this.generateId());
+          h.name = String(h.name || h.title || 'Abitudine');
+          h.streak = cleanNumber(h.streak);
+        });
       },
 
       async importBackupFile(event) {
@@ -1003,7 +1123,6 @@
       formatDate(dateStr) { if (!dateStr) return '--/--/----'; const d = new Date(dateStr); return isNaN(d) ? '--/--/----' : d.toLocaleDateString('it-IT'); },
       generateId() { return Math.random().toString(36).substr(2, 9); },
       
-      // COMPRESSORE IMMAGINI E SUPPORTO PDF NATIVO
       async fileToBase64(file) { 
         return new Promise((resolve, reject) => { 
           const reader = new FileReader(); 
@@ -1043,7 +1162,7 @@
       verifyPin() { const input = document.getElementById('loginPinInput')?.value; if (input === this.state.pin) { document.getElementById('lockScreen')?.classList.add('hidden'); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
       togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); this.setElHTML('privacyBtn', isActive ? '🔒' : '👁️'); },
 
-      // === ABITUDINI (RIPRISTINATE) ===
+      // === ABITUDINI ===
       addHabit() {
         const name = prompt("Inserisci il nome della nuova abitudine:");
         if (name && name.trim()) {
@@ -1055,7 +1174,7 @@
       toggleHabit(id) {
         const h = this.state.habits.find(x => x.id === id);
         if (!h) return;
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
         if (h.lastDone === todayStr) {
           h.lastDone = null;
           h.streak = Math.max(0, (Number(h.streak) || 1) - 1);
@@ -1073,7 +1192,7 @@
         }
       },
 
-      // === DEEP VAULT (CASSAFORTE CIFRATA) ===
+      // === DEEP VAULT ===
       cryptoObfuscate(text, pin) {
         let res = '';
         for(let i=0; i<text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
@@ -1163,7 +1282,7 @@
             <div style="flex:1;"><strong>🔐 ${dTitle}</strong><br><small class="stat-label" style="user-select:all; white-space:pre-wrap;">${dData}</small></div>
             <button class="btn btn-sm btn-danger" onclick="App.deleteVaultSecret('${v.id}')">🗑</button>
           </div>`;
-        }).join('') : '<div class="stat-label">La cassaforte è vuota.</div>';
+        }).join('') : '<div class="list-row stat-label">La cassaforte è vuota.</div>';
         this.setElHTML('vaultList', html);
       },
 
@@ -1173,7 +1292,7 @@
         this.setElText('greetingTitle', greet); this.setElText('greetingDate', new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
         const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0);
         this.setElText('dashNetWorth', this.formatMoney(total)); this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
         const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length; const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
         const score = Math.min(100, Math.max(25, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15))));
         this.setElText('lifeScoreValue', `${score}%`);
@@ -1206,7 +1325,7 @@
         this.renderCalendar();
       },
       selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
-      selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
+      selectDate(dateStr) { const [y, m, d] = dateStr.split('-').map(Number); this.selectedDate = new Date(y, m - 1, d, 12); this.renderCalendar(); },
       renderCalendar() {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         if (!(this.selectedDate instanceof Date) || isNaN(this.selectedDate)) this.selectedDate = new Date();
@@ -1220,12 +1339,12 @@
         let start = new Date(y, m, 1).getDay(); start = start === 0 ? 7 : start;
         for (let i = 1; i < start; i++) { const el = document.createElement('div'); el.className = 'cal-day'; el.style.visibility = 'hidden'; grid.appendChild(el); }
         
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const selStr = this.selectedDate.toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
+        const selStr = this.toLocalISO(this.selectedDate);
         const last = new Date(y, m + 1, 0).getDate();
         
         for (let d = 1; d <= last; d++) {
-          const dateStr = new Date(y, m, d, 12).toISOString().slice(0, 10);
+          const dateStr = this.toLocalISO(new Date(y, m, d, 12));
           const el = document.createElement('div'); el.className = 'cal-day';
           if (dateStr === todayStr) el.classList.add('today');
           if (dateStr === selStr) el.classList.add('active');
@@ -1236,18 +1355,18 @@
         }
         this.renderCalendarTasks(); this.renderJournalHistory();
       },
-      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.selectedDate.toISOString().slice(0, 10), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
+      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.toLocalISO(this.selectedDate), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
       deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
       renderCalendarTasks() {
-        const selStr = (this.selectedDate instanceof Date && !isNaN(this.selectedDate)) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+        const selStr = this.toLocalISO(this.selectedDate);
         const tasks = this.state.calendarTasks.filter(t => t.date === selStr);
         this.setElText('calTaskCountBadge', tasks.length);
         this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
       },
-      saveJournalEntry(e) { e.preventDefault(); const date = (this.selectedDate instanceof Date) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
+      saveJournalEntry(e) { e.preventDefault(); const date = this.toLocalISO(this.selectedDate); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
       renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
 
-      // === GARAGE OS (COMPLETAMENTE REVISIONATO) ===
+      // === GARAGE OS ===
       ensureActiveVehicle() {
         if (!Array.isArray(this.state.vehicles) || this.state.vehicles.length === 0) {
           this.state.vehicles = [{ id: this.generateId(), name: 'Veicolo Principale', plate: 'AA 000 AA', bollo: '', assic: '', revis: '', km: 0 }];
@@ -1357,7 +1476,7 @@
         e.preventDefault();
         const v = this.ensureActiveVehicle();
         const title = document.getElementById('gMaintTitle').value.trim();
-        const date = document.getElementById('gMaintDate').value || new Date().toISOString().slice(0, 10);
+        const date = document.getElementById('gMaintDate').value || this.toLocalISO();
         const cost = parseFloat(document.getElementById('gMaintCost').value) || 0;
         const inputKm = parseFloat(document.getElementById('gMaintKm')?.value);
         const kmAtMaint = !isNaN(inputKm) && inputKm > 0 ? inputKm : (Number(v.km) || 0);
@@ -1376,7 +1495,7 @@
         });
         this.save();
         e.target.reset();
-        document.getElementById('gMaintDate').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('gMaintDate').value = this.toLocalISO();
         this.showToast('Intervento registrato!');
       },
 
@@ -1492,14 +1611,22 @@
         
         this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === a.id ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${a.name}</span><div class="wallet-arrows">${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}</div></div><div><div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div></div></div>`).join('') : '<div class="stat-label">Nessun conto presente.</div>');
         
-        let filtered = [...this.state.transactions]; if (fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc); filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        let filtered = [...this.state.transactions];
+        if (fAcc !== 'ALL') filtered = filtered.filter(t => String(t.accountId) === String(fAcc) || String(t.targetAccountId) === String(fAcc));
+        filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        
+        this.setElText('txCountBadge', filtered.length);
         this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => { 
-          const acc = this.state.accounts.find(a => a.id === tx.accountId); 
+          const acc = this.state.accounts.find(a => String(a.id) === String(tx.accountId)); 
           const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; 
           const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : ''; 
           const imgHtml = tx.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="event.stopPropagation(); App.openImageViewer('${tx.fileData}')">📎</span>` : '';
-          return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong>${tx.desc}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`, `App.deleteTransaction('${tx.id}')`); 
-        }).join('') : '<div class="list-row stat-label">Nessuna transazione.</div>');
+          return this.createSwipeRow(
+            `<div style="min-width:0;"><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong style="word-break:break-word;">${tx.desc || 'Movimento'}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right; flex-shrink:0;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace; font-size:0.95rem;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`,
+            `App.deleteTransaction('${tx.id}')`
+          ); 
+        }).join('') : '<div class="list-row stat-label">Nessuna transazione registrata.</div>');
+
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0); this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
         this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><strong>${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
         this.renderExpenseCategoryChart();
@@ -1514,25 +1641,27 @@
         const recurrence = document.getElementById('txRecurrence')?.value || 'Singola';
         const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence, timestamp: new Date().toISOString(), fileData }; 
         if (src) { if (t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { src.balance -= a; const trg = this.state.accounts.find(x => x.id === trgId); if (trg) trg.balance += a; tx.targetAccountId = trgId; } } 
-        this.state.transactions.push(tx); this.save(); e.target.reset(); document.getElementById('txDate').value = new Date().toISOString().slice(0, 10); this.populateAccountSelects(); this.renderFinance(); this.showToast('Transazione registrata!');
+        this.state.transactions.push(tx); this.save(); e.target.reset();
+        this.setElText('txFileLabel', '📷 Allega Scontrino (opz.)');
+        document.getElementById('txDate').value = this.toLocalISO(); this.populateAccountSelects(); this.renderFinance(); this.showToast('Transazione registrata!');
       },
-      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: new Date().toISOString().slice(0, 10), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
-      deleteTransaction(id) { const tx = this.state.transactions.find(t => t.id === id); if (!tx || !confirm('Eliminare movimento?')) return; const src = this.state.accounts.find(a => a.id === tx.accountId); if (src) { if (tx.type === 'EXPENSE') src.balance += tx.amount; else if (tx.type === 'INCOME') src.balance -= tx.amount; else if (tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => a.id === tx.targetAccountId); if (trg) trg.balance -= tx.amount; } } this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.save(); this.populateAccountSelects(); this.renderFinance(); },
-      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: new Date().toISOString().slice(0, 10) }); this.save(); e.target.reset(); this.renderFinance(); },
+      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: this.toLocalISO(), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
+      deleteTransaction(id) { const tx = this.state.transactions.find(t => String(t.id) === String(id)); if (!tx || !confirm('Eliminare movimento?')) return; const src = this.state.accounts.find(a => String(a.id) === String(tx.accountId)); if (src) { if (tx.type === 'EXPENSE') src.balance += tx.amount; else if (tx.type === 'INCOME') src.balance -= tx.amount; else if (tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => String(a.id) === String(tx.targetAccountId)); if (trg) trg.balance -= tx.amount; } } this.state.transactions = this.state.transactions.filter(t => String(t.id) !== String(id)); this.save(); this.populateAccountSelects(); this.renderFinance(); },
+      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: this.toLocalISO() }); this.save(); e.target.reset(); this.renderFinance(); },
       deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
 
       // === SALUTE OS ===
       populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${f.name} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
       AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => f.id === foodId); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
-      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
+      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = this.toLocalISO(); this.renderHealth(); },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
+      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = this.toLocalISO(); this.renderHealth(); },
       deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
-      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); document.getElementById('medDate').value = new Date().toISOString().slice(0, 10); this.toggleMedFields(); this.renderHealth(); },
+      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.setElText('medFileLabel', '📄 Allega Referto PDF o Foto'); document.getElementById('medDate').value = this.toLocalISO(); this.toggleMedFields(); this.renderHealth(); },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       renderHealth() {
-        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||'')); const latestDay = sortedNutri[0]?.date || new Date().toISOString().slice(0, 10); const dayLogs = sortedNutri.filter(n => n.date === latestDay);
+        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||'')); const latestDay = sortedNutri[0]?.date || this.toLocalISO(); const dayLogs = sortedNutri.filter(n => n.date === latestDay);
         const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)), totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)), totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)), totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)), goalKcal = this.state.nutritionGoals?.kcal || 2100;
         this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
         this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`); this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`); this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
@@ -1550,13 +1679,13 @@
         let fileData = null; if (document.getElementById('invFile')?.files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('invFile').files[0]); } catch (err) {} }
         const locationVal = document.getElementById('invLocation')?.value || '';
         this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: locationVal, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString(), fileData }); 
-        this.save(); e.target.reset(); document.getElementById('invDate').value = new Date().toISOString().slice(0, 10); this.populateCategorySelects(); this.renderInventory(); this.showToast('Bene salvato!');
+        this.save(); e.target.reset(); this.setElText('invFileLabel', '📷 Allega Foto'); document.getElementById('invDate').value = this.toLocalISO(); this.populateCategorySelects(); this.renderInventory(); this.showToast('Bene salvato!');
       },
       deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
       renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search) || (i.location||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => { const imgHtml = item.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="event.stopPropagation(); App.openImageViewer('${item.fileData}')">📎</span>` : ''; return this.createSwipeRow(`<div><strong>📦 ${item.name}</strong> ${imgHtml} <span class="badge">${item.category}</span><br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`, `App.deleteInventoryItem('${item.id}')`); }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
 
       populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('maintCategory', html); this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html); },
-      addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); document.getElementById('maintDueDate').value = new Date().toISOString().slice(0, 10); this.renderGeneralMaintenances(); },
+      addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); document.getElementById('maintDueDate').value = this.toLocalISO(); this.renderGeneralMaintenances(); },
       deleteGeneralMaintenance(id) { if (confirm('Eliminare manutenzione?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderGeneralMaintenances(); } },
       renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
 
@@ -1578,13 +1707,13 @@
       startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
       closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
 
-      exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v10_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); },
+      exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v10_Backup_${this.toLocalISO()}.json`; document.body.appendChild(a); a.click(); a.remove(); },
       exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${t.desc}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${n.meal}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
       async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo?")) { await localforage.clear(); location.reload(); } },
 
       async init() {
         await this.load();
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => { const el = document.getElementById(id); if (el) el.value = todayStr; });
         this.populateAccountSelects(); this.populateCategorySelects(); this.populateMaintenanceSelects(); this.populateFoodLibrarySelect(); this.updateHapticButton();
         this.initGestures();
