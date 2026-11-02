@@ -3,21 +3,37 @@
   "short_name": "LifeOS",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#090d16",
-  "theme_color": "#090d16",
+  "background_color": "#070a12",
+  "theme_color": "#070a12",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192/6366f1/ffffff?text=L7",
+      "src": "https://via.placeholder.com/192/6366f1/ffffff?text=L10",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://via.placeholder.com/512/6366f1/ffffff?text=L7",
+      "src": "https://via.placeholder.com/512/6366f1/ffffff?text=L10",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuova Spesa",
+      "short_name": "Spesa",
+      "description": "Registra una nuova uscita",
+      "url": "/LifeOS/?action=addExpense",
+      "icons": [{ "src": "https://via.placeholder.com/192/ef4444/ffffff?text=%E2%82%AC", "sizes": "192x192" }]
+    },
+    {
+      "name": "Nuovo Task",
+      "short_name": "Task",
+      "description": "Aggiungi un'attività in agenda",
+      "url": "/LifeOS/?action=addTask",
+      "icons": [{ "src": "https://via.placeholder.com/192/3b82f6/ffffff?text=%E2%9C%93", "sizes": "192x192" }]
     }
   ]
 }
