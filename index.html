@@ -94,10 +94,10 @@
     .bg-aurora { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; background-image: radial-gradient(circle at 10% 15%, var(--aurora-1) 0%, transparent 45%), radial-gradient(circle at 90% 80%, var(--aurora-2) 0%, transparent 45%); }
 
     .sensitive { transition: filter 0.35s ease, opacity 0.35s ease; }
-    body.privacy-active .sensitive { filter: blur(8px); opacity: 0.4; user-select: none; pointer-events: none; }
+    body.privacy-active .sensitive { filter: blur(8px); opacity: 0.45; user-select: none; }
 
     /* ==========================================
-       2. COMPONENTI UI & SWIPE-TO-DELETE (FIXATO)
+       2. COMPONENTI UI & SWIPE-TO-DELETE
        ========================================== */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
     .btn:active { transform: scale(0.96); }
@@ -119,7 +119,6 @@
 
     .item-list { display: flex; flex-direction: column; gap: 0.65rem; max-height: 420px; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; }
     
-    /* FIX CRITICO: flex-shrink: 0 impedisce lo schiacciamento delle righe e --bg-solid copre il rosso sotto */
     .swipe-container { position: relative; overflow: hidden; border-radius: 14px; flex-shrink: 0; width: 100%; background: var(--bg-solid); }
     .swipe-content { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.9rem 1rem; border-radius: 14px; background: var(--bg-solid); border: 1px solid var(--border-color); position: relative; z-index: 2; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); min-height: 60px; width: 100%; }
     .swipe-action { position: absolute; right: 0; top: 0; bottom: 0; width: 75px; background: var(--danger); color: #fff; display: grid; place-items: center; z-index: 1; border-radius: 0 14px 14px 0; cursor: pointer; font-size: 1.2rem; }
@@ -163,8 +162,8 @@
     .wallet-card-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
     .wallet-card-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
     .wallet-card-4 { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
-    .wallet-arrows { display:flex; gap:0.3rem; }
-    .wallet-arrows button { background:rgba(0,0,0,0.3); border:none; color:#fff; border-radius:4px; padding:0.1rem 0.4rem; cursor:pointer; font-size:0.7rem; }
+    .wallet-arrows { display:flex; gap:0.3rem; align-items:center; }
+    .wallet-arrows button { background:rgba(0,0,0,0.35); border:none; color:#fff; border-radius:6px; padding:0.2rem 0.45rem; cursor:pointer; font-size:0.72rem; font-weight:700; }
 
     /* GARAGE OS */
     .vehicle-selector { display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem; margin-bottom:1rem; align-items:center; }
@@ -209,7 +208,7 @@
     .pin-box { background: var(--bg-card); padding: 2.5rem; border-radius: 24px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-lg); width: 90%; max-width: 400px; }
     .pin-input { width: 100%; text-align: center; font-size: 2.5rem; letter-spacing: 0.5rem; background: transparent; border: none; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); margin: 1.5rem 0; outline: none; }
 
-    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 99999; display: flex; flex-direction: column; gap: 0.6rem; }
+    #toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100000; display: flex; flex-direction: column; gap: 0.6rem; }
     .toast { padding: 0.85rem 1.15rem; border-radius: 14px; background: var(--bg-solid); border-left: 4px solid var(--accent-primary); box-shadow: var(--shadow-lg); font-size: 0.85rem; font-weight: 600; animation: slideIn 0.25s ease; }
     @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -263,7 +262,7 @@
       <div class="brand-logo" style="margin: 0 auto 1rem; width: 54px; height: 54px; font-size: 1.4rem;">L10</div>
       <h2>LifeOS Masterpiece</h2>
       <p class="stat-label">Inserisci il PIN per sbloccare l'ecosistema</p>
-      <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="4" placeholder="••••">
+      <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter') App.verifyPin()">
       <button class="btn btn-primary" style="width: 100%;" onclick="App.verifyPin()">Sblocca</button>
     </div>
   </div>
@@ -383,10 +382,10 @@
       <div class="bento-grid">
         <div class="bento-card col-span-12">
           <div class="card-header">
-            <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti (Usa ◀ ▶ per riordinare)</div></div>
+            <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti (Usa ◀ ▶ per riordinare o ✕ per eliminare)</div></div>
             <span class="badge badge-success sensitive" id="finTotalBalanceBadge" style="font-size:0.95rem; padding:0.35rem 0.85rem;">€ 0,00</span>
           </div>
-          <div id="financeAccountsList" class="wallet-carousel sensitive"></div>
+          <div id="financeAccountsList" class="wallet-carousel"></div>
           <div class="form-row" style="margin-top:0.5rem; margin-bottom:0;">
             <form onsubmit="App.addFinanceAccount(event)" style="display:flex; gap:0.5rem;">
               <input type="text" id="accNameInput" class="input" placeholder="Nuovo Conto..." required style="margin:0;">
@@ -431,7 +430,7 @@
             <div class="card-title">📜 Libro Mastro Storico <span class="badge" id="txCountBadge">0</span></div>
             <select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select>
           </div>
-          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 420px; overflow-x:hidden;"></div>
+          <div id="financeTransactionsList" class="item-list" style="max-height: 420px; overflow-x:hidden;"></div>
         </div>
 
         <div class="bento-card col-span-4">
@@ -442,7 +441,7 @@
           <form onsubmit="App.addSubscription(event)" style="display:flex; gap:0.4rem; margin-bottom:0.75rem;">
             <input type="text" id="subName" class="input" placeholder="Nome" required style="margin:0;"><input type="number" id="subCost" class="input" step="0.01" placeholder="€" required style="margin:0; max-width:80px;"><button type="submit" class="btn btn-primary btn-sm">+</button>
           </form>
-          <div id="subsList" class="item-list sensitive" style="max-height: 200px;"></div>
+          <div id="subsList" class="item-list" style="max-height: 200px;"></div>
         </div>
       </div>
     </section>
@@ -478,28 +477,32 @@
       </div>
     </section>
 
-    <!-- SUB: DEEP VAULT -->
+    <!-- SUB: DEEP VAULT (REVISIONATO E CORRETTO) -->
     <section id="sub-vault" class="module-section">
       <div class="card-header" style="margin-bottom: 1rem;">
-        <div class="card-title">🔐 Deep Vault</div>
-        <div>
-          <button class="btn btn-sm" style="margin-right:0.5rem;" onclick="App.exportVaultTXT()">📄 Esporta (TXT in chiaro)</button>
-          <button class="btn btn-sm" onclick="App.lockVault()">🔒 Blocca Vault</button>
+        <div class="card-title">🔐 Deep Vault (Cassaforte Cifrata)</div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button type="button" class="btn btn-sm" onclick="App.openVaultSetupModal()">🔑 Cambia PIN</button>
+          <button type="button" class="btn btn-sm" onclick="App.exportVaultTXT()">📄 Esporta TXT</button>
+          <button type="button" class="btn btn-sm btn-danger" onclick="App.lockVault()">🔒 Blocca Vault</button>
         </div>
       </div>
       <div class="bento-grid">
         <div class="bento-card col-span-4">
           <div class="card-header"><div class="card-title">➕ Aggiungi Segreto Cifrato</div></div>
           <form onsubmit="App.addVaultSecret(event)">
-            <input type="text" id="vaultTitle" class="input" placeholder="Titolo (es. PIN Bancomat, PUK)" required>
+            <input type="text" id="vaultTitle" class="input" placeholder="Titolo (es. PIN Bancomat, PUK, Seed)" required>
             <textarea id="vaultData" class="input" rows="4" placeholder="Dati segreti da criptare..." required></textarea>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">🔐 Cripta e Salva in Base64</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">🔐 Cripta e Salva nel Vault</button>
           </form>
-          <div class="stat-label" style="margin-top:1rem;">I dati inseriti qui vengono cifrati usando il tuo PIN Vault e sono illeggibili dal file di backup JSON.</div>
+          <div class="stat-label" style="margin-top:1rem;">I dati inseriti qui vengono cifrati con algoritmo XOR UTF-8 + Base64 tramite il tuo PIN Vault e restano illeggibili nel file di backup JSON.</div>
         </div>
         <div class="bento-card col-span-8">
-          <div class="card-header"><div class="card-title">🗄️ I Tuoi Segreti (Decriptati in RAM)</div></div>
-          <div id="vaultList" class="item-list sensitive" style="max-height: 400px; overflow-x:hidden;"></div>
+          <div class="card-header">
+            <div class="card-title">🗄️ I Tuoi Segreti (Decriptati in RAM)</div>
+            <span class="badge" id="vaultCountBadge">0</span>
+          </div>
+          <div id="vaultList" class="item-list" style="max-height: 420px; overflow-x:hidden;"></div>
         </div>
       </div>
     </section>
@@ -665,7 +668,7 @@
           <div class="card-header"><div class="card-title">⚖️ Trend Peso</div></div>
           <div style="margin-bottom: 1rem; height: 150px; position: relative;" class="sensitive"><canvas id="weightChart"></canvas></div>
           <form onsubmit="App.addWeightLog(event)" style="margin-bottom: 1rem;"><div class="form-row"><input type="number" id="weightValue" class="input" step="0.1" min="20" placeholder="Peso (kg) *" required><input type="date" id="weightDate" class="input" required></div><button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra</button></form>
-          <div id="healthWeightList" class="item-list sensitive" style="max-height: 220px;"></div>
+          <div id="healthWeightList" class="item-list" style="max-height: 220px;"></div>
         </div>
         <div class="bento-card col-span-5">
           <div class="card-header"><div class="card-title">🩺 Cartella Clinica & Referti (DB Offline)</div></div>
@@ -682,7 +685,7 @@
             <input type="text" id="medNotes" class="input" placeholder="Note cliniche...">
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella</button>
           </form>
-          <div id="healthMedicalList" class="item-list sensitive" style="max-height: 320px; overflow-x:hidden;"></div>
+          <div id="healthMedicalList" class="item-list" style="max-height: 320px; overflow-x:hidden;"></div>
         </div>
       </div>
     </section>
@@ -728,19 +731,20 @@
   <!-- MODALE VAULT PIN SETUP -->
   <div id="vaultSetupModal" class="modal-backdrop">
     <div class="modal-content" style="max-width:380px; text-align:center;">
-      <div class="card-header"><div class="card-title">🔐 Attiva Deep Vault</div><button class="btn btn-sm" onclick="App.closeModal('vaultSetupModal')">✕</button></div>
-      <p class="stat-label" style="margin-bottom:1rem;">Crea un PIN a 6 cifre esclusivo per cifrare i dati all'interno della tua cassaforte.</p>
-      <input type="password" id="vaultSetupPinInput" class="pin-input" inputmode="numeric" maxlength="6" placeholder="••••••">
-      <button class="btn btn-primary" style="width: 100%;" onclick="App.saveVaultPin()">Salva PIN Vault</button>
+      <div class="card-header"><div class="card-title">🔐 Imposta PIN Deep Vault</div><button type="button" class="btn btn-sm" onclick="App.closeModal('vaultSetupModal')">✕</button></div>
+      <p class="stat-label" style="margin-bottom:1rem;">Scegli un PIN (da 4 a 6 cifre) esclusivo per cifrare e proteggere i dati della tua cassaforte.</p>
+      <input type="password" id="vaultSetupPinInput" class="pin-input" inputmode="numeric" maxlength="6" placeholder="••••••" onkeydown="if(event.key==='Enter') App.saveVaultPin()">
+      <button type="button" class="btn btn-primary" style="width: 100%;" onclick="App.saveVaultPin()">💾 Salva e Apri Vault</button>
     </div>
   </div>
 
+  <!-- MODALE SBLOCCO VAULT -->
   <div id="vaultAuthModal" class="modal-backdrop">
     <div class="modal-content" style="max-width:380px; text-align:center;">
-      <div class="card-header"><div class="card-title">🔐 Sblocca Cassaforte</div><button class="btn btn-sm" onclick="App.closeModal('vaultAuthModal')">✕</button></div>
-      <p class="stat-label" style="margin-bottom:1rem;">Inserisci il PIN della cassaforte (6 cifre).</p>
-      <input type="password" id="vaultAuthPinInput" class="pin-input" inputmode="numeric" maxlength="6" placeholder="••••••">
-      <button class="btn btn-primary" style="width: 100%;" onclick="App.verifyVaultPin()">Sblocca</button>
+      <div class="card-header"><div class="card-title">🔐 Sblocca Cassaforte</div><button type="button" class="btn btn-sm" onclick="App.closeModal('vaultAuthModal')">✕</button></div>
+      <p class="stat-label" style="margin-bottom:1rem;">Inserisci il PIN della cassaforte per decriptare i segreti in RAM.</p>
+      <input type="password" id="vaultAuthPinInput" class="pin-input" inputmode="numeric" maxlength="6" placeholder="••••••" onkeydown="if(event.key==='Enter') App.verifyVaultPin()">
+      <button type="button" class="btn btn-primary" style="width: 100%;" onclick="App.verifyVaultPin()">🔓 Sblocca Ora</button>
     </div>
   </div>
 
@@ -792,7 +796,7 @@
         </div>
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
           <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">🔐 PIN Cassaforte (Deep Vault)</div>
-          <button class="btn btn-sm btn-primary" style="width:100%; margin-bottom:0.5rem;" onclick="App.openModal('vaultSetupModal')">🔑 Imposta/Cambia PIN Vault</button>
+          <button class="btn btn-sm btn-primary" style="width:100%; margin-bottom:0.5rem;" onclick="App.openVaultSetupModal()">🔑 Imposta/Cambia PIN Vault</button>
           <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.resetVault()">🗑️ Distruggi Cassaforte (Cancella dati cifrati)</button>
         </div>
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
@@ -847,13 +851,16 @@
       pomoTimer: null,
       pomoSeconds: 1500,
 
-      // === DATA LOCALE SICURA (EVITA BUG FUSO ORARIO UTC) ===
       toLocalISO(d = new Date()) {
         const date = (d instanceof Date && !isNaN(d)) ? d : new Date();
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${y}-${m}-${day}`;
+      },
+
+      escapeHTML(str) {
+        return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
       },
 
       // === GESTURES SWIPE NATIVO ===
@@ -930,12 +937,19 @@
           return parseFloat(s) || 0;
         };
 
-        // Recupero compatibilità da vecchi backup
+        // Recupero compatibilità da vecchi backup per Garage e Vault
         if (Array.isArray(this.state.cars) && (!Array.isArray(this.state.vehicles) || !this.state.vehicles.length)) {
           this.state.vehicles = this.state.cars;
         }
         if (Array.isArray(this.state.garageMaintenances) && (!Array.isArray(this.state.garageMaint) || !this.state.garageMaint.length)) {
           this.state.garageMaint = this.state.garageMaintenances;
+        }
+        if (Array.isArray(this.state.vault) && (!Array.isArray(this.state.vaultData) || !this.state.vaultData.length)) {
+          this.state.vaultData = this.state.vault;
+        }
+        if (this.state.vaultPin && !this.state.vaultPinHash) {
+          this.state.vaultPinHash = btoa(String(this.state.vaultPin));
+          delete this.state.vaultPin;
         }
 
         const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'vehicles', 'garageMaint', 'vaultData'];
@@ -949,7 +963,6 @@
           this.state.settings.maintenanceCategories = ['Casa', 'Salute', 'Altro'];
         }
 
-        // Migrazione e sanitizzazione rigorosa Garage & Veicoli
         if (this.state.garageConfig && typeof this.state.garageConfig === 'object' && this.state.vehicles.length === 0) {
           this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
           delete this.state.garageConfig;
@@ -1008,6 +1021,13 @@
           h.name = String(h.name || h.title || 'Abitudine');
           h.streak = cleanNumber(h.streak);
         });
+
+        this.state.vaultData = this.state.vaultData.filter(v => v && typeof v === 'object').map(v => ({
+          id: String(v.id || this.generateId()),
+          title: String(v.title || v.name || ''),
+          data: String(v.data || v.secret || v.value || ''),
+          date: v.date || new Date().toISOString()
+        }));
       },
 
       async importBackupFile(event) {
@@ -1068,6 +1088,7 @@
         if (id === 'garageConfigModal' && document.getElementById('gConfMode')?.value !== 'create') this.loadGarageConfig(); 
       },
       closeModal(id) { document.getElementById(id)?.classList.remove('open'); },
+      
       openImageViewer(src) {
         if (!src) return;
         if (src.startsWith('data:application/pdf')) {
@@ -1077,6 +1098,14 @@
         }
         document.getElementById('photoModalImg').src = src;
         this.openModal('photoModal');
+      },
+
+      openMediaById(type, id) {
+        let item = null;
+        if (type === 'tx') item = this.state.transactions.find(x => String(x.id) === String(id));
+        else if (type === 'inv') item = this.state.inventory.find(x => String(x.id) === String(id));
+        else if (type === 'med') item = this.state.healthMedical.find(x => String(x.id) === String(id));
+        if (item && item.fileData) this.openImageViewer(item.fileData);
       },
 
       switchModule(modId) {
@@ -1192,97 +1221,205 @@
         }
       },
 
-      // === DEEP VAULT ===
+      // === DEEP VAULT (CRITTOGRAFIA UTF-8 SICURA + GESTIONE PIN AUTOMATICA) ===
       cryptoObfuscate(text, pin) {
-        let res = '';
-        for(let i=0; i<text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
-        return btoa(unescape(encodeURIComponent(res)));
+        const cleanPin = String(pin || '0000');
+        const utf8 = encodeURIComponent(String(text || ''));
+        let xor = '';
+        for (let i = 0; i < utf8.length; i++) {
+          xor += String.fromCharCode(utf8.charCodeAt(i) ^ cleanPin.charCodeAt(i % cleanPin.length));
+        }
+        return 'V2:' + btoa(xor);
       },
-      cryptoDeobfuscate(b64, pin) {
+
+      cryptoDeobfuscate(payload, pin) {
+        if (!payload) return '';
+        const cleanPin = String(pin || '0000');
+        const str = String(payload);
+
+        // Formato V2 UTF-8 sicuro
+        if (str.startsWith('V2:')) {
+          try {
+            const raw = atob(str.slice(3));
+            let utf8 = '';
+            for (let i = 0; i < raw.length; i++) {
+              utf8 += String.fromCharCode(raw.charCodeAt(i) ^ cleanPin.charCodeAt(i % cleanPin.length));
+            }
+            return decodeURIComponent(utf8);
+          } catch (e) {
+            return '⚠️ Impossibile decriptare (PIN diverso)';
+          }
+        }
+
+        // Compatibilità retroattiva con formato V1
         try {
-          let text = decodeURIComponent(escape(atob(b64)));
+          const text = decodeURIComponent(escape(atob(str)));
           let res = '';
-          for(let i=0; i<text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
+          for (let i = 0; i < text.length; i++) {
+            res += String.fromCharCode(text.charCodeAt(i) ^ cleanPin.charCodeAt(i % cleanPin.length));
+          }
           return res;
-        } catch(e) { return "Errore decrittografia"; }
+        } catch (e) {
+          // Fallback nel caso fosse testo non codificato
+          return str;
+        }
       },
+
+      openVaultSetupModal() {
+        this.closeModal('settingsModal');
+        const input = document.getElementById('vaultSetupPinInput');
+        if (input) input.value = '';
+        this.openModal('vaultSetupModal');
+        setTimeout(() => input?.focus(), 100);
+      },
+
       saveVaultPin() {
-        const pin = document.getElementById('vaultSetupPinInput').value;
-        if(pin.length === 6) { 
-          this.state.vaultPinHash = btoa(pin); 
-          this.save(); this.closeModal('vaultSetupModal'); 
-          this.showToast('PIN Cassaforte salvato.'); 
-        } else this.showToast('Il PIN Vault deve essere di 6 cifre', 'warning');
+        const pin = (document.getElementById('vaultSetupPinInput')?.value || '').trim();
+        if (pin.length < 4 || pin.length > 6) {
+          return this.showToast('Inserisci un PIN da 4 a 6 cifre', 'warning');
+        }
+
+        // Se c'erano già segreti cifrati col vecchio PIN, li ricripta col nuovo PIN
+        if (this.state.vaultPinHash && this.state.vaultData.length > 0) {
+          try {
+            const oldPin = this.vaultUnlockedPIN || atob(this.state.vaultPinHash);
+            this.state.vaultData = this.state.vaultData.map(v => {
+              const plainTitle = this.cryptoDeobfuscate(v.title, oldPin);
+              const plainData = this.cryptoDeobfuscate(v.data, oldPin);
+              return {
+                ...v,
+                title: this.cryptoObfuscate(plainTitle, pin),
+                data: this.cryptoObfuscate(plainData, pin)
+              };
+            });
+          } catch (e) {}
+        }
+
+        this.state.vaultPinHash = btoa(pin);
+        this.vaultUnlockedPIN = pin;
+        this.closeModal('vaultSetupModal');
+        this.save();
+        this.openHubModule('sub-vault');
+        this.showToast('PIN Cassaforte attivato e Vault sbloccato!');
       },
+
       promptVaultAccess() {
-        if (!this.state.vaultPinHash) return this.showToast("Devi prima impostare il PIN Vault in Impostazioni!", "warning");
-        this.vaultUnlockedPIN = null;
-        document.getElementById('vaultAuthPinInput').value = '';
+        // Se il PIN non è mai stato impostato, apre direttamente il modale di creazione PIN!
+        if (!this.state.vaultPinHash) {
+          this.showToast("Configura il tuo PIN per attivare il Deep Vault", "info");
+          return this.openVaultSetupModal();
+        }
+        // Se è già sbloccato nella sessione corrente, entra subito
+        if (this.vaultUnlockedPIN && btoa(this.vaultUnlockedPIN) === this.state.vaultPinHash) {
+          return this.openHubModule('sub-vault');
+        }
+        const input = document.getElementById('vaultAuthPinInput');
+        if (input) input.value = '';
         this.openModal('vaultAuthModal');
+        setTimeout(() => input?.focus(), 100);
       },
+
       verifyVaultPin() {
-        const pin = document.getElementById('vaultAuthPinInput').value;
+        const pin = (document.getElementById('vaultAuthPinInput')?.value || '').trim();
         if (btoa(pin) === this.state.vaultPinHash) {
           this.vaultUnlockedPIN = pin;
           this.closeModal('vaultAuthModal');
           this.openHubModule('sub-vault');
-        } else { this.showToast('PIN Cassaforte errato', 'danger'); }
+          this.showToast('Cassaforte sbloccata!');
+        } else {
+          this.showToast('PIN Cassaforte errato', 'danger');
+          document.getElementById('vaultAuthPinInput').value = '';
+        }
       },
+
       lockVault() {
         this.vaultUnlockedPIN = null;
         this.switchModule('mod-hub');
-        this.showToast('Cassaforte chiusa.');
+        this.showToast('Cassaforte bloccata.');
       },
+
       resetVault() {
-        if(confirm('Vuoi cancellare definitivamente TUTTI i segreti e il PIN della cassaforte?')) {
+        if (confirm('Vuoi cancellare definitivamente TUTTI i segreti e il PIN della cassaforte?')) {
           this.state.vaultData = [];
           this.state.vaultPinHash = null;
           this.vaultUnlockedPIN = null;
           this.save();
-          this.showToast('Cassaforte distrutta.');
+          this.closeModal('settingsModal');
+          this.showToast('Cassaforte resettata.');
         }
       },
+
       addVaultSecret(e) {
         e.preventDefault();
-        if(!this.vaultUnlockedPIN) return this.showToast('Cassaforte bloccata!', 'danger');
-        const title = document.getElementById('vaultTitle').value;
-        const data = document.getElementById('vaultData').value;
+        if (!this.vaultUnlockedPIN) return this.showToast('Cassaforte bloccata!', 'danger');
+        const title = document.getElementById('vaultTitle').value.trim();
+        const data = document.getElementById('vaultData').value.trim();
+        if (!title || !data) return;
+
         this.state.vaultData.push({
           id: this.generateId(),
           title: this.cryptoObfuscate(title, this.vaultUnlockedPIN),
           data: this.cryptoObfuscate(data, this.vaultUnlockedPIN),
           date: new Date().toISOString()
         });
-        this.save(); e.target.reset(); this.renderVault();
+        this.save();
+        e.target.reset();
+        this.renderVault();
+        this.showToast('Segreto criptato e salvato!');
       },
+
+      copyVaultSecret(id) {
+        if (!this.vaultUnlockedPIN) return;
+        const item = this.state.vaultData.find(v => String(v.id) === String(id));
+        if (!item) return;
+        const decrypted = this.cryptoDeobfuscate(item.data, this.vaultUnlockedPIN);
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(decrypted).then(() => this.showToast('Segreto copiato negli appunti!')).catch(() => {});
+        }
+      },
+
       deleteVaultSecret(id) {
-        this.state.vaultData = this.state.vaultData.filter(v => v.id !== id);
-        this.save(); this.renderVault();
+        if (confirm('Eliminare definitivamente questo segreto dalla cassaforte?')) {
+          this.state.vaultData = this.state.vaultData.filter(v => String(v.id) !== String(id));
+          this.save();
+          this.renderVault();
+        }
       },
+
       exportVaultTXT() {
-        if(!this.vaultUnlockedPIN) return this.showToast('Sblocca la cassaforte prima.', 'danger');
-        let text = "=== LIFEOS VAULT EXPORT ===\n\n";
+        if (!this.vaultUnlockedPIN) return this.showToast('Sblocca la cassaforte prima.', 'danger');
+        let text = "=== LIFEOS DEEP VAULT EXPORT ===\n\n";
         this.state.vaultData.forEach(v => {
           text += "Titolo: " + this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN) + "\n";
           text += "Dati: " + this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN) + "\n";
-          text += "---------------------------\n";
+          text += "Data: " + this.formatDate(v.date) + "\n";
+          text += "--------------------------------\n";
         });
         const a = document.createElement('a');
         a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(text);
-        a.download = `LifeOS_Vault_Decriptato.txt`;
+        a.download = `LifeOS_Vault_Decriptato_${this.toLocalISO()}.txt`;
         document.body.appendChild(a); a.click(); a.remove();
         this.showToast('Esportato in chiaro.');
       },
+
       renderVault() {
-        if(!this.vaultUnlockedPIN) { this.switchModule('mod-hub'); return; }
+        if (!this.vaultUnlockedPIN) {
+          this.switchModule('mod-hub');
+          return;
+        }
+        this.setElText('vaultCountBadge', this.state.vaultData.length);
         const html = this.state.vaultData.length ? this.state.vaultData.map(v => {
-          const dTitle = this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN);
-          const dData = this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN);
-          return `<div class="list-row" style="align-items:flex-start;">
-            <div style="flex:1;"><strong>🔐 ${dTitle}</strong><br><small class="stat-label" style="user-select:all; white-space:pre-wrap;">${dData}</small></div>
-            <button class="btn btn-sm btn-danger" onclick="App.deleteVaultSecret('${v.id}')">🗑</button>
-          </div>`;
-        }).join('') : '<div class="list-row stat-label">La cassaforte è vuota.</div>';
+          const dTitle = this.escapeHTML(this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN));
+          const dData = this.escapeHTML(this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN));
+          return this.createSwipeRow(
+            `<div style="flex:1; min-width:0;">
+              <strong>🔐 ${dTitle}</strong> <span class="stat-label" style="font-size:0.7rem;">• ${this.formatDate(v.date)}</span>
+              <div class="sensitive" style="margin-top:0.35rem; padding:0.5rem 0.7rem; background:rgba(0,0,0,0.25); border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--text-primary); user-select:all; white-space:pre-wrap; word-break:break-word;">${dData}</div>
+            </div>
+            <button type="button" class="btn btn-sm" onclick="event.stopPropagation(); App.copyVaultSecret('${v.id}')" title="Copia">📋</button>`,
+            `App.deleteVaultSecret('${v.id}')`
+          );
+        }).join('') : '<div class="list-row stat-label">La cassaforte è vuota. Usa il modulo a sinistra per criptare il tuo primo segreto.</div>';
         this.setElHTML('vaultList', html);
       },
 
@@ -1302,11 +1439,11 @@
         this.setElText('smartInsightText', txCount > 0 ? `Hai ${txCount} movimenti, ${this.state.inventory.length} beni${lastWeight ? ` e ultimo peso a ${lastWeight.value} kg` : ''}.` : `Tocca + per registrare i tuoi dati.`);
 
         const medItems = this.state.healthMedical.slice(0, 4);
-        this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + t.therapy : '🩺 ' + t.title}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + t.notes : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
+        this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + this.escapeHTML(t.therapy) : '🩺 ' + this.escapeHTML(t.title)}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + this.escapeHTML(t.notes) : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
         const upcoming = [...this.state.calendarTasks].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5);
-        this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in programma.</div>');
+        this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${this.escapeHTML(t.title)}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in programma.</div>');
         
-        this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
+        this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${this.escapeHTML(h.name)}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
         this.renderFinanceChart();
       },
 
@@ -1361,10 +1498,10 @@
         const selStr = this.toLocalISO(this.selectedDate);
         const tasks = this.state.calendarTasks.filter(t => t.date === selStr);
         this.setElText('calTaskCountBadge', tasks.length);
-        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
+        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${this.escapeHTML(t.title)}</div></div>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
       },
       saveJournalEntry(e) { e.preventDefault(); const date = this.toLocalISO(this.selectedDate); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
-      renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
+      renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${this.escapeHTML(j.text)}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
 
       // === GARAGE OS ===
       ensureActiveVehicle() {
@@ -1589,7 +1726,7 @@
         this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => {
           const kmLabel = Number(m.kmAtMaint) > 0 ? `<span class="badge badge-info">${Number(m.kmAtMaint).toLocaleString('it-IT')} km</span>` : '';
           return this.createSwipeRow(
-            `<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong> ${kmLabel}</div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong></div>`,
+            `<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${this.escapeHTML(m.title)}</strong> ${kmLabel}</div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong></div>`,
             `App.deleteGarageMaint('${m.id}')`
           );
         }).join('') : '<div class="list-row stat-label">Nessun intervento registrato per questo veicolo.</div>');
@@ -1597,11 +1734,21 @@
 
       // === FINANZE WALLET ===
       moveAccount(id, dir) { const idx = this.state.accounts.findIndex(a => a.id === id); if (idx < 0) return; const newIdx = idx + dir; if (newIdx < 0 || newIdx >= this.state.accounts.length) return; const temp = this.state.accounts[idx]; this.state.accounts[idx] = this.state.accounts[newIdx]; this.state.accounts[newIdx] = temp; this.save(); },
+      deleteFinanceAccount(id) {
+        const acc = this.state.accounts.find(a => String(a.id) === String(id));
+        if (!acc) return;
+        if (confirm(`Eliminare il conto "${acc.name}"?`)) {
+          this.state.accounts = this.state.accounts.filter(a => String(a.id) !== String(id));
+          this.save();
+          this.populateAccountSelects();
+          this.renderFinance();
+        }
+      },
       populateAccountSelects() {
-        const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join('');
+        const html = this.state.accounts.map(a => `<option value="${a.id}">${this.escapeHTML(a.name)} (${this.formatMoney(a.balance)})</option>`).join('');
         this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html); this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html); this.setElHTML('reconcileAccountSelect', html);
         const filterEl = document.getElementById('txFilterAccount'); const currentFilter = filterEl?.value || 'ALL';
-        this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''));
+        this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${this.escapeHTML(a.name)}</option>`).join(''));
         if (filterEl) filterEl.value = currentFilter;
       },
       selectWalletCard(accId) { const filterEl = document.getElementById('txFilterAccount'); if (!filterEl) return; filterEl.value = (filterEl.value === accId) ? 'ALL' : accId; this.renderFinance(); },
@@ -1609,7 +1756,7 @@
         const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0); this.setElText('finTotalBalanceBadge', this.formatMoney(total));
         const fAcc = document.getElementById('txFilterAccount')?.value || 'ALL';
         
-        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === a.id ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${a.name}</span><div class="wallet-arrows">${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}</div></div><div><div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div></div></div>`).join('') : '<div class="stat-label">Nessun conto presente.</div>');
+        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === a.id ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${this.escapeHTML(a.name)}</span><div class="wallet-arrows">${idx > 0 ? `<button type="button" onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}${idx < this.state.accounts.length - 1 ? `<button type="button" onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}<button type="button" onclick="event.stopPropagation(); App.deleteFinanceAccount('${a.id}')" title="Elimina conto">✕</button></div></div><div><div class="sensitive" style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div></div></div>`).join('') : '<div class="stat-label">Nessun conto presente. Aggiungine uno qui sotto.</div>');
         
         let filtered = [...this.state.transactions];
         if (fAcc !== 'ALL') filtered = filtered.filter(t => String(t.accountId) === String(fAcc) || String(t.targetAccountId) === String(fAcc));
@@ -1620,15 +1767,15 @@
           const acc = this.state.accounts.find(a => String(a.id) === String(tx.accountId)); 
           const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; 
           const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : ''; 
-          const imgHtml = tx.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="event.stopPropagation(); App.openImageViewer('${tx.fileData}')">📎</span>` : '';
+          const imgHtml = tx.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('tx', '${tx.id}')">📎 Scontrino</button>` : '';
           return this.createSwipeRow(
-            `<div style="min-width:0;"><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong style="word-break:break-word;">${tx.desc || 'Movimento'}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right; flex-shrink:0;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace; font-size:0.95rem;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`,
+            `<div style="min-width:0;"><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? this.escapeHTML(acc.name) : 'Conto'}</strong></span><br><strong style="word-break:break-word;">${this.escapeHTML(tx.desc || 'Movimento')}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${this.escapeHTML(tx.category || 'Altro')}</span></div><div class="sensitive" style="text-align:right; flex-shrink:0;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace; font-size:0.95rem;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`,
             `App.deleteTransaction('${tx.id}')`
           ); 
         }).join('') : '<div class="list-row stat-label">Nessuna transazione registrata.</div>');
 
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0); this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
-        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><strong>${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
+        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${this.escapeHTML(s.name)}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><strong class="sensitive">${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
         this.renderExpenseCategoryChart();
       },
       renderExpenseCategoryChart() { const ctx = document.getElementById('expenseCatChart'); if (!ctx || typeof Chart === 'undefined') return; const catTotals = {}; this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => { const c = t.category || 'Altro'; catTotals[c] = (catTotals[c] || 0) + t.amount; }); const labels = Object.keys(catTotals); const data = Object.values(catTotals); if (this.charts.expCat) this.charts.expCat.destroy(); this.charts.expCat = new Chart(ctx, { type: 'doughnut', data: { labels: labels.length ? labels : ['Nessuna spesa'], datasets: [{ data: data.length ? data : [1], backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } } } } }); },
@@ -1651,7 +1798,7 @@
       deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
 
       // === SALUTE OS ===
-      populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${f.name} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
+      populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${this.escapeHTML(f.name)} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
       AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => f.id === foodId); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
       addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = this.toLocalISO(); this.renderHealth(); },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
@@ -1665,10 +1812,10 @@
         const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)), totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)), totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)), totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)), goalKcal = this.state.nutritionGoals?.kcal || 2100;
         this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
         this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`); this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`); this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
-        this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => this.createSwipeRow(`<div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div>`, `App.deleteNutritionLog('${n.id}')`)).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
-        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => this.createSwipeRow(`<div><strong>⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
+        this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => this.createSwipeRow(`<div><strong>${this.escapeHTML(n.meal)}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div>`, `App.deleteNutritionLog('${n.id}')`)).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
+        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => this.createSwipeRow(`<div><strong class="sensitive">⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
         const ctxW = document.getElementById('weightChart'); if (ctxW && typeof Chart !== 'undefined') { const sortedW = [...this.state.healthWeight].sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(-10); if (this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w => this.formatDate(w.date).slice(0, 5)), datasets: [{ label: 'Peso', data: sortedW.map(w => w.value), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.2)', tension: 0.35, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
-        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => { const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; const file = m.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="event.stopPropagation(); App.openImageViewer('${m.fileData}')">📎</span>` : ''; return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${m.title}</strong> ${file}${extra}<div class="stat-label">${m.notes || ''}</div></div>`, `App.deleteMedicalRecord('${m.id}')`); }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
+        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => { const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${this.escapeHTML(m.therapy)}</div>` : ''; const file = m.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('med', '${m.id}')">📎 Allegato</button>` : ''; return this.createSwipeRow(`<div class="sensitive"><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${this.escapeHTML(m.title)}</strong> ${file}${extra}<div class="stat-label">${this.escapeHTML(m.notes || '')}</div></div>`, `App.deleteMedicalRecord('${m.id}')`); }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
       },
 
       // === HUB EXTRA: INVENTARIO, MANUTENZIONI, RICERCA, GALLERIA ===
@@ -1682,27 +1829,27 @@
         this.save(); e.target.reset(); this.setElText('invFileLabel', '📷 Allega Foto'); document.getElementById('invDate').value = this.toLocalISO(); this.populateCategorySelects(); this.renderInventory(); this.showToast('Bene salvato!');
       },
       deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
-      renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search) || (i.location||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => { const imgHtml = item.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="event.stopPropagation(); App.openImageViewer('${item.fileData}')">📎</span>` : ''; return this.createSwipeRow(`<div><strong>📦 ${item.name}</strong> ${imgHtml} <span class="badge">${item.category}</span><br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`, `App.deleteInventoryItem('${item.id}')`); }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
+      renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search) || (i.location||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => { const imgHtml = item.fileData ? `<button type="button" class="btn btn-sm" style="padding:0.1rem 0.4rem; font-size:0.75rem;" onclick="event.stopPropagation(); App.openMediaById('inv', '${item.id}')">📎 Foto</button>` : ''; return this.createSwipeRow(`<div><strong>📦 ${this.escapeHTML(item.name)}</strong> ${imgHtml} <span class="badge">${this.escapeHTML(item.category)}</span><br><small class="stat-label">${this.escapeHTML(item.location || '')} ${item.notes ? '— ' + this.escapeHTML(item.notes) : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`, `App.deleteInventoryItem('${item.id}')`); }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
 
       populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('maintCategory', html); this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html); },
       addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); document.getElementById('maintDueDate').value = this.toLocalISO(); this.renderGeneralMaintenances(); },
       deleteGeneralMaintenance(id) { if (confirm('Eliminare manutenzione?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderGeneralMaintenances(); } },
-      renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
+      renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${this.escapeHTML(m.title)}</strong> <span class="badge">${this.escapeHTML(m.category)}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + this.escapeHTML(m.notes) : ''}</small></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
 
       renderGallery() {
         let images = [];
-        this.state.transactions.forEach(t => { if(t.fileData) images.push({src: t.fileData, title: t.desc, date: t.date, type: 'Spesa'}); });
-        this.state.inventory.forEach(i => { if(i.fileData) images.push({src: i.fileData, title: i.name, date: i.date, type: 'Inventario'}); });
-        this.state.healthMedical.forEach(m => { if(m.fileData) images.push({src: m.fileData, title: m.title, date: m.date, type: 'Referto'}); });
+        this.state.transactions.forEach(t => { if(t.fileData) images.push({id: t.id, mod: 'tx', src: t.fileData, title: t.desc, date: t.date, type: 'Spesa'}); });
+        this.state.inventory.forEach(i => { if(i.fileData) images.push({id: i.id, mod: 'inv', src: i.fileData, title: i.name, date: i.date, type: 'Inventario'}); });
+        this.state.healthMedical.forEach(m => { if(m.fileData) images.push({id: m.id, mod: 'med', src: m.fileData, title: m.title, date: m.date, type: 'Referto'}); });
         images.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
         this.setElHTML('galleryGrid', images.length ? images.map(img => {
           const isPdf = img.src.startsWith('data:application/pdf');
-          const preview = isPdf ? `<div style="font-size:2.5rem;">📄</div>` : `<img src="${img.src}" alt="${img.title}">`;
-          return `<div class="gallery-item" onclick="App.openImageViewer('${img.src}')">${preview}<div class="gallery-overlay"><strong>${img.type}</strong><br>${img.title}</div></div>`;
+          const preview = isPdf ? `<div style="font-size:2.5rem;">📄</div>` : `<img src="${img.src}" alt="${this.escapeHTML(img.title)}">`;
+          return `<div class="gallery-item" onclick="App.openMediaById('${img.mod}', '${img.id}')">${preview}<div class="gallery-overlay"><strong>${img.type}</strong><br>${this.escapeHTML(img.title)}</div></div>`;
         }).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
       },
 
-      executeSearch() { const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim(); if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'); let html = ''; this.state.transactions.forEach(t => { if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${t.category}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`; }); this.state.inventory.forEach(i => { if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>📦 ${i.name}</strong><br><small class="stat-label">${i.category}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`; }); this.state.healthMedical.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${m.notes}</small></div></div>`; }); this.state.maintenances.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🔧 ${m.title}</strong><br><small class="stat-label">${m.category} • ${this.formatDate(m.dueDate)}</small></div></div>`; }); this.state.garageMaint.forEach(m => { if ((m.title||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🏎️ ${m.title}</strong><br><small class="stat-label">${this.formatDate(m.date)}</small></div><strong>${this.formatMoney(m.cost)}</strong></div>`; }); this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`); },
+      executeSearch() { const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim(); if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'); let html = ''; this.state.transactions.forEach(t => { if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>💸 ${this.escapeHTML(t.desc)}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${this.escapeHTML(t.category)}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`; }); this.state.inventory.forEach(i => { if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>📦 ${this.escapeHTML(i.name)}</strong><br><small class="stat-label">${this.escapeHTML(i.category)}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`; }); this.state.healthMedical.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🩺 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${this.escapeHTML(m.notes)}</small></div></div>`; }); this.state.maintenances.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🔧 ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.escapeHTML(m.category)} • ${this.formatDate(m.dueDate)}</small></div></div>`; }); this.state.garageMaint.forEach(m => { if ((m.title||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🏎️ ${this.escapeHTML(m.title)}</strong><br><small class="stat-label">${this.formatDate(m.date)}</small></div><strong>${this.formatMoney(m.cost)}</strong></div>`; }); this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${this.escapeHTML(query)}"</div>`); },
 
       startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
       closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
