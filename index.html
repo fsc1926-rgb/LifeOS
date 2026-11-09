@@ -37,9 +37,9 @@
     body.privacy-active .sensitive { filter: blur(8px); opacity: 0.4; user-select: none; pointer-events: none; }
 
     /* ==========================================
-       2. COMPONENTI UI & SWIPE-TO-DELETE
+       2. COMPONENTI UI & SWIPE-TO-DELETE (FIX SCHIACCIAMENTO)
        ========================================== */
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; flex-shrink: 0; }
     .btn:active { transform: scale(0.96); }
     .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
     .btn-danger { background: rgba(239, 68, 68, 0.14); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
@@ -47,19 +47,22 @@
     
     .input, select, textarea { width: 100%; padding: 0.7rem 0.95rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; margin-bottom: 0.75rem; transition: border-color 0.2s ease; outline: none; }
     .input:focus, select:focus, textarea:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; } .form-row .input, .form-row select { margin-bottom: 0; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+    .form-row .input, .form-row select { margin-bottom: 0; }
+    .wallet-actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
     
-    .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); }
+    .badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.65rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); flex-shrink: 0; }
     .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); } .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); } .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); } .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--info); }
 
-    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; padding-right: 2px; }
+    .item-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 420px; overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
     
-    .swipe-container { position: relative; overflow: hidden; border-radius: 14px; margin-bottom: 0.1rem; }
-    .swipe-content { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); position: relative; z-index: 2; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    /* FIX CRITICO: flex-shrink: 0 impedisce lo schiacciamento verticale delle righe quando la lista supera max-height */
+    .swipe-container { position: relative; overflow: hidden; border-radius: 14px; flex-shrink: 0; width: 100%; }
+    .swipe-content { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); position: relative; z-index: 2; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); min-height: 60px; width: 100%; }
     .swipe-action { position: absolute; right: 0; top: 0; bottom: 0; width: 75px; background: var(--danger); color: #fff; display: grid; place-items: center; z-index: 1; border-radius: 0 14px 14px 0; cursor: pointer; font-size: 1.2rem; }
-    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); }
+    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); flex-shrink: 0; min-height: 58px; width: 100%; }
     
-    .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+    .inner-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; flex-wrap: wrap; }
     .inner-tab { background: transparent; border: none; color: var(--text-secondary); font-weight: 700; font-size: 0.9rem; cursor: pointer; padding: 0.35rem 0.75rem; border-radius: 8px; }
     .inner-tab.active { color: #fff; background: var(--accent-gradient); }
 
@@ -72,7 +75,7 @@
     .col-span-12 { grid-column: span 12; } .col-span-9 { grid-column: span 9; } .col-span-8 { grid-column: span 8; } .col-span-6 { grid-column: span 6; } .col-span-5 { grid-column: span 5; } .col-span-4 { grid-column: span 4; } .col-span-3 { grid-column: span 3; }
 
     .bento-card { background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-top: 1px solid rgba(255, 255, 255, 0.14); border-radius: 22px; padding: 1.35rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; position: relative; overflow: hidden; }
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.75rem; flex-wrap: wrap; }
     .card-title { font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.02em; }
     .stat-value { font-size: 2rem; font-weight: 900; letter-spacing: -0.03em; font-family: 'JetBrains Mono', monospace; margin: 0.25rem 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
@@ -87,25 +90,25 @@
     .score-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
     .score-progress { fill: none; stroke: url(#auroraGrad); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 150; stroke-dashoffset: 150; transition: stroke-dashoffset 1s ease; }
     
-    .wallet-carousel { display: flex; gap: 0.85rem; overflow-x: auto; padding-bottom: 0.6rem; margin-bottom: 1rem; scroll-snap-type: x mandatory; }
-    .wallet-card { min-width: 230px; flex: 1; scroll-snap-align: start; padding: 1.15rem; border-radius: 18px; color: #fff; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: transform 0.2s ease, outline 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px; }
+    .wallet-carousel { display: flex; gap: 0.85rem; overflow-x: auto; padding: 0.2rem 0.2rem 0.75rem; margin-bottom: 0.8rem; scroll-snap-type: x mandatory; }
+    .wallet-card { min-width: 240px; flex: 0 0 245px; scroll-snap-align: start; padding: 1.15rem; border-radius: 18px; color: #fff; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: transform 0.2s ease, outline 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; }
     .wallet-card:active { transform: scale(0.97); }
-    .wallet-card.selected { outline: 3px solid #ffffff; }
+    .wallet-card.selected { outline: 3px solid #ffffff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.5); }
+    .wallet-card-all { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: 1px solid rgba(255,255,255,0.2); }
     .wallet-card-0 { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
     .wallet-card-1 { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); }
     .wallet-card-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
     .wallet-card-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-    .wallet-card-4 { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
-    .wallet-chip { width: 28px; height: 20px; border-radius: 5px; background: rgba(255,255,255,0.28); border: 1px solid rgba(255,255,255,0.4); }
-    .wallet-arrows { display:flex; gap:0.3rem; }
-    .wallet-arrows button { background:rgba(0,0,0,0.3); border:none; color:#fff; border-radius:4px; padding:0.1rem 0.4rem; cursor:pointer; font-size:0.7rem; }
+    .wallet-card-4 { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); }
+    .wallet-arrows { display: flex; gap: 0.3rem; align-items: center; }
+    .wallet-arrows button { background: rgba(0,0,0,0.35); border: none; color: #fff; border-radius: 6px; padding: 0.2rem 0.45rem; cursor: pointer; font-size: 0.72rem; }
 
     /* GARAGE OS */
     .vehicle-selector { display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem; margin-bottom:1rem; }
-    .vehicle-chip { padding:0.5rem 1rem; border-radius:999px; background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-secondary); font-weight:700; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
+    .vehicle-chip { padding:0.5rem 1rem; border-radius:999px; background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-secondary); font-weight:700; font-size:0.85rem; cursor:pointer; white-space:nowrap; flex-shrink: 0; }
     .vehicle-chip.active { background:var(--accent-gradient); color:#fff; border-color:transparent; }
-    .garage-car-header { position: relative; background: linear-gradient(45deg, #0f172a 0%, #1e1b4b 100%); border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-highlight); display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
-    .garage-car-header::after { content: '🚘'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-size: 8rem; opacity: 0.15; filter: blur(2px); }
+    .garage-car-header { position: relative; background: linear-gradient(45deg, #0f172a 0%, #1e1b4b 100%); border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-highlight); display: flex; align-items: center; justify-content: space-between; overflow: hidden; gap: 1rem; flex-wrap: wrap; }
+    .garage-car-header::after { content: '🚘'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-size: 8rem; opacity: 0.15; filter: blur(2px); pointer-events: none; }
     .car-brand-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; z-index: 1; }
     .car-plate { display: inline-block; background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 6px; border: 2px solid #3b82f6; z-index: 1; }
     .traffic-light-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
@@ -156,7 +159,7 @@
     .fab-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: grid; place-items: center; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5); cursor: pointer; border: none; transition: transform 0.2s; }
     .fab-btn:active { transform: scale(0.9); }
     .fab-menu { display: none; flex-direction: column; gap: 0.5rem; }
-    .fab-menu.open { display: flex; animation: fadeIn 0.2s ease; }
+    .fab-menu.open { display: flex; animation: slideIn 0.2s ease; }
     .fab-item { display: flex; align-items: center; gap: 0.5rem; background: var(--bg-secondary); padding: 0.65rem 1.2rem; border-radius: 999px; border: 1px solid var(--border-highlight); color: var(--text-primary); font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: var(--shadow-lg); }
 
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-top: 0.75rem; }
@@ -216,7 +219,7 @@
         <div class="brand-logo">L10</div>
         <div class="brand-text"><span>LifeOS</span><span class="badge" style="font-size:0.6rem; padding: 0.15rem 0.45rem; margin-left:4px;">CLOUD SYNC</span></div>
       </div>
-      <div>
+      <div style="display:flex; gap:0.35rem;">
         <button class="btn btn-sm" onclick="App.openModal('pomodoroModal')" title="Focus Timer">⏱️</button>
         <button class="btn btn-sm" onclick="App.openModal('searchModal')" title="Ricerca Globale">🔍</button>
         <button class="btn btn-sm" id="privacyBtn" onclick="App.togglePrivacyMode()" title="Privacy">👁️</button>
@@ -278,7 +281,7 @@
 
         <div class="bento-card col-span-12">
           <div class="card-header"><span class="card-title">📌 Prossime Attività & Scadenze</span><button class="btn btn-sm" onclick="App.switchModule('mod-calendar')">Apri Calendario →</button></div>
-          <div id="dashUpcomingTasks" class="item-list" style="max-height: 220px; overflow-x:hidden;"></div>
+          <div id="dashUpcomingTasks" class="item-list" style="max-height: 220px;"></div>
         </div>
       </div>
     </section>
@@ -295,13 +298,13 @@
           <div class="calendar-grid" id="calendarDaysGrid"></div>
         </div>
         <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">✅ Task del Giorno (Fai Swipe per Eliminare)</div><span class="badge" id="calTaskCountBadge">0</span></div>
+          <div class="card-header"><div class="card-title">✅ Task del Giorno (Swipe per Eliminare)</div><span class="badge" id="calTaskCountBadge">0</span></div>
           <form onsubmit="App.addCalendarTask(event)" style="margin-bottom: 1rem;">
             <input type="text" id="calTaskTitle" class="input" placeholder="Nuova attività o promemoria..." required>
             <div class="form-row"><select id="calTaskType" class="input"><option value="Attività">📌 Attività</option><option value="Promemoria">⏰ Promemoria</option><option value="Evento">🗓️ Evento</option></select><select id="calTaskPriority" class="input"><option value="Normale">Priorità Normale</option><option value="Alta">🔥 Alta</option><option value="Bassa">🌱 Bassa</option></select></div>
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Aggiungi al Giorno</button>
           </form>
-          <div id="calendarTasksList" class="item-list" style="max-height: 320px; overflow-x:hidden;"></div>
+          <div id="calendarTasksList" class="item-list" style="max-height: 320px;"></div>
         </div>
         <div class="bento-card col-span-3">
           <div class="card-header"><div class="card-title">📓 Diario & Mood</div></div>
@@ -314,28 +317,32 @@
         </div>
       </div>
     </section>
-
     <!-- ==========================================
-         3. FINANZE WALLET
+         3. FINANZE WALLET (CORRETTO E OTTIMIZZATO)
          ========================================== -->
     <section id="mod-finance" class="module-section">
       <div class="bento-grid">
         <div class="bento-card col-span-12">
           <div class="card-header">
-            <div><div class="card-title">💳 Il Mio Wallet Digitale</div><div class="stat-label">Tocca una carta per filtrare i movimenti (Usa ◀ ▶ per riordinare)</div></div>
+            <div>
+              <div class="card-title">💳 Il Mio Wallet Digitale</div>
+              <div class="stat-label">Tocca una carta per filtrare i movimenti (Usa ◀ ▶ per riordinare)</div>
+            </div>
             <span class="badge badge-success sensitive" id="finTotalBalanceBadge" style="font-size:0.95rem; padding:0.35rem 0.85rem;">€ 0,00</span>
           </div>
+          
           <div id="financeAccountsList" class="wallet-carousel sensitive"></div>
-          <div class="form-row" style="margin-top:0.5rem; margin-bottom:0;">
-            <form onsubmit="App.addFinanceAccount(event)" style="display:flex; gap:0.5rem;">
-              <input type="text" id="accNameInput" class="input" placeholder="Nuovo Conto..." required style="margin:0;">
-              <input type="number" id="accInitialBalance" class="input" step="0.01" placeholder="Saldo €" required style="margin:0; max-width:120px;">
-              <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">+ Conto</button>
+          
+          <div class="wallet-actions-grid">
+            <form onsubmit="App.addFinanceAccount(event)" style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="text" id="accNameInput" class="input" placeholder="Nuovo Conto..." required style="margin:0; flex:1;">
+              <input type="number" id="accInitialBalance" class="input" step="0.01" placeholder="Saldo €" required style="margin:0; width:115px;">
+              <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap; height:40px;">+ Conto</button>
             </form>
-            <div style="display:flex; gap:0.5rem;">
-              <select id="reconcileAccountSelect" class="input" style="margin:0;"></select>
-              <input type="number" id="reconcileTargetInput" class="input" step="0.01" placeholder="Saldo reale €" style="margin:0; max-width:130px;">
-              <button type="button" class="btn btn-sm" style="white-space:nowrap;" onclick="App.reconcileAccountBalance()">⚖️ Allinea</button>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <select id="reconcileAccountSelect" class="input" style="margin:0; flex:1;"></select>
+              <input type="number" id="reconcileTargetInput" class="input" step="0.01" placeholder="Saldo reale €" style="margin:0; width:125px;">
+              <button type="button" class="btn btn-sm" style="white-space:nowrap; height:40px;" onclick="App.reconcileAccountBalance()">⚖️ Allinea</button>
             </div>
           </div>
         </div>
@@ -344,7 +351,11 @@
           <div class="card-header"><div class="card-title">💸 Registra Transazione (con Scontrino)</div></div>
           <form onsubmit="App.addTransaction(event)" style="margin-bottom: 1.25rem;">
             <div class="form-row">
-              <select id="txType" class="input" onchange="App.toggleTransferFields()" required><option value="EXPENSE">📉 Uscita / Spesa</option><option value="INCOME">📈 Entrata / Stipendio</option><option value="TRANSFER">🔄 Giroconto</option></select>
+              <select id="txType" class="input" onchange="App.toggleTransferFields()" required>
+                <option value="EXPENSE">📉 Uscita / Spesa</option>
+                <option value="INCOME">📈 Entrata / Stipendio</option>
+                <option value="TRANSFER">🔄 Giroconto</option>
+              </select>
               <input type="number" id="txAmount" class="input" step="0.01" min="0.01" placeholder="Importo € *" required>
             </div>
             <div class="form-row">
@@ -354,19 +365,30 @@
             <div class="form-row">
               <input type="text" id="txDesc" class="input" placeholder="Causale *" required>
               <input type="text" id="txCategory" class="input" list="catSuggestions" placeholder="Categoria (es. Alimentari)">
-              <datalist id="catSuggestions"><option value="Alimentari"><option value="Auto & Trasporti"><option value="Svago & Extra"><option value="Casa & Utenze"><option value="Salute"><option value="Stipendio / Entrate"></datalist>
+              <datalist id="catSuggestions">
+                <option value="Alimentari">
+                <option value="Auto & Trasporti">
+                <option value="Svago & Extra">
+                <option value="Casa & Utenze">
+                <option value="Salute">
+                <option value="Stipendio / Entrate">
+              </datalist>
             </div>
             <div class="form-row">
               <input type="date" id="txDate" class="input" required>
-              <div style="display:flex; align-items:center; background:var(--bg-secondary); border:1px dashed var(--border-highlight); border-radius:12px; padding:0 0.5rem; overflow:hidden;">
-                <label style="font-size:0.75rem; color:var(--text-secondary); white-space:nowrap;">📷 Scontrino</label>
-                <input type="file" id="txFile" class="input" accept="image/*" style="margin:0; border:none; padding:0.4rem;">
+              <div style="display:flex; align-items:center; background:var(--bg-secondary); border:1px dashed var(--border-highlight); border-radius:12px; padding:0 0.65rem; overflow:hidden;">
+                <label style="font-size:0.75rem; color:var(--text-secondary); white-space:nowrap; margin-right:0.4rem;">📷 Scontrino</label>
+                <input type="file" id="txFile" class="input" accept="image/*" style="margin:0; border:none; padding:0.4rem 0;">
               </div>
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra nel Libro Mastro</button>
           </form>
-          <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">📜 Libro Mastro Storico (Fai Swipe per Eliminare)</div><select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select></div>
-          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 440px; overflow-x:hidden;"></div>
+
+          <div class="card-header" style="margin-bottom: 0.75rem;">
+            <div class="card-title">📜 Libro Mastro Storico <span class="badge" id="txCountBadge">0</span></div>
+            <select id="txFilterAccount" class="input" style="width: auto; min-width: 180px; margin: 0;" onchange="App.renderFinance()"></select>
+          </div>
+          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 460px;"></div>
         </div>
 
         <div class="bento-card col-span-4">
@@ -375,9 +397,11 @@
           <hr style="border:none; border-top:1px solid var(--border-color); margin-bottom:1rem;">
           <div class="card-header" style="margin-bottom:0.5rem;"><div class="card-title">🔄 Abbonamenti Attivi</div><span class="badge badge-warning sensitive" id="subsTotalBadge">0 €/mese</span></div>
           <form onsubmit="App.addSubscription(event)" style="display:flex; gap:0.4rem; margin-bottom:0.75rem;">
-            <input type="text" id="subName" class="input" placeholder="Nome" required style="margin:0;"><input type="number" id="subCost" class="input" step="0.01" placeholder="€" required style="margin:0; max-width:80px;"><button type="submit" class="btn btn-primary btn-sm">+</button>
+            <input type="text" id="subName" class="input" placeholder="Nome" required style="margin:0; flex:1;">
+            <input type="number" id="subCost" class="input" step="0.01" placeholder="€" required style="margin:0; width:85px;">
+            <button type="submit" class="btn btn-primary btn-sm">+</button>
           </form>
-          <div id="subsList" class="item-list sensitive" style="max-height: 200px;"></div>
+          <div id="subsList" class="item-list sensitive" style="max-height: 220px;"></div>
         </div>
       </div>
     </section>
@@ -417,8 +441,8 @@
     <section id="sub-vault" class="module-section">
       <div class="card-header" style="margin-bottom: 1rem;">
         <div class="card-title">🔐 Deep Vault</div>
-        <div>
-          <button class="btn btn-sm" style="margin-right:0.5rem;" onclick="App.exportVaultTXT()">📄 Esporta (TXT in chiaro)</button>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-sm" onclick="App.exportVaultTXT()">📄 Esporta (TXT in chiaro)</button>
           <button class="btn btn-sm" onclick="App.lockVault()">🔒 Blocca Vault</button>
         </div>
       </div>
@@ -434,7 +458,7 @@
         </div>
         <div class="bento-card col-span-8">
           <div class="card-header"><div class="card-title">🗄️ I Tuoi Segreti (Decriptati in RAM)</div></div>
-          <div id="vaultList" class="item-list sensitive" style="max-height: 400px; overflow-x:hidden;"></div>
+          <div id="vaultList" class="item-list sensitive" style="max-height: 400px;"></div>
         </div>
       </div>
     </section>
@@ -451,7 +475,7 @@
               <div class="car-brand-title" id="garageCarName">--</div>
               <div class="car-plate" id="garageCarPlate">--</div>
             </div>
-            <div>
+            <div style="z-index:1;">
               <button class="btn btn-sm btn-primary" onclick="App.openModal('garageConfigModal')" style="margin-bottom:0.5rem;">⚙️ Configura</button><br>
               <button class="btn btn-sm btn-danger" onclick="App.deleteActiveVehicle()">🗑 Elimina</button>
             </div>
@@ -469,7 +493,7 @@
 
         <div class="bento-card col-span-4">
           <div class="card-header"><div class="card-title">⛽ Consumi & Chilometri</div></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
             <div><div class="stat-label">Chilometri Attuali</div><div class="stat-value" id="garageKmOdo" style="font-size:1.6rem;">0 km</div></div>
             <button class="btn btn-sm" onclick="App.updateGarageKm()">Aggiorna</button>
           </div>
@@ -483,12 +507,12 @@
         <div class="bento-card col-span-8">
           <div class="card-header"><div class="card-title">🔧 Storico Interventi (Swipe per eliminare)</div></div>
           <form onsubmit="App.addGarageMaintenance(event)" style="display:flex; gap:0.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
-            <input type="text" id="gMaintTitle" class="input" placeholder="Lavoro..." required style="margin:0; flex:2; min-width:200px;">
-            <input type="date" id="gMaintDate" class="input" required style="margin:0; flex:1; min-width:120px;">
+            <input type="text" id="gMaintTitle" class="input" placeholder="Lavoro..." required style="margin:0; flex:2; min-width:180px;">
+            <input type="date" id="gMaintDate" class="input" required style="margin:0; flex:1; min-width:130px;">
             <input type="number" id="gMaintCost" class="input" step="0.01" placeholder="Costo €" style="margin:0; flex:1; min-width:100px;">
             <button type="submit" class="btn btn-primary" style="white-space:nowrap;">+ Aggiungi</button>
           </form>
-          <div id="garageMaintList" class="item-list" style="max-height:300px; overflow-x:hidden;"></div>
+          <div id="garageMaintList" class="item-list" style="max-height:320px;"></div>
         </div>
       </div>
     </section>
@@ -517,8 +541,8 @@
         </div>
         <div class="bento-card col-span-8">
           <div class="inner-tabs"><button class="inner-tab active" id="tab-archivio" onclick="App.switchInvTab('archivio')">📦 Archivio Oggetti</button><button class="inner-tab" id="tab-garanzie" onclick="App.switchInvTab('garanzie')">🛡️ Garanzie</button></div>
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><select id="invFilterCat" class="input" style="width: auto; margin:0;" onchange="App.renderInventory()"><option value="ALL">Tutte</option></select><input type="text" id="invSearchInput" class="input" style="margin:0;" placeholder="Cerca bene, seriale o nota..." oninput="App.renderInventory()"></div>
-          <div id="inventoryList" class="item-list" style="max-height: 480px; overflow-x:hidden;"></div>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;"><select id="invFilterCat" class="input" style="width: auto; min-width: 140px; margin:0;" onchange="App.renderInventory()"><option value="ALL">Tutte</option></select><input type="text" id="invSearchInput" class="input" style="margin:0; flex:1;" placeholder="Cerca bene, seriale o nota..." oninput="App.renderInventory()"></div>
+          <div id="inventoryList" class="item-list" style="max-height: 480px;"></div>
         </div>
       </div>
     </section>
@@ -539,10 +563,10 @@
           </form>
         </div>
         <div class="bento-card col-span-8">
-          <div class="card-header" style="margin-bottom: 0.75rem;"><div class="card-title">🛠️ Storico & Scadenze (Swipe per eliminare)</div>
-            <div style="display:flex; gap:0.5rem;"><select id="maintFilterCat" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"></select><select id="maintFilterStatus" class="input" style="margin:0; width:auto;" onchange="App.renderGeneralMaintenances()"><option value="ALL">Tutti</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option></select></div>
+          <div class="card-header" style="margin-bottom: 0.75rem;"><div class="card-title">🛠️ Storico & Scadenze</div>
+            <div style="display:flex; gap:0.5rem;"><select id="maintFilterCat" class="input" style="margin:0; width:auto; min-width:120px;" onchange="App.renderGeneralMaintenances()"></select><select id="maintFilterStatus" class="input" style="margin:0; width:auto; min-width:130px;" onchange="App.renderGeneralMaintenances()"><option value="ALL">Tutti</option><option value="In attesa">⏳ In attesa</option><option value="Completata">✅ Completate</option></select></div>
           </div>
-          <div id="maintenanceList" class="item-list" style="max-height: 500px; overflow-x:hidden;"></div>
+          <div id="maintenanceList" class="item-list" style="max-height: 500px;"></div>
         </div>
       </div>
     </section>
@@ -552,7 +576,7 @@
       <div class="card-header" style="margin-bottom: 1rem;"><div class="card-title">❤️ Salute OS: Nutrizione, Peso & Cartella Clinica</div><button class="btn btn-sm" onclick="App.switchModule('mod-hub')">← Torna all'Hub</button></div>
       <div class="bento-grid">
         <div class="bento-card col-span-4">
-          <div class="card-header"><div class="card-title">🍎 Diario Alimentare (Swipe per eliminare)</div><span class="badge badge-info" id="kcalProgressText">0 / 2100 kcal</span></div>
+          <div class="card-header"><div class="card-title">🍎 Diario Alimentare</div><span class="badge badge-info" id="kcalProgressText">0 / 2100 kcal</span></div>
           <div style="margin-bottom: 1rem; background: var(--bg-secondary); padding: 0.85rem; border-radius: 14px; border: 1px solid var(--border-color);">
             <div class="macro-bar-bg" style="height:10px; margin-bottom:0.6rem;"><div id="kcalProgressBar" class="macro-bar-fill" style="width:0%;"></div></div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; text-align:center; font-size:0.75rem;"><div><span class="stat-label">Proteine</span><br><strong id="protProgressText" style="color:#10b981;">0g</strong></div><div><span class="stat-label">Carbo</span><br><strong id="carbProgressText" style="color:#3b82f6;">0g</strong></div><div><span class="stat-label">Grassi</span><br><strong id="fatProgressText" style="color:#f59e0b;">0g</strong></div></div>
@@ -560,7 +584,7 @@
           <div style="margin-bottom:0.75rem; padding:0.75rem; border-radius:12px; border:1px dashed var(--border-highlight);">
             <div class="stat-label" style="margin-bottom:0.4rem; color:var(--accent-primary); font-weight:700;">⚡ Calcolo Rapido Cibi:</div>
             <select id="nutriFoodSelect" class="input" style="margin-bottom:0.5rem;" onchange="App.AutoCalcFood()"></select>
-            <div style="display:flex; gap:0.5rem;"><select id="nutriMealType" class="input" style="margin:0;"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntino">🍎 Spuntino</option></select><input type="number" id="nutriGrams" class="input" placeholder="Grammi (g)" value="100" oninput="App.AutoCalcFood()" style="margin:0; max-width:110px;"></div>
+            <div style="display:flex; gap:0.5rem;"><select id="nutriMealType" class="input" style="margin:0; flex:1;"><option value="Colazione">☕ Colazione</option><option value="Pranzo">🍝 Pranzo</option><option value="Cena">🥩 Cena</option><option value="Spuntino">🍎 Spuntino</option></select><input type="number" id="nutriGrams" class="input" placeholder="Grammi (g)" value="100" oninput="App.AutoCalcFood()" style="margin:0; width:110px;"></div>
           </div>
           <form onsubmit="App.addNutritionLog(event)" style="margin-bottom: 1rem;">
             <input type="text" id="nutriMeal" class="input" placeholder="Pasto manuale..." required>
@@ -568,7 +592,7 @@
             <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-bottom:0.75rem;"><input type="number" id="nutriProt" class="input" step="0.1" placeholder="Prot" style="margin:0;"><input type="number" id="nutriCarbs" class="input" step="0.1" placeholder="Carb" style="margin:0;"><input type="number" id="nutriFat" class="input" step="0.1" placeholder="Gras" style="margin:0;"></div>
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">+ Registra Pasto</button>
           </form>
-          <div id="healthNutritionList" class="item-list" style="max-height: 240px; overflow-x:hidden;"></div>
+          <div id="healthNutritionList" class="item-list" style="max-height: 240px;"></div>
         </div>
         <div class="bento-card col-span-3">
           <div class="card-header"><div class="card-title">⚖️ Trend Peso</div></div>
@@ -577,7 +601,7 @@
           <div id="healthWeightList" class="item-list sensitive" style="max-height: 220px;"></div>
         </div>
         <div class="bento-card col-span-5">
-          <div class="card-header"><div class="card-title">🩺 Cartella Clinica & Referti (DB Offline)</div></div>
+          <div class="card-header"><div class="card-title">🩺 Cartella Clinica & Referti</div></div>
           <form onsubmit="App.addMedicalRecord(event)" style="margin-bottom: 1rem;">
             <div class="form-row"><select id="medType" class="input" onchange="App.toggleMedFields()" required><option value="Visita Medica">👨‍⚕️ Visita Specialistica</option><option value="Referto">📄 Referto (Upload PDF/Img)</option><option value="Sintomo">🌡️ Sintomo / Evento</option></select><input type="date" id="medDate" class="input" required></div>
             <input type="text" id="medTitle" class="input" placeholder="Oggetto *" required>
@@ -586,14 +610,14 @@
             <input type="text" id="medNotes" class="input" placeholder="Note cliniche...">
             <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">💾 Salva in Cartella</button>
           </form>
-          <div id="healthMedicalList" class="item-list sensitive" style="max-height: 320px; overflow-x:hidden;"></div>
+          <div id="healthMedicalList" class="item-list sensitive" style="max-height: 320px;"></div>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- MODALI -->
+  <!-- MODALI E FAB -->
   <div class="fab-container">
     <div class="fab-menu" id="fabMenu">
       <div class="fab-item" onclick="App.quickAdd('txAmount')">💸 Nuova Spesa</div>
@@ -625,11 +649,10 @@
 
   <div id="photoModal" class="modal-backdrop" onclick="App.closeModal('photoModal')">
     <div style="max-width: 90vw; max-height: 90vh;">
-      <img id="photoModalImg" style="width:100%; height:auto; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+      <img id="photoModalImg" style="width:100%; max-height:85vh; object-fit:contain; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
     </div>
   </div>
 
-  <!-- MODALE VAULT PIN SETUP -->
   <div id="vaultSetupModal" class="modal-backdrop">
     <div class="modal-content" style="max-width:380px; text-align:center;">
       <div class="card-header"><div class="card-title">🔐 Attiva Deep Vault</div><button class="btn btn-sm" onclick="App.closeModal('vaultSetupModal')">✕</button></div>
@@ -648,7 +671,6 @@
     </div>
   </div>
 
-  <!-- MODALE CONFIGURAZIONE GARAGE MULTI-VEICOLO -->
   <div id="garageConfigModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="card-header"><div class="card-title">⚙️ Impostazioni Veicolo</div><button class="btn btn-sm" onclick="App.closeModal('garageConfigModal')">✕</button></div>
@@ -667,11 +689,10 @@
     </div>
   </div>
 
-  <!-- MODALE FIREBASE CLOUD SYNC CONFIG -->
   <div id="firebaseConfigModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="card-header"><div class="card-title">☁️ Firebase Cloud Sync</div><button class="btn btn-sm" onclick="App.closeModal('firebaseConfigModal')">✕</button></div>
-      <p class="stat-label" style="margin-bottom:1rem;">Incolla i dati dell'oggetto <code>firebaseConfig</code> (dal Firebase Console). Questo abiliterà il backup automatico invisibile sul cloud. Lascia vuoto per usare solo il salvataggio locale.</p>
+      <p class="stat-label" style="margin-bottom:1rem;">Incolla i dati dell'oggetto <code>firebaseConfig</code> (dalla Firebase Console). Lascia vuoto per usare solo il salvataggio locale.</p>
       <input type="text" id="fbApiKey" class="input" placeholder="apiKey">
       <input type="text" id="fbAuthDomain" class="input" placeholder="authDomain">
       <input type="text" id="fbProjectId" class="input" placeholder="projectId">
@@ -683,12 +704,10 @@
     </div>
   </div>
 
-  <!-- MODALE IMPOSTAZIONI GLOBALI -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="card-header"><div class="card-title">⚙️ Impostazioni Ecosistema</div><button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button></div>
       <div class="bento-grid">
-        
         <div class="bento-card col-span-12" style="padding: 1.1rem; background:rgba(59, 130, 246, 0.1); border: 1px solid var(--info);">
           <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem; color:var(--info);">☁️ Cloud Sync (Firebase)</div>
           <div class="stat-label" style="margin-bottom:0.5rem;" id="syncStatusLabel">Stato: Disconnesso</div>
@@ -721,7 +740,6 @@
       </div>
     </div>
   </div>
-
   <script>
     localforage.config({ driver: localforage.INDEXEDDB, name: 'LifeOS_v7', version: 1.0, storeName: 'lifeos_data' });
 
@@ -764,6 +782,7 @@
       selectedDate: new Date(),
       activeInvTab: 'archivio',
       activeVehicleId: null,
+      activeAccountFilter: 'ALL',
       vaultUnlockedPIN: null,
       charts: {},
       html5QrcodeScanner: null,
@@ -771,7 +790,6 @@
       pomoSeconds: 1500,
       db: null,
 
-      // Helper data locale immune da bug di fuso orario (YYYY-MM-DD)
       toLocalISO(d = new Date()) {
         const dateObj = (d instanceof Date && !isNaN(d)) ? d : new Date(d);
         if (isNaN(dateObj)) return new Date().toISOString().slice(0, 10);
@@ -937,6 +955,11 @@
         const data = JSON.parse(JSON.stringify(importedData));
         const todayStr = this.toLocalISO();
 
+        // 0. Migrazione Conti (accounts / financeAccounts)
+        if (!Array.isArray(data.accounts) && Array.isArray(data.financeAccounts)) {
+          data.accounts = data.financeAccounts;
+        }
+
         // 1. Migrazione Transazioni (da financeTx o transactions)
         const rawTx = Array.isArray(data.transactions) ? data.transactions : (Array.isArray(data.financeTx) ? data.financeTx : []);
         data.transactions = rawTx.map(t => {
@@ -947,7 +970,7 @@
           else rawType = 'EXPENSE';
 
           return {
-            id: t.id || this.generateId(),
+            id: String(t.id || this.generateId()),
             type: rawType,
             amount: Number((parseFloat(t.amount) || 0).toFixed(2)),
             accountId: String(t.accountId || 'acc-main').trim(),
@@ -961,10 +984,10 @@
           };
         });
 
-        // 2. Migrazione Inventario (da vault legacy o inventory)
+        // 2. Migrazione Inventario
         if (Array.isArray(data.vault) && (!Array.isArray(data.inventory) || data.inventory.length === 0)) {
           data.inventory = data.vault.map(v => ({
-            id: v.id || this.generateId(),
+            id: String(v.id || this.generateId()),
             type: 'Archivio',
             name: v.title || v.name || 'Oggetto',
             category: v.cat || v.category || 'Generale',
@@ -982,7 +1005,7 @@
         // 3. Migrazione Nutrizione, Peso e Cartella Clinica
         if (Array.isArray(data.foodLogs) && (!Array.isArray(data.healthNutrition) || data.healthNutrition.length === 0)) {
           data.healthNutrition = data.foodLogs.map(f => ({
-            id: f.id || this.generateId(),
+            id: String(f.id || this.generateId()),
             meal: f.meal + (f.name ? ' - ' + f.name : ''),
             date: f.date || todayStr,
             kcal: parseFloat(f.kcal) || 0,
@@ -993,14 +1016,14 @@
         }
         if (Array.isArray(data.weightLogs) && (!Array.isArray(data.healthWeight) || data.healthWeight.length === 0)) {
           data.healthWeight = data.weightLogs.map(w => ({
-            id: w.id || this.generateId(),
+            id: String(w.id || this.generateId()),
             value: parseFloat(w.kg ?? w.value) || 0,
             date: w.date || todayStr
           }));
         }
         if (Array.isArray(data.medRecords) && (!Array.isArray(data.healthMedical) || data.healthMedical.length === 0)) {
           data.healthMedical = data.medRecords.map(m => ({
-            id: m.id || this.generateId(),
+            id: String(m.id || this.generateId()),
             title: m.title || 'Record',
             type: m.type || 'Visita Medica',
             date: m.date || todayStr,
@@ -1013,7 +1036,7 @@
         // 4. Migrazione Agenda
         if (Array.isArray(data.crmTasks) && (!Array.isArray(data.calendarTasks) || data.calendarTasks.length === 0)) {
           data.calendarTasks = data.crmTasks.map(t => ({
-            id: t.id || this.generateId(),
+            id: String(t.id || this.generateId()),
             title: t.title || 'Attività',
             type: t.scope === 'Memoria' ? 'Promemoria' : 'Attività',
             priority: t.priority || 'Normale',
@@ -1040,7 +1063,7 @@
             const alreadyInGarage = data.garageMaint.some(gm => gm.id === m.id);
             if (!alreadyInGarage) {
               data.garageMaint.push({
-                id: m.id || this.generateId(),
+                id: String(m.id || this.generateId()),
                 vehicleId: m.vehicleId || defaultVehId,
                 title: m.task || m.title || 'Intervento Veicolo',
                 date: m.dueDate || m.date || todayStr,
@@ -1050,7 +1073,7 @@
             }
           } else {
             cleanMaintenances.push({
-              id: m.id || this.generateId(),
+              id: String(m.id || this.generateId()),
               title: m.task || m.title || 'Intervento',
               category: m.asset || m.category || 'Casa',
               dueDate: m.dueDate || m.date || todayStr,
@@ -1064,15 +1087,7 @@
         data.maintenances = cleanMaintenances;
 
         if (data.vehicles.length === 0) {
-          data.vehicles.push({
-            id: defaultVehId,
-            name: 'Auto Principale',
-            plate: 'XX 000 XX',
-            bollo: '',
-            assic: '',
-            revis: '',
-            km: 0
-          });
+          data.vehicles.push({ id: defaultVehId, name: 'Auto Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
         }
 
         const currentFirebase = this.state.firebase;
@@ -1118,6 +1133,7 @@
         }
 
         this.state.inventory.forEach(item => {
+          item.id = String(item.id || this.generateId());
           if (item.category && !this.state.settings.inventoryCategories[item.category]) {
             this.state.settings.inventoryCategories[item.category] = ['Generale'];
           }
@@ -1126,6 +1142,7 @@
           }
         });
         this.state.maintenances.forEach(m => {
+          m.id = String(m.id || this.generateId());
           if (m.category && !this.state.settings.maintenanceCategories.includes(m.category)) {
             this.state.settings.maintenanceCategories.push(m.category);
           }
@@ -1138,7 +1155,7 @@
             const targetVehId = this.state.vehicles[0]?.id || 'veh-main';
             if (!this.state.garageMaint.some(gm => gm.id === m.id)) {
               this.state.garageMaint.push({
-                id: m.id || this.generateId(),
+                id: String(m.id || this.generateId()),
                 vehicleId: targetVehId,
                 title: m.title || 'Intervento Auto',
                 date: m.dueDate || m.date || today,
@@ -1159,11 +1176,17 @@
           this.activeVehicleId = this.state.vehicles[0].id;
         }
         this.state.garageMaint.forEach(m => {
+          m.id = String(m.id || this.generateId());
           if (!m.vehicleId || !this.state.vehicles.some(v => v.id === m.vehicleId)) {
             m.vehicleId = this.state.vehicles[0].id;
           }
           m.cost = cleanNumber(m.cost);
         });
+
+        // Se ci sono transazioni ma nessun conto, crea un conto principale automatico
+        if (this.state.accounts.length === 0 && this.state.transactions.length > 0) {
+          this.state.accounts.push({ id: 'acc-main', name: 'Conto Principale', balance: 0 });
+        }
 
         this.state.accounts.forEach(a => {
           a.id = String(a.id || this.generateId()).trim();
@@ -1171,10 +1194,11 @@
           a.name = (a.name || 'Conto').trim();
         });
 
-        const buddyAcc = this.state.accounts.find(a => a.name.toLowerCase().includes('buddy')) || this.state.accounts[0];
+        const fallbackAcc = this.state.accounts.find(a => a.name.toLowerCase().includes('buddy')) || this.state.accounts[0];
         const validAccIds = new Set(this.state.accounts.map(a => a.id));
 
         this.state.transactions.forEach(t => {
+          t.id = String(t.id || this.generateId());
           t.amount = cleanNumber(t.amount);
           t.date = String(t.date || today).slice(0, 10);
           t.desc = t.desc || 'Movimento';
@@ -1183,14 +1207,18 @@
           t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(upType) ? upType : 'EXPENSE';
 
           const txAccId = String(t.accountId || '').trim();
-          if (!validAccIds.has(txAccId) && buddyAcc) {
-            t.accountId = buddyAcc.id;
+          if (!validAccIds.has(txAccId) && fallbackAcc) {
+            t.accountId = fallbackAcc.id;
           } else {
             t.accountId = txAccId;
+          }
+          if (t.targetAccountId) {
+            t.targetAccountId = String(t.targetAccountId).trim();
           }
         });
 
         this.state.calendarTasks.forEach(t => {
+          t.id = String(t.id || this.generateId());
           if (!t.date || t.date.length < 10) t.date = today;
           else t.date = String(t.date).slice(0, 10);
           t.title = t.title || 'Attività';
@@ -1256,6 +1284,12 @@
         }
         document.getElementById('photoModalImg').src = src;
         this.openModal('photoModal');
+      },
+      viewAttachment(collection, id) {
+        const list = this.state[collection];
+        if (!Array.isArray(list)) return;
+        const item = list.find(x => String(x.id) === String(id));
+        if (item && item.fileData) this.openImageViewer(item.fileData);
       },
 
       switchModule(modId) {
@@ -1327,7 +1361,6 @@
       },
       generateId() { return Math.random().toString(36).substr(2, 9); },
 
-      // Supporta sia compressione immagini sia allegati PDF
       async fileToBase64(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -1598,7 +1631,7 @@
         });
       },
 
-      // === CALENDARIO (IMMUNE A FUSO ORARIO) ===
+      // === CALENDARIO ===
       changeMonth(dir) {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         this.currentDate.setMonth(this.currentDate.getMonth() + dir);
@@ -1697,7 +1730,6 @@
         const hist = [...this.state.journal].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 5);
         this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start; cursor:pointer;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>');
       },
-
       // === GARAGE OS ===
       switchVehicle(id) { this.activeVehicleId = id; this.renderGarage(); },
       addVehicle() {
@@ -1808,9 +1840,9 @@
         this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div><div style="display:flex; align-items:center; gap:0.6rem;"><strong>${this.formatMoney(m.cost)}</strong><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteGarageMaint('${m.id}')">🗑</button></div>`, `App.deleteGarageMaint('${m.id}')`)).join('') : '<div class="list-row stat-label">Nessun lavoro registrato.</div>');
       },
 
-      // === FINANZE WALLET ===
+      // === FINANZE WALLET (REVISIONATO E SENZA ERRORI) ===
       moveAccount(id, dir) {
-        const idx = this.state.accounts.findIndex(a => a.id === id);
+        const idx = this.state.accounts.findIndex(a => String(a.id) === String(id));
         if (idx < 0) return;
         const newIdx = idx + dir;
         if (newIdx < 0 || newIdx >= this.state.accounts.length) return;
@@ -1819,25 +1851,49 @@
         this.state.accounts[newIdx] = temp;
         this.save();
       },
+      deleteFinanceAccount(id) {
+        if (this.state.accounts.length <= 1) {
+          return this.showToast('Devi mantenere almeno un conto attivo.', 'warning');
+        }
+        const acc = this.state.accounts.find(a => String(a.id) === String(id));
+        if (!acc) return;
+        if (confirm(`Vuoi eliminare il conto "${acc.name}"? I movimenti associati resteranno nello storico.`)) {
+          this.state.accounts = this.state.accounts.filter(a => String(a.id) !== String(id));
+          if (this.activeAccountFilter === String(id)) this.activeAccountFilter = 'ALL';
+          this.save();
+          this.populateAccountSelects();
+          this.renderFinance();
+        }
+      },
       populateAccountSelects() {
         const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join('');
         this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html);
         this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html);
         this.setElHTML('reconcileAccountSelect', html);
+
         const filterEl = document.getElementById('txFilterAccount');
-        const currentFilter = String(filterEl?.value || 'ALL').trim();
-        this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''));
-        if (filterEl && (currentFilter === 'ALL' || this.state.accounts.some(a => String(a.id).trim() === currentFilter))) {
-          filterEl.value = currentFilter;
+        const desiredFilter = this.activeAccountFilter || String(filterEl?.value || 'ALL').trim();
+        this.setElHTML('txFilterAccount', `<option value="ALL">🌐 Tutti i Conti (${this.state.transactions.length})</option>` + this.state.accounts.map(a => `<option value="${a.id}">💳 ${a.name}</option>`).join(''));
+
+        if (filterEl) {
+          if (desiredFilter === 'ALL' || this.state.accounts.some(a => String(a.id).trim() === desiredFilter)) {
+            filterEl.value = desiredFilter;
+            this.activeAccountFilter = desiredFilter;
+          } else {
+            filterEl.value = 'ALL';
+            this.activeAccountFilter = 'ALL';
+          }
         }
       },
       selectWalletCard(accId) {
         const filterEl = document.getElementById('txFilterAccount');
-        if (!filterEl) return;
-        this.populateAccountSelects();
-        const currentVal = String(filterEl.value || 'ALL').trim();
-        const targetVal = String(accId || '').trim();
-        filterEl.value = (currentVal === targetVal) ? 'ALL' : targetVal;
+        const targetVal = String(accId || 'ALL').trim();
+        if (targetVal === 'ALL') {
+          this.activeAccountFilter = 'ALL';
+        } else {
+          this.activeAccountFilter = (this.activeAccountFilter === targetVal) ? 'ALL' : targetVal;
+        }
+        if (filterEl) filterEl.value = this.activeAccountFilter;
         this.renderFinance();
       },
       renderFinance() {
@@ -1845,48 +1901,86 @@
         this.setElText('finTotalBalanceBadge', this.formatMoney(total));
 
         const filterEl = document.getElementById('txFilterAccount');
-        const fAcc = String(filterEl?.value || 'ALL').trim();
+        if (filterEl && filterEl.value) {
+          this.activeAccountFilter = String(filterEl.value).trim();
+        }
+        const fAcc = this.activeAccountFilter || 'ALL';
 
-        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => {
-          const txCount = this.state.transactions.filter(t => String(t.accountId).trim() === String(a.id).trim() || String(t.targetAccountId).trim() === String(a.id).trim()).length;
-          return `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === String(a.id).trim() ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')">
+        // Card "Tutti i Conti" + Carosello Carte Singole
+        const allCardHtml = `
+          <div class="wallet-card wallet-card-all ${fAcc === 'ALL' ? 'selected' : ''}" onclick="App.selectWalletCard('ALL')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-weight:800; font-size:0.95rem;">${a.name}</span>
+              <span style="font-weight:800; font-size:0.95rem;">🌐 Tutti i Conti</span>
+              <span class="badge" style="background:rgba(255,255,255,0.18); color:#fff;">Globale</span>
+            </div>
+            <div>
+              <div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(total)}</div>
+              <div style="font-size:0.72rem; opacity:0.85;">${this.state.accounts.length} conti • ${this.state.transactions.length} movimenti totali</div>
+            </div>
+          </div>
+        `;
+
+        const cardsHtml = this.state.accounts.map((a, idx) => {
+          const accIdStr = String(a.id).trim();
+          const txCount = this.state.transactions.filter(t => String(t.accountId).trim() === accIdStr || String(t.targetAccountId).trim() === accIdStr).length;
+          return `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === accIdStr ? 'selected' : ''}" onclick="App.selectWalletCard('${accIdStr}')">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.4rem;">
+              <span style="font-weight:800; font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${a.name}</span>
               <div class="wallet-arrows">
-                ${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}
-                ${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}
+                ${idx > 0 ? `<button title="Sposta a sinistra" onclick="event.stopPropagation(); App.moveAccount('${accIdStr}', -1)">◀</button>` : ''}
+                ${idx < this.state.accounts.length - 1 ? `<button title="Sposta a destra" onclick="event.stopPropagation(); App.moveAccount('${accIdStr}', 1)">▶</button>` : ''}
+                ${this.state.accounts.length > 1 ? `<button title="Elimina conto" onclick="event.stopPropagation(); App.deleteFinanceAccount('${accIdStr}')">✕</button>` : ''}
               </div>
             </div>
             <div>
               <div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div>
-              <div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • ${txCount} mov.</div>
+              <div style="font-size:0.72rem; opacity:0.85;">${a.type || 'Conto'} • ${txCount} mov.</div>
             </div>
           </div>`;
-        }).join('') : '<div class="stat-label">Nessun conto presente.</div>');
+        }).join('');
+
+        this.setElHTML('financeAccountsList', allCardHtml + cardsHtml);
 
         let filtered = [...this.state.transactions];
         if (fAcc !== 'ALL') {
           filtered = filtered.filter(t => String(t.accountId).trim() === fAcc || String(t.targetAccountId).trim() === fAcc);
         }
-        filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+        this.setElText('txCountBadge', filtered.length);
 
         this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => {
           const acc = this.state.accounts.find(a => String(a.id).trim() === String(tx.accountId).trim());
-          const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)';
-          const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '';
-          const imgHtml = tx.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${tx.fileData}')">📎</span>` : '';
+          const trgAcc = tx.targetAccountId ? this.state.accounts.find(a => String(a.id).trim() === String(tx.targetAccountId).trim()) : null;
+
+          let accLabel = acc ? acc.name : 'Conto';
+          let color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)';
+          let prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '🔄 ';
+
+          if (tx.type === 'TRANSFER') {
+            accLabel = `${acc ? acc.name : 'Origine'} ➔ ${trgAcc ? trgAcc.name : 'Destinazione'}`;
+            if (fAcc !== 'ALL') {
+              if (String(tx.accountId).trim() === fAcc) { color = 'var(--danger)'; prefix = '-'; }
+              else if (String(tx.targetAccountId).trim() === fAcc) { color = 'var(--success)'; prefix = '+'; }
+            }
+          }
+
+          const imgHtml = tx.fileData ? `<span style="font-size:0.9rem; cursor:pointer; margin-left:4px;" title="Vedi Scontrino" onclick="App.viewAttachment('transactions', '${tx.id}')">📎</span>` : '';
           return this.createSwipeRow(
-            `<div>
-              <span class="stat-label">${this.formatDate(tx.date)} • <strong style="color:var(--accent-primary);">${acc ? acc.name : 'Buddy'}</strong></span><br>
-              <strong>${tx.desc}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span>
+            `<div style="flex:1; min-width:0;">
+              <span class="stat-label">${this.formatDate(tx.date)} • <strong style="color:var(--accent-primary);">${accLabel}</strong></span>
+              <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-top:2px;">
+                <strong style="word-break:break-word;">${tx.desc}</strong>${imgHtml}
+                <span class="badge" style="font-size:0.65rem;">${tx.category || 'Generale'}</span>
+              </div>
             </div>
-            <div style="display:flex; align-items:center; gap:0.6rem;">
-              <strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong>
-              <button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteTransaction('${tx.id}')">🗑</button>
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-shrink:0;">
+              <strong style="color:${color}; font-family:'JetBrains Mono',monospace; white-space:nowrap;">${prefix}${this.formatMoney(tx.amount)}</strong>
+              <button class="btn btn-sm btn-danger" style="padding:0.25rem 0.5rem;" onclick="App.deleteTransaction('${tx.id}')">🗑</button>
             </div>`,
             `App.deleteTransaction('${tx.id}')`
           );
-        }).join('') : '<div class="list-row stat-label">Nessuna transazione per questo filtro.</div>');
+        }).join('') : '<div class="list-row stat-label">Nessuna transazione registrata per questo filtro.</div>');
 
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0);
         this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
@@ -1897,7 +1991,8 @@
         const ctx = document.getElementById('expenseCatChart');
         if (!ctx || typeof Chart === 'undefined') return;
         const catTotals = {};
-        this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => {
+        const fAcc = this.activeAccountFilter || 'ALL';
+        this.state.transactions.filter(t => t.type === 'EXPENSE' && (fAcc === 'ALL' || String(t.accountId).trim() === fAcc)).forEach(t => {
           const c = t.category || 'Altro';
           catTotals[c] = Number(((catTotals[c] || 0) + t.amount).toFixed(2));
         });
@@ -1920,18 +2015,25 @@
       },
       addFinanceAccount(e) {
         e.preventDefault();
-        this.state.accounts.push({
+        const newAcc = {
           id: this.generateId(),
-          name: document.getElementById('accNameInput').value,
+          name: document.getElementById('accNameInput').value.trim(),
           balance: parseFloat(document.getElementById('accInitialBalance').value) || 0
-        });
+        };
+        this.state.accounts.push(newAcc);
         this.save();
         e.target.reset();
         this.populateAccountSelects();
         this.renderFinance();
+        this.showToast(`Conto "${newAcc.name}" aggiunto!`);
       },
       toggleTransferFields() {
-        document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none';
+        const isTransfer = document.getElementById('txType').value === 'TRANSFER';
+        const trgEl = document.getElementById('txTargetAccount');
+        if (trgEl) {
+          trgEl.style.display = isTransfer ? 'block' : 'none';
+          trgEl.required = isTransfer;
+        }
       },
       async addTransaction(e) {
         e.preventDefault();
@@ -1939,9 +2041,9 @@
         const a = parseFloat(document.getElementById('txAmount').value);
         const srcId = document.getElementById('txAccount').value;
         const trgId = document.getElementById('txTargetAccount').value;
-        if (!srcId) return this.showToast('Seleziona un conto', 'danger');
-        if (t === 'TRANSFER' && (!trgId || trgId === srcId)) return this.showToast('Seleziona un conto destinazione valido', 'warning');
-        const src = this.state.accounts.find(x => x.id === srcId);
+        if (!srcId) return this.showToast('Seleziona un conto origine', 'danger');
+        if (t === 'TRANSFER' && (!trgId || trgId === srcId)) return this.showToast('Seleziona un conto destinazione diverso', 'warning');
+        const src = this.state.accounts.find(x => String(x.id) === String(srcId));
         let fileData = null;
         if (document.getElementById('txFile')?.files?.length > 0) {
           try { fileData = await this.fileToBase64(document.getElementById('txFile').files[0]); } catch (err) {}
@@ -1951,10 +2053,11 @@
           type: t,
           amount: a,
           accountId: srcId,
-          desc: document.getElementById('txDesc').value,
-          category: document.getElementById('txCategory').value || 'Generale',
+          targetAccountId: t === 'TRANSFER' ? trgId : null,
+          desc: document.getElementById('txDesc').value.trim(),
+          category: document.getElementById('txCategory').value.trim() || (t === 'TRANSFER' ? 'Giroconto' : 'Generale'),
           date: document.getElementById('txDate').value,
-          recurrence: document.getElementById('txRecurrence')?.value || 'Singola',
+          recurrence: 'Singola',
           timestamp: new Date().toISOString(),
           fileData
         };
@@ -1963,9 +2066,8 @@
           else if (t === 'INCOME') src.balance = Number((src.balance + a).toFixed(2));
           else if (t === 'TRANSFER') {
             src.balance = Number((src.balance - a).toFixed(2));
-            const trg = this.state.accounts.find(x => x.id === trgId);
+            const trg = this.state.accounts.find(x => String(x.id) === String(trgId));
             if (trg) trg.balance = Number((trg.balance + a).toFixed(2));
-            tx.targetAccountId = trgId;
           }
         }
         this.state.transactions.push(tx);
@@ -1975,15 +2077,16 @@
         this.toggleTransferFields();
         this.populateAccountSelects();
         this.renderFinance();
+        this.showToast('Movimento registrato!');
       },
       reconcileAccountBalance() {
         const id = document.getElementById('reconcileAccountSelect').value;
         const tar = parseFloat(document.getElementById('reconcileTargetInput').value);
-        if (!id || isNaN(tar)) return;
-        const acc = this.state.accounts.find(a => a.id === id);
+        if (!id || isNaN(tar)) return this.showToast('Inserisci un saldo valido', 'warning');
+        const acc = this.state.accounts.find(a => String(a.id) === String(id));
         if (!acc) return;
         const diff = Number((tar - acc.balance).toFixed(2));
-        if (diff === 0) return;
+        if (diff === 0) return this.showToast('Il saldo è già allineato!', 'info');
         acc.balance = tar;
         this.state.transactions.push({
           id: this.generateId(),
@@ -2000,21 +2103,22 @@
         document.getElementById('reconcileTargetInput').value = '';
         this.populateAccountSelects();
         this.renderFinance();
+        this.showToast('Saldo allineato!');
       },
       deleteTransaction(id) {
-        const tx = this.state.transactions.find(t => t.id === id);
-        if (!tx || !confirm('Eliminare movimento?')) return;
-        const src = this.state.accounts.find(a => a.id === tx.accountId);
+        const tx = this.state.transactions.find(t => String(t.id) === String(id));
+        if (!tx || !confirm('Eliminare questo movimento e ripristinare il saldo del conto?')) return;
+        const src = this.state.accounts.find(a => String(a.id) === String(tx.accountId));
         if (src) {
           if (tx.type === 'EXPENSE') src.balance = Number((src.balance + tx.amount).toFixed(2));
           else if (tx.type === 'INCOME') src.balance = Number((src.balance - tx.amount).toFixed(2));
           else if (tx.type === 'TRANSFER') {
             src.balance = Number((src.balance + tx.amount).toFixed(2));
-            const trg = this.state.accounts.find(a => a.id === tx.targetAccountId);
+            const trg = this.state.accounts.find(a => String(a.id) === String(tx.targetAccountId));
             if (trg) trg.balance = Number((trg.balance - tx.amount).toFixed(2));
           }
         }
-        this.state.transactions = this.state.transactions.filter(t => t.id !== id);
+        this.state.transactions = this.state.transactions.filter(t => String(t.id) !== String(id));
         this.save();
         this.populateAccountSelects();
         this.renderFinance();
@@ -2146,7 +2250,7 @@
         }
         this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(m => {
           const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : '';
-          const file = m.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${m.fileData}')">📎</span>` : '';
+          const file = m.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.viewAttachment('healthMedical', '${m.id}')">📎</span>` : '';
           return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)} • ${m.type || 'Record'}</span><br><strong>🩺 ${m.title}</strong> ${file}${extra}<div class="stat-label">${m.notes || ''}</div></div><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button>`, `App.deleteMedicalRecord('${m.id}')`);
         }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
       },
@@ -2207,7 +2311,7 @@
         if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat);
         if (search) filtered = filtered.filter(i => (i.name || '').toLowerCase().includes(search) || (i.notes || '').toLowerCase().includes(search));
         this.setElHTML('inventoryList', filtered.map(item => {
-          const imgHtml = item.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${item.fileData}')">📎</span>` : '';
+          const imgHtml = item.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.viewAttachment('inventory', '${item.id}')">📎</span>` : '';
           const warrHtml = item.warranty ? `<br><small class="badge badge-info" style="margin-top:2px;">🛡️ Fine Garanzia: ${this.formatDate(item.warranty)}</small>` : '';
           return this.createSwipeRow(`<div><strong>📦 ${item.name}</strong> ${imgHtml} <span class="badge">${item.category}</span><br><small class="stat-label">${item.date ? 'Acq: ' + this.formatDate(item.date) + ' ' : ''}${item.notes ? '— ' + item.notes : ''}</small>${warrHtml}</div><div style="display:flex; align-items:center; gap:0.6rem;"><strong>${this.formatMoney(item.price)}</strong><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div>`, `App.deleteInventoryItem('${item.id}')`);
         }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>');
@@ -2225,7 +2329,6 @@
       addGeneralMaintenance(e) {
         e.preventDefault();
         const cat = document.getElementById('maintCategory').value;
-        // Se sceglie "Auto", lo invia automaticamente a Garage OS
         if (cat.toLowerCase() === 'auto') {
           const v = this.state.vehicles.find(x => x.id === this.activeVehicleId) || this.state.vehicles[0];
           this.state.garageMaint.push({
@@ -2282,11 +2385,11 @@
 
       renderGallery() {
         let images = [];
-        this.state.transactions.forEach(t => { if (t.fileData) images.push({ src: t.fileData, title: t.desc, date: t.date, type: 'Spesa' }); });
-        this.state.inventory.forEach(i => { if (i.fileData) images.push({ src: i.fileData, title: i.name, date: i.date, type: 'Inventario' }); });
-        this.state.healthMedical.forEach(m => { if (m.fileData) images.push({ src: m.fileData, title: m.title, date: m.date, type: 'Referto' }); });
+        this.state.transactions.forEach(t => { if (t.fileData) images.push({ col: 'transactions', id: t.id, src: t.fileData, title: t.desc, date: t.date, type: 'Spesa' }); });
+        this.state.inventory.forEach(i => { if (i.fileData) images.push({ col: 'inventory', id: i.id, src: i.fileData, title: i.name, date: i.date, type: 'Inventario' }); });
+        this.state.healthMedical.forEach(m => { if (m.fileData) images.push({ col: 'healthMedical', id: m.id, src: m.fileData, title: m.title, date: m.date, type: 'Referto' }); });
         images.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        this.setElHTML('galleryGrid', images.length ? images.map(img => `<div class="gallery-item" onclick="App.openImageViewer('${img.src}')"><img src="${img.src.startsWith('data:application/pdf') ? 'https://via.placeholder.com/150/6366f1/ffffff?text=PDF' : img.src}"><div class="gallery-overlay"><strong>${img.type}</strong><br>${img.title}</div></div>`).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
+        this.setElHTML('galleryGrid', images.length ? images.map(img => `<div class="gallery-item" onclick="App.viewAttachment('${img.col}', '${img.id}')"><img src="${img.src.startsWith('data:application/pdf') ? 'https://via.placeholder.com/150/6366f1/ffffff?text=PDF' : img.src}"><div class="gallery-overlay"><strong>${img.type}</strong><br>${img.title}</div></div>`).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
       },
 
       executeSearch() {
