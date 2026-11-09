@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#070a12">
-  <title>LifeOS v10 — CloudSync Edition</title>
+  <title>LifeOS v10.2 — CloudSync Edition</title>
   
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/6366f1/ffffff?text=L10">
@@ -22,9 +22,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ==========================================
-       1. TEMI E VARIABILI GLOBALI
-       ========================================== */
     :root[data-theme="dark"] { --bg-primary: #070a12; --bg-secondary: rgba(17, 24, 39, 0.85); --bg-card: rgba(24, 33, 52, 0.62); --bg-glass: rgba(10, 15, 28, 0.82); --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b; --border-color: rgba(255, 255, 255, 0.08); --border-highlight: rgba(139, 92, 246, 0.45); --accent-primary: #6366f1; --accent-secondary: #ec4899; --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.3); --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55); --aurora-1: rgba(99, 102, 241, 0.16); --aurora-2: rgba(236, 72, 153, 0.12); }
     :root[data-theme="oled"] { --bg-primary: #000000; --bg-secondary: #08080c; --bg-card: rgba(14, 14, 20, 0.88); --bg-glass: rgba(0, 0, 0, 0.9); --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #52525b; --border-color: rgba(255, 255, 255, 0.11); --border-highlight: rgba(139, 92, 246, 0.6); --accent-primary: #818cf8; --accent-secondary: #f472b6; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #e11d48 100%); --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.8); --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.95); --aurora-1: rgba(99, 102, 241, 0.12); --aurora-2: rgba(236, 72, 153, 0.08); }
     :root[data-theme="light"] { --bg-primary: #f1f5f9; --bg-secondary: #ffffff; --bg-card: rgba(255, 255, 255, 0.88); --bg-glass: rgba(255, 255, 255, 0.88); --text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8; --border-color: rgba(15, 23, 42, 0.08); --border-highlight: rgba(99, 102, 241, 0.45); --accent-primary: #4f46e5; --accent-secondary: #db2777; --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%); --success: #059669; --warning: #d97706; --danger: #dc2626; --info: #2563eb; --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.06); --shadow-lg: 0 16px 32px rgba(15, 23, 42, 0.12); --aurora-1: rgba(99, 102, 241, 0.1); --aurora-2: rgba(236, 72, 153, 0.08); }
@@ -36,9 +33,6 @@
     .sensitive { transition: filter 0.35s ease, opacity 0.35s ease; }
     body.privacy-active .sensitive { filter: blur(8px); opacity: 0.4; user-select: none; pointer-events: none; }
 
-    /* ==========================================
-       2. COMPONENTI UI & SWIPE-TO-DELETE
-       ========================================== */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.65rem 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
     .btn:active { transform: scale(0.96); }
     .btn-primary { background: var(--accent-gradient); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
@@ -77,7 +71,6 @@
     .stat-value { font-size: 2rem; font-weight: 900; letter-spacing: -0.03em; font-family: 'JetBrains Mono', monospace; margin: 0.25rem 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
 
-    /* HERO E WALLET */
     .hero-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(139, 92, 246, 0.12) 50%, rgba(236, 72, 153, 0.15) 100%); border: 1px solid var(--border-highlight); padding: 1.4rem; }
     .hero-content { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap; }
     .hero-greeting h1 { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
@@ -96,11 +89,9 @@
     .wallet-card-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
     .wallet-card-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
     .wallet-card-4 { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
-    .wallet-chip { width: 28px; height: 20px; border-radius: 5px; background: rgba(255,255,255,0.28); border: 1px solid rgba(255,255,255,0.4); }
     .wallet-arrows { display:flex; gap:0.3rem; }
     .wallet-arrows button { background:rgba(0,0,0,0.3); border:none; color:#fff; border-radius:4px; padding:0.1rem 0.4rem; cursor:pointer; font-size:0.7rem; }
 
-    /* GARAGE OS */
     .vehicle-selector { display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem; margin-bottom:1rem; }
     .vehicle-chip { padding:0.5rem 1rem; border-radius:999px; background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-secondary); font-weight:700; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
     .vehicle-chip.active { background:var(--accent-gradient); color:#fff; border-color:transparent; }
@@ -113,23 +104,19 @@
     .tl-indicator { width: 14px; height: 14px; border-radius: 50%; margin-bottom: 0.5rem; box-shadow: 0 0 10px currentColor; }
     .tl-red { background: #ef4444; color: #ef4444; } .tl-yellow { background: #f59e0b; color: #f59e0b; } .tl-green { background: #10b981; color: #10b981; }
 
-    /* MACRO NUTRIZIONE */
     .macro-bar-bg { width: 100%; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; margin-top: 4px; }
     .macro-bar-fill { height: 100%; border-radius: 999px; background: var(--accent-gradient); transition: width 0.5s ease; }
 
-    /* MEDIA GALLERY */
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem; }
     .gallery-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1; cursor: pointer; border: 1px solid var(--border-color); }
     .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
     .gallery-item:active img { transform: scale(1.05); }
     .gallery-overlay { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); font-size: 0.65rem; padding: 0.3rem; text-align: center; backdrop-filter: blur(4px); }
 
-    /* CLOUD SYNC INDICATOR */
     #cloudSyncStatus { position: fixed; top: 10px; right: 10px; z-index: 99999; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.8rem; box-shadow: var(--shadow-sm); transition: opacity 0.3s ease; opacity: 0; pointer-events: none; }
     #cloudSyncStatus.syncing { opacity: 1; animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* NAV, HEADER & MODALI */
     .app-header { position: sticky; top: 0; z-index: 1000; background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 0.8rem 1.25rem; }
     .header-top { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: nowrap; }
     .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 900; font-size: 1.15rem; letter-spacing: -0.03em; white-space: nowrap; }
@@ -192,8 +179,6 @@
   </svg>
 
   <div class="bg-aurora"></div>
-
-  <!-- INDICATORE SYNC FIREBASE -->
   <div id="cloudSyncStatus">☁️</div>
 
   <!-- BLOCCO SISTEMA (PIN GLOBALE) -->
@@ -214,7 +199,7 @@
     <div class="header-top">
       <div class="brand">
         <div class="brand-logo">L10</div>
-        <div class="brand-text"><span>LifeOS</span><span class="badge" style="font-size:0.6rem; padding: 0.15rem 0.45rem; margin-left:4px;">CLOUD SYNC</span></div>
+        <div class="brand-text"><span>LifeOS</span><span class="badge" style="font-size:0.6rem; padding: 0.15rem 0.45rem; margin-left:4px;">v10.2 SYNC</span></div>
       </div>
       <div>
         <button class="btn btn-sm" onclick="App.openModal('pomodoroModal')" title="Focus Timer">⏱️</button>
@@ -232,12 +217,9 @@
     <button class="nav-tab" data-target="mod-hub" onclick="App.switchModule('mod-hub')">⚡ Hub Extra</button>
   </nav>
 
-  <!-- CONTAINER CON SWIPE TO NAVIGATE -->
   <main class="main-container" id="swipeArea">
 
-    <!-- ==========================================
-         1. DASHBOARD
-         ========================================== -->
+    <!-- 1. DASHBOARD -->
     <section id="mod-dashboard" class="module-section active">
       <div class="bento-grid">
         <div class="bento-card hero-card col-span-12">
@@ -283,9 +265,7 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         2. CALENDARIO
-         ========================================== -->
+    <!-- 2. CALENDARIO -->
     <section id="mod-calendar" class="module-section">
       <div class="bento-grid">
         <div class="bento-card col-span-5">
@@ -315,9 +295,7 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         3. FINANZE WALLET
-         ========================================== -->
+    <!-- 3. FINANZE WALLET -->
     <section id="mod-finance" class="module-section">
       <div class="bento-grid">
         <div class="bento-card col-span-12">
@@ -382,9 +360,7 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         4. HUB EXTRA
-         ========================================== -->
+    <!-- 4. HUB EXTRA -->
     <section id="mod-hub" class="module-section">
       <div class="bento-card col-span-12" style="margin-bottom: 1.5rem;">
         <div class="card-title" style="font-size: 1.25rem; margin-bottom: 0.3rem;">⚡ Hub Ecosistemi</div>
@@ -399,10 +375,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ==========================================
-         SOTTOMODULI HUB
-         ========================================== -->
 
     <!-- SUB: MEDIA GALLERY -->
     <section id="sub-gallery" class="module-section">
@@ -629,6 +601,16 @@
     </div>
   </div>
 
+  <!-- MODALE INCOLLA JSON DIRETTO -->
+  <div id="pasteJsonModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="card-header"><div class="card-title">📋 Incolla Contenuto Backup JSON</div><button class="btn btn-sm" onclick="App.closeModal('pasteJsonModal')">✕</button></div>
+      <p class="stat-label" style="margin-bottom:0.75rem;">Se il selettore file del telefono blocca il caricamento, apri il tuo file <code>.json</code> con qualsiasi app di testo, copia tutto e incollalo qui sotto:</p>
+      <textarea id="pasteJsonTextarea" class="input" rows="8" placeholder='{"accounts": [...], "transactions": [...]}'></textarea>
+      <button class="btn btn-primary" style="width:100%;" onclick="App.importFromPastedText()">🚀 Importa Dati Ora</button>
+    </div>
+  </div>
+
   <!-- MODALE VAULT PIN SETUP -->
   <div id="vaultSetupModal" class="modal-backdrop">
     <div class="modal-content" style="max-width:380px; text-align:center;">
@@ -686,7 +668,7 @@
   <!-- MODALE IMPOSTAZIONI GLOBALI -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal-content">
-      <div class="card-header"><div class="card-title">⚙️ Impostazioni Ecosistema</div><button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button></div>
+      <div class="card-header"><div class="card-title">⚙️ Impostazioni Ecosistema (v10.2)</div><button class="btn btn-sm" onclick="App.closeModal('settingsModal')">✕</button></div>
       <div class="bento-grid">
         
         <div class="bento-card col-span-12" style="padding: 1.1rem; background:rgba(59, 130, 246, 0.1); border: 1px solid var(--info);">
@@ -695,6 +677,24 @@
           <button class="btn btn-sm btn-primary" style="width:100%; margin-bottom:0.5rem;" onclick="App.openModal('firebaseConfigModal')">⚙️ Configura Cloud Database</button>
           <button class="btn btn-sm" style="width:100%; margin-bottom:0.5rem;" onclick="App.forceCloudSyncDown()">⬇️ Forza Ripristino da Cloud</button>
           <button class="btn btn-sm" style="width:100%; border-color:var(--success); color:var(--success);" onclick="App.testCloudConnection()">🧪 Verifica Connessione & Sync</button>
+        </div>
+
+        <div class="bento-card col-span-12" style="padding: 1.1rem;">
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">📊 Backup & Ripristino Dati</div>
+          
+          <!-- Input file separato dal bottone per compatibilità 100% mobile -->
+          <input type="file" id="backupFileInput" onchange="App.importBackupFile(event)" style="display: none;">
+          
+          <button type="button" class="btn btn-sm" style="width:100%; margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.18); color: var(--success); border-color: var(--success);" onclick="document.getElementById('backupFileInput').click()">📂 1. Scegli File Backup (JSON o ZIP)</button>
+          
+          <button type="button" class="btn btn-sm" style="width:100%; margin-bottom: 0.5rem; border-color: var(--info); color: var(--info);" onclick="App.openModal('pasteJsonModal')">📋 2. Incolla Testo JSON Manualmente</button>
+          
+          <button type="button" class="btn btn-sm btn-primary" style="width:100%; margin-bottom: 0.75rem;" onclick="App.loadEmbeddedUserBackup()">⚡ 3. Carica Subito il tuo Backup (27/29 Ott)</button>
+
+          <button type="button" class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem;">💾 Esporta Backup Completo (JSON)</button>
+          <button type="button" class="btn btn-sm" onclick="App.forceUpdateCache()" style="width:100%; margin-bottom: 1rem; border-color: var(--warning); color: var(--warning);">🔄 Svuota Cache PWA e Aggiorna</button>
+          <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
+          <button type="button" class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Reset Totale App</button>
         </div>
 
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
@@ -711,14 +711,6 @@
           <button class="btn btn-sm btn-primary" style="width:100%; margin-bottom:0.5rem;" onclick="App.openModal('vaultSetupModal')">🔑 Imposta/Cambia PIN Vault</button>
           <button class="btn btn-sm btn-danger" style="width:100%;" onclick="App.resetVault()">🗑️ Distruggi Cassaforte (Cancella dati cifrati)</button>
         </div>
-        <div class="bento-card col-span-12" style="padding: 1.1rem;">
-          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">📊 Backup & Ripristino Manuale</div>
-          <button class="btn btn-sm" onclick="App.exportJSON()" style="width:100%; margin-bottom: 0.5rem;">💾 Esporta Backup Completo (JSON)</button>
-          <label class="btn btn-sm" style="width:100%; margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.15); color: var(--success); cursor: pointer; display: flex; justify-content: center;">📂 Ripristina Backup (JSON o ZIP)<input type="file" accept=".json, .zip, application/json, application/zip" onchange="App.importBackupFile(event)" style="display: none;"></label>
-          <button class="btn btn-sm" onclick="App.forceUpdateCache()" style="width:100%; margin-bottom: 1rem; border-color: var(--accent-primary); color: var(--accent-primary);">🔄 Svuota Cache PWA</button>
-          <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1rem;">
-          <button class="btn btn-sm btn-danger" onclick="App.resetAllData()" style="width:100%;">🗑️ Reset Totale App</button>
-        </div>
       </div>
     </div>
   </div>
@@ -729,15 +721,110 @@
     const DEFAULT_FOODS = [
       { id: 'f1', name: 'Petto di Pollo (crudo)', kcal: 110, carb: 0, prot: 23.1, fat: 1.2 },
       { id: 'f2', name: 'Pasta di Semola (cruda)', kcal: 353, carb: 72.7, prot: 12.5, fat: 1.5 },
-      { id: 'f3', name: 'Riso Basmati (crudo)', kcal: 349, carb: 78, prot: 7.5, fat: 0.6 },
+      { id: 'f3', name: 'Riso Basmati / Carnaroli (crudo)', kcal: 349, carb: 78, prot: 7.5, fat: 0.6 },
       { id: 'f4', name: 'Uovo Intero', kcal: 143, carb: 0.7, prot: 12.6, fat: 9.5 },
-      { id: 'f6', name: 'Olio EVO', kcal: 899, carb: 0, prot: 0, fat: 99.9 },
-      { id: 'f8', name: 'Tonno al Naturale', kcal: 108, carb: 0, prot: 25.1, fat: 0.8 },
+      { id: 'f5', name: "Albume d'Uovo", kcal: 48, carb: 0.7, prot: 10.9, fat: 0.2 },
+      { id: 'f6', name: 'Olio Extravergine di Oliva (EVO)', kcal: 899, carb: 0, prot: 0, fat: 99.9 },
+      { id: 'f7', name: 'Salmone Fresco', kcal: 208, carb: 0, prot: 20.4, fat: 13.4 },
+      { id: 'f8', name: 'Tonno al Naturale (sgocciolato)', kcal: 108, carb: 0, prot: 25.1, fat: 0.8 },
+      { id: 'f9', name: "Tonno all'Olio (sgocciolato)", kcal: 192, carb: 0, prot: 24, fat: 10.5 },
+      { id: 'f10', name: 'Tagliata / Filetto di Manzo Magro', kcal: 135, carb: 0, prot: 21.8, fat: 5 },
+      { id: 'f11', name: 'Macinato di Tacchino / Pollo', kcal: 119, carb: 0, prot: 21.5, fat: 3.4 },
+      { id: 'f12', name: 'Bresaola', kcal: 151, carb: 0, prot: 32, fat: 2.6 },
+      { id: 'f13', name: 'Prosciutto Crudo', kcal: 224, carb: 0.3, prot: 28, fat: 12 },
+      { id: 'f14', name: 'Fesa di Tacchino Arrosto', kcal: 104, carb: 1.5, prot: 22, fat: 1.2 },
       { id: 'f15', name: 'Yogurt Greco 0%', kcal: 59, carb: 3.6, prot: 10.3, fat: 0.4 },
+      { id: 'f16', name: 'Fiocchi di Latte', kcal: 98, carb: 3.1, prot: 12.5, fat: 4 },
+      { id: 'f17', name: 'Ricotta Vaccina', kcal: 146, carb: 3.5, prot: 8.8, fat: 10.9 },
       { id: 'f18', name: 'Mozzarella Fior di Latte', kcal: 253, carb: 0.7, prot: 18.7, fat: 19.5 },
-      { id: 'f20', name: 'Latte Parz. Scremato', kcal: 46, carb: 4.9, prot: 3.3, fat: 1.6 },
-      { id: 'f22', name: 'Pane Comune', kcal: 275, carb: 58, prot: 8.6, fat: 1 }
+      { id: 'f19', name: 'Parmigiano Reggiano', kcal: 402, carb: 0, prot: 32.4, fat: 29.7 },
+      { id: 'f20', name: 'Latte Parzialmente Scremato', kcal: 46, carb: 4.9, prot: 3.3, fat: 1.6 },
+      { id: 'f21', name: "Fiocchi d'Avena", kcal: 389, carb: 66.3, prot: 16.9, fat: 6.9 },
+      { id: 'f22', name: 'Pane Comune', kcal: 275, carb: 58, prot: 8.6, fat: 1 },
+      { id: 'f23', name: 'Pane Integrale', kcal: 243, carb: 48.5, prot: 8.5, fat: 1.8 },
+      { id: 'f24', name: 'Fette Biscottate', kcal: 408, carb: 74.5, prot: 11.3, fat: 6 },
+      { id: 'f25', name: 'Gallette di Riso', kcal: 382, carb: 81, prot: 7.8, fat: 2.5 },
+      { id: 'f26', name: 'Patate', kcal: 77, carb: 17.5, prot: 2, fat: 0.1 },
+      { id: 'f27', name: 'Patate Dolci / Americane', kcal: 86, carb: 20.1, prot: 1.6, fat: 0.1 },
+      { id: 'f28', name: 'Lenticchie Cotte', kcal: 116, carb: 20.1, prot: 9, fat: 0.4 },
+      { id: 'f29', name: 'Ceci Cotti', kcal: 120, carb: 18.8, prot: 7, fat: 2.1 },
+      { id: 'f30', name: 'Fagioli Borlotti Cotti', kcal: 103, carb: 15.2, prot: 7.1, fat: 0.6 },
+      { id: 'f31', name: 'Verdura Mista / Zucchine / Insalata', kcal: 19, carb: 3.1, prot: 1.3, fat: 0.2 },
+      { id: 'f32', name: 'Broccoli / Cavolfiore', kcal: 34, carb: 6.6, prot: 2.8, fat: 0.4 },
+      { id: 'f33', name: 'Pomodori da Insalata / Passata', kcal: 24, carb: 4.2, prot: 1.1, fat: 0.2 },
+      { id: 'f34', name: 'Banana', kcal: 89, carb: 22.8, prot: 1.1, fat: 0.3 },
+      { id: 'f35', name: 'Mela', kcal: 52, carb: 13.8, prot: 0.3, fat: 0.2 },
+      { id: 'f36', name: 'Arancia / Mandarino', kcal: 47, carb: 11.8, prot: 0.9, fat: 0.1 },
+      { id: 'f37', name: 'Avocado', kcal: 160, carb: 8.5, prot: 2, fat: 14.7 },
+      { id: 'f38', name: 'Mandorle / Noci', kcal: 605, carb: 10.5, prot: 20, fat: 54 },
+      { id: 'f39', name: 'Burro di Arachidi 100%', kcal: 588, carb: 16, prot: 26, fat: 49 },
+      { id: 'f40', name: 'Cioccolato Fondente 85%', kcal: 584, carb: 22, prot: 11, fat: 49 },
+      { id: 'f41', name: 'Proteine Whey in Polvere', kcal: 380, carb: 5.5, prot: 80, fat: 4.5 },
+      { id: 'f42', name: 'Pizza Margherita', kcal: 266, carb: 33, prot: 11, fat: 9.8 },
+      { id: 'f43', name: 'Cornetto da Bar (vuoto / marmellata)', kcal: 410, carb: 52, prot: 7.5, fat: 19 },
+      { id: 'f44', name: 'Caffè Espresso (senza zucchero)', kcal: 2, carb: 0.3, prot: 0.1, fat: 0 },
+      { id: 'f45', name: 'Cappuccino con Latte Intero', kcal: 58, carb: 4.8, prot: 3.2, fat: 2.8 },
+      { id: 'c0d46af0-6ba2-463c-b089-f7802f25cb8f', name: 'Parmigiana melenzane non fritta', kcal: 120, carb: 8.1, prot: 9, fat: 5.7 }
     ];
+
+    // TUO BACKUP PRE-CARICATO PER RIPRISTINO CON 1 CLICK
+    const EMBEDDED_USER_BACKUP = {
+      inventory: [
+        { id: "629fe609-e8e5-4c18-bd91-b527c456da0b", type: "Garanzia", name: "Caldaia Baxi", category: "Elettrodomestici", subcategory: "Generale", price: 0, date: "2025-10-01", warranty: "", location: "", notes: "Duotech compact", addedAt: "2026-10-29T12:42:09.982Z" },
+        { id: "64ebce09-50b1-48b0-a6dd-4bcd909925d1", type: "Garanzia", name: "Scrivania amore", category: "Casa/Impianti", subcategory: "Generale", price: 38, date: "2026-10-22", warranty: "", location: "", notes: "Amazon", addedAt: "2026-10-29T12:42:09.982Z" },
+        { id: "63cca1e7-2b4b-4dcf-9db5-f2172f64a328", type: "Garanzia", name: "Folletto", category: "Elettrodomestici", subcategory: "Generale", price: 310, date: "2026-10-19", warranty: "", location: "", notes: "Vk 150 - Motore originale e scocche originali", addedAt: "2026-10-29T12:42:09.982Z" }
+      ],
+      calendarTasks: [
+        { id: "aa6ff7ee-efa9-4dcf-9582-0299892a9c0e", date: "2026-10-29", title: "Comprare griglia coniglio", type: "Attività", priority: "Normale" }
+      ],
+      maintenances: [
+        { id: "02e47f1a-d4fd-40d1-9128-3597d2220c1f", title: "Diagnosi", category: "Auto", dueDate: "2026-10-19", cost: 0, recurrence: "Annuale", status: "In attesa", notes: "" },
+        { id: "e1b4d825-0b84-4373-8933-02c2b4898fd4", title: "Sostituzione valvola gas", category: "Caldaia", dueDate: "2026-10-09", cost: 0, recurrence: "Annuale", status: "In attesa", notes: "" }
+      ],
+      accounts: [
+        { id: "acc-main", name: "Buddy", type: "Carta", balance: -4.59 },
+        { id: "32ecc295-c138-4c10-a51f-f72c96fea65c", name: "Revolut", type: "Carta", balance: 22 },
+        { id: "3f8d55e6-b763-40f5-8cf1-ef594040a84a", name: "ING", type: "Carta", balance: 200 },
+        { id: "fe07f6ec-0f27-434e-811c-69f0e94ca217", name: "Contante", type: "Contanti", balance: 250 }
+      ],
+      transactions: [
+        { id: "304d9e26-1727-48c8-80bb-8662e068acb9", type: "EXPENSE", amount: 7.1, accountId: "acc-main", desc: "Mangime Coniglio", category: "Svago & Extra", date: "2026-10-26", recurrence: "Singola" },
+        { id: "c056b9bc-447a-41b6-824c-fd8e204398b0", type: "EXPENSE", amount: 64.3, accountId: "3f8d55e6-b763-40f5-8cf1-ef594040a84a", desc: "Spesa MD", category: "Alimentari", date: "2026-10-26", recurrence: "Singola" },
+        { id: "6a8e8edb-f73c-44de-8f14-da7c0d858c28", type: "EXPENSE", amount: 1.05, accountId: "acc-main", desc: "Casello x Santo bono Ambra", category: "Alimentari", date: "2026-10-24", recurrence: "Singola" },
+        { id: "0ae88189-076e-4262-b288-86cf216862d4", type: "EXPENSE", amount: 11.89, accountId: "acc-main", desc: "Gas", category: "Auto & Trasporti", date: "2026-10-24", recurrence: "Singola" },
+        { id: "c819bc79-dbb5-429d-a06c-1c5fab4cff57", type: "EXPENSE", amount: 24.8, accountId: "acc-main", desc: "Scatole tabacco", category: "Svago & Extra", date: "2026-10-24", recurrence: "Singola" },
+        { id: "b402d766-51a2-4a1b-b442-75d921f65b86", type: "EXPENSE", amount: 20, accountId: "fe07f6ec-0f27-434e-811c-69f0e94ca217", desc: "Benzina", category: "Auto & Trasporti", date: "2026-10-23", recurrence: "Singola" },
+        { id: "72c621c6-65b5-4b67-a59c-3c3539d5f155", type: "EXPENSE", amount: 72.4, accountId: "3f8d55e6-b763-40f5-8cf1-ef594040a84a", desc: "Macelleria I Damiano", category: "Alimentari", date: "2026-10-23", recurrence: "Singola" },
+        { id: "007c443b-f57a-40fd-af06-b9706803260a", type: "EXPENSE", amount: 70, accountId: "fe07f6ec-0f27-434e-811c-69f0e94ca217", desc: "Visita ortopedico", category: "Svago & Extra", date: "2026-10-20", recurrence: "Singola" },
+        { id: "456090ba-72e1-42fa-8035-1c16cf7ee79c", type: "EXPENSE", amount: 23.02, accountId: "acc-main", desc: "Gas", category: "Auto & Trasporti", date: "2026-10-20", recurrence: "Singola" },
+        { id: "1403ec15-69fa-4bcb-bc45-a3e60f112d7d", type: "EXPENSE", amount: 15, accountId: "acc-main", desc: "Fruttivendolo", category: "Alimentari", date: "2026-10-17", recurrence: "Singola" },
+        { id: "ed6d16fd-b17d-4d1d-8805-b895d8571b2b", type: "EXPENSE", amount: 20, accountId: "acc-main", desc: "Pannolini", category: "Alimentari", date: "2026-10-17", recurrence: "Singola" },
+        { id: "5bf7a745-cd10-48cf-a39f-4eae95183854", type: "EXPENSE", amount: 65, accountId: "3f8d55e6-b763-40f5-8cf1-ef594040a84a", desc: "Spesa MD", category: "Alimentari", date: "2026-10-17", recurrence: "Singola" },
+        { id: "05880a1d-9861-4d2f-a785-7caf1bb89dd1", type: "INCOME", amount: 42.5, accountId: "acc-main", desc: "Compensazione conto", category: "Stipendio / Entrate", date: "2026-10-16", recurrence: "Singola" },
+        { id: "148214fb-4e3a-4a91-8646-043ec32aec0c", type: "INCOME", amount: 120, accountId: "acc-main", desc: "Simona", category: "Stipendio / Entrate", date: "2026-10-16", recurrence: "Singola" },
+        { id: "a6b8bfe0-818d-4e1c-b916-8c35310db162", type: "EXPENSE", amount: 20, accountId: "acc-main", desc: "Benzina", category: "Auto & Trasporti", date: "2026-10-15", recurrence: "Singola" },
+        { id: "cc329563-d05f-4a79-b7a9-92928d02fc88", type: "EXPENSE", amount: 22.5, accountId: "acc-main", desc: "Gas", category: "Auto & Trasporti", date: "2026-10-15", recurrence: "Singola" }
+      ],
+      subs: [
+        { id: "bbc4934d-0f16-4c6e-b5bb-1b373738c0b9", name: "Gemini Pro", cost: 5.5, cycle: "monthly", next: "2026-11-21" }
+      ],
+      healthNutrition: [
+        { id: "3b37c652-f2b4-464c-9b24-fab34d6b6097", meal: "Colazione - Latte Parzialmente Scremato (200g)", date: "2026-10-16", kcal: 92, prot: 6.6, carbs: 9.8, fat: 3.2 },
+        { id: "24d9bd89-ee22-44ad-90b1-82fe5f3caf3e", meal: "Colazione - Fette Biscottate (10g)", date: "2026-10-16", kcal: 41, prot: 1.1, carbs: 7.5, fat: 0.6 },
+        { id: "e39a5ee9-24df-4225-bb9e-821e379dec94", meal: "Pranzo - Pane Comune / Rosetta (120g)", date: "2026-10-16", kcal: 330, prot: 10.3, carbs: 69.6, fat: 1.2 },
+        { id: "86fbb82b-536b-4ee8-add3-8d8ac0cd2958", meal: "Cena - Pasta di Semola (200g)", date: "2026-10-16", kcal: 706, prot: 25, carbs: 145.4, fat: 3 },
+        { id: "5e02cc05-a02e-4369-87c7-9da6858344b8", meal: "Cena - Broccoli / Cavolfiore (100g)", date: "2026-10-16", kcal: 34, prot: 2.8, carbs: 6.6, fat: 0.4 },
+        { id: "5ee823b6-abb5-44d2-b1a0-b8623172348f", meal: "Cena - Mozzarella Fior di Latte (100g)", date: "2026-10-16", kcal: 253, prot: 18.7, carbs: 0.7, fat: 19.5 }
+      ],
+      healthWeight: [
+        { id: "1bfa6056-178b-4a17-ba04-9170e094b5d3", value: 87.4, date: "2026-10-16" }
+      ],
+      healthMedical: [
+        { id: "89254601-ed11-4671-aaa5-f0da57078bca", type: "Visita Specialistica", date: "2026-10-20", title: "Visita ortopedico piede", notes: "Dott. Storino — Costo 70 euro", therapy: "", fileData: null },
+        { id: "5ba7dd4a-455e-4d63-9b57-265f36c20b37", type: "Risonanza / TAC", date: "2026-10-09", title: "Risonanza piede sx", notes: "Dott. Medicina futura — Cisti liquida e intraossea", therapy: "", fileData: null }
+      ],
+      foodLibrary: DEFAULT_FOODS
+    };
 
     const App = {
       state: {
@@ -748,7 +835,7 @@
         foodLibrary: DEFAULT_FOODS,
         vehicles: [], garageMaint: [],
         settings: {
-          inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
+          inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Generale', 'Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
           maintenanceCategories: ['Casa', 'Auto', 'Caldaia', 'Salute', 'Altro'],
           hapticEnabled: true
         }
@@ -762,7 +849,7 @@
       html5QrcodeScanner: null,
       pomoTimer: null,
       pomoSeconds: 1500,
-      db: null, // Firebase Firestore Instance
+      db: null,
 
       // === FIREBASE CLOUD SYNC ===
       initFirebase() {
@@ -776,7 +863,7 @@
           }
           this.db = firebase.firestore();
           this.setElText('syncStatusLabel', 'Stato: 🟢 Cloud Sync Attivo');
-          this.pullFromCloud(false); // Check silently if cloud has newer data on startup
+          this.pullFromCloud(false);
         } catch(e) {
           console.error("Firebase init error", e);
           this.setElText('syncStatusLabel', 'Stato: 🔴 Errore Configurazione Firebase');
@@ -792,15 +879,11 @@
            appId: document.getElementById('fbAppId').value.trim(),
            deviceId: document.getElementById('fbDeviceId').value.trim() || 'LifeOS_Device_1'
          };
-         if(!fb.apiKey) {
-            this.state.firebase = null;
-         } else {
-            this.state.firebase = fb;
-         }
-         this.save(true); // save local only
+         this.state.firebase = fb.apiKey ? fb : null;
+         this.save(true);
          this.closeModal('firebaseConfigModal');
-         this.showToast('Configurazione Cloud Salvata. Riavvio necessario.', 'info');
-         setTimeout(() => location.reload(), 1500);
+         this.showToast('Configurazione Cloud Salvata. Riavvio...', 'info');
+         setTimeout(() => location.reload(), 1200);
       },
       async pushToCloud() {
          if(!this.db || !this.state.firebase?.deviceId) return;
@@ -832,14 +915,7 @@
                const cloudData = doc.data();
                if (force || (cloudData.timestamp && (!this.state.lastCloudSync || cloudData.timestamp > this.state.lastCloudSync + 10000))) {
                   const parsedState = JSON.parse(cloudData.dataStr);
-                  this.state = { ...this.state, ...parsedState };
-                  this.sanitizeData();
-                  await localforage.setItem('appData', this.state);
-                  this.populateAccountSelects();
-                  this.populateCategorySelects();
-                  this.populateMaintenanceSelects();
-                  this.populateFoodLibrarySelect();
-                  this.renderActiveModule();
+                  this.applyImportedObject(parsedState, false);
                   if(force) this.showToast('Dati ripristinati dal Cloud!');
                }
             } else if(force) {
@@ -860,7 +936,7 @@
       },
       async testCloudConnection() {
         if (!this.db || !this.state.firebase?.deviceId) {
-          return this.showToast('Cloud non configurato! Inserisci i dati Firebase.', 'warning');
+          return this.showToast('Cloud non configurato! Inserisci prima i dati Firebase.', 'warning');
         }
         this.showToast('Test di connessione a Firestore in corso...', 'info');
         try {
@@ -955,7 +1031,7 @@
         if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
         if (!this.state.settings) this.state.settings = {};
         if (!this.state.settings.inventoryCategories) {
-          this.state.settings.inventoryCategories = { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] };
+          this.state.settings.inventoryCategories = { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Generale', 'Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] };
         }
         if (!Array.isArray(this.state.settings.maintenanceCategories)) {
           this.state.settings.maintenanceCategories = ['Casa', 'Auto', 'Caldaia', 'Salute', 'Altro'];
@@ -978,7 +1054,6 @@
         this.state.calendarTasks.forEach(t => { if(!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
       },
 
-      // SALVATAGGIO LOCALE + SYNC REMOTO IN BACKGROUND
       async save(localOnly = false) { 
           try { 
               this.sanitizeData(); 
@@ -994,7 +1069,7 @@
           } catch (e) {} 
       },
 
-      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3200); },
+      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3500); },
       
       openModal(id) { 
           const el = document.getElementById(id); if (el) el.classList.add('open'); 
@@ -1057,7 +1132,6 @@
       formatDate(dateStr) { return dateStr ? new Date(dateStr).toLocaleDateString('it-IT') : '--'; },
       generateId() { return Math.random().toString(36).substr(2, 9); },
       
-      // === COMPRESSORE IMMAGINI NATIVO (S25 ULTRA FIX) ===
       async fileToBase64(file) { 
           return new Promise((resolve, reject) => { 
               const reader = new FileReader(); 
@@ -1121,7 +1195,7 @@
         this.save();
       },
 
-      // === DEEP VAULT (CASSAFORTE CIFRATA) ===
+      // === DEEP VAULT ===
       cryptoObfuscate(text, pin) {
           let res = '';
           for(let i=0; i<text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
@@ -1448,50 +1522,79 @@
       startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
       closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
 
-      // === IMPORTAZIONE BACKUP (JSON, ZIP & LEGACY V5) ===
+      // === IMPORTAZIONE UNIVERSALE (FILE, TESTO INCOLLATO & EMBEDDED) ===
+      async applyImportedObject(rawData, pushCloud = true) {
+        const importedState = this.convertLegacyBackup(rawData);
+        const currentFb = this.state.firebase;
+        const currentPin = this.state.pin;
+        const currentVaultPin = this.state.vaultPinHash;
+
+        this.state = {
+          ...this.state,
+          ...importedState,
+          firebase: importedState.firebase || currentFb,
+          pin: importedState.pin !== undefined && importedState.pin !== null ? importedState.pin : currentPin,
+          vaultPinHash: importedState.vaultPinHash || currentVaultPin
+        };
+
+        await this.save(!pushCloud);
+        this.populateAccountSelects();
+        this.populateCategorySelects();
+        this.populateMaintenanceSelects();
+        this.populateFoodLibrarySelect();
+        this.renderActiveModule();
+        this.closeModal('settingsModal');
+        this.closeModal('pasteJsonModal');
+        this.showToast('Backup ripristinato con successo! 🎉');
+      },
+
       async importBackupFile(event) {
-        const file = event.target.files[0];
+        const file = event.target?.files?.[0];
         if (!file) return;
+        this.showToast('Lettura file in corso...', 'info');
         try {
           let jsonText = '';
           if (file.name.toLowerCase().endsWith('.zip')) {
+            if (typeof JSZip === 'undefined') throw new Error('Libreria JSZip non caricata');
             const zip = await JSZip.loadAsync(file);
-            const jsonFile = zip.file('database_lifeos_completo.json') || Object.values(zip.files).find(f => f.name.endsWith('.json') && !f.dir);
-            if (!jsonFile) throw new Error('Nessun file JSON trovato nello ZIP');
+            const jsonFile = zip.file('database_lifeos_completo.json') || Object.values(zip.files).find(f => f.name.toLowerCase().endsWith('.json') && !f.dir);
+            if (!jsonFile) throw new Error('Nessun file JSON trovato dentro lo ZIP');
             jsonText = await jsonFile.async('string');
           } else {
-            jsonText = await file.text();
+            jsonText = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = e => resolve(e.target.result);
+              reader.onerror = () => reject(new Error('Impossibile leggere il file'));
+              reader.readAsText(file);
+            });
           }
 
           const rawData = JSON.parse(jsonText);
-          const importedState = this.convertLegacyBackup(rawData);
-
-          const currentFb = this.state.firebase;
-          const currentPin = this.state.pin;
-          const currentVaultPin = this.state.vaultPinHash;
-
-          this.state = {
-            ...this.state,
-            ...importedState,
-            firebase: importedState.firebase || currentFb,
-            pin: importedState.pin !== undefined ? importedState.pin : currentPin,
-            vaultPinHash: importedState.vaultPinHash || currentVaultPin
-          };
-
-          await this.save();
-          this.populateAccountSelects();
-          this.populateCategorySelects();
-          this.populateMaintenanceSelects();
-          this.populateFoodLibrarySelect();
-          this.renderActiveModule();
-          this.closeModal('settingsModal');
-          this.showToast('Backup ripristinato con successo! 🎉');
+          await this.applyImportedObject(rawData, true);
         } catch (err) {
           console.error('Errore importazione:', err);
-          this.showToast('Errore nel caricamento: ' + err.message, 'danger');
+          alert('Errore durante il caricamento del file: ' + err.message);
+          this.showToast('Errore: ' + err.message, 'danger');
         } finally {
           event.target.value = '';
         }
+      },
+
+      async importFromPastedText() {
+        const text = document.getElementById('pasteJsonTextarea')?.value?.trim();
+        if (!text) return this.showToast('Incolla prima il testo JSON!', 'warning');
+        try {
+          const rawData = JSON.parse(text);
+          await this.applyImportedObject(rawData, true);
+          document.getElementById('pasteJsonTextarea').value = '';
+        } catch (err) {
+          alert('Il testo incollato non è un JSON valido: ' + err.message);
+        }
+      },
+
+      async loadEmbeddedUserBackup() {
+        if (!confirm('Vuoi caricare il tuo backup verificato (Conti Buddy, Revolut, ING, Contante, 16 transazioni, Caldaia Baxi, Scrivania, Folletto, Visite e Diario Alimentare)?')) return;
+        await this.applyImportedObject(EMBEDDED_USER_BACKUP, true);
       },
 
       convertLegacyBackup(data) {
@@ -1593,16 +1696,20 @@
       },
 
       async forceUpdateCache() {
-        if ('serviceWorker' in navigator) {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          for (let r of regs) await r.unregister();
-        }
-        if (window.caches) {
-          const keys = await caches.keys();
-          for (let k of keys) await caches.delete(k);
-        }
-        this.showToast('Cache PWA svuotata! Riavvio in corso...');
-        setTimeout(() => location.reload(true), 1000);
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (let r of regs) await r.unregister();
+          }
+          if (window.caches) {
+            const keys = await caches.keys();
+            for (let k of keys) await caches.delete(k);
+          }
+        } catch(e) {}
+        this.showToast('Cache svuotata! Ricarico versione aggiornata...');
+        setTimeout(() => {
+          window.location.href = window.location.pathname + '?v=' + Date.now();
+        }, 800);
       },
 
       exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v10_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); },
@@ -1610,14 +1717,19 @@
       async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo e disconnettere il Cloud?")) { await localforage.clear(); location.reload(); } },
 
       async init() {
+        // Rimuove eventuali vecchi Service Worker che bloccano gli aggiornamenti di GitHub Pages
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(regs => {
+            regs.forEach(r => r.update());
+          }).catch(() => {});
+        }
+
         await this.load();
         const todayStr = new Date().toISOString().slice(0, 10);
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => { const el = document.getElementById(id); if (el) el.value = todayStr; });
         this.populateAccountSelects(); this.populateCategorySelects(); this.populateMaintenanceSelects(); this.populateFoodLibrarySelect(); this.updateHapticButton();
         this.initGestures();
         this.initFirebase();
-        
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
         
         const urlParams = new URLSearchParams(window.location.search);
         const action = urlParams.get('action');
