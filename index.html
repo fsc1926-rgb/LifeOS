@@ -921,11 +921,14 @@
           return parseFloat(s) || 0;
         };
 
-        const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'foodLibrary', 'vehicles', 'garageMaint', 'vaultData'];
+        const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'vaultData'];
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
-        if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
+        if (!Array.isArray(this.state.foodLibrary) || this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
         if (!this.state.settings) this.state.settings = {};
 
+        // INIZIALIZZAZIONE VEICOLI
+        if (!Array.isArray(this.state.vehicles)) this.state.vehicles = [];
+        if (!Array.isArray(this.state.garageMaint)) this.state.garageMaint = [];
         if (this.state.garageConfig && !this.state.vehicles.length) {
            this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
            delete this.state.garageConfig;
@@ -1271,6 +1274,7 @@
       },
       deleteGarageMaint(id) { if(confirm("Eliminare lavoro?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
       renderGarage() {
+        if (!Array.isArray(this.state.vehicles) || this.state.vehicles.length === 0) return;
         this.setElHTML('garageVehicleTabs', this.state.vehicles.map(v => `<div class="vehicle-chip ${v.id === this.activeVehicleId ? 'active' : ''}" onclick="App.switchVehicle('${v.id}')">${v.name}</div>`).join('') + `<div class="vehicle-chip" style="background:transparent; border-style:dashed;" onclick="App.addVehicle()">+ Nuovo</div>`);
         const v = this.state.vehicles.find(x => x.id === this.activeVehicleId); if(!v) return;
         this.setElText('garageCarName', v.name); this.setElText('garageCarPlate', v.plate || 'Targa N/D'); this.setElText('garageKmOdo', `${v.km.toLocaleString('it-IT')} km`);
@@ -1460,14 +1464,47 @@
                     type: m.type || 'Sintomo'
                  }));
               }
-              // Manutenzioni
+              // Manutenzioni / Garage
               if (importedData.maint) {
-                 importedData.maintenances = importedData.maint.map(m => ({
-                    ...m,
-                    title: m.task || m.title || 'Intervento',
-                    category: m.asset || m.category || 'Altro',
-                    dueDate: m.date || new Date().toISOString().slice(0, 10)
-                 }));
+                 importedData.maintenances = [];
+                 importedData.garageMaint = [];
+                 const migratedVehicleId = "veh-" + Date.now();
+                 let hasVehicles = false;
+
+                 importedData.maint.forEach(m => {
+                    const cat = (m.asset || m.category || '').toLowerCase();
+                    if (cat === 'auto' || cat === 'moto' || cat === 'veicolo') {
+                       hasVehicles = true;
+                       importedData.garageMaint.push({
+                           id: m.id || this.generateId(),
+                           vehicleId: migratedVehicleId,
+                           title: m.task || m.title || 'Intervento',
+                           date: m.date || new Date().toISOString().slice(0, 10),
+                           cost: parseFloat(m.cost) || 0,
+                           kmAtMaint: parseFloat(m.kmNow) || 0
+                       });
+                    } else {
+                       importedData.maintenances.push({
+                           ...m,
+                           title: m.task || m.title || 'Intervento',
+                           category: m.asset || m.category || 'Altro',
+                           dueDate: m.date || new Date().toISOString().slice(0, 10)
+                       });
+                    }
+                 });
+
+                 // Genera il profilo vettura se ci sono storici auto
+                 if (hasVehicles && (!importedData.vehicles || importedData.vehicles.length === 0)) {
+                     importedData.vehicles = [{
+                         id: migratedVehicleId,
+                         name: 'Auto (Migrata)',
+                         plate: 'XX 000 XX',
+                         bollo: '',
+                         assic: '',
+                         revis: '',
+                         km: 0
+                     }];
+                 }
               }
               // Agenda
               if (importedData.crmTasks) {
