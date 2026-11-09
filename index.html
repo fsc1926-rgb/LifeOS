@@ -366,7 +366,7 @@
             <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Registra nel Libro Mastro</button>
           </form>
           <div class="card-header" style="margin-bottom: 0.5rem;"><div class="card-title">📜 Libro Mastro Storico (Fai Swipe per Eliminare)</div><select id="txFilterAccount" class="input" style="width: auto; margin:0;" onchange="App.renderFinance()"></select></div>
-          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 380px; overflow-x:hidden;"></div>
+          <div id="financeTransactionsList" class="item-list sensitive" style="max-height: 440px; overflow-x:hidden;"></div>
         </div>
 
         <div class="bento-card col-span-4">
@@ -939,8 +939,8 @@
             id: t.id || this.generateId(),
             type: rawType,
             amount: Number(parseFloat(t.amount).toFixed(2)) || 0,
-            accountId: t.accountId || 'acc-main',
-            targetAccountId: t.targetAccountId || null,
+            accountId: String(t.accountId || 'acc-main').trim(),
+            targetAccountId: t.targetAccountId ? String(t.targetAccountId).trim() : null,
             desc: t.desc || t.title || 'Movimento',
             category: t.category || t.cat || 'Generale',
             date: (t.date || new Date().toISOString()).slice(0, 10),
@@ -1026,7 +1026,6 @@
         rawMaint.forEach(m => {
           const cat = String(m.asset || m.category || '').trim().toLowerCase();
           if (cat === 'auto' || cat === 'moto' || cat === 'veicolo' || cat === 'veicoli') {
-            // Evita duplicati se già migrato in garageMaint
             const alreadyInGarage = data.garageMaint.some(gm => gm.id === m.id);
             if (!alreadyInGarage) {
               data.garageMaint.push({
@@ -1065,7 +1064,6 @@
           });
         }
 
-        // Preserva eventuale configurazione Firebase locale attiva se non presente nel backup
         const currentFirebase = this.state.firebase;
         this.state = { ...this.state, ...data };
         if (!this.state.firebase && currentFirebase) {
@@ -1108,7 +1106,6 @@
           this.state.settings.maintenanceCategories = ['Casa', 'Caldaia', 'Auto', 'Salute', 'Altro'];
         }
 
-        // Assicura che tutte le categorie usate negli oggetti e nelle manutenzioni esistano nei menu a tendina
         this.state.inventory.forEach(item => {
           if (item.category && !this.state.settings.inventoryCategories[item.category]) {
             this.state.settings.inventoryCategories[item.category] = ['Generale'];
@@ -1123,7 +1120,6 @@
           }
         });
 
-        // Sposta eventuali manutenzioni "Auto" residue nel Garage OS
         const remainingMaint = [];
         this.state.maintenances.forEach(m => {
           const cat = String(m.category || '').trim().toLowerCase();
@@ -1158,7 +1154,16 @@
           m.cost = cleanNumber(m.cost);
         });
 
-        this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
+        this.state.accounts.forEach(a => {
+          a.id = String(a.id || this.generateId()).trim();
+          a.balance = cleanNumber(a.balance);
+          a.name = (a.name || 'Conto').trim();
+        });
+
+        // Riparazione automatica transazioni di Buddy / conti con ID disallineati
+        const buddyAcc = this.state.accounts.find(a => a.name.toLowerCase().includes('buddy')) || this.state.accounts[0];
+        const validAccIds = new Set(this.state.accounts.map(a => a.id));
+
         this.state.transactions.forEach(t => {
           t.amount = cleanNumber(t.amount);
           t.date = (t.date || today).slice(0, 10);
@@ -1166,7 +1171,15 @@
           t.category = t.category || 'Generale';
           const upType = String(t.type || 'EXPENSE').toUpperCase();
           t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(upType) ? upType : 'EXPENSE';
+
+          const txAccId = String(t.accountId || '').trim();
+          if (!validAccIds.has(txAccId) && buddyAcc) {
+            t.accountId = buddyAcc.id;
+          } else {
+            t.accountId = txAccId;
+          }
         });
+
         this.state.calendarTasks.forEach(t => {
           if (!t.date || t.date.length < 10) t.date = today;
           t.title = t.title || 'Attività';
@@ -1747,7 +1760,6 @@
         setTrafficLight('date-bollo', 'tl-bollo', v.bollo);
         setTrafficLight('date-revisione', 'tl-revisione', v.revis);
 
-        // Calcola spesa carburante/auto degli ultimi 30 giorni (o del mese dell'ultima transazione auto se storica)
         const autoTx = this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category || '').toLowerCase().includes('auto'));
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -1776,35 +1788,67 @@
         this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html);
         this.setElHTML('reconcileAccountSelect', html);
         const filterEl = document.getElementById('txFilterAccount');
-        const currentFilter = filterEl?.value || 'ALL';
+        const currentFilter = String(filterEl?.value || 'ALL').trim();
         this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''));
-        if (filterEl && (currentFilter === 'ALL' || this.state.accounts.some(a => a.id === currentFilter))) {
+        if (filterEl && (currentFilter === 'ALL' || this.state.accounts.some(a => String(a.id).trim() === currentFilter))) {
           filterEl.value = currentFilter;
         }
       },
       selectWalletCard(accId) {
         const filterEl = document.getElementById('txFilterAccount');
         if (!filterEl) return;
-        filterEl.value = (filterEl.value === accId) ? 'ALL' : accId;
+        this.populateAccountSelects();
+        const currentVal = String(filterEl.value || 'ALL').trim();
+        const targetVal = String(accId || '').trim();
+        filterEl.value = (currentVal === targetVal) ? 'ALL' : targetVal;
         this.renderFinance();
       },
       renderFinance() {
         const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0);
         this.setElText('finTotalBalanceBadge', this.formatMoney(total));
-        const fAcc = document.getElementById('txFilterAccount')?.value || 'ALL';
+        
+        const filterEl = document.getElementById('txFilterAccount');
+        const fAcc = String(filterEl?.value || 'ALL').trim();
 
-        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === a.id ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${a.name}</span><div class="wallet-arrows">${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}</div></div><div><div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div></div></div>`).join('') : '<div class="stat-label">Nessun conto presente.</div>');
+        this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => {
+          const txCount = this.state.transactions.filter(t => String(t.accountId).trim() === String(a.id).trim()).length;
+          return `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === String(a.id).trim() ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:800; font-size:0.95rem;">${a.name}</span>
+              <div class="wallet-arrows">
+                ${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}
+                ${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}
+              </div>
+            </div>
+            <div>
+              <div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div>
+              <div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • ${txCount} mov.</div>
+            </div>
+          </div>`;
+        }).join('') : '<div class="stat-label">Nessun conto presente.</div>');
 
         let filtered = [...this.state.transactions];
-        if (fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc);
+        if (fAcc !== 'ALL') {
+          filtered = filtered.filter(t => String(t.accountId).trim() === fAcc || String(t.targetAccountId).trim() === fAcc);
+        }
         filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
         this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => {
-          const acc = this.state.accounts.find(a => a.id === tx.accountId);
+          const acc = this.state.accounts.find(a => String(a.id).trim() === String(tx.accountId).trim());
           const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)';
           const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '';
           const imgHtml = tx.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${tx.fileData}')">📎</span>` : '';
-          return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong>${tx.desc}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`, `App.deleteTransaction('${tx.id}')`);
-        }).join('') : '<div class="list-row stat-label">Nessuna transazione.</div>');
+          return this.createSwipeRow(
+            `<div>
+              <span class="stat-label">${this.formatDate(tx.date)} • <strong style="color:var(--accent-primary);">${acc ? acc.name : 'Buddy'}</strong></span><br>
+              <strong>${tx.desc}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span>
+            </div>
+            <div style="text-align:right;">
+              <strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong>
+            </div>`,
+            `App.deleteTransaction('${tx.id}')`
+          );
+        }).join('') : '<div class="list-row stat-label">Nessuna transazione per questo filtro.</div>');
 
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0);
         this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
