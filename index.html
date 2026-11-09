@@ -771,6 +771,16 @@
       pomoSeconds: 1500,
       db: null,
 
+      // Helper data locale immune da bug di fuso orario (YYYY-MM-DD)
+      toLocalISO(d = new Date()) {
+        const dateObj = (d instanceof Date && !isNaN(d)) ? d : new Date(d);
+        if (isNaN(dateObj)) return new Date().toISOString().slice(0, 10);
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      },
+
       // === FIREBASE CLOUD SYNC ===
       initFirebase() {
         if (!this.state.firebase || !this.state.firebase.apiKey) {
@@ -925,6 +935,7 @@
         if (!importedData || typeof importedData !== 'object') return;
 
         const data = JSON.parse(JSON.stringify(importedData));
+        const todayStr = this.toLocalISO();
 
         // 1. Migrazione Transazioni (da financeTx o transactions)
         const rawTx = Array.isArray(data.transactions) ? data.transactions : (Array.isArray(data.financeTx) ? data.financeTx : []);
@@ -938,12 +949,12 @@
           return {
             id: t.id || this.generateId(),
             type: rawType,
-            amount: Number(parseFloat(t.amount).toFixed(2)) || 0,
+            amount: Number((parseFloat(t.amount) || 0).toFixed(2)),
             accountId: String(t.accountId || 'acc-main').trim(),
             targetAccountId: t.targetAccountId ? String(t.targetAccountId).trim() : null,
             desc: t.desc || t.title || 'Movimento',
             category: t.category || t.cat || 'Generale',
-            date: (t.date || new Date().toISOString()).slice(0, 10),
+            date: String(t.date || todayStr).slice(0, 10),
             recurrence: t.recurrence || 'Singola',
             timestamp: t.timestamp || new Date().toISOString(),
             fileData: t.fileData || null
@@ -973,7 +984,7 @@
           data.healthNutrition = data.foodLogs.map(f => ({
             id: f.id || this.generateId(),
             meal: f.meal + (f.name ? ' - ' + f.name : ''),
-            date: f.date || new Date().toISOString().slice(0, 10),
+            date: f.date || todayStr,
             kcal: parseFloat(f.kcal) || 0,
             prot: parseFloat(f.prot) || 0,
             carbs: parseFloat(f.carb ?? f.carbs) || 0,
@@ -984,7 +995,7 @@
           data.healthWeight = data.weightLogs.map(w => ({
             id: w.id || this.generateId(),
             value: parseFloat(w.kg ?? w.value) || 0,
-            date: w.date || new Date().toISOString().slice(0, 10)
+            date: w.date || todayStr
           }));
         }
         if (Array.isArray(data.medRecords) && (!Array.isArray(data.healthMedical) || data.healthMedical.length === 0)) {
@@ -992,7 +1003,7 @@
             id: m.id || this.generateId(),
             title: m.title || 'Record',
             type: m.type || 'Visita Medica',
-            date: m.date || new Date().toISOString().slice(0, 10),
+            date: m.date || todayStr,
             notes: m.notes || '',
             therapy: m.therapy || '',
             fileData: m.fileData || null
@@ -1006,11 +1017,11 @@
             title: t.title || 'Attività',
             type: t.scope === 'Memoria' ? 'Promemoria' : 'Attività',
             priority: t.priority || 'Normale',
-            date: t.date || new Date().toISOString().slice(0, 10)
+            date: t.date || todayStr
           }));
         }
 
-        // 5. Migrazione Veicoli e Manutenzioni Auto (da maint O da maintenances con categoria Auto/Moto/Veicolo)
+        // 5. Migrazione Veicoli e Manutenzioni Auto
         if (!Array.isArray(data.vehicles)) data.vehicles = [];
         if (!Array.isArray(data.garageMaint)) data.garageMaint = [];
 
@@ -1032,7 +1043,7 @@
                 id: m.id || this.generateId(),
                 vehicleId: m.vehicleId || defaultVehId,
                 title: m.task || m.title || 'Intervento Veicolo',
-                date: m.dueDate || m.date || new Date().toISOString().slice(0, 10),
+                date: m.dueDate || m.date || todayStr,
                 cost: parseFloat(m.cost) || 0,
                 kmAtMaint: parseFloat(m.kmNow || m.kmAtMaint) || 0
               });
@@ -1042,7 +1053,7 @@
               id: m.id || this.generateId(),
               title: m.task || m.title || 'Intervento',
               category: m.asset || m.category || 'Casa',
-              dueDate: m.dueDate || m.date || new Date().toISOString().slice(0, 10),
+              dueDate: m.dueDate || m.date || todayStr,
               cost: parseFloat(m.cost) || 0,
               recurrence: m.recurrence || 'Singola',
               status: m.status || 'In attesa',
@@ -1074,7 +1085,7 @@
       },
 
       sanitizeData() {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = this.toLocalISO();
         const cleanNumber = (val) => {
           if (typeof val === 'number' && !isNaN(val)) return Number(val.toFixed(2));
           if (!val) return 0;
@@ -1160,13 +1171,12 @@
           a.name = (a.name || 'Conto').trim();
         });
 
-        // Riparazione automatica transazioni di Buddy / conti con ID disallineati
         const buddyAcc = this.state.accounts.find(a => a.name.toLowerCase().includes('buddy')) || this.state.accounts[0];
         const validAccIds = new Set(this.state.accounts.map(a => a.id));
 
         this.state.transactions.forEach(t => {
           t.amount = cleanNumber(t.amount);
-          t.date = (t.date || today).slice(0, 10);
+          t.date = String(t.date || today).slice(0, 10);
           t.desc = t.desc || 'Movimento';
           t.category = t.category || 'Generale';
           const upType = String(t.type || 'EXPENSE').toUpperCase();
@@ -1182,6 +1192,7 @@
 
         this.state.calendarTasks.forEach(t => {
           if (!t.date || t.date.length < 10) t.date = today;
+          else t.date = String(t.date).slice(0, 10);
           t.title = t.title || 'Attività';
         });
       },
@@ -1236,7 +1247,16 @@
         }
       },
       closeModal(id) { document.getElementById(id)?.classList.remove('open'); },
-      openImageViewer(src) { document.getElementById('photoModalImg').src = src; this.openModal('photoModal'); },
+      openImageViewer(src) {
+        if (!src) return;
+        if (src.startsWith('data:application/pdf')) {
+          const win = window.open();
+          if (win) win.document.write(`<iframe src="${src}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
+          return;
+        }
+        document.getElementById('photoModalImg').src = src;
+        this.openModal('photoModal');
+      },
 
       switchModule(modId) {
         document.querySelectorAll('.module-section').forEach(el => el.classList.remove('active'));
@@ -1299,14 +1319,23 @@
       },
 
       formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(amount) || 0); },
-      formatDate(dateStr) { return dateStr ? new Date(dateStr).toLocaleDateString('it-IT') : '--'; },
+      formatDate(dateStr) {
+        if (!dateStr) return '--';
+        const parts = String(dateStr).slice(0, 10).split('-');
+        if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        return new Date(dateStr).toLocaleDateString('it-IT');
+      },
       generateId() { return Math.random().toString(36).substr(2, 9); },
 
+      // Supporta sia compressione immagini sia allegati PDF
       async fileToBase64(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsDataURL(file);
           reader.onload = (e) => {
+            if (file.type === 'application/pdf' || !file.type.startsWith('image/')) {
+              return resolve(e.target.result);
+            }
             const img = new Image();
             img.src = e.target.result;
             img.onload = () => {
@@ -1397,7 +1426,7 @@
       toggleHabit(id) {
         const h = this.state.habits.find(x => x.id === id);
         if (!h) return;
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
         if (h.lastDone === todayStr) {
           h.lastDone = null;
           h.streak = Math.max(0, (h.streak || 1) - 1);
@@ -1517,7 +1546,7 @@
         const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0);
         this.setElText('dashNetWorth', this.formatMoney(total));
         this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
         const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length;
         const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
         const score = Math.min(100, Math.max(25, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15))));
@@ -1554,7 +1583,7 @@
           type: 'bar',
           data: {
             labels: ['Entrate', 'Uscite'],
-            datasets: [{ data: [income, expense], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }]
+            datasets: [{ data: [Number(income.toFixed(2)), Number(expense.toFixed(2))], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }]
           },
           options: {
             indexAxis: 'y',
@@ -1569,14 +1598,22 @@
         });
       },
 
-      // === CALENDARIO ===
+      // === CALENDARIO (IMMUNE A FUSO ORARIO) ===
       changeMonth(dir) {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         this.currentDate.setMonth(this.currentDate.getMonth() + dir);
         this.renderCalendar();
       },
       selectToday() { this.currentDate = new Date(); this.selectedDate = new Date(); this.renderCalendar(); },
-      selectDate(dateStr) { this.selectedDate = new Date(dateStr); this.renderCalendar(); },
+      selectDate(dateStr) {
+        const parts = String(dateStr).split('-');
+        if (parts.length === 3) {
+          this.selectedDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+        } else {
+          this.selectedDate = new Date(dateStr);
+        }
+        this.renderCalendar();
+      },
       renderCalendar() {
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         if (!(this.selectedDate instanceof Date) || isNaN(this.selectedDate)) this.selectedDate = new Date();
@@ -1599,12 +1636,12 @@
           grid.appendChild(el);
         }
 
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const selStr = this.selectedDate.toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO(new Date());
+        const selStr = this.toLocalISO(this.selectedDate);
         const last = new Date(y, m + 1, 0).getDate();
 
         for (let d = 1; d <= last; d++) {
-          const dateStr = new Date(y, m, d, 12).toISOString().slice(0, 10);
+          const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
           const el = document.createElement('div');
           el.className = 'cal-day';
           if (dateStr === todayStr) el.classList.add('today');
@@ -1623,7 +1660,7 @@
         e.preventDefault();
         this.state.calendarTasks.push({
           id: this.generateId(),
-          date: this.selectedDate.toISOString().slice(0, 10),
+          date: this.toLocalISO(this.selectedDate),
           title: document.getElementById('calTaskTitle').value,
           type: document.getElementById('calTaskType').value,
           priority: document.getElementById('calTaskPriority').value
@@ -1638,14 +1675,14 @@
         this.renderCalendar();
       },
       renderCalendarTasks() {
-        const selStr = (this.selectedDate instanceof Date && !isNaN(this.selectedDate)) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+        const selStr = this.toLocalISO(this.selectedDate);
         const tasks = this.state.calendarTasks.filter(t => t.date === selStr);
         this.setElText('calTaskCountBadge', tasks.length);
-        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : t.priority === 'Bassa' ? 'badge-success' : 'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
+        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : t.priority === 'Bassa' ? 'badge-success' : 'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteCalendarTask('${t.id}')">🗑</button>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
       },
       saveJournalEntry(e) {
         e.preventDefault();
-        const date = (this.selectedDate instanceof Date) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+        const date = this.toLocalISO(this.selectedDate);
         const text = document.getElementById('journalText').value.trim();
         if (!text) return;
         const entry = { date, mood: document.getElementById('journalMood').value, text };
@@ -1658,7 +1695,7 @@
       },
       renderJournalHistory() {
         const hist = [...this.state.journal].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 5);
-        this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>');
+        this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start; cursor:pointer;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>');
       },
 
       // === GARAGE OS ===
@@ -1709,7 +1746,7 @@
         const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
         if (!v) return;
         const newKm = prompt("Inserisci chilometraggio attuale:", v.km);
-        if (newKm !== null && !isNaN(newKm)) {
+        if (newKm !== null && newKm.trim() !== '' && !isNaN(newKm)) {
           v.km = parseFloat(newKm);
           this.save();
         }
@@ -1728,7 +1765,7 @@
         });
         this.save();
         e.target.reset();
-        document.getElementById('gMaintDate').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('gMaintDate').value = this.toLocalISO();
       },
       deleteGarageMaint(id) {
         if (confirm("Eliminare lavoro?")) {
@@ -1760,15 +1797,15 @@
         setTrafficLight('date-bollo', 'tl-bollo', v.bollo);
         setTrafficLight('date-revisione', 'tl-revisione', v.revis);
 
-        const autoTx = this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category || '').toLowerCase().includes('auto'));
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const cutoffStr = this.toLocalISO(thirtyDaysAgo);
         let fuelCost = 0;
-        autoTx.filter(t => new Date(t.date) >= thirtyDaysAgo).forEach(t => fuelCost += t.amount);
+        this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category || '').toLowerCase().includes('auto') && t.date >= cutoffStr).forEach(t => fuelCost += t.amount);
         this.setElText('garageFuelMonth', this.formatMoney(fuelCost));
 
-        const sorted = this.state.garageMaint.filter(m => m.vehicleId === v.id).sort((a, b) => new Date(b.date) - new Date(a.date));
-        this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong></div>`, `App.deleteGarageMaint('${m.id}')`)).join('') : '<div class="list-row stat-label">Nessun lavoro registrato.</div>');
+        const sorted = this.state.garageMaint.filter(m => m.vehicleId === v.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div><div style="display:flex; align-items:center; gap:0.6rem;"><strong>${this.formatMoney(m.cost)}</strong><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteGarageMaint('${m.id}')">🗑</button></div>`, `App.deleteGarageMaint('${m.id}')`)).join('') : '<div class="list-row stat-label">Nessun lavoro registrato.</div>');
       },
 
       // === FINANZE WALLET ===
@@ -1806,12 +1843,12 @@
       renderFinance() {
         const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0);
         this.setElText('finTotalBalanceBadge', this.formatMoney(total));
-        
+
         const filterEl = document.getElementById('txFilterAccount');
         const fAcc = String(filterEl?.value || 'ALL').trim();
 
         this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => {
-          const txCount = this.state.transactions.filter(t => String(t.accountId).trim() === String(a.id).trim()).length;
+          const txCount = this.state.transactions.filter(t => String(t.accountId).trim() === String(a.id).trim() || String(t.targetAccountId).trim() === String(a.id).trim()).length;
           return `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === String(a.id).trim() ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-weight:800; font-size:0.95rem;">${a.name}</span>
@@ -1843,8 +1880,9 @@
               <span class="stat-label">${this.formatDate(tx.date)} • <strong style="color:var(--accent-primary);">${acc ? acc.name : 'Buddy'}</strong></span><br>
               <strong>${tx.desc}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span>
             </div>
-            <div style="text-align:right;">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
               <strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong>
+              <button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteTransaction('${tx.id}')">🗑</button>
             </div>`,
             `App.deleteTransaction('${tx.id}')`
           );
@@ -1852,7 +1890,7 @@
 
         const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0);
         this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
-        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><strong>${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
+        this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><div style="display:flex; align-items:center; gap:0.5rem;"><strong>${this.formatMoney(s.cost)}</strong><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteSubscription('${s.id}')">🗑</button></div>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
         this.renderExpenseCategoryChart();
       },
       renderExpenseCategoryChart() {
@@ -1861,7 +1899,7 @@
         const catTotals = {};
         this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => {
           const c = t.category || 'Altro';
-          catTotals[c] = (catTotals[c] || 0) + t.amount;
+          catTotals[c] = Number(((catTotals[c] || 0) + t.amount).toFixed(2));
         });
         const labels = Object.keys(catTotals);
         const data = Object.values(catTotals);
@@ -1902,6 +1940,7 @@
         const srcId = document.getElementById('txAccount').value;
         const trgId = document.getElementById('txTargetAccount').value;
         if (!srcId) return this.showToast('Seleziona un conto', 'danger');
+        if (t === 'TRANSFER' && (!trgId || trgId === srcId)) return this.showToast('Seleziona un conto destinazione valido', 'warning');
         const src = this.state.accounts.find(x => x.id === srcId);
         let fileData = null;
         if (document.getElementById('txFile')?.files?.length > 0) {
@@ -1920,19 +1959,20 @@
           fileData
         };
         if (src) {
-          if (t === 'EXPENSE') src.balance -= a;
-          else if (t === 'INCOME') src.balance += a;
+          if (t === 'EXPENSE') src.balance = Number((src.balance - a).toFixed(2));
+          else if (t === 'INCOME') src.balance = Number((src.balance + a).toFixed(2));
           else if (t === 'TRANSFER') {
-            src.balance -= a;
+            src.balance = Number((src.balance - a).toFixed(2));
             const trg = this.state.accounts.find(x => x.id === trgId);
-            if (trg) trg.balance += a;
+            if (trg) trg.balance = Number((trg.balance + a).toFixed(2));
             tx.targetAccountId = trgId;
           }
         }
         this.state.transactions.push(tx);
         this.save();
         e.target.reset();
-        document.getElementById('txDate').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('txDate').value = this.toLocalISO();
+        this.toggleTransferFields();
         this.populateAccountSelects();
         this.renderFinance();
       },
@@ -1952,7 +1992,7 @@
           accountId: id,
           desc: '⚖️ Allineamento Saldo',
           category: 'Rettifica',
-          date: new Date().toISOString().slice(0, 10),
+          date: this.toLocalISO(),
           recurrence: 'Singola',
           timestamp: new Date().toISOString()
         });
@@ -1966,12 +2006,12 @@
         if (!tx || !confirm('Eliminare movimento?')) return;
         const src = this.state.accounts.find(a => a.id === tx.accountId);
         if (src) {
-          if (tx.type === 'EXPENSE') src.balance += tx.amount;
-          else if (tx.type === 'INCOME') src.balance -= tx.amount;
+          if (tx.type === 'EXPENSE') src.balance = Number((src.balance + tx.amount).toFixed(2));
+          else if (tx.type === 'INCOME') src.balance = Number((src.balance - tx.amount).toFixed(2));
           else if (tx.type === 'TRANSFER') {
-            src.balance += tx.amount;
+            src.balance = Number((src.balance + tx.amount).toFixed(2));
             const trg = this.state.accounts.find(a => a.id === tx.targetAccountId);
-            if (trg) trg.balance -= tx.amount;
+            if (trg) trg.balance = Number((trg.balance - tx.amount).toFixed(2));
           }
         }
         this.state.transactions = this.state.transactions.filter(t => t.id !== id);
@@ -1986,7 +2026,7 @@
           name: document.getElementById('subName').value,
           cost: parseFloat(document.getElementById('subCost').value) || 0,
           cycle: 'monthly',
-          next: new Date().toISOString().slice(0, 10)
+          next: this.toLocalISO()
         });
         this.save();
         e.target.reset();
@@ -2029,7 +2069,7 @@
         });
         this.save();
         e.target.reset();
-        document.getElementById('nutriDate').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('nutriDate').value = this.toLocalISO();
         this.renderHealth();
       },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
@@ -2042,7 +2082,7 @@
         });
         this.save();
         e.target.reset();
-        document.getElementById('weightDate').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('weightDate').value = this.toLocalISO();
         this.renderHealth();
       },
       deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
@@ -2069,13 +2109,14 @@
         });
         this.save();
         e.target.reset();
+        document.getElementById('medDate').value = this.toLocalISO();
         this.toggleMedFields();
         this.renderHealth();
       },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       renderHealth() {
         const sortedNutri = [...this.state.healthNutrition].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        const latestDay = sortedNutri[0]?.date || new Date().toISOString().slice(0, 10);
+        const latestDay = sortedNutri[0]?.date || this.toLocalISO();
         const dayLogs = sortedNutri.filter(n => n.date === latestDay);
         const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)),
               totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)),
@@ -2088,8 +2129,8 @@
         this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`);
         this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`);
         this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
-        this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => this.createSwipeRow(`<div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div>`, `App.deleteNutritionLog('${n.id}')`)).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
-        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(w => this.createSwipeRow(`<div><strong>⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
+        this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => this.createSwipeRow(`<div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteNutritionLog('${n.id}')">🗑</button>`, `App.deleteNutritionLog('${n.id}')`)).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
+        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(w => this.createSwipeRow(`<div><strong>⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteWeightLog('${w.id}')">🗑</button>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
         const ctxW = document.getElementById('weightChart');
         if (ctxW && typeof Chart !== 'undefined') {
           const sortedW = [...this.state.healthWeight].sort((a, b) => (a.date || '').localeCompare(b.date || '')).slice(-10);
@@ -2106,7 +2147,7 @@
         this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(m => {
           const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : '';
           const file = m.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${m.fileData}')">📎</span>` : '';
-          return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${m.title}</strong> ${file}${extra}<div class="stat-label">${m.notes || ''}</div></div>`, `App.deleteMedicalRecord('${m.id}')`);
+          return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)} • ${m.type || 'Record'}</span><br><strong>🩺 ${m.title}</strong> ${file}${extra}<div class="stat-label">${m.notes || ''}</div></div><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteMedicalRecord('${m.id}')">🗑</button>`, `App.deleteMedicalRecord('${m.id}')`);
         }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
       },
 
@@ -2148,6 +2189,8 @@
         });
         this.save();
         e.target.reset();
+        document.getElementById('invDate').value = this.toLocalISO();
+        this.populateCategorySelects();
         this.renderInventory();
       },
       deleteInventoryItem(id) {
@@ -2160,12 +2203,13 @@
       renderInventory() {
         const filterCat = document.getElementById('invFilterCat')?.value || 'ALL';
         const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase();
-        let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true);
+        let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? (i.type === 'Garanzia' || Boolean(i.warranty)) : true);
         if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat);
         if (search) filtered = filtered.filter(i => (i.name || '').toLowerCase().includes(search) || (i.notes || '').toLowerCase().includes(search));
         this.setElHTML('inventoryList', filtered.map(item => {
           const imgHtml = item.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${item.fileData}')">📎</span>` : '';
-          return this.createSwipeRow(`<div><strong>📦 ${item.name}</strong> ${imgHtml} <span class="badge">${item.category}</span><br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`, `App.deleteInventoryItem('${item.id}')`);
+          const warrHtml = item.warranty ? `<br><small class="badge badge-info" style="margin-top:2px;">🛡️ Fine Garanzia: ${this.formatDate(item.warranty)}</small>` : '';
+          return this.createSwipeRow(`<div><strong>📦 ${item.name}</strong> ${imgHtml} <span class="badge">${item.category}</span><br><small class="stat-label">${item.date ? 'Acq: ' + this.formatDate(item.date) + ' ' : ''}${item.notes ? '— ' + item.notes : ''}</small>${warrHtml}</div><div style="display:flex; align-items:center; gap:0.6rem;"><strong>${this.formatMoney(item.price)}</strong><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteInventoryItem('${item.id}')">🗑</button></div>`, `App.deleteInventoryItem('${item.id}')`);
         }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>');
       },
 
@@ -2180,10 +2224,28 @@
       },
       addGeneralMaintenance(e) {
         e.preventDefault();
+        const cat = document.getElementById('maintCategory').value;
+        // Se sceglie "Auto", lo invia automaticamente a Garage OS
+        if (cat.toLowerCase() === 'auto') {
+          const v = this.state.vehicles.find(x => x.id === this.activeVehicleId) || this.state.vehicles[0];
+          this.state.garageMaint.push({
+            id: this.generateId(),
+            vehicleId: v ? v.id : 'veh-main',
+            title: document.getElementById('maintTitle').value,
+            date: document.getElementById('maintDueDate').value,
+            cost: parseFloat(document.getElementById('maintCost').value) || 0,
+            kmAtMaint: v ? v.km : 0
+          });
+          this.save();
+          e.target.reset();
+          document.getElementById('maintDueDate').value = this.toLocalISO();
+          this.showToast('Spostato automaticamente in Garage OS!');
+          return;
+        }
         this.state.maintenances.push({
           id: this.generateId(),
           title: document.getElementById('maintTitle').value,
-          category: document.getElementById('maintCategory').value,
+          category: cat,
           dueDate: document.getElementById('maintDueDate').value,
           cost: parseFloat(document.getElementById('maintCost').value) || 0,
           recurrence: document.getElementById('maintRecurrence').value,
@@ -2192,6 +2254,14 @@
         });
         this.save();
         e.target.reset();
+        document.getElementById('maintDueDate').value = this.toLocalISO();
+        this.renderGeneralMaintenances();
+      },
+      toggleGeneralMaintenanceStatus(id) {
+        const m = this.state.maintenances.find(x => x.id === id);
+        if (!m) return;
+        m.status = m.status === 'Completata' ? 'In attesa' : 'Completata';
+        this.save();
         this.renderGeneralMaintenances();
       },
       deleteGeneralMaintenance(id) {
@@ -2207,7 +2277,7 @@
         const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL';
         if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat);
         if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat);
-        this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>');
+        this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><div style="display:flex; align-items:center; gap:0.5rem;"><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; cursor:pointer; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};" onclick="App.toggleGeneralMaintenanceStatus('${m.id}')">${m.status === 'Completata' ? '✅ Completata' : '⏳ In attesa'}</span></div><button class="btn btn-sm btn-danger" style="padding:0.2rem 0.5rem;" onclick="App.deleteGeneralMaintenance('${m.id}')">🗑</button></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>');
       },
 
       renderGallery() {
@@ -2215,8 +2285,8 @@
         this.state.transactions.forEach(t => { if (t.fileData) images.push({ src: t.fileData, title: t.desc, date: t.date, type: 'Spesa' }); });
         this.state.inventory.forEach(i => { if (i.fileData) images.push({ src: i.fileData, title: i.name, date: i.date, type: 'Inventario' }); });
         this.state.healthMedical.forEach(m => { if (m.fileData) images.push({ src: m.fileData, title: m.title, date: m.date, type: 'Referto' }); });
-        images.sort((a, b) => new Date(b.date) - new Date(a.date));
-        this.setElHTML('galleryGrid', images.length ? images.map(img => `<div class="gallery-item" onclick="App.openImageViewer('${img.src}')"><img src="${img.src}"><div class="gallery-overlay"><strong>${img.type}</strong><br>${img.title}</div></div>`).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
+        images.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        this.setElHTML('galleryGrid', images.length ? images.map(img => `<div class="gallery-item" onclick="App.openImageViewer('${img.src}')"><img src="${img.src.startsWith('data:application/pdf') ? 'https://via.placeholder.com/150/6366f1/ffffff?text=PDF' : img.src}"><div class="gallery-overlay"><strong>${img.type}</strong><br>${img.title}</div></div>`).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
       },
 
       executeSearch() {
@@ -2323,7 +2393,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2));
         const a = document.createElement('a');
         a.href = dataStr;
-        a.download = `LifeOS_v10_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+        a.download = `LifeOS_v10_Backup_${this.toLocalISO()}.json`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -2358,7 +2428,7 @@
 
       async init() {
         await this.load();
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = this.toLocalISO();
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = todayStr;
