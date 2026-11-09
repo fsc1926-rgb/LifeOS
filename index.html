@@ -745,10 +745,18 @@
         accounts: [], transactions: [], subs: [],
         healthNutrition: [], healthWeight: [], healthMedical: [], habits: [], vaultData: [],
         foodLibrary: DEFAULT_FOODS,
+        nutritionGoals: { kcal: 2100, carb: 230, prot: 140, fat: 70 },
+        weightGoal: 75,
         vehicles: [], garageMaint: [],
         settings: {
-          inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
-          maintenanceCategories: ['Casa', 'Salute', 'Altro'],
+          inventoryCategories: {
+            'Elettrodomestici': ['Generale', 'Cucina', 'Clima'],
+            'Casa/Impianti': ['Generale', 'Mobili', 'Impianti'],
+            'Casa': ['Generale', 'Elettrodomestici', 'Mobili'],
+            'Elettronica': ['Generale', 'Smartphone', 'Computer', 'Casa'],
+            'Veicoli': ['Auto', 'Moto']
+          },
+          maintenanceCategories: ['Casa', 'Caldaia', 'Auto', 'Salute', 'Altro'],
           hapticEnabled: true
         }
       },
@@ -761,13 +769,13 @@
       html5QrcodeScanner: null,
       pomoTimer: null,
       pomoSeconds: 1500,
-      db: null, // Firebase Firestore Instance
+      db: null,
 
       // === FIREBASE CLOUD SYNC ===
       initFirebase() {
-        if(!this.state.firebase || !this.state.firebase.apiKey) {
-           this.setElText('syncStatusLabel', 'Stato: 🔴 Cloud Sync Disattivato (Uso solo Locale)');
-           return;
+        if (!this.state.firebase || !this.state.firebase.apiKey) {
+          this.setElText('syncStatusLabel', 'Stato: 🔴 Cloud Sync Disattivato (Uso solo Locale)');
+          return;
         }
         try {
           if (!firebase.apps.length) {
@@ -775,80 +783,80 @@
           }
           this.db = firebase.firestore();
           this.setElText('syncStatusLabel', 'Stato: 🟢 Cloud Sync Attivo');
-          this.pullFromCloud(false); // Check silently if cloud has newer data on startup
-        } catch(e) {
+          this.pullFromCloud(false);
+        } catch (e) {
           console.error("Firebase init error", e);
           this.setElText('syncStatusLabel', 'Stato: 🔴 Errore Configurazione Firebase');
         }
       },
       saveFirebaseConfig() {
-         const fb = {
-           apiKey: document.getElementById('fbApiKey').value.trim(),
-           authDomain: document.getElementById('fbAuthDomain').value.trim(),
-           projectId: document.getElementById('fbProjectId').value.trim(),
-           storageBucket: document.getElementById('fbStorageBucket').value.trim(),
-           messagingSenderId: document.getElementById('fbMessagingSenderId').value.trim(),
-           appId: document.getElementById('fbAppId').value.trim(),
-           deviceId: document.getElementById('fbDeviceId').value.trim() || 'LifeOS_Device_1'
-         };
-         if(!fb.apiKey) {
-            this.state.firebase = null;
-         } else {
-            this.state.firebase = fb;
-         }
-         this.save(true); // save local only
-         this.closeModal('firebaseConfigModal');
-         this.showToast('Configurazione Cloud Salvata. Riavvio necessario.', 'info');
-         setTimeout(() => location.reload(), 1500);
+        const fb = {
+          apiKey: document.getElementById('fbApiKey').value.trim(),
+          authDomain: document.getElementById('fbAuthDomain').value.trim(),
+          projectId: document.getElementById('fbProjectId').value.trim(),
+          storageBucket: document.getElementById('fbStorageBucket').value.trim(),
+          messagingSenderId: document.getElementById('fbMessagingSenderId').value.trim(),
+          appId: document.getElementById('fbAppId').value.trim(),
+          deviceId: document.getElementById('fbDeviceId').value.trim() || 'LifeOS_Device_1'
+        };
+        this.state.firebase = fb.apiKey ? fb : null;
+        this.save(true);
+        this.closeModal('firebaseConfigModal');
+        this.showToast('Configurazione Cloud Salvata. Riavvio...', 'info');
+        setTimeout(() => location.reload(), 1200);
       },
       async pushToCloud() {
-         if(!this.db || !this.state.firebase.deviceId) return;
-         const syncIcon = document.getElementById('cloudSyncStatus');
-         if(syncIcon) syncIcon.classList.add('syncing');
-         try {
-            this.state.lastCloudSync = Date.now();
-            const payload = {
-                timestamp: this.state.lastCloudSync,
-                dataStr: JSON.stringify(this.state)
-            };
-            await this.db.collection('lifeos_backups').doc(this.state.firebase.deviceId).set(payload);
-         } catch(e) {
-            console.error("Cloud push failed", e);
-         } finally {
-            if(syncIcon) syncIcon.classList.remove('syncing');
-         }
+        if (!this.db || !this.state.firebase?.deviceId) return;
+        const syncIcon = document.getElementById('cloudSyncStatus');
+        if (syncIcon) syncIcon.classList.add('syncing');
+        try {
+          this.state.lastCloudSync = Date.now();
+          await localforage.setItem('appData', this.state);
+          const payload = {
+            timestamp: this.state.lastCloudSync,
+            dataStr: JSON.stringify(this.state)
+          };
+          await this.db.collection('lifeos_backups').doc(this.state.firebase.deviceId).set(payload);
+        } catch (e) {
+          console.error("Cloud push failed", e);
+        } finally {
+          if (syncIcon) syncIcon.classList.remove('syncing');
+        }
       },
       async pullFromCloud(force = false) {
-         if(!this.db || !this.state.firebase.deviceId) return;
-         const syncIcon = document.getElementById('cloudSyncStatus');
-         if(syncIcon) syncIcon.classList.add('syncing');
-         try {
-            const doc = await this.db.collection('lifeos_backups').doc(this.state.firebase.deviceId).get();
-            if(doc.exists) {
-               const cloudData = doc.data();
-               if (force || (cloudData.timestamp && (!this.state.lastCloudSync || cloudData.timestamp > this.state.lastCloudSync + 10000))) {
-                  const parsedState = JSON.parse(cloudData.dataStr);
-                  this.state = { ...this.state, ...parsedState };
-                  this.sanitizeData();
-                  await localforage.setItem('appData', this.state); // salva in locale
-                  this.renderActiveModule();
-                  if(force) this.showToast('Dati ripristinati dal Cloud!');
-               }
-            } else if(force) {
-               this.showToast('Nessun backup trovato sul Cloud.', 'warning');
+        if (!this.db || !this.state.firebase?.deviceId) return;
+        const syncIcon = document.getElementById('cloudSyncStatus');
+        if (syncIcon) syncIcon.classList.add('syncing');
+        try {
+          const doc = await this.db.collection('lifeos_backups').doc(this.state.firebase.deviceId).get();
+          if (doc.exists) {
+            const cloudData = doc.data();
+            if (force || (cloudData.timestamp && (!this.state.lastCloudSync || cloudData.timestamp > this.state.lastCloudSync + 10000))) {
+              const parsedState = JSON.parse(cloudData.dataStr);
+              this.migrateAndMergeData(parsedState);
+              await localforage.setItem('appData', this.state);
+              this.populateAccountSelects();
+              this.populateCategorySelects();
+              this.populateMaintenanceSelects();
+              this.populateFoodLibrarySelect();
+              this.renderActiveModule();
+              if (force) this.showToast('Dati ripristinati dal Cloud!');
             }
-         } catch(e) {
-            console.error("Cloud pull failed", e);
-            if(force) this.showToast('Errore lettura dal Cloud.', 'danger');
-         } finally {
-            if(syncIcon) syncIcon.classList.remove('syncing');
-         }
+          } else if (force) {
+            this.showToast('Nessun backup trovato sul Cloud.', 'warning');
+          }
+        } catch (e) {
+          console.error("Cloud pull failed", e);
+          if (force) this.showToast('Errore lettura dal Cloud.', 'danger');
+        } finally {
+          if (syncIcon) syncIcon.classList.remove('syncing');
+        }
       },
       forceCloudSyncDown() {
-         if(!this.db) return this.showToast('Cloud non configurato.', 'warning');
-         if(confirm("Attenzione: questo sovrascriverà i dati locali con quelli presenti sul Cloud. Procedere?")) {
-            this.pullFromCloud(true);
-         }
+        if (!this.db) return this.showToast('Cloud non configurato.', 'warning');
+        if (confirm("Attenzione: questo sovrascriverà i dati locali con quelli presenti sul Cloud. Procedere?")) {
+          this.pullFromCloud(true);
+        }
       },
 
       // === GESTURES SWIPE NATIVO ===
@@ -860,26 +868,26 @@
         document.addEventListener('touchstart', e => {
           const sc = e.target.closest('.swipe-container');
           if (sc) this.swipeStartX = e.touches[0].clientX;
-        }, {passive: true});
-        
+        }, { passive: true });
+
         document.addEventListener('touchend', e => {
           const sc = e.target.closest('.swipe-container');
           if (sc && this.swipeStartX !== null) {
             const endX = e.changedTouches[0].clientX;
             const content = sc.querySelector('.swipe-content');
-            if(content) {
+            if (content) {
               if (this.swipeStartX - endX > 50) content.style.transform = 'translateX(-75px)';
               else content.style.transform = 'translateX(0)';
             }
             this.swipeStartX = null;
           }
-        }, {passive: true});
+        }, { passive: true });
 
         main.addEventListener('touchstart', e => {
           if (e.target.closest('input, textarea, select, .swipe-container, .wallet-carousel, canvas, .modal-backdrop')) return;
           this.navStartX = e.touches[0].clientX;
-        }, {passive: true});
-        
+        }, { passive: true });
+
         main.addEventListener('touchend', e => {
           if (this.navStartX === null) return;
           const endX = e.changedTouches[0].clientX;
@@ -892,12 +900,12 @@
           const activeSec = document.querySelector('.module-section.active');
           if (!activeSec) return;
           let idx = tabs.indexOf(activeSec.id);
-          
+
           if (idx !== -1) {
             if (diff > 0 && idx < tabs.length - 1) this.switchModule(tabs[idx + 1]);
             else if (diff < 0 && idx > 0) this.switchModule(tabs[idx - 1]);
           }
-        }, {passive: true});
+        }, { passive: true });
       },
 
       createSwipeRow(contentHTML, deleteActionJS) {
@@ -912,71 +920,307 @@
       setElText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; },
       setElHTML(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; },
 
+      // === MOTORE DI MIGRAZIONE E SANIFICAZIONE UNIVERSALE ===
+      migrateAndMergeData(importedData) {
+        if (!importedData || typeof importedData !== 'object') return;
+
+        const data = JSON.parse(JSON.stringify(importedData));
+
+        // 1. Migrazione Transazioni (da financeTx o transactions)
+        const rawTx = Array.isArray(data.transactions) ? data.transactions : (Array.isArray(data.financeTx) ? data.financeTx : []);
+        data.transactions = rawTx.map(t => {
+          let rawType = String(t.type || 'EXPENSE').toUpperCase();
+          if (rawType === 'EXPENSE' || rawType === 'USCITA') rawType = 'EXPENSE';
+          else if (rawType === 'INCOME' || rawType === 'ENTRATA') rawType = 'INCOME';
+          else if (rawType === 'TRANSFER' || rawType === 'GIROCONTO') rawType = 'TRANSFER';
+          else rawType = 'EXPENSE';
+
+          return {
+            id: t.id || this.generateId(),
+            type: rawType,
+            amount: Number(parseFloat(t.amount).toFixed(2)) || 0,
+            accountId: t.accountId || 'acc-main',
+            targetAccountId: t.targetAccountId || null,
+            desc: t.desc || t.title || 'Movimento',
+            category: t.category || t.cat || 'Generale',
+            date: (t.date || new Date().toISOString()).slice(0, 10),
+            recurrence: t.recurrence || 'Singola',
+            timestamp: t.timestamp || new Date().toISOString(),
+            fileData: t.fileData || null
+          };
+        });
+
+        // 2. Migrazione Inventario (da vault legacy o inventory)
+        if (Array.isArray(data.vault) && (!Array.isArray(data.inventory) || data.inventory.length === 0)) {
+          data.inventory = data.vault.map(v => ({
+            id: v.id || this.generateId(),
+            type: 'Archivio',
+            name: v.title || v.name || 'Oggetto',
+            category: v.cat || v.category || 'Generale',
+            subcategory: v.subcategory || 'Generale',
+            price: parseFloat(v.price) || 0,
+            date: v.date || '',
+            warranty: v.warranty || '',
+            location: v.location || '',
+            notes: ((v.serial || '') + ' ' + (v.notes || '')).trim(),
+            addedAt: v.addedAt || new Date().toISOString(),
+            fileData: v.fileData || null
+          }));
+        }
+
+        // 3. Migrazione Nutrizione, Peso e Cartella Clinica
+        if (Array.isArray(data.foodLogs) && (!Array.isArray(data.healthNutrition) || data.healthNutrition.length === 0)) {
+          data.healthNutrition = data.foodLogs.map(f => ({
+            id: f.id || this.generateId(),
+            meal: f.meal + (f.name ? ' - ' + f.name : ''),
+            date: f.date || new Date().toISOString().slice(0, 10),
+            kcal: parseFloat(f.kcal) || 0,
+            prot: parseFloat(f.prot) || 0,
+            carbs: parseFloat(f.carb ?? f.carbs) || 0,
+            fat: parseFloat(f.fat) || 0
+          }));
+        }
+        if (Array.isArray(data.weightLogs) && (!Array.isArray(data.healthWeight) || data.healthWeight.length === 0)) {
+          data.healthWeight = data.weightLogs.map(w => ({
+            id: w.id || this.generateId(),
+            value: parseFloat(w.kg ?? w.value) || 0,
+            date: w.date || new Date().toISOString().slice(0, 10)
+          }));
+        }
+        if (Array.isArray(data.medRecords) && (!Array.isArray(data.healthMedical) || data.healthMedical.length === 0)) {
+          data.healthMedical = data.medRecords.map(m => ({
+            id: m.id || this.generateId(),
+            title: m.title || 'Record',
+            type: m.type || 'Visita Medica',
+            date: m.date || new Date().toISOString().slice(0, 10),
+            notes: m.notes || '',
+            therapy: m.therapy || '',
+            fileData: m.fileData || null
+          }));
+        }
+
+        // 4. Migrazione Agenda
+        if (Array.isArray(data.crmTasks) && (!Array.isArray(data.calendarTasks) || data.calendarTasks.length === 0)) {
+          data.calendarTasks = data.crmTasks.map(t => ({
+            id: t.id || this.generateId(),
+            title: t.title || 'Attività',
+            type: t.scope === 'Memoria' ? 'Promemoria' : 'Attività',
+            priority: t.priority || 'Normale',
+            date: t.date || new Date().toISOString().slice(0, 10)
+          }));
+        }
+
+        // 5. Migrazione Veicoli e Manutenzioni Auto (da maint O da maintenances con categoria Auto/Moto/Veicolo)
+        if (!Array.isArray(data.vehicles)) data.vehicles = [];
+        if (!Array.isArray(data.garageMaint)) data.garageMaint = [];
+
+        if (data.garageConfig && data.vehicles.length === 0) {
+          data.vehicles.push({ id: this.generateId(), ...data.garageConfig });
+          delete data.garageConfig;
+        }
+
+        const rawMaint = Array.isArray(data.maint) ? data.maint : (Array.isArray(data.maintenances) ? data.maintenances : []);
+        const cleanMaintenances = [];
+        const defaultVehId = data.vehicles[0]?.id || 'veh-main';
+
+        rawMaint.forEach(m => {
+          const cat = String(m.asset || m.category || '').trim().toLowerCase();
+          if (cat === 'auto' || cat === 'moto' || cat === 'veicolo' || cat === 'veicoli') {
+            // Evita duplicati se già migrato in garageMaint
+            const alreadyInGarage = data.garageMaint.some(gm => gm.id === m.id);
+            if (!alreadyInGarage) {
+              data.garageMaint.push({
+                id: m.id || this.generateId(),
+                vehicleId: m.vehicleId || defaultVehId,
+                title: m.task || m.title || 'Intervento Veicolo',
+                date: m.dueDate || m.date || new Date().toISOString().slice(0, 10),
+                cost: parseFloat(m.cost) || 0,
+                kmAtMaint: parseFloat(m.kmNow || m.kmAtMaint) || 0
+              });
+            }
+          } else {
+            cleanMaintenances.push({
+              id: m.id || this.generateId(),
+              title: m.task || m.title || 'Intervento',
+              category: m.asset || m.category || 'Casa',
+              dueDate: m.dueDate || m.date || new Date().toISOString().slice(0, 10),
+              cost: parseFloat(m.cost) || 0,
+              recurrence: m.recurrence || 'Singola',
+              status: m.status || 'In attesa',
+              notes: m.notes || ''
+            });
+          }
+        });
+        data.maintenances = cleanMaintenances;
+
+        if (data.vehicles.length === 0) {
+          data.vehicles.push({
+            id: defaultVehId,
+            name: 'Auto Principale',
+            plate: 'XX 000 XX',
+            bollo: '',
+            assic: '',
+            revis: '',
+            km: 0
+          });
+        }
+
+        // Preserva eventuale configurazione Firebase locale attiva se non presente nel backup
+        const currentFirebase = this.state.firebase;
+        this.state = { ...this.state, ...data };
+        if (!this.state.firebase && currentFirebase) {
+          this.state.firebase = currentFirebase;
+        }
+        this.state.lastCloudSync = Date.now();
+        this.sanitizeData();
+      },
+
       sanitizeData() {
         const today = new Date().toISOString().slice(0, 10);
         const cleanNumber = (val) => {
-          if (typeof val === 'number' && !isNaN(val)) return val;
+          if (typeof val === 'number' && !isNaN(val)) return Number(val.toFixed(2));
           if (!val) return 0;
-          let s = String(val).replace(/[^0-9.,-]/g, '').replace(',', '.');
-          return parseFloat(s) || 0;
+          let s = String(val).trim();
+          if (s.includes(',') && s.includes('.')) {
+            s = s.replace(/\./g, '').replace(',', '.');
+          } else if (s.includes(',')) {
+            s = s.replace(',', '.');
+          }
+          s = s.replace(/[^0-9.-]/g, '');
+          const n = parseFloat(s);
+          return isNaN(n) ? 0 : Number(n.toFixed(2));
         };
 
-        const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'vaultData'];
+        const arrays = ['inventory', 'calendarTasks', 'journal', 'maintenances', 'accounts', 'transactions', 'subs', 'healthNutrition', 'healthWeight', 'healthMedical', 'habits', 'vaultData', 'vehicles', 'garageMaint'];
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
         if (!Array.isArray(this.state.foodLibrary) || this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
         if (!this.state.settings) this.state.settings = {};
-
-        // INIZIALIZZAZIONE VEICOLI
-        if (!Array.isArray(this.state.vehicles)) this.state.vehicles = [];
-        if (!Array.isArray(this.state.garageMaint)) this.state.garageMaint = [];
-        if (this.state.garageConfig && !this.state.vehicles.length) {
-           this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
-           delete this.state.garageConfig;
+        if (!this.state.settings.inventoryCategories) {
+          this.state.settings.inventoryCategories = {
+            'Elettrodomestici': ['Generale', 'Cucina', 'Clima'],
+            'Casa/Impianti': ['Generale', 'Mobili', 'Impianti'],
+            'Casa': ['Generale', 'Elettrodomestici', 'Mobili'],
+            'Elettronica': ['Generale', 'Smartphone', 'Computer', 'Casa'],
+            'Veicoli': ['Auto', 'Moto']
+          };
         }
+        if (!Array.isArray(this.state.settings.maintenanceCategories)) {
+          this.state.settings.maintenanceCategories = ['Casa', 'Caldaia', 'Auto', 'Salute', 'Altro'];
+        }
+
+        // Assicura che tutte le categorie usate negli oggetti e nelle manutenzioni esistano nei menu a tendina
+        this.state.inventory.forEach(item => {
+          if (item.category && !this.state.settings.inventoryCategories[item.category]) {
+            this.state.settings.inventoryCategories[item.category] = ['Generale'];
+          }
+          if (item.category && item.subcategory && !this.state.settings.inventoryCategories[item.category].includes(item.subcategory)) {
+            this.state.settings.inventoryCategories[item.category].push(item.subcategory);
+          }
+        });
+        this.state.maintenances.forEach(m => {
+          if (m.category && !this.state.settings.maintenanceCategories.includes(m.category)) {
+            this.state.settings.maintenanceCategories.push(m.category);
+          }
+        });
+
+        // Sposta eventuali manutenzioni "Auto" residue nel Garage OS
+        const remainingMaint = [];
+        this.state.maintenances.forEach(m => {
+          const cat = String(m.category || '').trim().toLowerCase();
+          if (cat === 'auto' || cat === 'moto' || cat === 'veicolo') {
+            const targetVehId = this.state.vehicles[0]?.id || 'veh-main';
+            if (!this.state.garageMaint.some(gm => gm.id === m.id)) {
+              this.state.garageMaint.push({
+                id: m.id || this.generateId(),
+                vehicleId: targetVehId,
+                title: m.title || 'Intervento Auto',
+                date: m.dueDate || m.date || today,
+                cost: cleanNumber(m.cost),
+                kmAtMaint: cleanNumber(m.kmAtMaint)
+              });
+            }
+          } else {
+            remainingMaint.push(m);
+          }
+        });
+        this.state.maintenances = remainingMaint;
+
         if (this.state.vehicles.length === 0) {
-           this.state.vehicles.push({ id: this.generateId(), name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
+          this.state.vehicles.push({ id: 'veh-main', name: 'Veicolo Principale', plate: 'XX 000 XX', bollo: '', assic: '', revis: '', km: 0 });
         }
         if (!this.activeVehicleId || !this.state.vehicles.find(v => v.id === this.activeVehicleId)) {
-           this.activeVehicleId = this.state.vehicles[0].id;
+          this.activeVehicleId = this.state.vehicles[0].id;
         }
-        this.state.garageMaint.forEach(m => { if (!m.vehicleId) m.vehicleId = this.state.vehicles[0].id; });
+        this.state.garageMaint.forEach(m => {
+          if (!m.vehicleId || !this.state.vehicles.some(v => v.id === m.vehicleId)) {
+            m.vehicleId = this.state.vehicles[0].id;
+          }
+          m.cost = cleanNumber(m.cost);
+        });
 
         this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
-        this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(t.type) ? t.type : 'EXPENSE'; });
-        this.state.calendarTasks.forEach(t => { if(!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
+        this.state.transactions.forEach(t => {
+          t.amount = cleanNumber(t.amount);
+          t.date = (t.date || today).slice(0, 10);
+          t.desc = t.desc || 'Movimento';
+          t.category = t.category || 'Generale';
+          const upType = String(t.type || 'EXPENSE').toUpperCase();
+          t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(upType) ? upType : 'EXPENSE';
+        });
+        this.state.calendarTasks.forEach(t => {
+          if (!t.date || t.date.length < 10) t.date = today;
+          t.title = t.title || 'Attività';
+        });
       },
 
-      // SALVATAGGIO LOCALE + SYNC REMOTO IN BACKGROUND
-      async save(localOnly = false) { 
-          try { 
-              this.sanitizeData(); 
-              await localforage.setItem('appData', this.state); 
-              this.renderActiveModule(); 
-              if(!localOnly) this.pushToCloud();
-          } catch (e) { this.showToast('Errore salvataggio', 'danger'); } 
+      async save(localOnly = false) {
+        try {
+          this.sanitizeData();
+          await localforage.setItem('appData', this.state);
+          this.renderActiveModule();
+          if (!localOnly) this.pushToCloud();
+        } catch (e) {
+          console.error("Save error:", e);
+          this.showToast('Errore salvataggio', 'danger');
+        }
       },
-      async load() { 
-          try { 
-              const data = await localforage.getItem('appData'); 
-              if (data) { this.state = { ...this.state, ...data }; this.sanitizeData(); await localforage.setItem('appData', this.state); } 
-          } catch (e) {} 
-      },
-
-      showToast(msg, type = 'success') { const container = document.getElementById('toast-container'); if (!container) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3200); },
-      
-      openModal(id) { 
-          const el = document.getElementById(id); if (el) el.classList.add('open'); 
-          if (id === 'searchModal') setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100); 
-          if (id === 'garageConfigModal') this.loadGarageConfig(); 
-          if (id === 'firebaseConfigModal' && this.state.firebase) {
-             document.getElementById('fbApiKey').value = this.state.firebase.apiKey || '';
-             document.getElementById('fbAuthDomain').value = this.state.firebase.authDomain || '';
-             document.getElementById('fbProjectId').value = this.state.firebase.projectId || '';
-             document.getElementById('fbStorageBucket').value = this.state.firebase.storageBucket || '';
-             document.getElementById('fbMessagingSenderId').value = this.state.firebase.messagingSenderId || '';
-             document.getElementById('fbAppId').value = this.state.firebase.appId || '';
-             document.getElementById('fbDeviceId').value = this.state.firebase.deviceId || 'LifeOS_Device_1';
+      async load() {
+        try {
+          const data = await localforage.getItem('appData');
+          if (data) {
+            this.migrateAndMergeData(data);
+            await localforage.setItem('appData', this.state);
+          } else {
+            this.sanitizeData();
           }
+        } catch (e) {
+          console.error("Load error:", e);
+        }
+      },
+
+      showToast(msg, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'info' ? 'ℹ️' : '❌'} ${msg}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3200);
+      },
+
+      openModal(id) {
+        const el = document.getElementById(id); if (el) el.classList.add('open');
+        if (id === 'searchModal') setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100);
+        if (id === 'garageConfigModal') this.loadGarageConfig();
+        if (id === 'firebaseConfigModal' && this.state.firebase) {
+          document.getElementById('fbApiKey').value = this.state.firebase.apiKey || '';
+          document.getElementById('fbAuthDomain').value = this.state.firebase.authDomain || '';
+          document.getElementById('fbProjectId').value = this.state.firebase.projectId || '';
+          document.getElementById('fbStorageBucket').value = this.state.firebase.storageBucket || '';
+          document.getElementById('fbMessagingSenderId').value = this.state.firebase.messagingSenderId || '';
+          document.getElementById('fbAppId').value = this.state.firebase.appId || '';
+          document.getElementById('fbDeviceId').value = this.state.firebase.deviceId || 'LifeOS_Device_1';
+        }
       },
       closeModal(id) { document.getElementById(id)?.classList.remove('open'); },
       openImageViewer(src) { document.getElementById('photoModalImg').src = src; this.openModal('photoModal'); },
@@ -993,199 +1237,323 @@
         document.getElementById(hubId)?.classList.add('active');
         this.renderActiveModule();
       },
-      switchInvTab(tabId) { this.activeInvTab = tabId; document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`)?.classList.add('active'); this.renderInventory(); },
-
-      renderActiveModule() {
-        if(document.getElementById('mod-dashboard').classList.contains('active')) this.renderDashboard();
-        if(document.getElementById('mod-calendar').classList.contains('active')) this.renderCalendar();
-        if(document.getElementById('mod-finance').classList.contains('active')) { this.populateAccountSelects(); this.renderFinance(); }
-        if(document.getElementById('sub-garage').classList.contains('active')) this.renderGarage();
-        if(document.getElementById('sub-inventory').classList.contains('active')) { this.populateCategorySelects(); this.renderInventory(); }
-        if(document.getElementById('sub-maintenance').classList.contains('active')) { this.populateMaintenanceSelects(); this.renderGeneralMaintenances(); }
-        if(document.getElementById('sub-health').classList.contains('active')) { this.populateFoodLibrarySelect(); this.renderHealth(); }
-        if(document.getElementById('sub-gallery').classList.contains('active')) this.renderGallery();
-        if(document.getElementById('sub-vault').classList.contains('active')) this.renderVault();
+      switchInvTab(tabId) {
+        this.activeInvTab = tabId;
+        document.querySelectorAll('.inner-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`)?.classList.add('active');
+        this.renderInventory();
       },
 
-      toggleTheme() { const html = document.documentElement; const current = html.getAttribute('data-theme'); const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark'; html.setAttribute('data-theme', nextTheme); this.save(true); this.showToast(`Tema: ${nextTheme.toUpperCase()}`); },
-      toggleHaptic() { this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled; this.save(true); if (this.state.settings.hapticEnabled) this.vibrate(25); this.updateHapticButton(); },
+      renderActiveModule() {
+        if (document.getElementById('mod-dashboard')?.classList.contains('active')) this.renderDashboard();
+        if (document.getElementById('mod-calendar')?.classList.contains('active')) this.renderCalendar();
+        if (document.getElementById('mod-finance')?.classList.contains('active')) { this.populateAccountSelects(); this.renderFinance(); }
+        if (document.getElementById('sub-garage')?.classList.contains('active')) this.renderGarage();
+        if (document.getElementById('sub-inventory')?.classList.contains('active')) { this.populateCategorySelects(); this.renderInventory(); }
+        if (document.getElementById('sub-maintenance')?.classList.contains('active')) { this.populateMaintenanceSelects(); this.renderGeneralMaintenances(); }
+        if (document.getElementById('sub-health')?.classList.contains('active')) { this.populateFoodLibrarySelect(); this.renderHealth(); }
+        if (document.getElementById('sub-gallery')?.classList.contains('active')) this.renderGallery();
+        if (document.getElementById('sub-vault')?.classList.contains('active')) this.renderVault();
+      },
+
+      toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const nextTheme = current === 'dark' ? 'oled' : current === 'oled' ? 'light' : 'dark';
+        html.setAttribute('data-theme', nextTheme);
+        this.save(true);
+        this.showToast(`Tema: ${nextTheme.toUpperCase()}`);
+      },
+      toggleHaptic() {
+        this.state.settings.hapticEnabled = !this.state.settings.hapticEnabled;
+        this.save(true);
+        if (this.state.settings.hapticEnabled) this.vibrate(25);
+        this.updateHapticButton();
+      },
       updateHapticButton() { this.setElText('hapticBtn', this.state.settings.hapticEnabled ? '📳 Vibrazione ON' : '🔕 Vibrazione OFF'); },
       vibrate(ms = 12) { if (this.state.settings?.hapticEnabled && navigator.vibrate) navigator.vibrate(ms); },
       toggleFab() { document.getElementById('fabMenu')?.classList.toggle('open'); this.vibrate(12); },
-      
-      quickAdd(inputId) { 
-        this.toggleFab(); 
-        if (inputId === 'txAmount') this.switchModule('mod-finance'); 
-        else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar'); 
-        else if (inputId === 'weightValue' || inputId === 'nutriGrams') this.openHubModule('sub-health'); 
-        setTimeout(() => { const input = document.getElementById(inputId); if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 300); 
+
+      quickAdd(inputId) {
+        this.toggleFab();
+        if (inputId === 'txAmount') this.switchModule('mod-finance');
+        else if (inputId === 'calTaskTitle') this.switchModule('mod-calendar');
+        else if (inputId === 'weightValue' || inputId === 'nutriGrams') this.openHubModule('sub-health');
+        setTimeout(() => {
+          const input = document.getElementById(inputId);
+          if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }, 300);
       },
 
       formatMoney(amount) { return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(amount) || 0); },
       formatDate(dateStr) { return dateStr ? new Date(dateStr).toLocaleDateString('it-IT') : '--'; },
       generateId() { return Math.random().toString(36).substr(2, 9); },
-      
-      // === COMPRESSORE IMMAGINI NATIVO (S25 ULTRA FIX) ===
-      async fileToBase64(file) { 
-          return new Promise((resolve, reject) => { 
-              const reader = new FileReader(); 
-              reader.readAsDataURL(file); 
-              reader.onload = (e) => {
-                  const img = new Image();
-                  img.src = e.target.result;
-                  img.onload = () => {
-                      const canvas = document.createElement('canvas');
-                      const MAX_WIDTH = 900;
-                      let width = img.width;
-                      let height = img.height;
-                      if (width > MAX_WIDTH) {
-                          height = height * (MAX_WIDTH / width);
-                          width = MAX_WIDTH;
-                      }
-                      canvas.width = width;
-                      canvas.height = height;
-                      const ctx = canvas.getContext('2d');
-                      ctx.drawImage(img, 0, 0, width, height);
-                      resolve(canvas.toDataURL('image/jpeg', 0.7)); 
-                  };
-                  img.onerror = (err) => reject(err);
-              }; 
-              reader.onerror = error => reject(error); 
-          }); 
+
+      async fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 900;
+              let width = img.width;
+              let height = img.height;
+              if (width > MAX_WIDTH) {
+                height = height * (MAX_WIDTH / width);
+                width = MAX_WIDTH;
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.onerror = (err) => reject(err);
+          };
+          reader.onerror = error => reject(error);
+        });
       },
 
-      togglePomodoro() { if (this.pomoTimer) { clearInterval(this.pomoTimer); this.pomoTimer = null; this.setElText('pomoBtn', '▶️ Riprendi'); } else { this.setElText('pomoBtn', '⏸️ Pausa'); this.pomoTimer = setInterval(() => { if (this.pomoSeconds > 0) { this.pomoSeconds--; const m = String(Math.floor(this.pomoSeconds / 60)).padStart(2, '0'); const s = String(this.pomoSeconds % 60).padStart(2, '0'); this.setElText('pomoDisplay', `${m}:${s}`); } else { clearInterval(this.pomoTimer); this.pomoTimer = null; this.vibrate([100, 50, 100]); this.showToast('Sessione Completata! 🎉'); } }, 1000); } },
-      resetPomodoro() { clearInterval(this.pomoTimer); this.pomoTimer = null; this.pomoSeconds = 1500; this.setElText('pomoDisplay', '25:00'); this.setElText('pomoBtn', '▶️ Avvia Focus'); },
+      togglePomodoro() {
+        if (this.pomoTimer) {
+          clearInterval(this.pomoTimer);
+          this.pomoTimer = null;
+          this.setElText('pomoBtn', '▶️ Riprendi');
+        } else {
+          this.setElText('pomoBtn', '⏸️ Pausa');
+          this.pomoTimer = setInterval(() => {
+            if (this.pomoSeconds > 0) {
+              this.pomoSeconds--;
+              const m = String(Math.floor(this.pomoSeconds / 60)).padStart(2, '0');
+              const s = String(this.pomoSeconds % 60).padStart(2, '0');
+              this.setElText('pomoDisplay', `${m}:${s}`);
+            } else {
+              clearInterval(this.pomoTimer);
+              this.pomoTimer = null;
+              this.vibrate([100, 50, 100]);
+              this.showToast('Sessione Completata! 🎉');
+            }
+          }, 1000);
+        }
+      },
+      resetPomodoro() {
+        clearInterval(this.pomoTimer);
+        this.pomoTimer = null;
+        this.pomoSeconds = 1500;
+        this.setElText('pomoDisplay', '25:00');
+        this.setElText('pomoBtn', '▶️ Avvia Focus');
+      },
 
-      savePin() { const pin = document.getElementById('setupPinInput')?.value || ''; if (pin.length === 4) { this.state.pin = pin; this.save(true); document.getElementById('setupPinInput').value = ''; this.showToast('PIN Avvio Attivato.'); } else this.showToast('Inserisci 4 cifre', 'warning'); },
+      savePin() {
+        const pin = document.getElementById('setupPinInput')?.value || '';
+        if (pin.length === 4) {
+          this.state.pin = pin;
+          this.save(true);
+          document.getElementById('setupPinInput').value = '';
+          this.showToast('PIN Avvio Attivato.');
+        } else this.showToast('Inserisci 4 cifre', 'warning');
+      },
       removePin() { this.state.pin = null; this.save(true); this.showToast('PIN Avvio Disattivato.'); },
-      verifyPin() { const input = document.getElementById('loginPinInput')?.value; if (input === this.state.pin) { document.getElementById('lockScreen')?.classList.add('hidden'); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
-      togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); this.setElHTML('privacyBtn', isActive ? '🔒' : '👁️'); },
+      verifyPin() {
+        const input = document.getElementById('loginPinInput')?.value;
+        if (input === this.state.pin) {
+          document.getElementById('lockScreen')?.classList.add('hidden');
+          this.switchModule('mod-dashboard');
+        } else {
+          this.showToast('PIN Errato', 'danger');
+          document.getElementById('loginPinInput').value = '';
+        }
+      },
+      togglePrivacyMode() {
+        document.body.classList.toggle('privacy-active');
+        const isActive = document.body.classList.contains('privacy-active');
+        this.setElHTML('privacyBtn', isActive ? '🔒' : '👁️');
+      },
 
-      // === DEEP VAULT (CASSAFORTE CIFRATA) ===
+      // === ABITUDINI (HABITS) ===
+      addHabit() {
+        const name = prompt("Nome della nuova abitudine (es. Bere 2L d'acqua, Lettura):");
+        if (name && name.trim()) {
+          this.state.habits.push({ id: this.generateId(), name: name.trim(), streak: 0, lastDone: null });
+          this.save();
+        }
+      },
+      toggleHabit(id) {
+        const h = this.state.habits.find(x => x.id === id);
+        if (!h) return;
+        const todayStr = new Date().toISOString().slice(0, 10);
+        if (h.lastDone === todayStr) {
+          h.lastDone = null;
+          h.streak = Math.max(0, (h.streak || 1) - 1);
+        } else {
+          h.lastDone = todayStr;
+          h.streak = (h.streak || 0) + 1;
+          this.vibrate(20);
+        }
+        this.save();
+      },
+      deleteHabit(id) {
+        this.state.habits = this.state.habits.filter(h => h.id !== id);
+        this.save();
+      },
+
+      // === DEEP VAULT ===
       cryptoObfuscate(text, pin) {
-          let res = '';
-          for(let i=0; i<text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
-          return btoa(unescape(encodeURIComponent(res)));
+        let res = '';
+        for (let i = 0; i < text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
+        return btoa(unescape(encodeURIComponent(res)));
       },
       cryptoDeobfuscate(b64, pin) {
-          try {
-            let text = decodeURIComponent(escape(atob(b64)));
-            let res = '';
-            for(let i=0; i<text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
-            return res;
-          } catch(e) { return "Errore decrittografia"; }
+        try {
+          let text = decodeURIComponent(escape(atob(b64)));
+          let res = '';
+          for (let i = 0; i < text.length; i++) { res += String.fromCharCode(text.charCodeAt(i) ^ pin.charCodeAt(i % pin.length)); }
+          return res;
+        } catch (e) { return "Errore decrittografia"; }
       },
       saveVaultPin() {
-          const pin = document.getElementById('vaultSetupPinInput').value;
-          if(pin.length === 6) { 
-              this.state.vaultPinHash = btoa(pin); 
-              this.save(true); this.closeModal('vaultSetupModal'); 
-              this.showToast('PIN Cassaforte salvato.'); 
-          } else this.showToast('Il PIN Vault deve essere di 6 cifre', 'warning');
+        const pin = document.getElementById('vaultSetupPinInput').value;
+        if (pin.length === 6) {
+          this.state.vaultPinHash = btoa(pin);
+          this.save(true);
+          this.closeModal('vaultSetupModal');
+          this.showToast('PIN Cassaforte salvato.');
+        } else this.showToast('Il PIN Vault deve essere di 6 cifre', 'warning');
       },
       promptVaultAccess() {
-          if (!this.state.vaultPinHash) return this.showToast("Devi prima impostare il PIN Vault in Impostazioni!", "warning");
-          this.vaultUnlockedPIN = null;
-          document.getElementById('vaultAuthPinInput').value = '';
-          this.openModal('vaultAuthModal');
+        if (!this.state.vaultPinHash) return this.showToast("Devi prima impostare il PIN Vault in Impostazioni!", "warning");
+        this.vaultUnlockedPIN = null;
+        document.getElementById('vaultAuthPinInput').value = '';
+        this.openModal('vaultAuthModal');
       },
       verifyVaultPin() {
-          const pin = document.getElementById('vaultAuthPinInput').value;
-          if (btoa(pin) === this.state.vaultPinHash) {
-              this.vaultUnlockedPIN = pin;
-              this.closeModal('vaultAuthModal');
-              this.openHubModule('sub-vault');
-          } else { this.showToast('PIN Cassaforte errato', 'danger'); }
+        const pin = document.getElementById('vaultAuthPinInput').value;
+        if (btoa(pin) === this.state.vaultPinHash) {
+          this.vaultUnlockedPIN = pin;
+          this.closeModal('vaultAuthModal');
+          this.openHubModule('sub-vault');
+        } else { this.showToast('PIN Cassaforte errato', 'danger'); }
       },
       lockVault() {
-          this.vaultUnlockedPIN = null;
-          this.switchModule('mod-hub');
-          this.showToast('Cassaforte chiusa.');
+        this.vaultUnlockedPIN = null;
+        this.switchModule('mod-hub');
+        this.showToast('Cassaforte chiusa.');
       },
       resetVault() {
-          if(confirm('Vuoi cancellare definitivamente TUTTI i segreti e il PIN della cassaforte?')) {
-              this.state.vaultData = [];
-              this.state.vaultPinHash = null;
-              this.vaultUnlockedPIN = null;
-              this.save();
-              this.showToast('Cassaforte distrutta.');
-          }
+        if (confirm('Vuoi cancellare definitivamente TUTTI i segreti e il PIN della cassaforte?')) {
+          this.state.vaultData = [];
+          this.state.vaultPinHash = null;
+          this.vaultUnlockedPIN = null;
+          this.save();
+          this.showToast('Cassaforte distrutta.');
+        }
       },
       addVaultSecret(e) {
-          e.preventDefault();
-          if(!this.vaultUnlockedPIN) return this.showToast('Cassaforte bloccata!', 'danger');
-          const title = document.getElementById('vaultTitle').value;
-          const data = document.getElementById('vaultData').value;
-          this.state.vaultData.push({
-              id: this.generateId(),
-              title: this.cryptoObfuscate(title, this.vaultUnlockedPIN),
-              data: this.cryptoObfuscate(data, this.vaultUnlockedPIN),
-              date: new Date().toISOString()
-          });
-          this.save(); e.target.reset(); this.renderVault();
+        e.preventDefault();
+        if (!this.vaultUnlockedPIN) return this.showToast('Cassaforte bloccata!', 'danger');
+        const title = document.getElementById('vaultTitle').value;
+        const data = document.getElementById('vaultData').value;
+        this.state.vaultData.push({
+          id: this.generateId(),
+          title: this.cryptoObfuscate(title, this.vaultUnlockedPIN),
+          data: this.cryptoObfuscate(data, this.vaultUnlockedPIN),
+          date: new Date().toISOString()
+        });
+        this.save(); e.target.reset(); this.renderVault();
       },
       deleteVaultSecret(id) {
-          this.state.vaultData = this.state.vaultData.filter(v => v.id !== id);
-          this.save(); this.renderVault();
+        this.state.vaultData = this.state.vaultData.filter(v => v.id !== id);
+        this.save(); this.renderVault();
       },
       exportVaultTXT() {
-          if(!this.vaultUnlockedPIN) return this.showToast('Sblocca la cassaforte prima.', 'danger');
-          let text = "=== LIFEOS VAULT EXPORT ===\n\n";
-          this.state.vaultData.forEach(v => {
-            text += "Titolo: " + this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN) + "\n";
-            text += "Dati: " + this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN) + "\n";
-            text += "---------------------------\n";
-          });
-          const a = document.createElement('a');
-          a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(text);
-          a.download = `LifeOS_Vault_Decriptato.txt`;
-          document.body.appendChild(a); a.click(); a.remove();
-          this.showToast('Esportato in chiaro.');
+        if (!this.vaultUnlockedPIN) return this.showToast('Sblocca la cassaforte prima.', 'danger');
+        let text = "=== LIFEOS VAULT EXPORT ===\n\n";
+        this.state.vaultData.forEach(v => {
+          text += "Titolo: " + this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN) + "\n";
+          text += "Dati: " + this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN) + "\n";
+          text += "---------------------------\n";
+        });
+        const a = document.createElement('a');
+        a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(text);
+        a.download = `LifeOS_Vault_Decriptato.txt`;
+        document.body.appendChild(a); a.click(); a.remove();
+        this.showToast('Esportato in chiaro.');
       },
       renderVault() {
-          if(!this.vaultUnlockedPIN) { this.switchModule('mod-hub'); return; }
-          const html = this.state.vaultData.length ? this.state.vaultData.map(v => {
-              const dTitle = this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN);
-              const dData = this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN);
-              return `<div class="list-row" style="align-items:flex-start;">
-                  <div style="flex:1;"><strong>🔐 ${dTitle}</strong><br><small class="stat-label" style="user-select:all; white-space:pre-wrap;">${dData}</small></div>
-                  <button class="btn btn-sm btn-danger" onclick="App.deleteVaultSecret('${v.id}')">🗑</button>
-              </div>`;
-          }).join('') : '<div class="stat-label">La cassaforte è vuota.</div>';
-          this.setElHTML('vaultList', html);
+        if (!this.vaultUnlockedPIN) { this.switchModule('mod-hub'); return; }
+        const html = this.state.vaultData.length ? this.state.vaultData.map(v => {
+          const dTitle = this.cryptoDeobfuscate(v.title, this.vaultUnlockedPIN);
+          const dData = this.cryptoDeobfuscate(v.data, this.vaultUnlockedPIN);
+          return `<div class="list-row" style="align-items:flex-start;">
+              <div style="flex:1;"><strong>🔐 ${dTitle}</strong><br><small class="stat-label" style="user-select:all; white-space:pre-wrap;">${dData}</small></div>
+              <button class="btn btn-sm btn-danger" onclick="App.deleteVaultSecret('${v.id}')">🗑</button>
+          </div>`;
+        }).join('') : '<div class="stat-label">La cassaforte è vuota.</div>';
+        this.setElHTML('vaultList', html);
       },
 
       // === DASHBOARD ===
       renderDashboard() {
-        const hour = new Date().getHours(); const greet = hour < 12 ? 'Buongiorno ✨' : hour < 18 ? 'Buon pomeriggio ☀️' : 'Buonasera 🌙';
-        this.setElText('greetingTitle', greet); this.setElText('greetingDate', new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+        const hour = new Date().getHours();
+        const greet = hour < 12 ? 'Buongiorno ✨' : hour < 18 ? 'Buon pomeriggio ☀️' : 'Buonasera 🌙';
+        this.setElText('greetingTitle', greet);
+        this.setElText('greetingDate', new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
         const total = this.state.accounts.reduce((acc, a) => acc + (parseFloat(a.balance) || 0), 0);
-        this.setElText('dashNetWorth', this.formatMoney(total)); this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
+        this.setElText('dashNetWorth', this.formatMoney(total));
+        this.setElText('dashAccountsCount', `${this.state.accounts.length} conti attivi nel Wallet`);
         const todayStr = new Date().toISOString().slice(0, 10);
-        const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length; const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
+        const habitsDone = this.state.habits.filter(h => h.lastDone === todayStr).length;
+        const habitScore = this.state.habits.length > 0 ? Math.round((habitsDone / this.state.habits.length) * 100) : 85;
         const score = Math.min(100, Math.max(25, Math.round((habitScore * 0.6) + (total > 0 ? 40 : 15))));
         this.setElText('lifeScoreValue', `${score}%`);
-        const circle = document.getElementById('lifeScoreCircle'); if (circle) circle.style.strokeDashoffset = 150 - (150 * score) / 100;
+        const circle = document.getElementById('lifeScoreCircle');
+        if (circle) circle.style.strokeDashoffset = 150 - (150 * score) / 100;
 
-        const txCount = this.state.transactions.length; const lastWeight = [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||''))[0];
+        const txCount = this.state.transactions.length;
+        const lastWeight = [...this.state.healthWeight].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
         this.setElText('smartInsightText', txCount > 0 ? `Hai ${txCount} movimenti, ${this.state.inventory.length} beni${lastWeight ? ` e ultimo peso a ${lastWeight.value} kg` : ''}.` : `Tocca + per registrare i tuoi dati.`);
 
         const medItems = this.state.healthMedical.slice(0, 4);
         this.setElHTML('dashPillReminders', medItems.length ? medItems.map(t => `<div class="list-row" style="border-left:3px solid var(--accent-primary);"><div><strong>${t.therapy ? '💊 ' + t.therapy : '🩺 ' + t.title}</strong><br><small class="stat-label">${this.formatDate(t.date)} ${t.notes ? '— ' + t.notes : ''}</small></div></div>`).join('') : '<div class="list-row stat-label">Nessuna visita o terapia.</div>');
-        const upcoming = [...this.state.calendarTasks].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5);
+        const upcoming = [...this.state.calendarTasks].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 5);
         this.setElHTML('dashUpcomingTasks', upcoming.length ? upcoming.map(t => `<div class="list-row"><div><span class="stat-label">${this.formatDate(t.date)}</span><br><strong>${t.title}</strong></div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : 'badge-info'}">${t.type || 'Task'}</span></div>`).join('') : '<div class="list-row stat-label">Nessuna attività in programma.</div>');
-        
-        this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => { const isDone = h.lastDone === todayStr; return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`; }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
+
+        this.setElHTML('habitList', this.state.habits.length ? this.state.habits.map(h => {
+          const isDone = h.lastDone === todayStr;
+          return `<div class="list-row" style="opacity:${isDone ? 0.65 : 1};"><div style="display:flex; align-items:center; gap:0.6rem;"><button class="btn btn-sm ${isDone ? 'btn-primary' : ''}" style="width:32px; height:32px; padding:0; border-radius:50%;" onclick="App.toggleHabit('${h.id}')">${isDone ? '✓' : ''}</button><strong>${h.name}</strong></div><div style="display:flex; align-items:center; gap:0.4rem;"><span class="badge badge-warning">🔥 ${h.streak}</span><button class="btn btn-sm" style="padding:0.2rem 0.45rem; background:transparent; border:none;" onclick="App.deleteHabit('${h.id}')">✕</button></div></div>`;
+        }).join('') : `<div class="list-row stat-label">Tocca "+ Nuova" per creare la tua abitudine.</div>`);
         this.renderFinanceChart();
       },
 
       renderFinanceChart() {
-        const ctx = document.getElementById('dashboardChart'); if (!ctx || typeof Chart === 'undefined') return;
+        const ctx = document.getElementById('dashboardChart');
+        if (!ctx || typeof Chart === 'undefined') return;
         let income = 0, expense = 0;
-        this.state.transactions.forEach(t => { if (t.type === 'INCOME') income += t.amount; if (t.type === 'EXPENSE') expense += t.amount; });
+        this.state.transactions.forEach(t => {
+          if (t.type === 'INCOME') income += t.amount;
+          if (t.type === 'EXPENSE') expense += t.amount;
+        });
         if (this.charts.finance) this.charts.finance.destroy();
-        this.charts.finance = new Chart(ctx, { type: 'bar', data: { labels: ['Entrate', 'Uscite'], datasets: [{ data: [income, expense], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } } } });
+        this.charts.finance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Entrate', 'Uscite'],
+            datasets: [{ data: [income, expense], backgroundColor: ['#10b981', '#ef4444'], borderRadius: 8, barThickness: 38 }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { display: false },
+              y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } }
+            }
+          }
+        });
       },
 
       // === CALENDARIO ===
@@ -1200,388 +1568,785 @@
         if (!(this.currentDate instanceof Date) || isNaN(this.currentDate)) this.currentDate = new Date();
         if (!(this.selectedDate instanceof Date) || isNaN(this.selectedDate)) this.selectedDate = new Date();
 
-        const y = this.currentDate.getFullYear(); const m = this.currentDate.getMonth();
+        const y = this.currentDate.getFullYear();
+        const m = this.currentDate.getMonth();
         this.setElText('calMonthTitle', new Date(y, m, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }).toUpperCase());
         this.setElText('calSelectedDateLabel', this.selectedDate.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }));
-        
-        const grid = document.getElementById('calendarDaysGrid'); if (!grid) return; grid.innerHTML = '';
-        
-        let start = new Date(y, m, 1).getDay(); start = start === 0 ? 7 : start;
-        for (let i = 1; i < start; i++) { const el = document.createElement('div'); el.className = 'cal-day'; el.style.visibility = 'hidden'; grid.appendChild(el); }
-        
+
+        const grid = document.getElementById('calendarDaysGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        let start = new Date(y, m, 1).getDay();
+        start = start === 0 ? 7 : start;
+        for (let i = 1; i < start; i++) {
+          const el = document.createElement('div');
+          el.className = 'cal-day';
+          el.style.visibility = 'hidden';
+          grid.appendChild(el);
+        }
+
         const todayStr = new Date().toISOString().slice(0, 10);
         const selStr = this.selectedDate.toISOString().slice(0, 10);
         const last = new Date(y, m + 1, 0).getDate();
-        
+
         for (let d = 1; d <= last; d++) {
           const dateStr = new Date(y, m, d, 12).toISOString().slice(0, 10);
-          const el = document.createElement('div'); el.className = 'cal-day';
+          const el = document.createElement('div');
+          el.className = 'cal-day';
           if (dateStr === todayStr) el.classList.add('today');
           if (dateStr === selStr) el.classList.add('active');
           el.innerHTML = `<div>${d}</div>`;
-          if (this.state.calendarTasks.some(t => t.date === dateStr)) { el.innerHTML += `<div class="cal-dot"></div>`; }
+          if (this.state.calendarTasks.some(t => t.date === dateStr)) {
+            el.innerHTML += `<div class="cal-dot"></div>`;
+          }
           el.onclick = () => this.selectDate(dateStr);
           grid.appendChild(el);
         }
-        this.renderCalendarTasks(); this.renderJournalHistory();
+        this.renderCalendarTasks();
+        this.renderJournalHistory();
       },
-      addCalendarTask(e) { e.preventDefault(); this.state.calendarTasks.push({ id: this.generateId(), date: this.selectedDate.toISOString().slice(0, 10), title: document.getElementById('calTaskTitle').value, type: document.getElementById('calTaskType').value, priority: document.getElementById('calTaskPriority').value }); this.save(); document.getElementById('calTaskTitle').value = ''; this.renderCalendar(); },
-      deleteCalendarTask(id) { this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id); this.save(); this.renderCalendar(); },
+      addCalendarTask(e) {
+        e.preventDefault();
+        this.state.calendarTasks.push({
+          id: this.generateId(),
+          date: this.selectedDate.toISOString().slice(0, 10),
+          title: document.getElementById('calTaskTitle').value,
+          type: document.getElementById('calTaskType').value,
+          priority: document.getElementById('calTaskPriority').value
+        });
+        this.save();
+        document.getElementById('calTaskTitle').value = '';
+        this.renderCalendar();
+      },
+      deleteCalendarTask(id) {
+        this.state.calendarTasks = this.state.calendarTasks.filter(t => t.id !== id);
+        this.save();
+        this.renderCalendar();
+      },
       renderCalendarTasks() {
         const selStr = (this.selectedDate instanceof Date && !isNaN(this.selectedDate)) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
         const tasks = this.state.calendarTasks.filter(t => t.date === selStr);
         this.setElText('calTaskCountBadge', tasks.length);
-        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority==='Alta'?'badge-danger':t.priority==='Bassa'?'badge-success':'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
+        this.setElHTML('calendarTasksList', tasks.length ? tasks.map(t => this.createSwipeRow(`<div><span class="badge ${t.priority === 'Alta' ? 'badge-danger' : t.priority === 'Bassa' ? 'badge-success' : 'badge-warning'}">${t.type}</span><div style="margin-top:4px; font-weight:600;">${t.title}</div></div>`, `App.deleteCalendarTask('${t.id}')`)).join('') : '<div class="list-row stat-label">Nessuna attività programmata.</div>');
       },
-      saveJournalEntry(e) { e.preventDefault(); const date = (this.selectedDate instanceof Date) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10); const text = document.getElementById('journalText').value.trim(); if (!text) return; const entry = { date, mood: document.getElementById('journalMood').value, text }; const idx = this.state.journal.findIndex(j => j.date === date); if (idx >= 0) this.state.journal[idx] = entry; else this.state.journal.push(entry); this.save(); document.getElementById('journalText').value=''; this.renderJournalHistory(); },
-      renderJournalHistory() { const hist = [...this.state.journal].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 5); this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>'); },
+      saveJournalEntry(e) {
+        e.preventDefault();
+        const date = (this.selectedDate instanceof Date) ? this.selectedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+        const text = document.getElementById('journalText').value.trim();
+        if (!text) return;
+        const entry = { date, mood: document.getElementById('journalMood').value, text };
+        const idx = this.state.journal.findIndex(j => j.date === date);
+        if (idx >= 0) this.state.journal[idx] = entry;
+        else this.state.journal.push(entry);
+        this.save();
+        document.getElementById('journalText').value = '';
+        this.renderJournalHistory();
+      },
+      renderJournalHistory() {
+        const hist = [...this.state.journal].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 5);
+        this.setElHTML('journalHistoryList', hist.length ? hist.map(j => `<div class="list-row" style="align-items:flex-start;" onclick="App.selectDate('${j.date}')"><div><strong>${this.formatDate(j.date)}</strong> <span class="badge">${j.mood}</span><div style="margin-top:4px; font-size:0.8rem; color:var(--text-secondary); max-height:40px; overflow:hidden;">${j.text}</div></div></div>`).join('') : '<div class="list-row stat-label">Nessun diario salvato.</div>');
+      },
 
       // === GARAGE OS ===
       switchVehicle(id) { this.activeVehicleId = id; this.renderGarage(); },
       addVehicle() {
-         const name = prompt("Inserisci marca/modello del nuovo veicolo (es. Moto Honda):");
-         if(name && name.trim()) {
-            const newV = { id: this.generateId(), name: name.trim(), plate: '', bollo: '', assic: '', revis: '', km: 0 };
-            this.state.vehicles.push(newV); this.activeVehicleId = newV.id; this.save();
-         }
+        const name = prompt("Inserisci marca/modello del nuovo veicolo (es. Moto Honda):");
+        if (name && name.trim()) {
+          const newV = { id: this.generateId(), name: name.trim(), plate: '', bollo: '', assic: '', revis: '', km: 0 };
+          this.state.vehicles.push(newV);
+          this.activeVehicleId = newV.id;
+          this.save();
+        }
       },
       deleteActiveVehicle() {
-         if (this.state.vehicles.length <= 1) return this.showToast("Devi avere almeno un veicolo.", "warning");
-         if (confirm("Eliminare questo veicolo e il suo storico?")) {
-            this.state.garageMaint = this.state.garageMaint.filter(m => m.vehicleId !== this.activeVehicleId);
-            this.state.vehicles = this.state.vehicles.filter(v => v.id !== this.activeVehicleId);
-            this.activeVehicleId = this.state.vehicles[0].id; this.save();
-         }
+        if (this.state.vehicles.length <= 1) return this.showToast("Devi avere almeno un veicolo.", "warning");
+        if (confirm("Eliminare questo veicolo e il suo storico?")) {
+          this.state.garageMaint = this.state.garageMaint.filter(m => m.vehicleId !== this.activeVehicleId);
+          this.state.vehicles = this.state.vehicles.filter(v => v.id !== this.activeVehicleId);
+          this.activeVehicleId = this.state.vehicles[0].id;
+          this.save();
+        }
       },
       loadGarageConfig() {
-        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId); if(!v) return;
-        document.getElementById('gConfName').value = v.name || ''; document.getElementById('gConfPlate').value = v.plate || '';
-        document.getElementById('gConfBollo').value = v.bollo || ''; document.getElementById('gConfAssic').value = v.assic || '';
-        document.getElementById('gConfRevis').value = v.revis || ''; document.getElementById('gConfKm').value = v.km || 0;
+        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        if (!v) return;
+        document.getElementById('gConfName').value = v.name || '';
+        document.getElementById('gConfPlate').value = v.plate || '';
+        document.getElementById('gConfBollo').value = v.bollo || '';
+        document.getElementById('gConfAssic').value = v.assic || '';
+        document.getElementById('gConfRevis').value = v.revis || '';
+        document.getElementById('gConfKm').value = v.km || 0;
       },
       saveGarageConfig(e) {
-        e.preventDefault(); const v = this.state.vehicles.find(x => x.id === this.activeVehicleId); if(!v) return;
-        v.name = document.getElementById('gConfName').value; v.plate = document.getElementById('gConfPlate').value.toUpperCase();
-        v.bollo = document.getElementById('gConfBollo').value; v.assic = document.getElementById('gConfAssic').value;
-        v.revis = document.getElementById('gConfRevis').value; v.km = parseFloat(document.getElementById('gConfKm').value) || 0;
-        this.save(); this.closeModal('garageConfigModal'); this.showToast('Veicolo Aggiornato!');
+        e.preventDefault();
+        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        if (!v) return;
+        v.name = document.getElementById('gConfName').value;
+        v.plate = document.getElementById('gConfPlate').value.toUpperCase();
+        v.bollo = document.getElementById('gConfBollo').value;
+        v.assic = document.getElementById('gConfAssic').value;
+        v.revis = document.getElementById('gConfRevis').value;
+        v.km = parseFloat(document.getElementById('gConfKm').value) || 0;
+        this.save();
+        this.closeModal('garageConfigModal');
+        this.showToast('Veicolo Aggiornato!');
       },
-      updateGarageKm() { const v = this.state.vehicles.find(x => x.id === this.activeVehicleId); if(!v) return; const newKm = prompt("Inserisci chilometraggio attuale:", v.km); if(newKm && !isNaN(newKm)) { v.km = parseFloat(newKm); this.save(); } },
+      updateGarageKm() {
+        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        if (!v) return;
+        const newKm = prompt("Inserisci chilometraggio attuale:", v.km);
+        if (newKm !== null && !isNaN(newKm)) {
+          v.km = parseFloat(newKm);
+          this.save();
+        }
+      },
       addGarageMaintenance(e) {
-        e.preventDefault(); const v = this.state.vehicles.find(x => x.id === this.activeVehicleId); if(!v) return;
-        this.state.garageMaint.push({ id: this.generateId(), vehicleId: v.id, title: document.getElementById('gMaintTitle').value, date: document.getElementById('gMaintDate').value, cost: parseFloat(document.getElementById('gMaintCost').value) || 0, kmAtMaint: v.km });
-        this.save(); e.target.reset(); document.getElementById('gMaintDate').value = new Date().toISOString().slice(0, 10);
+        e.preventDefault();
+        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId);
+        if (!v) return;
+        this.state.garageMaint.push({
+          id: this.generateId(),
+          vehicleId: v.id,
+          title: document.getElementById('gMaintTitle').value,
+          date: document.getElementById('gMaintDate').value,
+          cost: parseFloat(document.getElementById('gMaintCost').value) || 0,
+          kmAtMaint: v.km
+        });
+        this.save();
+        e.target.reset();
+        document.getElementById('gMaintDate').value = new Date().toISOString().slice(0, 10);
       },
-      deleteGarageMaint(id) { if(confirm("Eliminare lavoro?")) { this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id); this.save(); } },
+      deleteGarageMaint(id) {
+        if (confirm("Eliminare lavoro?")) {
+          this.state.garageMaint = this.state.garageMaint.filter(m => m.id !== id);
+          this.save();
+        }
+      },
       renderGarage() {
         if (!Array.isArray(this.state.vehicles) || this.state.vehicles.length === 0) return;
         this.setElHTML('garageVehicleTabs', this.state.vehicles.map(v => `<div class="vehicle-chip ${v.id === this.activeVehicleId ? 'active' : ''}" onclick="App.switchVehicle('${v.id}')">${v.name}</div>`).join('') + `<div class="vehicle-chip" style="background:transparent; border-style:dashed;" onclick="App.addVehicle()">+ Nuovo</div>`);
-        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId); if(!v) return;
-        this.setElText('garageCarName', v.name); this.setElText('garageCarPlate', v.plate || 'Targa N/D'); this.setElText('garageKmOdo', `${v.km.toLocaleString('it-IT')} km`);
+        const v = this.state.vehicles.find(x => x.id === this.activeVehicleId) || this.state.vehicles[0];
+        if (!v) return;
+        this.setElText('garageCarName', v.name);
+        this.setElText('garageCarPlate', v.plate || 'Targa N/D');
+        this.setElText('garageKmOdo', `${(v.km || 0).toLocaleString('it-IT')} km`);
         const today = new Date();
         const setTrafficLight = (idDate, idTl, dateStr) => {
-          this.setElText(idDate, this.formatDate(dateStr)); const el = document.getElementById(idTl); if(!el) return;
-          el.className = 'tl-indicator'; if(!dateStr) { el.classList.add('tl-red'); return; }
+          this.setElText(idDate, this.formatDate(dateStr));
+          const el = document.getElementById(idTl);
+          if (!el) return;
+          el.className = 'tl-indicator';
+          if (!dateStr) { el.classList.add('tl-red'); return; }
           const diffDays = Math.floor((new Date(dateStr) - today) / (1000 * 60 * 60 * 24));
-          if(diffDays < 0) el.classList.add('tl-red'); else if (diffDays <= 30) el.classList.add('tl-yellow'); else el.classList.add('tl-green');
+          if (diffDays < 0) el.classList.add('tl-red');
+          else if (diffDays <= 30) el.classList.add('tl-yellow');
+          else el.classList.add('tl-green');
         };
-        setTrafficLight('date-assicurazione', 'tl-assicurazione', v.assic); setTrafficLight('date-bollo', 'tl-bollo', v.bollo); setTrafficLight('date-revisione', 'tl-revisione', v.revis);
-        const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30); let fuelCost = 0;
-        this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category||'').includes('Auto') && new Date(t.date) >= thirtyDaysAgo).forEach(t => fuelCost += t.amount);
+        setTrafficLight('date-assicurazione', 'tl-assicurazione', v.assic);
+        setTrafficLight('date-bollo', 'tl-bollo', v.bollo);
+        setTrafficLight('date-revisione', 'tl-revisione', v.revis);
+
+        // Calcola spesa carburante/auto degli ultimi 30 giorni (o del mese dell'ultima transazione auto se storica)
+        const autoTx = this.state.transactions.filter(t => t.type === 'EXPENSE' && (t.category || '').toLowerCase().includes('auto'));
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        let fuelCost = 0;
+        autoTx.filter(t => new Date(t.date) >= thirtyDaysAgo).forEach(t => fuelCost += t.amount);
         this.setElText('garageFuelMonth', this.formatMoney(fuelCost));
 
-        const sorted = this.state.garageMaint.filter(m => m.vehicleId === v.id).sort((a,b) => new Date(b.date) - new Date(a.date));
+        const sorted = this.state.garageMaint.filter(m => m.vehicleId === v.id).sort((a, b) => new Date(b.date) - new Date(a.date));
         this.setElHTML('garageMaintList', sorted.length ? sorted.map(m => this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🔧 ${m.title}</strong><div class="stat-label">${m.kmAtMaint > 0 ? m.kmAtMaint + ' km' : ''}</div></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong></div>`, `App.deleteGarageMaint('${m.id}')`)).join('') : '<div class="list-row stat-label">Nessun lavoro registrato.</div>');
       },
 
       // === FINANZE WALLET ===
-      moveAccount(id, dir) { const idx = this.state.accounts.findIndex(a => a.id === id); if (idx < 0) return; const newIdx = idx + dir; if (newIdx < 0 || newIdx >= this.state.accounts.length) return; const temp = this.state.accounts[idx]; this.state.accounts[idx] = this.state.accounts[newIdx]; this.state.accounts[newIdx] = temp; this.save(); },
+      moveAccount(id, dir) {
+        const idx = this.state.accounts.findIndex(a => a.id === id);
+        if (idx < 0) return;
+        const newIdx = idx + dir;
+        if (newIdx < 0 || newIdx >= this.state.accounts.length) return;
+        const temp = this.state.accounts[idx];
+        this.state.accounts[idx] = this.state.accounts[newIdx];
+        this.state.accounts[newIdx] = temp;
+        this.save();
+      },
       populateAccountSelects() {
         const html = this.state.accounts.map(a => `<option value="${a.id}">${a.name} (${this.formatMoney(a.balance)})</option>`).join('');
-        this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html); this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html); this.setElHTML('reconcileAccountSelect', html);
-        const filterEl = document.getElementById('txFilterAccount'); const currentFilter = filterEl?.value || 'ALL';
+        this.setElHTML('txAccount', '<option value="">Conto Origine *</option>' + html);
+        this.setElHTML('txTargetAccount', '<option value="">Conto Destinazione *</option>' + html);
+        this.setElHTML('reconcileAccountSelect', html);
+        const filterEl = document.getElementById('txFilterAccount');
+        const currentFilter = filterEl?.value || 'ALL';
         this.setElHTML('txFilterAccount', '<option value="ALL">Tutti i Conti</option>' + this.state.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join(''));
-        if (filterEl) filterEl.value = currentFilter;
+        if (filterEl && (currentFilter === 'ALL' || this.state.accounts.some(a => a.id === currentFilter))) {
+          filterEl.value = currentFilter;
+        }
       },
-      selectWalletCard(accId) { const filterEl = document.getElementById('txFilterAccount'); if (!filterEl) return; filterEl.value = (filterEl.value === accId) ? 'ALL' : accId; this.renderFinance(); },
+      selectWalletCard(accId) {
+        const filterEl = document.getElementById('txFilterAccount');
+        if (!filterEl) return;
+        filterEl.value = (filterEl.value === accId) ? 'ALL' : accId;
+        this.renderFinance();
+      },
       renderFinance() {
-        const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0); this.setElText('finTotalBalanceBadge', this.formatMoney(total));
+        const total = this.state.accounts.reduce((sum, a) => sum + (parseFloat(a.balance) || 0), 0);
+        this.setElText('finTotalBalanceBadge', this.formatMoney(total));
         const fAcc = document.getElementById('txFilterAccount')?.value || 'ALL';
-        
+
         this.setElHTML('financeAccountsList', this.state.accounts.length ? this.state.accounts.map((a, idx) => `<div class="wallet-card wallet-card-${idx % 5} ${fAcc === a.id ? 'selected' : ''}" onclick="App.selectWalletCard('${a.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:800; font-size:0.95rem;">${a.name}</span><div class="wallet-arrows">${idx > 0 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', -1)">◀</button>` : ''}${idx < this.state.accounts.length - 1 ? `<button onclick="event.stopPropagation(); App.moveAccount('${a.id}', 1)">▶</button>` : ''}</div></div><div><div style="font-size:1.35rem; font-weight:900; font-family:'JetBrains Mono',monospace; margin-top:0.6rem;">${this.formatMoney(a.balance)}</div><div style="font-size:0.7rem; opacity:0.8;">${a.type || 'Conto'} • Tocca per filtrare</div></div></div>`).join('') : '<div class="stat-label">Nessun conto presente.</div>');
-        
-        let filtered = [...this.state.transactions]; if (fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc); filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => { 
-          const acc = this.state.accounts.find(a => a.id === tx.accountId); 
-          const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)'; 
-          const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : ''; 
+
+        let filtered = [...this.state.transactions];
+        if (fAcc !== 'ALL') filtered = filtered.filter(t => t.accountId === fAcc || t.targetAccountId === fAcc);
+        filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        this.setElHTML('financeTransactionsList', filtered.length ? filtered.map(tx => {
+          const acc = this.state.accounts.find(a => a.id === tx.accountId);
+          const color = tx.type === 'EXPENSE' ? 'var(--danger)' : tx.type === 'INCOME' ? 'var(--success)' : 'var(--info)';
+          const prefix = tx.type === 'EXPENSE' ? '-' : tx.type === 'INCOME' ? '+' : '';
           const imgHtml = tx.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${tx.fileData}')">📎</span>` : '';
-          return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong>${tx.desc}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`, `App.deleteTransaction('${tx.id}')`); 
+          return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(tx.date)} • <strong>${acc ? acc.name : 'Conto'}</strong></span><br><strong>${tx.desc}</strong> ${imgHtml} <span class="badge" style="font-size:0.65rem;">${tx.category || 'Altro'}</span></div><div style="text-align:right;"><strong style="color:${color}; font-family:'JetBrains Mono',monospace;">${prefix}${this.formatMoney(tx.amount)}</strong></div>`, `App.deleteTransaction('${tx.id}')`);
         }).join('') : '<div class="list-row stat-label">Nessuna transazione.</div>');
-        const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0); this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
+
+        const subsTotal = this.state.subs.reduce((s, x) => s + (parseFloat(x.cost) || 0), 0);
+        this.setElText('subsTotalBadge', `${this.formatMoney(subsTotal)}/mese`);
         this.setElHTML('subsList', this.state.subs.length ? this.state.subs.map(s => this.createSwipeRow(`<div><strong>🔄 ${s.name}</strong><br><small class="stat-label">Rinnovo: ${this.formatDate(s.next)}</small></div><strong>${this.formatMoney(s.cost)}</strong>`, `App.deleteSubscription('${s.id}')`)).join('') : '<div class="list-row stat-label">Nessun abbonamento attivo.</div>');
         this.renderExpenseCategoryChart();
       },
-      renderExpenseCategoryChart() { const ctx = document.getElementById('expenseCatChart'); if (!ctx || typeof Chart === 'undefined') return; const catTotals = {}; this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => { const c = t.category || 'Altro'; catTotals[c] = (catTotals[c] || 0) + t.amount; }); const labels = Object.keys(catTotals); const data = Object.values(catTotals); if (this.charts.expCat) this.charts.expCat.destroy(); this.charts.expCat = new Chart(ctx, { type: 'doughnut', data: { labels: labels.length ? labels : ['Nessuna spesa'], datasets: [{ data: data.length ? data : [1], backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } } } } }); },
-      addFinanceAccount(e) { e.preventDefault(); this.state.accounts.push({ id: this.generateId(), name: document.getElementById('accNameInput').value, balance: parseFloat(document.getElementById('accInitialBalance').value) || 0 }); this.save(); e.target.reset(); this.populateAccountSelects(); this.renderFinance(); },
-      toggleTransferFields() { document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none'; },
-      async addTransaction(e) { 
-        e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value; 
-        if (!srcId) return this.showToast('Seleziona un conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId); 
-        let fileData = null; if (document.getElementById('txFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('txFile').files[0]); } catch (err) {} }
-        const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence').value, timestamp: new Date().toISOString(), fileData }; 
-        if (src) { if (t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { src.balance -= a; const trg = this.state.accounts.find(x => x.id === trgId); if (trg) trg.balance += a; tx.targetAccountId = trgId; } } 
-        this.state.transactions.push(tx); this.save(); e.target.reset(); document.getElementById('txDate').value = new Date().toISOString().slice(0, 10); this.populateAccountSelects(); this.renderFinance(); 
+      renderExpenseCategoryChart() {
+        const ctx = document.getElementById('expenseCatChart');
+        if (!ctx || typeof Chart === 'undefined') return;
+        const catTotals = {};
+        this.state.transactions.filter(t => t.type === 'EXPENSE').forEach(t => {
+          const c = t.category || 'Altro';
+          catTotals[c] = (catTotals[c] || 0) + t.amount;
+        });
+        const labels = Object.keys(catTotals);
+        const data = Object.values(catTotals);
+        if (this.charts.expCat) this.charts.expCat.destroy();
+        this.charts.expCat = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels.length ? labels : ['Nessuna spesa'],
+            datasets: [{ data: data.length ? data : [1], backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'], borderWidth: 0 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } } }
+          }
+        });
       },
-      reconcileAccountBalance() { const id = document.getElementById('reconcileAccountSelect').value; const tar = parseFloat(document.getElementById('reconcileTargetInput').value); if (!id || isNaN(tar)) return; const acc = this.state.accounts.find(a => a.id === id); if (!acc) return; const diff = tar - acc.balance; if (diff === 0) return; acc.balance = tar; this.state.transactions.push({ id: this.generateId(), type: diff > 0 ? 'INCOME' : 'EXPENSE', amount: Math.abs(diff), accountId: id, desc: '⚖️ Allineamento Saldo', category: 'Rettifica', date: new Date().toISOString().slice(0, 10), recurrence: 'Singola', timestamp: new Date().toISOString() }); this.save(); document.getElementById('reconcileTargetInput').value = ''; this.populateAccountSelects(); this.renderFinance(); },
-      deleteTransaction(id) { const tx = this.state.transactions.find(t => t.id === id); if (!tx || !confirm('Eliminare movimento?')) return; const src = this.state.accounts.find(a => a.id === tx.accountId); if (src) { if (tx.type === 'EXPENSE') src.balance += tx.amount; else if (tx.type === 'INCOME') src.balance -= tx.amount; else if (tx.type === 'TRANSFER') { src.balance += tx.amount; const trg = this.state.accounts.find(a => a.id === tx.targetAccountId); if (trg) trg.balance -= tx.amount; } } this.state.transactions = this.state.transactions.filter(t => t.id !== id); this.save(); this.populateAccountSelects(); this.renderFinance(); },
-      addSubscription(e) { e.preventDefault(); this.state.subs.push({ id: this.generateId(), name: document.getElementById('subName').value, cost: parseFloat(document.getElementById('subCost').value) || 0, cycle: 'monthly', next: new Date().toISOString().slice(0, 10) }); this.save(); e.target.reset(); this.renderFinance(); },
-      deleteSubscription(id) { this.state.subs = this.state.subs.filter(s => s.id !== id); this.save(); this.renderFinance(); },
+      addFinanceAccount(e) {
+        e.preventDefault();
+        this.state.accounts.push({
+          id: this.generateId(),
+          name: document.getElementById('accNameInput').value,
+          balance: parseFloat(document.getElementById('accInitialBalance').value) || 0
+        });
+        this.save();
+        e.target.reset();
+        this.populateAccountSelects();
+        this.renderFinance();
+      },
+      toggleTransferFields() {
+        document.getElementById('txTargetAccount').style.display = document.getElementById('txType').value === 'TRANSFER' ? 'block' : 'none';
+      },
+      async addTransaction(e) {
+        e.preventDefault();
+        const t = document.getElementById('txType').value;
+        const a = parseFloat(document.getElementById('txAmount').value);
+        const srcId = document.getElementById('txAccount').value;
+        const trgId = document.getElementById('txTargetAccount').value;
+        if (!srcId) return this.showToast('Seleziona un conto', 'danger');
+        const src = this.state.accounts.find(x => x.id === srcId);
+        let fileData = null;
+        if (document.getElementById('txFile')?.files?.length > 0) {
+          try { fileData = await this.fileToBase64(document.getElementById('txFile').files[0]); } catch (err) {}
+        }
+        const tx = {
+          id: this.generateId(),
+          type: t,
+          amount: a,
+          accountId: srcId,
+          desc: document.getElementById('txDesc').value,
+          category: document.getElementById('txCategory').value || 'Generale',
+          date: document.getElementById('txDate').value,
+          recurrence: document.getElementById('txRecurrence')?.value || 'Singola',
+          timestamp: new Date().toISOString(),
+          fileData
+        };
+        if (src) {
+          if (t === 'EXPENSE') src.balance -= a;
+          else if (t === 'INCOME') src.balance += a;
+          else if (t === 'TRANSFER') {
+            src.balance -= a;
+            const trg = this.state.accounts.find(x => x.id === trgId);
+            if (trg) trg.balance += a;
+            tx.targetAccountId = trgId;
+          }
+        }
+        this.state.transactions.push(tx);
+        this.save();
+        e.target.reset();
+        document.getElementById('txDate').value = new Date().toISOString().slice(0, 10);
+        this.populateAccountSelects();
+        this.renderFinance();
+      },
+      reconcileAccountBalance() {
+        const id = document.getElementById('reconcileAccountSelect').value;
+        const tar = parseFloat(document.getElementById('reconcileTargetInput').value);
+        if (!id || isNaN(tar)) return;
+        const acc = this.state.accounts.find(a => a.id === id);
+        if (!acc) return;
+        const diff = Number((tar - acc.balance).toFixed(2));
+        if (diff === 0) return;
+        acc.balance = tar;
+        this.state.transactions.push({
+          id: this.generateId(),
+          type: diff > 0 ? 'INCOME' : 'EXPENSE',
+          amount: Math.abs(diff),
+          accountId: id,
+          desc: '⚖️ Allineamento Saldo',
+          category: 'Rettifica',
+          date: new Date().toISOString().slice(0, 10),
+          recurrence: 'Singola',
+          timestamp: new Date().toISOString()
+        });
+        this.save();
+        document.getElementById('reconcileTargetInput').value = '';
+        this.populateAccountSelects();
+        this.renderFinance();
+      },
+      deleteTransaction(id) {
+        const tx = this.state.transactions.find(t => t.id === id);
+        if (!tx || !confirm('Eliminare movimento?')) return;
+        const src = this.state.accounts.find(a => a.id === tx.accountId);
+        if (src) {
+          if (tx.type === 'EXPENSE') src.balance += tx.amount;
+          else if (tx.type === 'INCOME') src.balance -= tx.amount;
+          else if (tx.type === 'TRANSFER') {
+            src.balance += tx.amount;
+            const trg = this.state.accounts.find(a => a.id === tx.targetAccountId);
+            if (trg) trg.balance -= tx.amount;
+          }
+        }
+        this.state.transactions = this.state.transactions.filter(t => t.id !== id);
+        this.save();
+        this.populateAccountSelects();
+        this.renderFinance();
+      },
+      addSubscription(e) {
+        e.preventDefault();
+        this.state.subs.push({
+          id: this.generateId(),
+          name: document.getElementById('subName').value,
+          cost: parseFloat(document.getElementById('subCost').value) || 0,
+          cycle: 'monthly',
+          next: new Date().toISOString().slice(0, 10)
+        });
+        this.save();
+        e.target.reset();
+        this.renderFinance();
+      },
+      deleteSubscription(id) {
+        this.state.subs = this.state.subs.filter(s => s.id !== id);
+        this.save();
+        this.renderFinance();
+      },
 
       // === SALUTE OS ===
-      populateFoodLibrarySelect() { const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${f.name} (${f.kcal} kcal/100g)</option>`).join(''); this.setElHTML('nutriFoodSelect', html); },
-      AutoCalcFood() { const foodId = document.getElementById('nutriFoodSelect')?.value; const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100; const mealType = document.getElementById('nutriMealType')?.value || 'Pasto'; const food = this.state.foodLibrary.find(f => f.id === foodId); if (!food) return; const ratio = grams / 100; document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`; document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio); document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1); document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1); document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1); },
-      addNutritionLog(e) { e.preventDefault(); this.state.healthNutrition.push({ id: this.generateId(), meal: document.getElementById('nutriMeal').value, date: document.getElementById('nutriDate').value, kcal: parseFloat(document.getElementById('nutriKcal').value) || 0, prot: parseFloat(document.getElementById('nutriProt').value) || 0, carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0, fat: parseFloat(document.getElementById('nutriFat').value) || 0 }); this.save(); e.target.reset(); document.getElementById('nutriDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
+      populateFoodLibrarySelect() {
+        const html = '<option value="">-- Seleziona cibo dalla Libreria --</option>' + this.state.foodLibrary.map(f => `<option value="${f.id}">${f.name} (${f.kcal} kcal/100g)</option>`).join('');
+        this.setElHTML('nutriFoodSelect', html);
+      },
+      AutoCalcFood() {
+        const foodId = document.getElementById('nutriFoodSelect')?.value;
+        const grams = parseFloat(document.getElementById('nutriGrams')?.value) || 100;
+        const mealType = document.getElementById('nutriMealType')?.value || 'Pasto';
+        const food = this.state.foodLibrary.find(f => f.id === foodId);
+        if (!food) return;
+        const ratio = grams / 100;
+        document.getElementById('nutriMeal').value = `${mealType}: ${food.name} (${grams}g)`;
+        document.getElementById('nutriKcal').value = Math.round(food.kcal * ratio);
+        document.getElementById('nutriProt').value = (food.prot * ratio).toFixed(1);
+        document.getElementById('nutriCarbs').value = (food.carb * ratio).toFixed(1);
+        document.getElementById('nutriFat').value = (food.fat * ratio).toFixed(1);
+      },
+      addNutritionLog(e) {
+        e.preventDefault();
+        this.state.healthNutrition.push({
+          id: this.generateId(),
+          meal: document.getElementById('nutriMeal').value,
+          date: document.getElementById('nutriDate').value,
+          kcal: parseFloat(document.getElementById('nutriKcal').value) || 0,
+          prot: parseFloat(document.getElementById('nutriProt').value) || 0,
+          carbs: parseFloat(document.getElementById('nutriCarbs').value) || 0,
+          fat: parseFloat(document.getElementById('nutriFat').value) || 0
+        });
+        this.save();
+        e.target.reset();
+        document.getElementById('nutriDate').value = new Date().toISOString().slice(0, 10);
+        this.renderHealth();
+      },
       deleteNutritionLog(id) { this.state.healthNutrition = this.state.healthNutrition.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      addWeightLog(e) { e.preventDefault(); this.state.healthWeight.push({ id: this.generateId(), value: parseFloat(document.getElementById('weightValue').value), date: document.getElementById('weightDate').value }); this.save(); e.target.reset(); document.getElementById('weightDate').value = new Date().toISOString().slice(0, 10); this.renderHealth(); },
+      addWeightLog(e) {
+        e.preventDefault();
+        this.state.healthWeight.push({
+          id: this.generateId(),
+          value: parseFloat(document.getElementById('weightValue').value),
+          date: document.getElementById('weightDate').value
+        });
+        this.save();
+        e.target.reset();
+        document.getElementById('weightDate').value = new Date().toISOString().slice(0, 10);
+        this.renderHealth();
+      },
       deleteWeightLog(id) { this.state.healthWeight = this.state.healthWeight.filter(x => x.id !== id); this.save(); this.renderHealth(); },
-      toggleMedFields() { const t = document.getElementById('medType').value; document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none'; document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none'; },
-      async addMedicalRecord(e) { e.preventDefault(); const type = document.getElementById('medType').value; let fileData = null; if (type === 'Referto' && document.getElementById('medFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {} } this.state.healthMedical.push({ id: this.generateId(), type, date: document.getElementById('medDate').value, title: document.getElementById('medTitle').value, notes: document.getElementById('medNotes').value, therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '', fileData }); this.save(); e.target.reset(); this.toggleMedFields(); this.renderHealth(); },
+      toggleMedFields() {
+        const t = document.getElementById('medType').value;
+        document.getElementById('medTherapyGroup').style.display = t === 'Visita Medica' ? 'block' : 'none';
+        document.getElementById('medFileGroup').style.display = t === 'Referto' ? 'block' : 'none';
+      },
+      async addMedicalRecord(e) {
+        e.preventDefault();
+        const type = document.getElementById('medType').value;
+        let fileData = null;
+        if (type === 'Referto' && document.getElementById('medFile')?.files?.length > 0) {
+          try { fileData = await this.fileToBase64(document.getElementById('medFile').files[0]); } catch (err) {}
+        }
+        this.state.healthMedical.push({
+          id: this.generateId(),
+          type,
+          date: document.getElementById('medDate').value,
+          title: document.getElementById('medTitle').value,
+          notes: document.getElementById('medNotes').value,
+          therapy: type === 'Visita Medica' ? document.getElementById('medTherapy').value : '',
+          fileData
+        });
+        this.save();
+        e.target.reset();
+        this.toggleMedFields();
+        this.renderHealth();
+      },
       deleteMedicalRecord(id) { this.state.healthMedical = this.state.healthMedical.filter(x => x.id !== id); this.save(); this.renderHealth(); },
       renderHealth() {
-        const sortedNutri = [...this.state.healthNutrition].sort((a,b) => (b.date||'').localeCompare(a.date||'')); const latestDay = sortedNutri[0]?.date || new Date().toISOString().slice(0, 10); const dayLogs = sortedNutri.filter(n => n.date === latestDay);
-        const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)), totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)), totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)), totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)), goalKcal = this.state.nutritionGoals?.kcal || 2100;
-        this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal`); const bar = document.getElementById('kcalProgressBar'); if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
-        this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`); this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`); this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
+        const sortedNutri = [...this.state.healthNutrition].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const latestDay = sortedNutri[0]?.date || new Date().toISOString().slice(0, 10);
+        const dayLogs = sortedNutri.filter(n => n.date === latestDay);
+        const totKcal = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.kcal) || 0), 0)),
+              totProt = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.prot) || 0), 0)),
+              totCarb = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.carbs) || 0), 0)),
+              totFat = Math.round(dayLogs.reduce((s, x) => s + (parseFloat(x.fat) || 0), 0)),
+              goalKcal = this.state.nutritionGoals?.kcal || 2100;
+        this.setElText('kcalProgressText', `${totKcal} / ${goalKcal} kcal`);
+        const bar = document.getElementById('kcalProgressBar');
+        if (bar) bar.style.width = `${Math.min(100, Math.round((totKcal / goalKcal) * 100))}%`;
+        this.setElText('protProgressText', `${totProt}g / ${this.state.nutritionGoals?.prot || 140}g`);
+        this.setElText('carbProgressText', `${totCarb}g / ${this.state.nutritionGoals?.carb || 230}g`);
+        this.setElText('fatProgressText', `${totFat}g / ${this.state.nutritionGoals?.fat || 70}g`);
         this.setElHTML('healthNutritionList', sortedNutri.length ? sortedNutri.map(n => this.createSwipeRow(`<div><strong>${n.meal}</strong> <span class="badge">${n.kcal} kcal</span><br><small class="stat-label">${this.formatDate(n.date)} • P:${n.prot}g C:${n.carbs}g G:${n.fat}g</small></div>`, `App.deleteNutritionLog('${n.id}')`)).join('') : '<div class="list-row stat-label">Nessun pasto registrato.</div>');
-        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(w => this.createSwipeRow(`<div><strong>⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
-        const ctxW = document.getElementById('weightChart'); if (ctxW && typeof Chart !== 'undefined') { const sortedW = [...this.state.healthWeight].sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(-10); if (this.charts.weight) this.charts.weight.destroy(); this.charts.weight = new Chart(ctxW, { type: 'line', data: { labels: sortedW.map(w => this.formatDate(w.date).slice(0, 5)), datasets: [{ label: 'Peso', data: sortedW.map(w => w.value), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.2)', tension: 0.35, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
-        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(m => { const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : ''; const file = m.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${m.fileData}')">📎</span>` : ''; return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${m.title}</strong> ${file}${extra}<div class="stat-label">${m.notes || ''}</div></div>`, `App.deleteMedicalRecord('${m.id}')`); }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
+        this.setElHTML('healthWeightList', [...this.state.healthWeight].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(w => this.createSwipeRow(`<div><strong>⚖️ ${w.value} kg</strong><br><small class="stat-label">${this.formatDate(w.date)}</small></div>`, `App.deleteWeightLog('${w.id}')`)).join('') || '<div class="list-row stat-label">Nessun peso registrato.</div>');
+        const ctxW = document.getElementById('weightChart');
+        if (ctxW && typeof Chart !== 'undefined') {
+          const sortedW = [...this.state.healthWeight].sort((a, b) => (a.date || '').localeCompare(b.date || '')).slice(-10);
+          if (this.charts.weight) this.charts.weight.destroy();
+          this.charts.weight = new Chart(ctxW, {
+            type: 'line',
+            data: {
+              labels: sortedW.map(w => this.formatDate(w.date).slice(0, 5)),
+              datasets: [{ label: 'Peso', data: sortedW.map(w => w.value), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.2)', tension: 0.35, fill: true }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+          });
+        }
+        this.setElHTML('healthMedicalList', [...this.state.healthMedical].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(m => {
+          const extra = m.therapy ? `<div style="color:var(--accent-primary); font-size:0.8rem;">💊 ${m.therapy}</div>` : '';
+          const file = m.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${m.fileData}')">📎</span>` : '';
+          return this.createSwipeRow(`<div><span class="stat-label">${this.formatDate(m.date)}</span><br><strong>🩺 ${m.title}</strong> ${file}${extra}<div class="stat-label">${m.notes || ''}</div></div>`, `App.deleteMedicalRecord('${m.id}')`);
+        }).join('') || '<div class="list-row stat-label">Nessun record in cartella clinica.</div>');
       },
 
       // === HUB EXTRA: INVENTARIO, MANUTENZIONI, RICERCA, GALLERIA ===
-      populateCategorySelects() { const cats = Object.keys(this.state.settings.inventoryCategories); const html = cats.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('invCategory', html); this.setElHTML('invFilterCat', '<option value="ALL">Tutte</option>' + html); this.updateInvSubcategories(); },
-      updateInvSubcategories() { const cat = document.getElementById('invCategory')?.value; const subs = this.state.settings.inventoryCategories[cat] || ['Generale']; this.setElHTML('invSubcategory', subs.map(s => `<option value="${s}">${s}</option>`).join('')); },
-      async addInventoryItem(e) { 
-        e.preventDefault(); 
-        let fileData = null; if (document.getElementById('invFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('invFile').files[0]); } catch (err) {} }
-        this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString(), fileData }); 
-        this.save(); e.target.reset(); this.renderInventory(); 
+      populateCategorySelects() {
+        const cats = Object.keys(this.state.settings.inventoryCategories);
+        const html = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        this.setElHTML('invCategory', html);
+        const fEl = document.getElementById('invFilterCat');
+        const cur = fEl?.value || 'ALL';
+        this.setElHTML('invFilterCat', '<option value="ALL">Tutte</option>' + html);
+        if (fEl && (cur === 'ALL' || cats.includes(cur))) fEl.value = cur;
+        this.updateInvSubcategories();
       },
-      deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
-      renderInventory() { const filterCat = document.getElementById('invFilterCat')?.value || 'ALL'; const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase(); let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true); if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat); if (search) filtered = filtered.filter(i => (i.name||'').toLowerCase().includes(search) || (i.notes||'').toLowerCase().includes(search)); this.setElHTML('inventoryList', filtered.map(item => { const imgHtml = item.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${item.fileData}')">📎</span>` : ''; return this.createSwipeRow(`<div><strong>📦 ${item.name}</strong> ${imgHtml} <span class="badge">${item.category}</span><br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`, `App.deleteInventoryItem('${item.id}')`); }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>'); },
+      updateInvSubcategories() {
+        const cat = document.getElementById('invCategory')?.value;
+        const subs = this.state.settings.inventoryCategories[cat] || ['Generale'];
+        this.setElHTML('invSubcategory', subs.map(s => `<option value="${s}">${s}</option>`).join(''));
+      },
+      async addInventoryItem(e) {
+        e.preventDefault();
+        let fileData = null;
+        if (document.getElementById('invFile')?.files?.length > 0) {
+          try { fileData = await this.fileToBase64(document.getElementById('invFile').files[0]); } catch (err) {}
+        }
+        this.state.inventory.push({
+          id: this.generateId(),
+          type: document.getElementById('invType').value,
+          name: document.getElementById('invName').value,
+          category: document.getElementById('invCategory').value,
+          subcategory: document.getElementById('invSubcategory').value,
+          price: parseFloat(document.getElementById('invPrice').value) || 0,
+          date: document.getElementById('invDate').value,
+          warranty: document.getElementById('invWarranty').value,
+          location: document.getElementById('invLocation')?.value || '',
+          notes: document.getElementById('invNotes').value,
+          addedAt: new Date().toISOString(),
+          fileData
+        });
+        this.save();
+        e.target.reset();
+        this.renderInventory();
+      },
+      deleteInventoryItem(id) {
+        if (confirm('Eliminare bene?')) {
+          this.state.inventory = this.state.inventory.filter(i => i.id !== id);
+          this.save();
+          this.renderInventory();
+        }
+      },
+      renderInventory() {
+        const filterCat = document.getElementById('invFilterCat')?.value || 'ALL';
+        const search = (document.getElementById('invSearchInput')?.value || '').toLowerCase();
+        let filtered = this.state.inventory.filter(i => this.activeInvTab === 'garanzie' ? i.type === 'Garanzia' : true);
+        if (filterCat !== 'ALL') filtered = filtered.filter(i => i.category === filterCat);
+        if (search) filtered = filtered.filter(i => (i.name || '').toLowerCase().includes(search) || (i.notes || '').toLowerCase().includes(search));
+        this.setElHTML('inventoryList', filtered.map(item => {
+          const imgHtml = item.fileData ? `<span style="font-size:0.85rem; cursor:pointer;" onclick="App.openImageViewer('${item.fileData}')">📎</span>` : '';
+          return this.createSwipeRow(`<div><strong>📦 ${item.name}</strong> ${imgHtml} <span class="badge">${item.category}</span><br><small class="stat-label">${item.location || ''} ${item.notes ? '— ' + item.notes : ''}</small></div><div><strong>${this.formatMoney(item.price)}</strong></div>`, `App.deleteInventoryItem('${item.id}')`);
+        }).join('') || '<div class="list-row stat-label">Nessun oggetto in questa vista.</div>');
+      },
 
-      populateMaintenanceSelects() { const html = this.state.settings.maintenanceCategories.map(c => `<option value="${c}">${c}</option>`).join(''); this.setElHTML('maintCategory', html); this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html); },
-      addGeneralMaintenance(e) { e.preventDefault(); this.state.maintenances.push({ id: this.generateId(), title: document.getElementById('maintTitle').value, category: document.getElementById('maintCategory').value, dueDate: document.getElementById('maintDueDate').value, cost: parseFloat(document.getElementById('maintCost').value) || 0, recurrence: document.getElementById('maintRecurrence').value, status: document.getElementById('maintStatus').value, notes: document.getElementById('maintNotes').value }); this.save(); e.target.reset(); this.renderGeneralMaintenances(); },
-      deleteGeneralMaintenance(id) { if (confirm('Eliminare manutenzione?')) { this.state.maintenances = this.state.maintenances.filter(m => m.id !== id); this.save(); this.renderGeneralMaintenances(); } },
-      renderGeneralMaintenances() { let filtered = [...this.state.maintenances]; const fCat = document.getElementById('maintFilterCat')?.value || 'ALL'; const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL'; if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat); if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat); this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>'); },
+      populateMaintenanceSelects() {
+        const cats = this.state.settings.maintenanceCategories;
+        const html = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        this.setElHTML('maintCategory', html);
+        const fEl = document.getElementById('maintFilterCat');
+        const cur = fEl?.value || 'ALL';
+        this.setElHTML('maintFilterCat', '<option value="ALL">Tutte</option>' + html);
+        if (fEl && (cur === 'ALL' || cats.includes(cur))) fEl.value = cur;
+      },
+      addGeneralMaintenance(e) {
+        e.preventDefault();
+        this.state.maintenances.push({
+          id: this.generateId(),
+          title: document.getElementById('maintTitle').value,
+          category: document.getElementById('maintCategory').value,
+          dueDate: document.getElementById('maintDueDate').value,
+          cost: parseFloat(document.getElementById('maintCost').value) || 0,
+          recurrence: document.getElementById('maintRecurrence').value,
+          status: document.getElementById('maintStatus').value,
+          notes: document.getElementById('maintNotes').value
+        });
+        this.save();
+        e.target.reset();
+        this.renderGeneralMaintenances();
+      },
+      deleteGeneralMaintenance(id) {
+        if (confirm('Eliminare manutenzione?')) {
+          this.state.maintenances = this.state.maintenances.filter(m => m.id !== id);
+          this.save();
+          this.renderGeneralMaintenances();
+        }
+      },
+      renderGeneralMaintenances() {
+        let filtered = [...this.state.maintenances];
+        const fCat = document.getElementById('maintFilterCat')?.value || 'ALL';
+        const fStat = document.getElementById('maintFilterStatus')?.value || 'ALL';
+        if (fCat !== 'ALL') filtered = filtered.filter(m => m.category === fCat);
+        if (fStat !== 'ALL') filtered = filtered.filter(m => m.status === fStat);
+        this.setElHTML('maintenanceList', filtered.map(m => this.createSwipeRow(`<div><strong>🔧 ${m.title}</strong> <span class="badge">${m.category}</span><br><small class="stat-label">Data: ${this.formatDate(m.dueDate)} ${m.notes ? '— ' + m.notes : ''}</small></div><div style="text-align:right;"><strong>${this.formatMoney(m.cost)}</strong><br><span style="font-size:0.75rem; color:${m.status === 'Completata' ? 'var(--success)' : 'var(--warning)'};">${m.status}</span></div>`, `App.deleteGeneralMaintenance('${m.id}')`)).join('') || '<div class="list-row stat-label">Nessuna manutenzione registrata.</div>');
+      },
 
       renderGallery() {
         let images = [];
-        this.state.transactions.forEach(t => { if(t.fileData) images.push({src: t.fileData, title: t.desc, date: t.date, type: 'Spesa'}); });
-        this.state.inventory.forEach(i => { if(i.fileData) images.push({src: i.fileData, title: i.name, date: i.date, type: 'Inventario'}); });
-        this.state.healthMedical.forEach(m => { if(m.fileData) images.push({src: m.fileData, title: m.title, date: m.date, type: 'Referto'}); });
-        images.sort((a,b) => new Date(b.date) - new Date(a.date));
+        this.state.transactions.forEach(t => { if (t.fileData) images.push({ src: t.fileData, title: t.desc, date: t.date, type: 'Spesa' }); });
+        this.state.inventory.forEach(i => { if (i.fileData) images.push({ src: i.fileData, title: i.name, date: i.date, type: 'Inventario' }); });
+        this.state.healthMedical.forEach(m => { if (m.fileData) images.push({ src: m.fileData, title: m.title, date: m.date, type: 'Referto' }); });
+        images.sort((a, b) => new Date(b.date) - new Date(a.date));
         this.setElHTML('galleryGrid', images.length ? images.map(img => `<div class="gallery-item" onclick="App.openImageViewer('${img.src}')"><img src="${img.src}"><div class="gallery-overlay"><strong>${img.type}</strong><br>${img.title}</div></div>`).join('') : '<div class="stat-label col-span-12">Nessun documento o scontrino caricato nel database.</div>');
       },
 
-      executeSearch() { const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim(); if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>'); let html = ''; this.state.transactions.forEach(t => { if ((t.desc||'').toLowerCase().includes(query) || (t.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${t.category}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`; }); this.state.inventory.forEach(i => { if ((i.name||'').toLowerCase().includes(query) || (i.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>📦 ${i.name}</strong><br><small class="stat-label">${i.category}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`; }); this.state.healthMedical.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.notes||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${m.notes}</small></div></div>`; }); this.state.maintenances.forEach(m => { if ((m.title||'').toLowerCase().includes(query) || (m.category||'').toLowerCase().includes(query)) html += `<div class="list-row"><div><strong>🔧 ${m.title}</strong><br><small class="stat-label">${m.category} • ${this.formatDate(m.dueDate)}</small></div></div>`; }); this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`); },
+      executeSearch() {
+        const query = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim();
+        if (query.length < 2) return this.setElHTML('globalSearchResults', '<div class="stat-label" style="text-align:center; padding: 2rem 0;">Scrivi almeno 2 lettere...</div>');
+        let html = '';
+        this.state.transactions.forEach(t => {
+          if ((t.desc || '').toLowerCase().includes(query) || (t.category || '').toLowerCase().includes(query))
+            html += `<div class="list-row"><div><strong>💸 ${t.desc}</strong><br><small class="stat-label">${this.formatDate(t.date)} • ${t.category}</small></div><strong>${this.formatMoney(t.amount)}</strong></div>`;
+        });
+        this.state.inventory.forEach(i => {
+          if ((i.name || '').toLowerCase().includes(query) || (i.notes || '').toLowerCase().includes(query))
+            html += `<div class="list-row"><div><strong>📦 ${i.name}</strong><br><small class="stat-label">${i.category}</small></div><strong>${this.formatMoney(i.price)}</strong></div>`;
+        });
+        this.state.healthMedical.forEach(m => {
+          if ((m.title || '').toLowerCase().includes(query) || (m.notes || '').toLowerCase().includes(query))
+            html += `<div class="list-row"><div><strong>🩺 ${m.title}</strong><br><small class="stat-label">${this.formatDate(m.date)} — ${m.notes}</small></div></div>`;
+        });
+        this.state.maintenances.forEach(m => {
+          if ((m.title || '').toLowerCase().includes(query) || (m.category || '').toLowerCase().includes(query))
+            html += `<div class="list-row"><div><strong>🔧 ${m.title}</strong><br><small class="stat-label">${m.category} • ${this.formatDate(m.dueDate)}</small></div></div>`;
+        });
+        this.state.garageMaint.forEach(gm => {
+          if ((gm.title || '').toLowerCase().includes(query))
+            html += `<div class="list-row"><div><strong>🏎️ ${gm.title}</strong><br><small class="stat-label">Garage OS • ${this.formatDate(gm.date)}</small></div><strong>${this.formatMoney(gm.cost)}</strong></div>`;
+        });
+        this.setElHTML('globalSearchResults', html || `<div class="stat-label" style="text-align:center; padding: 2rem 0;">Nessun risultato per "${query}"</div>`);
+      },
 
-      startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
-      closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
+      startScanner() {
+        this.openModal('scannerModal');
+        if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false);
+        this.html5QrcodeScanner.render((decodedText) => {
+          document.getElementById('invName').value = decodedText;
+          this.vibrate(40);
+          this.showToast('Codice acquisito!');
+          this.closeScanner();
+        }, () => {});
+      },
+      closeScanner() {
+        if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {});
+        this.closeModal('scannerModal');
+      },
 
-      // --- NUOVE FUNZIONI DI IMPORTAZIONE, MIGRAZIONE E GESTIONE CACHE ---
+      // === IMPORTAZIONE UNIVERSALE E GESTIONE CACHE ===
       async importBackupFile(e) {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = async (event) => {
           try {
             let importedData;
-            // 1. Lettura del file (ZIP o JSON)
-            if (file.name.endsWith('.zip')) {
-               const zip = await JSZip.loadAsync(file);
-               const jsonFile = Object.values(zip.files).find(f => f.name.endsWith('.json') && !f.name.includes('__MACOSX'));
-               if (jsonFile) {
-                   importedData = JSON.parse(await jsonFile.async('string'));
-               } else {
-                   return this.showToast('Nessun JSON trovato nel file ZIP', 'danger');
-               }
+            if (file.name.toLowerCase().endsWith('.zip')) {
+              const zip = await JSZip.loadAsync(file);
+              const jsonFile = Object.values(zip.files).find(f => f.name.endsWith('.json') && !f.name.includes('__MACOSX'));
+              if (jsonFile) {
+                importedData = JSON.parse(await jsonFile.async('string'));
+              } else {
+                return this.showToast('Nessun JSON trovato nel file ZIP', 'danger');
+              }
             } else {
-               importedData = JSON.parse(event.target.result);
+              importedData = JSON.parse(event.target.result);
             }
 
             if (importedData) {
-              // 2. MIGRAZIONE DATI VECCHI (v7/v8) -> NUOVI (v10)
-              
-              // Finanze
-              if (importedData.financeTx) {
-                 importedData.transactions = importedData.financeTx.map(t => ({
-                    ...t,
-                    type: t.type === 'expense' ? 'EXPENSE' : (t.type === 'income' ? 'INCOME' : 'TRANSFER'),
-                    category: t.cat || t.category || 'Generale',
-                    amount: parseFloat(t.amount) || 0
-                 }));
-              }
-              // Inventario (I vecchi beni erano in "vault")
-              if (importedData.vault && !importedData.inventory) {
-                 importedData.inventory = importedData.vault.map(v => ({
-                    id: v.id || this.generateId(),
-                    type: 'Archivio',
-                    name: v.title || 'Oggetto',
-                    category: v.cat || 'Generale',
-                    subcategory: 'Generale',
-                    price: parseFloat(v.price) || 0,
-                    date: v.date || '',
-                    warranty: '',
-                    location: '',
-                    notes: ((v.serial || '') + ' ' + (v.notes || '')).trim(),
-                    addedAt: new Date().toISOString()
-                 }));
-                 importedData.vaultData = []; // Svuota il vecchio vault in chiaro per sicurezza
-              }
-              // Nutrizione
-              if (importedData.foodLogs) {
-                 importedData.healthNutrition = importedData.foodLogs.map(f => ({
-                    ...f,
-                    carbs: parseFloat(f.carb || f.carbs) || 0,
-                    meal: f.meal + (f.name ? ' - ' + f.name : '')
-                 }));
-              }
-              // Peso
-              if (importedData.weightLogs) {
-                 importedData.healthWeight = importedData.weightLogs.map(w => ({
-                    ...w,
-                    value: parseFloat(w.kg || w.value) || 0
-                 }));
-              }
-              // Salute / Medico
-              if (importedData.medRecords) {
-                 importedData.healthMedical = importedData.medRecords.map(m => ({
-                    ...m,
-                    title: m.title || 'Record',
-                    type: m.type || 'Sintomo'
-                 }));
-              }
-              // Manutenzioni / Garage
-              if (importedData.maint) {
-                 importedData.maintenances = [];
-                 importedData.garageMaint = [];
-                 const migratedVehicleId = "veh-" + Date.now();
-                 let hasVehicles = false;
+              this.migrateAndMergeData(importedData);
+              await localforage.setItem('appData', this.state);
 
-                 importedData.maint.forEach(m => {
-                    const cat = (m.asset || m.category || '').toLowerCase();
-                    if (cat === 'auto' || cat === 'moto' || cat === 'veicolo') {
-                       hasVehicles = true;
-                       importedData.garageMaint.push({
-                           id: m.id || this.generateId(),
-                           vehicleId: migratedVehicleId,
-                           title: m.task || m.title || 'Intervento',
-                           date: m.date || new Date().toISOString().slice(0, 10),
-                           cost: parseFloat(m.cost) || 0,
-                           kmAtMaint: parseFloat(m.kmNow) || 0
-                       });
-                    } else {
-                       importedData.maintenances.push({
-                           ...m,
-                           title: m.task || m.title || 'Intervento',
-                           category: m.asset || m.category || 'Altro',
-                           dueDate: m.date || new Date().toISOString().slice(0, 10)
-                       });
-                    }
-                 });
-
-                 // Genera il profilo vettura se ci sono storici auto
-                 if (hasVehicles && (!importedData.vehicles || importedData.vehicles.length === 0)) {
-                     importedData.vehicles = [{
-                         id: migratedVehicleId,
-                         name: 'Auto (Migrata)',
-                         plate: 'XX 000 XX',
-                         bollo: '',
-                         assic: '',
-                         revis: '',
-                         km: 0
-                     }];
-                 }
-              }
-              // Agenda
-              if (importedData.crmTasks) {
-                 importedData.calendarTasks = importedData.crmTasks.map(t => ({
-                    ...t,
-                    type: t.scope === 'Memoria' ? 'Promemoria' : 'Attività',
-                    priority: 'Normale',
-                    date: t.date || new Date().toISOString().slice(0, 10)
-                 }));
-              }
-
-              // 3. Salvataggio ed esecuzione
-              this.state = { ...this.state, ...importedData };
-              
-              if (importedData.accounts) this.state.accounts = importedData.accounts;
-
-              this.sanitizeData();
-              await this.save(true); // Salva in locale
-              
               if (this.db) {
-                 await this.pushToCloud(); // Manda al cloud di Firebase
+                await this.pushToCloud();
               }
 
-              this.showToast('Backup ripristinato con successo! Riavvio...');
-              setTimeout(() => location.reload(), 1500);
+              this.populateAccountSelects();
+              this.populateCategorySelects();
+              this.populateMaintenanceSelects();
+              this.populateFoodLibrarySelect();
+              this.closeModal('settingsModal');
+              this.renderActiveModule();
+              this.showToast(`Backup importato! (${this.state.transactions.length} movimenti, ${this.state.inventory.length} beni)`);
             }
           } catch (err) {
             console.error("Errore importazione:", err);
-            this.showToast('Errore lettura backup: JSON corrotto', 'danger');
+            this.showToast('Errore lettura backup: file non valido', 'danger');
           }
         };
-        
-        if (file.name.endsWith('.zip')) reader.readAsArrayBuffer(file);
+
+        if (file.name.toLowerCase().endsWith('.zip')) reader.readAsArrayBuffer(file);
         else reader.readAsText(file);
-        
-        e.target.value = ''; // Resetta l'input per ricaricare lo stesso file se necessario
+
+        e.target.value = '';
       },
 
       async forceUpdateCache() {
-         if ('caches' in window) {
-            const names = await caches.keys();
-            for (let name of names) await caches.delete(name);
-         }
-         this.showToast('Cache svuotata. Ricarico...');
-         setTimeout(() => location.reload(), 1000);
+        if ('caches' in window) {
+          const names = await caches.keys();
+          for (let name of names) await caches.delete(name);
+        }
+        this.showToast('Cache svuotata. Ricarico...');
+        setTimeout(() => location.reload(), 1000);
       },
 
-      exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v10_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); },
-      exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${t.desc}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${n.meal}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
-      async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo e disconnettere il Cloud?")) { await localforage.clear(); location.reload(); } },
+      exportJSON() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2));
+        const a = document.createElement('a');
+        a.href = dataStr;
+        a.download = `LifeOS_v10_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      },
+      exportCSV(type) {
+        let csv = '';
+        if (type === 'finance') {
+          csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n';
+          this.state.transactions.forEach(t => {
+            const acc = this.state.accounts.find(a => a.id === t.accountId);
+            csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${t.desc}"\n`;
+          });
+        } else {
+          csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n';
+          this.state.healthNutrition.forEach(n => {
+            csv += `${n.date},"${n.meal}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`;
+          });
+        }
+        const a = document.createElement('a');
+        a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+        a.download = `LifeOS_${type}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      },
+      async resetAllData() {
+        if (confirm("Cancellare tutti i dati salvati sul dispositivo e disconnettere il Cloud?")) {
+          await localforage.clear();
+          location.reload();
+        }
+      },
 
       async init() {
         await this.load();
         const todayStr = new Date().toISOString().slice(0, 10);
-        ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => { const el = document.getElementById(id); if (el) el.value = todayStr; });
-        this.populateAccountSelects(); this.populateCategorySelects(); this.populateMaintenanceSelects(); this.populateFoodLibrarySelect(); this.updateHapticButton();
+        ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = todayStr;
+        });
+        this.populateAccountSelects();
+        this.populateCategorySelects();
+        this.populateMaintenanceSelects();
+        this.populateFoodLibrarySelect();
+        this.updateHapticButton();
         this.initGestures();
-        this.initFirebase(); // Inizializza Sync Cloud Invisibile
-        
+        this.initFirebase();
+
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const action = urlParams.get('action');
 
         if (this.state.pin) {
-           document.getElementById('lockScreen')?.classList.remove('hidden'); 
-        } else { 
-           document.getElementById('lockScreen')?.classList.add('hidden'); 
-           if(action === 'addExpense') this.quickAdd('txAmount');
-           else if(action === 'addTask') this.quickAdd('calTaskTitle');
-           else this.switchModule('mod-dashboard'); 
+          document.getElementById('lockScreen')?.classList.remove('hidden');
+        } else {
+          document.getElementById('lockScreen')?.classList.add('hidden');
+          if (action === 'addExpense') this.quickAdd('txAmount');
+          else if (action === 'addTask') this.quickAdd('calTaskTitle');
+          else this.switchModule('mod-dashboard');
         }
       }
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
-    document.addEventListener('click', (e) => { if (e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card, .wallet-card, .vehicle-chip, .gallery-item')) App.vibrate(10); });
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.btn, .nav-tab, .inner-tab, .fab-btn, .fab-item, .cal-day, .hub-card, .wallet-card, .vehicle-chip, .gallery-item')) App.vibrate(10);
+    });
   </script>
 </body>
 </html>
