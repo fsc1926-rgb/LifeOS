@@ -693,7 +693,8 @@
           <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem; color:var(--info);">☁️ Cloud Sync (Firebase)</div>
           <div class="stat-label" style="margin-bottom:0.5rem;" id="syncStatusLabel">Stato: Disconnesso</div>
           <button class="btn btn-sm btn-primary" style="width:100%; margin-bottom:0.5rem;" onclick="App.openModal('firebaseConfigModal')">⚙️ Configura Cloud Database</button>
-          <button class="btn btn-sm" style="width:100%;" onclick="App.forceCloudSyncDown()">⬇️ Forza Ripristino da Cloud</button>
+          <button class="btn btn-sm" style="width:100%; margin-bottom:0.5rem;" onclick="App.forceCloudSyncDown()">⬇️ Forza Ripristino da Cloud</button>
+          <button class="btn btn-sm" style="width:100%; border-color:var(--success); color:var(--success);" onclick="App.testCloudConnection()">🧪 Verifica Connessione & Sync</button>
         </div>
 
         <div class="bento-card col-span-12" style="padding: 1.1rem;">
@@ -748,7 +749,7 @@
         vehicles: [], garageMaint: [],
         settings: {
           inventoryCategories: { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] },
-          maintenanceCategories: ['Casa', 'Salute', 'Altro'],
+          maintenanceCategories: ['Casa', 'Auto', 'Caldaia', 'Salute', 'Altro'],
           hapticEnabled: true
         }
       },
@@ -802,37 +803,42 @@
          setTimeout(() => location.reload(), 1500);
       },
       async pushToCloud() {
-         if(!this.db || !this.state.firebase.deviceId) return;
+         if(!this.db || !this.state.firebase?.deviceId) return;
          const syncIcon = document.getElementById('cloudSyncStatus');
          if(syncIcon) syncIcon.classList.add('syncing');
          try {
             this.state.lastCloudSync = Date.now();
-            // Invia una copia crittografata in formato testuale JSON per superare limiti Firebase e per sicurezza
             const payload = {
-                timestamp: this.state.lastCloudSync,
-                dataStr: JSON.stringify(this.state) // The whole state is stringified
+               timestamp: this.state.lastCloudSync,
+               dataStr: JSON.stringify(this.state)
             };
             await this.db.collection('lifeos_backups').doc(this.state.firebase.deviceId).set(payload);
+            const syncTime = new Date(this.state.lastCloudSync).toLocaleTimeString('it-IT');
+            this.setElText('syncStatusLabel', `Stato: 🟢 Cloud Sync Attivo (Ultimo: ${syncTime})`);
          } catch(e) {
             console.error("Cloud push failed", e);
+            this.setElText('syncStatusLabel', `Stato: 🔴 Errore Sync (${e.code || 'Permessi'})`);
          } finally {
             if(syncIcon) syncIcon.classList.remove('syncing');
          }
       },
       async pullFromCloud(force = false) {
-         if(!this.db || !this.state.firebase.deviceId) return;
+         if(!this.db || !this.state.firebase?.deviceId) return;
          const syncIcon = document.getElementById('cloudSyncStatus');
          if(syncIcon) syncIcon.classList.add('syncing');
          try {
             const doc = await this.db.collection('lifeos_backups').doc(this.state.firebase.deviceId).get();
             if(doc.exists) {
                const cloudData = doc.data();
-               // Se forzato o se il cloud è più recente del locale di almeno 10 secondi
                if (force || (cloudData.timestamp && (!this.state.lastCloudSync || cloudData.timestamp > this.state.lastCloudSync + 10000))) {
                   const parsedState = JSON.parse(cloudData.dataStr);
                   this.state = { ...this.state, ...parsedState };
                   this.sanitizeData();
-                  await localforage.setItem('appData', this.state); // salva in locale
+                  await localforage.setItem('appData', this.state);
+                  this.populateAccountSelects();
+                  this.populateCategorySelects();
+                  this.populateMaintenanceSelects();
+                  this.populateFoodLibrarySelect();
                   this.renderActiveModule();
                   if(force) this.showToast('Dati ripristinati dal Cloud!');
                }
@@ -851,6 +857,27 @@
          if(confirm("Attenzione: questo sovrascriverà i dati locali con quelli presenti sul Cloud. Procedere?")) {
             this.pullFromCloud(true);
          }
+      },
+      async testCloudConnection() {
+        if (!this.db || !this.state.firebase?.deviceId) {
+          return this.showToast('Cloud non configurato! Inserisci i dati Firebase.', 'warning');
+        }
+        this.showToast('Test di connessione a Firestore in corso...', 'info');
+        try {
+          await this.pushToCloud();
+          const doc = await this.db.collection('lifeos_backups').doc(this.state.firebase.deviceId).get();
+          if (doc.exists) {
+            const syncTime = new Date(doc.data().timestamp).toLocaleTimeString('it-IT');
+            this.setElText('syncStatusLabel', `Stato: 🟢 Connesso (Ultimo sync: ${syncTime})`);
+            this.showToast(`Sync funzionante! Backup verificato alle ${syncTime} ✅`, 'success');
+          } else {
+            this.showToast('Connesso, ma il documento non è stato trovato.', 'warning');
+          }
+        } catch (err) {
+          console.error(err);
+          this.setElText('syncStatusLabel', `Stato: 🔴 Errore (${err.code || 'Permessi/Rete'})`);
+          this.showToast('Errore Sync: ' + (err.message || 'Controlla regole Firestore'), 'danger');
+        }
       },
 
       // === GESTURES SWIPE NATIVO ===
@@ -927,6 +954,12 @@
         arrays.forEach(k => { if (!Array.isArray(this.state[k])) this.state[k] = []; });
         if (this.state.foodLibrary.length === 0) this.state.foodLibrary = DEFAULT_FOODS;
         if (!this.state.settings) this.state.settings = {};
+        if (!this.state.settings.inventoryCategories) {
+          this.state.settings.inventoryCategories = { 'Elettrodomestici': ['Generale', 'Cucina', 'Clima'], 'Casa/Impianti': ['Mobili', 'Impianti'], 'Elettronica': ['Smartphone', 'Computer'], 'Veicoli': ['Auto', 'Moto'] };
+        }
+        if (!Array.isArray(this.state.settings.maintenanceCategories)) {
+          this.state.settings.maintenanceCategories = ['Casa', 'Auto', 'Caldaia', 'Salute', 'Altro'];
+        }
 
         if (this.state.garageConfig && !this.state.vehicles.length) {
            this.state.vehicles.push({ id: this.generateId(), ...this.state.garageConfig });
@@ -940,8 +973,8 @@
         }
         this.state.garageMaint.forEach(m => { if (!m.vehicleId) m.vehicleId = this.state.vehicles[0].id; });
 
-        this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance); a.name = a.name || 'Conto'; });
-        this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes(t.type) ? t.type : 'EXPENSE'; });
+        this.state.accounts.forEach(a => { a.balance = cleanNumber(a.balance !== undefined ? a.balance : a.baseBalance); a.name = a.name || 'Conto'; });
+        this.state.transactions.forEach(t => { t.amount = cleanNumber(t.amount); t.date = t.date || today; t.desc = t.desc || 'Movimento'; t.category = t.category || t.cat || 'Generale'; t.type = ['EXPENSE', 'INCOME', 'TRANSFER'].includes((t.type || '').toUpperCase()) ? t.type.toUpperCase() : 'EXPENSE'; });
         this.state.calendarTasks.forEach(t => { if(!t.date || t.date.length < 10) t.date = today; t.title = t.title || 'Attività'; });
       },
 
@@ -1060,6 +1093,33 @@
       removePin() { this.state.pin = null; this.save(true); this.showToast('PIN Avvio Disattivato.'); },
       verifyPin() { const input = document.getElementById('loginPinInput')?.value; if (input === this.state.pin) { document.getElementById('lockScreen')?.classList.add('hidden'); this.switchModule('mod-dashboard'); } else { this.showToast('PIN Errato', 'danger'); document.getElementById('loginPinInput').value = ''; } },
       togglePrivacyMode() { document.body.classList.toggle('privacy-active'); const isActive = document.body.classList.contains('privacy-active'); this.setElHTML('privacyBtn', isActive ? '🔒' : '👁️'); },
+
+      // === ABITUDINI ===
+      addHabit() {
+        const name = prompt("Nuova abitudine giornaliera (es. Bere 2L acqua, Lettura):");
+        if (name && name.trim()) {
+          this.state.habits.push({ id: this.generateId(), name: name.trim(), streak: 0, lastDone: null });
+          this.save();
+        }
+      },
+      toggleHabit(id) {
+        const h = this.state.habits.find(x => x.id === id);
+        if (!h) return;
+        const todayStr = new Date().toISOString().slice(0, 10);
+        if (h.lastDone === todayStr) {
+          h.lastDone = null;
+          h.streak = Math.max(0, (h.streak || 1) - 1);
+        } else {
+          h.lastDone = todayStr;
+          h.streak = (h.streak || 0) + 1;
+          this.vibrate(25);
+        }
+        this.save();
+      },
+      deleteHabit(id) {
+        this.state.habits = this.state.habits.filter(x => x.id !== id);
+        this.save();
+      },
 
       // === DEEP VAULT (CASSAFORTE CIFRATA) ===
       cryptoObfuscate(text, pin) {
@@ -1327,7 +1387,7 @@
         e.preventDefault(); const t = document.getElementById('txType').value; const a = parseFloat(document.getElementById('txAmount').value); const srcId = document.getElementById('txAccount').value; const trgId = document.getElementById('txTargetAccount').value; 
         if (!srcId) return this.showToast('Seleziona un conto', 'danger'); const src = this.state.accounts.find(x => x.id === srcId); 
         let fileData = null; if (document.getElementById('txFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('txFile').files[0]); } catch (err) {} }
-        const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence').value, timestamp: new Date().toISOString(), fileData }; 
+        const tx = { id: this.generateId(), type: t, amount: a, accountId: srcId, desc: document.getElementById('txDesc').value, category: document.getElementById('txCategory').value || 'Generale', date: document.getElementById('txDate').value, recurrence: document.getElementById('txRecurrence')?.value || 'Singola', timestamp: new Date().toISOString(), fileData }; 
         if (src) { if (t === 'EXPENSE') src.balance -= a; else if (t === 'INCOME') src.balance += a; else if (t === 'TRANSFER') { src.balance -= a; const trg = this.state.accounts.find(x => x.id === trgId); if (trg) trg.balance += a; tx.targetAccountId = trgId; } } 
         this.state.transactions.push(tx); this.save(); e.target.reset(); document.getElementById('txDate').value = new Date().toISOString().slice(0, 10); this.populateAccountSelects(); this.renderFinance(); 
       },
@@ -1363,7 +1423,7 @@
       async addInventoryItem(e) { 
         e.preventDefault(); 
         let fileData = null; if (document.getElementById('invFile').files.length > 0) { try { fileData = await this.fileToBase64(document.getElementById('invFile').files[0]); } catch (err) {} }
-        this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation').value, notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString(), fileData }); 
+        this.state.inventory.push({ id: this.generateId(), type: document.getElementById('invType').value, name: document.getElementById('invName').value, category: document.getElementById('invCategory').value, subcategory: document.getElementById('invSubcategory').value, price: parseFloat(document.getElementById('invPrice').value) || 0, date: document.getElementById('invDate').value, warranty: document.getElementById('invWarranty').value, location: document.getElementById('invLocation')?.value || '', notes: document.getElementById('invNotes').value, addedAt: new Date().toISOString(), fileData }); 
         this.save(); e.target.reset(); this.renderInventory(); 
       },
       deleteInventoryItem(id) { if (confirm('Eliminare bene?')) { this.state.inventory = this.state.inventory.filter(i => i.id !== id); this.save(); this.renderInventory(); } },
@@ -1388,6 +1448,163 @@
       startScanner() { this.openModal('scannerModal'); if (!this.html5QrcodeScanner) this.html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } }, false); this.html5QrcodeScanner.render((decodedText) => { document.getElementById('invName').value = decodedText; this.vibrate(40); this.showToast('Codice acquisito!'); this.closeScanner(); }, () => {}); },
       closeScanner() { if (this.html5QrcodeScanner) this.html5QrcodeScanner.clear().catch(() => {}); this.closeModal('scannerModal'); },
 
+      // === IMPORTAZIONE BACKUP (JSON, ZIP & LEGACY V5) ===
+      async importBackupFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+          let jsonText = '';
+          if (file.name.toLowerCase().endsWith('.zip')) {
+            const zip = await JSZip.loadAsync(file);
+            const jsonFile = zip.file('database_lifeos_completo.json') || Object.values(zip.files).find(f => f.name.endsWith('.json') && !f.dir);
+            if (!jsonFile) throw new Error('Nessun file JSON trovato nello ZIP');
+            jsonText = await jsonFile.async('string');
+          } else {
+            jsonText = await file.text();
+          }
+
+          const rawData = JSON.parse(jsonText);
+          const importedState = this.convertLegacyBackup(rawData);
+
+          const currentFb = this.state.firebase;
+          const currentPin = this.state.pin;
+          const currentVaultPin = this.state.vaultPinHash;
+
+          this.state = {
+            ...this.state,
+            ...importedState,
+            firebase: importedState.firebase || currentFb,
+            pin: importedState.pin !== undefined ? importedState.pin : currentPin,
+            vaultPinHash: importedState.vaultPinHash || currentVaultPin
+          };
+
+          await this.save();
+          this.populateAccountSelects();
+          this.populateCategorySelects();
+          this.populateMaintenanceSelects();
+          this.populateFoodLibrarySelect();
+          this.renderActiveModule();
+          this.closeModal('settingsModal');
+          this.showToast('Backup ripristinato con successo! 🎉');
+        } catch (err) {
+          console.error('Errore importazione:', err);
+          this.showToast('Errore nel caricamento: ' + err.message, 'danger');
+        } finally {
+          event.target.value = '';
+        }
+      },
+
+      convertLegacyBackup(data) {
+        if (Array.isArray(data.inventory) && Array.isArray(data.transactions)) {
+          return data;
+        }
+        const converted = {};
+        if (Array.isArray(data.vault)) {
+          converted.inventory = data.vault.map(v => ({
+            id: v.id || this.generateId(),
+            type: v.months > 0 ? 'Garanzia' : 'Archivio',
+            name: v.title || 'Oggetto',
+            category: v.cat || 'Elettrodomestici',
+            subcategory: 'Generale',
+            price: parseFloat(v.price) || 0,
+            date: v.date || '',
+            warranty: '',
+            location: '',
+            notes: [v.serial, v.notes].filter(Boolean).join(' - '),
+            addedAt: new Date(v.updatedAt || Date.now()).toISOString(),
+            fileData: v.img || null
+          }));
+        }
+        if (Array.isArray(data.crmTasks)) {
+          converted.calendarTasks = data.crmTasks.map(t => ({
+            id: t.id || this.generateId(),
+            date: new Date(t.updatedAt || Date.now()).toISOString().slice(0, 10),
+            title: t.title || 'Attività',
+            type: 'Attività',
+            priority: t.pinned ? 'Alta' : 'Normale'
+          }));
+        }
+        if (Array.isArray(data.maint)) {
+          converted.maintenances = data.maint.map(m => ({
+            id: m.id || this.generateId(),
+            title: m.task || 'Manutenzione',
+            category: m.asset || 'Casa',
+            dueDate: m.date || new Date().toISOString().slice(0, 10),
+            cost: parseFloat(m.cost) || 0,
+            recurrence: m.nextMonths === 12 ? 'Annuale' : m.nextMonths === 6 ? 'Semestrale' : m.nextMonths === 1 ? 'Mensile' : 'Singola',
+            status: 'In attesa',
+            notes: m.parts || ''
+          }));
+        }
+        if (Array.isArray(data.accounts)) {
+          converted.accounts = data.accounts.map(a => ({
+            id: a.id || this.generateId(),
+            name: a.name || 'Conto',
+            type: a.type || 'Carta',
+            balance: parseFloat(a.balance !== undefined ? a.balance : a.baseBalance) || 0
+          }));
+        }
+        if (Array.isArray(data.financeTx)) {
+          converted.transactions = data.financeTx.map(tx => ({
+            id: tx.id || this.generateId(),
+            type: (tx.type || 'EXPENSE').toUpperCase(),
+            amount: parseFloat(tx.amount) || 0,
+            accountId: tx.accountId || '',
+            desc: tx.desc || 'Movimento',
+            category: tx.cat || 'Generale',
+            date: tx.date || new Date().toISOString().slice(0, 10),
+            recurrence: 'Singola',
+            timestamp: new Date(tx.updatedAt || Date.now()).toISOString()
+          }));
+        }
+        if (Array.isArray(data.subs)) converted.subs = data.subs;
+        if (Array.isArray(data.foodLibrary)) converted.foodLibrary = data.foodLibrary;
+        if (data.nutritionGoals) converted.nutritionGoals = data.nutritionGoals;
+        if (Array.isArray(data.foodLogs)) {
+          converted.healthNutrition = data.foodLogs.map(f => ({
+            id: f.id || this.generateId(),
+            meal: `${f.meal ? f.meal + ' - ' : ''}${f.name || 'Pasto'}${f.grams ? ' (' + f.grams + 'g)' : ''}`,
+            date: f.date || new Date().toISOString().slice(0, 10),
+            kcal: parseFloat(f.kcal) || 0,
+            prot: parseFloat(f.prot) || 0,
+            carbs: parseFloat(f.carb !== undefined ? f.carb : f.carbs) || 0,
+            fat: parseFloat(f.fat) || 0
+          }));
+        }
+        if (Array.isArray(data.weightLogs)) {
+          converted.healthWeight = data.weightLogs.map(w => ({
+            id: w.id || this.generateId(),
+            value: parseFloat(w.kg !== undefined ? w.kg : w.value) || 0,
+            date: w.date || new Date().toISOString().slice(0, 10)
+          }));
+        }
+        if (Array.isArray(data.medRecords)) {
+          converted.healthMedical = data.medRecords.map(m => ({
+            id: m.id || this.generateId(),
+            type: m.type || 'Visita Specialistica',
+            date: m.date || new Date().toISOString().slice(0, 10),
+            title: m.title || 'Record medico',
+            notes: [m.doctor ? 'Dott. ' + m.doctor : '', m.notes].filter(Boolean).join(' — '),
+            therapy: '',
+            fileData: m.fileData || null
+          }));
+        }
+        return converted;
+      },
+
+      async forceUpdateCache() {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (let r of regs) await r.unregister();
+        }
+        if (window.caches) {
+          const keys = await caches.keys();
+          for (let k of keys) await caches.delete(k);
+        }
+        this.showToast('Cache PWA svuotata! Riavvio in corso...');
+        setTimeout(() => location.reload(true), 1000);
+      },
+
       exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.state, null, 2)); const a = document.createElement('a'); a.href = dataStr; a.download = `LifeOS_v10_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); },
       exportCSV(type) { let csv = ''; if (type === 'finance') { csv = 'Data,Tipo,Importo,Conto,Categoria,Descrizione\n'; this.state.transactions.forEach(t => { const acc = this.state.accounts.find(a => a.id === t.accountId); csv += `${t.date},${t.type},${t.amount},"${acc ? acc.name : 'Conto'}","${t.category}","${t.desc}"\n`; }); } else { csv = 'Data,Pasto,Kcal,Proteine,Carboidrati,Grassi\n'; this.state.healthNutrition.forEach(n => { csv += `${n.date},"${n.meal}",${n.kcal},${n.prot},${n.carbs},${n.fat}\n`; }); } const a = document.createElement('a'); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `LifeOS_${type}.csv`; document.body.appendChild(a); a.click(); a.remove(); },
       async resetAllData() { if (confirm("Cancellare tutti i dati salvati sul dispositivo e disconnettere il Cloud?")) { await localforage.clear(); location.reload(); } },
@@ -1398,7 +1615,7 @@
         ['invDate', 'txDate', 'maintDueDate', 'nutriDate', 'weightDate', 'medDate', 'gMaintDate'].forEach(id => { const el = document.getElementById(id); if (el) el.value = todayStr; });
         this.populateAccountSelects(); this.populateCategorySelects(); this.populateMaintenanceSelects(); this.populateFoodLibrarySelect(); this.updateHapticButton();
         this.initGestures();
-        this.initFirebase(); // Inizializza Sync Cloud Invisibile
+        this.initFirebase();
         
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
         
@@ -1421,5 +1638,3 @@
   </script>
 </body>
 </html>
-LifeOS_v10_CloudSync.html
-Visualizzazione di LifeOS_v10_CloudSync.html.
