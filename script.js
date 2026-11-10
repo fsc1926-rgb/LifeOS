@@ -39,8 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof App !== 'undefined' && App.toast) {
       App.haptic(25); // Fa vibrare leggermente il telefono se supportato
       App.toast('Sbloccato con impronta!', 'success');
-    };
-
+    }
       } catch (errore) {
         console.error("Operazione annullata o fallita:", errore);
       }
