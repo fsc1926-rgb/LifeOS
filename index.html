@@ -210,7 +210,13 @@
       <h2>LifeOS Masterpiece</h2>
       <p class="stat-label">Inserisci il PIN per sbloccare l'ecosistema</p>
       <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
-      <button type="submit" class="btn btn-primary" style="width: 100%;">Sblocca</button>
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Sblocca</button>
+      
+      <!-- NUOVO PULSANTE IMPRONTA -->
+      <button type="button" id="login-biometrico" style="width: 100%; padding: 10px; font-size: 15px; background-color: transparent; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: inherit;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Accedi con Impronta
+      </button>
     </form>
   </div>
 
@@ -3527,5 +3533,6 @@
 
     window.addEventListener('DOMContentLoaded', () => App.init());
   </script>
+  <script src="script.js"></script>
 </body>
 </html>
