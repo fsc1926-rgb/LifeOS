@@ -32,7 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const credenziale = await navigator.credentials.create(opzioniDiSicurezza);
         console.log("Successo! Dati crittografati generati:", credenziale);
-        alert("Impronta riconosciuta!");
+        // Nasconde la schermata di blocco
+    document.getElementById('lockScreen').classList.add('hidden');
+    
+    // Sfrutta il sistema di notifiche nativo della tua app
+    if (typeof App !== 'undefined' && App.toast) {
+      App.haptic(25); // Fa vibrare leggermente il telefono se supportato
+      App.toast('Sbloccato con impronta!', 'success');
+    };
 
       } catch (errore) {
         console.error("Operazione annullata o fallita:", errore);
