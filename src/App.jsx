@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import LockScreen from './components/LockScreen';
 import Header from './components/Header';
@@ -8,7 +8,7 @@ import Wallet from './components/Wallet';
 import Garage from './components/Garage';
 import Hub from './components/Hub';
 
-// Importiamo il nostro nuovo motore dati!
+// Motore dati e crittografia
 import { DataService } from './dataService'; 
 
 function App() {
@@ -16,40 +16,62 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isFabOpen, setIsFabOpen] = useState(false);
   
-  // Variabili di stato per gestire i dati scaricati dal Cloud
+  // Stati dei dati e del caricamento
   const [appData, setAppData] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  
+  // Stato del Tema
+  const [theme, setTheme] = useState('dark');
 
-  // Questa funzione scatta quando il lucchetto viene sbloccato
+  // Applica il tema al documento HTML ogni volta che cambia
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // Funzione per alternare i temi
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  // Funzione universale per aggiornare i dati in memoria e salvare su Firebase
+  const updateData = async (newData) => {
+    setAppData(newData);
+    await DataService.saveData(newData);
+  };
+
+  // Logica di sblocco e caricamento dati
   const handleUnlock = async () => {
     console.log("Inizio sincronizzazione col Cloud...");
     
-    // 1. Scarica e decripta i dati
     const data = await DataService.loadData();
-    
-    // 2. Salva i dati nella memoria dell'app
     setAppData(data);
     
-    // 3. Togli il lucchetto e mostra l'app
+    // Se c'era un tema salvato nei dati, lo applichiamo
+    if (data?.settings?.theme) {
+      setTheme(data.settings.theme);
+    }
+    
     setIsLocked(false);
   };
 
-  // Funzione di test per salvare dati sul Cloud
+  // Funzione di test per salvare dati sul Cloud tramite il pulsante fluttuante
   const handleTestSave = async () => {
     setIsSyncing(true);
-    // Creiamo una copia dei dati attuali per modificarli
     const newData = { ...appData };
-    // Simuliamo l'aggiunta di 10€ al saldo
-    newData.wallet.totalBalance += 10; 
     
-    // Aggiorniamo la grafica
+    // Simuliamo l'aggiunta di 10€ al Conto Principale
+    if (newData.accounts && newData.accounts.length > 0) {
+      newData.accounts[0].balance += 10;
+    }
+    // Salviamo anche il tema attuale
+    newData.settings.theme = theme;
+    
     setAppData(newData);
-    // Salviamo sul database criptando tutto
     await DataService.saveData(newData);
     
     setIsSyncing(false);
     setIsFabOpen(false); // Chiude il menu
-    alert("Dati salvati e criptati su Firebase! Controlla la console.");
+    alert("Dati salvati! Il saldo del conto principale è aumentato.");
   };
 
   return (
@@ -61,17 +83,20 @@ function App() {
           <Header />
           
           <div className="main-container">
-            {/* Ora possiamo passare i dati scaricati ai nostri componenti! */}
-            {activeTab === 'dashboard' && <Dashboard data={appData} />}
-            {activeTab === 'wallet' && <Wallet data={appData} />}
-            {activeTab === 'garage' && <Garage data={appData} />}
-            {activeTab === 'hub' && <Hub data={appData} />}
+            {/* Passiamo i dati e la funzione di aggiornamento ai moduli */}
+            {activeTab === 'dashboard' && <Dashboard data={appData} updateData={updateData} />}
+            {activeTab === 'wallet' && <Wallet data={appData} updateData={updateData} />}
+            {activeTab === 'garage' && <Garage data={appData} updateData={updateData} />}
+            
+            {/* Passiamo la gestione del tema all'Hub */}
+            {activeTab === 'hub' && <Hub theme={theme} toggleTheme={toggleTheme} data={appData} updateData={updateData} />}
           </div>
 
+          {/* Pulsante Fluttuante (FAB) */}
           <div className="fab-container">
             <div className={`fab-menu ${isFabOpen ? 'open' : ''}`}>
               <div className="fab-item" onClick={handleTestSave}>
-                {isSyncing ? "⏳ Sincronizzazione..." : "💾 TEST Salvataggio Cloud"}
+                {isSyncing ? "⏳ Sincronizzazione..." : "💾 TEST Salvataggio"}
               </div>
               <div className="fab-item">⛽ Rifornimento</div>
             </div>
