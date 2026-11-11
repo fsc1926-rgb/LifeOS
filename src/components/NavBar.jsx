@@ -2,32 +2,36 @@ import React from 'react';
 
 function NavBar({ activeTab, setActiveTab }) {
   return (
-    <div className="nav-tabs">
+    <nav className="nav-tabs">
       <button 
-        className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`} 
+        className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
         onClick={() => setActiveTab('dashboard')}
       >
-        📊 Dashboard
+        🏠 Dashboard
       </button>
+      
+      {/* Sostituito Garage con Calendar */}
       <button 
-        className={`nav-tab ${activeTab === 'wallet' ? 'active' : ''}`} 
+        className={`nav-tab ${activeTab === 'calendar' ? 'active' : ''}`}
+        onClick={() => setActiveTab('calendar')}
+      >
+        📅 Agenda
+      </button>
+      
+      <button 
+        className={`nav-tab ${activeTab === 'wallet' ? 'active' : ''}`}
         onClick={() => setActiveTab('wallet')}
       >
-        💳 Wallet
+        💳 Finanze
       </button>
+      
       <button 
-        className={`nav-tab ${activeTab === 'garage' ? 'active' : ''}`} 
-        onClick={() => setActiveTab('garage')}
-      >
-        🚘 Garage
-      </button>
-      <button 
-        className={`nav-tab ${activeTab === 'hub' ? 'active' : ''}`} 
+        className={`nav-tab ${activeTab === 'hub' ? 'active' : ''}`}
         onClick={() => setActiveTab('hub')}
       >
-        🧩 Hub
+        ⚡ Hub Extra
       </button>
-    </div>
+    </nav>
   );
 }
 
