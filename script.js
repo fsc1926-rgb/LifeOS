@@ -10,46 +10,74 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const opzioniDiSicurezza = {
-          publicKey: {
-            challenge: new Uint8Array([11, 22, 33, 44, 55, 66, 77, 88]),
-            rp: { name: "LifeOS PWA" },
-            user: {
-              id: new Uint8Array([1, 2, 3, 4]),
-              name: "admin@lifeos.com",
-              displayName: "Master User"
-            },
-            pubKeyCredParams: [
-              { type: "public-key", alg: -7 },
-              { type: "public-key", alg: -257 }
-            ],
-            authenticatorSelection: { authenticatorAttachment: "platform" }
+        // Controlliamo se ci sono già impronte salvate nel database dell'app
+        const passkeysSalvate = App.data.settings.passkeys || [];
+
+        if (passkeysSalvate.length > 0) {
+          // ==========================================
+          // FASE 2: LOGIN CON IMPRONTA GIÀ SALVATA
+          // ==========================================
+          const opzioniDiLogin = {
+            publicKey: {
+              challenge: new Uint8Array([11, 22, 33, 44, 55, 66, 77, 88]),
+              allowCredentials: passkeysSalvate.map(idB64 => ({
+                id: App.b64ToBytes(idB64), // Decodifica l'ID salvato
+                type: "public-key"
+              })),
+              userVerification: "required"
+            }
+          };
+
+          // navigator.credentials.get cerca una chiave esistente
+          const credenziale = await navigator.credentials.get(opzioniDiLogin);
+          
+          // Se arriviamo qui, il sensore ha confermato l'identità!
+          document.getElementById('lockScreen').classList.add('hidden');
+          if (typeof App !== 'undefined' && App.toast) {
+            App.haptic(25);
+            App.toast('Bentornato! Sblocco biometrico effettuato 🚀', 'success');
           }
-        };
 
-        // 1. Genera l'impronta tramite il sistema operativo
-        const credenziale = await navigator.credentials.create(opzioniDiSicurezza);
-        
-        // 2. Converte l'ID dell'impronta (ArrayBuffer) in testo Base64 usando la tua utility
-        const passkeyId = App.bufToB64(credenziale.rawId);
-        
-        // 3. Salva la chiave nelle impostazioni della TUA app e invia a Firebase
-        if (!App.data.settings.passkeys) App.data.settings.passkeys = [];
-        // Salviamo la nuova chiave nell'elenco (così puoi avere più dispositivi/impronte)
-        App.data.settings.passkeys.push(passkeyId);
-        App.saveData(); // Magia: salva in locale e innesca il push su Firestore!
+        } else {
+          // ==========================================
+          // FASE 1: PRIMA REGISTRAZIONE DELL'IMPRONTA
+          // ==========================================
+          const opzioniDiSicurezza = {
+            publicKey: {
+              challenge: new Uint8Array([11, 22, 33, 44, 55, 66, 77, 88]),
+              rp: { name: "LifeOS PWA" },
+              user: {
+                id: new Uint8Array([1, 2, 3, 4]),
+                name: "admin@lifeos.com",
+                displayName: "Master User"
+              },
+              pubKeyCredParams: [
+                { type: "public-key", alg: -7 },
+                { type: "public-key", alg: -257 }
+              ],
+              authenticatorSelection: { authenticatorAttachment: "platform" }
+            }
+          };
 
-        // 4. Sblocca l'interfaccia utente
-        document.getElementById('lockScreen').classList.add('hidden');
-        if (typeof App !== 'undefined' && App.toast) {
-          App.haptic(25);
-          App.toast('Nuova impronta salvata nel Cloud!', 'success');
+          // navigator.credentials.create genera la chiave
+          const credenziale = await navigator.credentials.create(opzioniDiSicurezza);
+          const passkeyId = App.bufToB64(credenziale.rawId);
+          
+          // Salva la firma nell'ecosistema
+          App.data.settings.passkeys = [passkeyId];
+          App.saveData();
+
+          document.getElementById('lockScreen').classList.add('hidden');
+          if (typeof App !== 'undefined' && App.toast) {
+            App.haptic(25);
+            App.toast('Nuova impronta salvata nel Cloud!', 'success');
+          }
         }
 
       } catch (errore) {
         console.error("Operazione annullata o fallita:", errore);
         if (typeof App !== 'undefined' && App.toast) {
-          App.toast('Registrazione impronta annullata', 'danger');
+          App.toast('Riconoscimento fallito o annullato', 'danger');
         }
       }
     });
