@@ -957,8 +957,7 @@
         this.applyTheme(this.data.settings.theme || 'dark');
         this.updateHapticUI();
 
-        if (this.data.settings.pin) this.showLock();
-        else document.getElementById('lockScreen').classList.add('hidden');
+        this.showLock();
 
         if (typeof Chart !== 'undefined') Chart.defaults.font.family = 'Inter, sans-serif';
 
@@ -1350,7 +1349,7 @@
             }
           } else if (this.state.hiddenAt && Date.now() - this.state.hiddenAt > 60000) {
             if (this.state.vaultUnlocked) this.lockVault(true);
-            if (this.data.settings.pin) this.showLock();
+            this.showLock();
           }
           if (!document.hidden && this.state.pomoRunning) this.pomoTick();
         });
