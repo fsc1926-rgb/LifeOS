@@ -6,6 +6,7 @@ import { db } from './firebase';
 import ErrorBoundary from './components/ErrorBoundary';
 import LockScreen from './components/LockScreen';
 import SearchModal from './components/SearchModal';
+import SettingsModal from './components/SettingsModal';
 import SmartFAB from './components/SmartFAB';
 import AnimatedPage from './components/AnimatedPage';
 
@@ -57,6 +58,7 @@ function App() {
   const [isLocked, setIsLocked] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [theme, setTheme] = useState('oled-black');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [appData, setAppData] = useState(DEFAULT_DATA);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -157,7 +159,7 @@ function App() {
       case 'dashboard': return <Dashboard {...commonProps} />;
       case 'calendar':  return <Calendar {...commonProps} />;
       case 'wallet':    return <Wallet {...commonProps} />;
-      case 'hub':       return <Hub theme={theme} setTheme={changeTheme} toggleTheme={toggleTheme} {...commonProps} />;
+      case 'hub':       return <Hub theme={theme} setTheme={changeTheme} toggleTheme={toggleTheme} onOpenSettings={() => setIsSettingsOpen(true)} {...commonProps} />;
       case 'garage':    return <Garage {...commonProps} />;
       case 'maintenance': return <Maintenance {...commonProps} />;
       case 'inventory': return <Inventory {...commonProps} />;
@@ -182,6 +184,15 @@ function App() {
               <div className="brand-logo">L</div>
               LifeOS
             </div>
+            <button
+              className="btn btn-sm btn-secondary-custom"
+              onClick={() => setIsSettingsOpen(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', borderRadius: '10px' }}
+              title="Impostazioni Generali"
+            >
+              <span>⚙️</span>
+              <span>Impostazioni</span>
+            </button>
           </div>
         </header>
 
@@ -200,6 +211,16 @@ function App() {
 
         {/* RICERCA GLOBALE (Ctrl+K) */}
         <SearchModal data={appData} setActiveTab={setActiveTab} />
+
+        {/* MODALE IMPOSTAZIONI GENERALI (Temi, Import/Export JSON-CSV, Sync) */}
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          theme={theme}
+          setTheme={changeTheme}
+          data={appData}
+          updateData={updateData}
+        />
 
         {/* FAB AZIONI RAPIDE */}
         <SmartFAB setActiveTab={setActiveTab} />
