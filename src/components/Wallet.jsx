@@ -109,7 +109,7 @@ function Wallet({ data, updateData }) {
           <div style={{ fontSize: '2.2rem', fontWeight: 900, margin: '0.5rem 0' }}>{formatCurrency(totalBalance)}</div>
         </div>
         {accounts.map(acc => (
-          <div key={acc.id} onClick={() => setSelectedAccFilter(acc.id)} style={{ minWidth: '220px', padding: '1.5rem', borderRadius: '20px', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', color: 'white', flexShrink: 0, cursor: 'pointer', border: selectedAccFilter === acc.id ? '2px solid white' : '2px solid transparent', opacity: selectedAccFilter !== null && selectedAccFilter !== acc.id ? 0.6 : 1 }}>
+          <div key={acc.id} onClick={() => setSelectedAccFilter(acc.id)} style={{ minWidth: '220px', padding: '1.5rem', borderRadius: '20px', background: 'var(--accent-gradient)', color: 'white', flexShrink: 0, cursor: 'pointer', border: selectedAccFilter === acc.id ? '2px solid white' : '2px solid transparent', opacity: selectedAccFilter !== null && selectedAccFilter !== acc.id ? 0.6 : 1, boxShadow: 'var(--shadow-sm)' }}>
             <div style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>{acc.name}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 900, marginTop: '1.5rem' }}>{formatCurrency(acc.balance)}</div>
           </div>
@@ -124,7 +124,7 @@ function Wallet({ data, updateData }) {
           <form onSubmit={handleAddAccount} className="bento-card" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', padding: '1rem' }}>
             <input type="text" className="input" style={{ flex: '1 1 100px' }} placeholder="Nome Conto" value={newAccName} onChange={e=>setNewAccName(e.target.value)} required />
             <input type="number" className="input" style={{ flex: '1 1 100px' }} step="0.01" placeholder="Saldo Iniziale €" value={newAccBal} onChange={e=>setNewAccBal(e.target.value)} />
-            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #8b5cf6, #ec4899)', border: 'none' }}>Salva</button>
+            <button type="submit" className="btn btn-primary">Salva</button>
             <button type="button" className="btn" onClick={() => setShowAccForm(false)}>Annulla</button>
           </form>
         )}
@@ -156,7 +156,7 @@ function Wallet({ data, updateData }) {
             </select>
             
             <input type="text" className="input" placeholder="Causale (Facoltativa)" value={desc} onChange={e => setDesc(e.target.value)} style={{ marginBottom: '1rem' }} />
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', background: 'linear-gradient(90deg, #8b5cf6, #3b82f6)', border: 'none', padding: '0.75rem', fontSize: '1rem' }}>Registra Movimento</button>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.75rem', fontSize: '1rem' }}>Registra Movimento</button>
           </form>
         </div>
 

@@ -25,7 +25,7 @@ const LOCAL_STORAGE_KEY = 'LIFEOS_DATA_BACKUP';
 
 const DEFAULT_DATA = {
   settings: {
-    theme: 'dark',
+    theme: 'oled-black',
     vaultCheck: null,
     vaultSalt: null,
     walletCategories: ['Rifornimento', 'Spesa', 'Farmaci', 'Svago', 'Stipendio/Entrate', 'Bollette'],
@@ -56,13 +56,16 @@ const LoadingSpinner = () => (
 function App() {
   const [isLocked, setIsLocked] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('oled-black');
   const [appData, setAppData] = useState(DEFAULT_DATA);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    document.body.className = theme === 'light' ? 'light-theme' : 'dark-theme';
+    const activeTheme = (theme === 'dark' || theme === 'oled' || !theme) 
+      ? 'oled-black' 
+      : (theme === 'light' ? 'light-blue' : theme);
+    document.documentElement.setAttribute('data-theme', activeTheme);
+    document.body.className = activeTheme.startsWith('light') ? 'light-theme' : 'dark-theme';
   }, [theme]);
 
   useEffect(() => {
@@ -127,13 +130,17 @@ function App() {
     }
   };
 
-  const toggleTheme = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
+  const changeTheme = (newTheme) => {
+    setTheme(newTheme);
     updateData({
       ...appData,
-      settings: { ...(appData.settings || {}), theme: nextTheme }
+      settings: { ...(appData.settings || {}), theme: newTheme }
     });
+  };
+
+  const toggleTheme = () => {
+    const nextTheme = theme.startsWith('light') ? 'oled-black' : 'light-blue';
+    changeTheme(nextTheme);
   };
 
   const isHubSection = ['hub', 'garage', 'maintenance', 'inventory', 'health', 'vault'].includes(activeTab);
@@ -150,7 +157,7 @@ function App() {
       case 'dashboard': return <Dashboard {...commonProps} />;
       case 'calendar':  return <Calendar {...commonProps} />;
       case 'wallet':    return <Wallet {...commonProps} />;
-      case 'hub':       return <Hub theme={theme} toggleTheme={toggleTheme} {...commonProps} />;
+      case 'hub':       return <Hub theme={theme} setTheme={changeTheme} toggleTheme={toggleTheme} {...commonProps} />;
       case 'garage':    return <Garage {...commonProps} />;
       case 'maintenance': return <Maintenance {...commonProps} />;
       case 'inventory': return <Inventory {...commonProps} />;
