@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/it';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import SwipeableRow from './SwipeableRow';
+import { auth } from '../firebase';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 moment.locale('it');
 const localizer = momentLocalizer(moment);
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
+const SCOPES = 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.readonly';
 
 function Calendar({ data, updateData, setActiveTab }) {
   if (!data) return <div>Caricamento...</div>;
@@ -23,32 +25,139 @@ function Calendar({ data, updateData, setActiveTab }) {
   const [isGoogleSynced, setIsGoogleSynced] = useState(false);
   const [googleEvents, setGoogleEvents] = useState([]);
   const [googleToken, setGoogleToken] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState('');
 
   const uid = () => 'tsk_' + Date.now().toString(36);
 
-  const handleGoogleSync = () => {
-    if (!window.google) return alert("Libreria Google in caricamento, attendi qualche secondo o ricarica la pagina.");
-    
-    const tokenClient = window.google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: (tokenResponse) => {
-        if (tokenResponse && tokenResponse.access_token) {
-          setGoogleToken(tokenResponse.access_token);
-          setIsGoogleSynced(true);
-          fetchGoogleEvents(tokenResponse.access_token);
+  // Ripristina eventi ed eventuale token salvato in locale al caricamento
+  useEffect(() => {
+    // 1. Carica eventi Google salvati in cache
+    try {
+      const cached = localStorage.getItem('lifeos_gcal_events');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          const formatted = parsed.map(item => ({
+            ...item,
+            start: new Date(item.start),
+            end: new Date(item.end)
+          }));
+          setGoogleEvents(formatted);
         }
-      },
-    });
-    tokenClient.requestAccessToken();
+      }
+    } catch (e) {
+      console.warn("Impossibile caricare eventi gcal in cache:", e);
+    }
+
+    // 2. Carica token di sessione se ancora valido
+    const savedToken = sessionStorage.getItem('lifeos_gcal_token') || localStorage.getItem('lifeos_gcal_token');
+    if (savedToken) {
+      setGoogleToken(savedToken);
+      setIsGoogleSynced(true);
+      fetchGoogleEvents(savedToken, false);
+    }
+  }, []);
+
+  // ----------------------------------------------------
+  // SINCRONIZZAZIONE GOOGLE CALENDAR (Dual-Engine: Firebase Auth & GSI)
+  // ----------------------------------------------------
+  const handleGoogleSync = async () => {
+    setIsSyncing(true);
+    setSyncStatusMsg('Connessione a Google Calendar in corso...');
+
+    try {
+      // METODO 1: Firebase GoogleAuthProvider con scope Calendar
+      const provider = new GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/calendar.events');
+      provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const accessToken = credential?.accessToken;
+
+      if (accessToken) {
+        setGoogleToken(accessToken);
+        sessionStorage.setItem('lifeos_gcal_token', accessToken);
+        localStorage.setItem('lifeos_gcal_token', accessToken);
+        setIsGoogleSynced(true);
+        await fetchGoogleEvents(accessToken, true);
+        return;
+      }
+      throw new Error("Token OAuth Google non ricevuto da Firebase.");
+    } catch (firebaseErr) {
+      console.warn("Metodo Firebase non riuscito, provo Google Identity Services:", firebaseErr);
+
+      // METODO 2: Google Identity Services (GSI)
+      if (window.google?.accounts?.oauth2 && CLIENT_ID) {
+        try {
+          const tokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: async (tokenResponse) => {
+              if (tokenResponse && tokenResponse.access_token) {
+                const token = tokenResponse.access_token;
+                setGoogleToken(token);
+                sessionStorage.setItem('lifeos_gcal_token', token);
+                localStorage.setItem('lifeos_gcal_token', token);
+                setIsGoogleSynced(true);
+                await fetchGoogleEvents(token, true);
+              } else if (tokenResponse.error) {
+                alert(`Errore autorizzazione Google: ${tokenResponse.error_description || tokenResponse.error}`);
+              }
+              setIsSyncing(false);
+            },
+            error_callback: (err) => {
+              console.error("GSI Error:", err);
+              alert("Errore Google Identity: assicurati che i popup non siano bloccati.");
+              setIsSyncing(false);
+            }
+          });
+          tokenClient.requestAccessToken();
+          return;
+        } catch (gsiErr) {
+          console.error("Errore GSI:", gsiErr);
+        }
+      }
+
+      alert(`Connessione Google fallita: ${firebaseErr.message || firebaseErr.code}`);
+      setIsSyncing(false);
+    }
   };
 
-  const fetchGoogleEvents = async (token) => {
+  const handleDisconnectGoogle = () => {
+    if (window.confirm("Disconnettere Google Calendar da LifeOS?")) {
+      setGoogleToken(null);
+      setIsGoogleSynced(false);
+      setGoogleEvents([]);
+      sessionStorage.removeItem('lifeos_gcal_token');
+      localStorage.removeItem('lifeos_gcal_token');
+      localStorage.removeItem('lifeos_gcal_events');
+      setSyncStatusMsg('');
+    }
+  };
+
+  const fetchGoogleEvents = async (token, showAlert = false) => {
     try {
-      const timeMin = new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString();
-      const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin}&singleEvents=true&orderBy=startTime`, {
+      const timeMin = new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString();
+      const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin}&singleEvents=true&orderBy=startTime&maxResults=250`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          // Token scaduto
+          sessionStorage.removeItem('lifeos_gcal_token');
+          localStorage.removeItem('lifeos_gcal_token');
+          setIsGoogleSynced(false);
+          setGoogleToken(null);
+          if (showAlert) alert("Sessione Google scaduta. Clicca di nuovo per riconnettere.");
+          return;
+        }
+        throw new Error(`Errore API Google (${res.status})`);
+      }
+
       const result = await res.json();
       
       if (result.items) {
@@ -60,10 +169,17 @@ function Calendar({ data, updateData, setActiveTab }) {
           allDay: !item.start.dateTime,
           isGoogle: true
         }));
+
         setGoogleEvents(formatted);
+        localStorage.setItem('lifeos_gcal_events', JSON.stringify(formatted));
+        setSyncStatusMsg(`Sincronizzati ${formatted.length} eventi da Google Calendar`);
+        if (showAlert) alert(`✅ Sincronizzazione completata! ${formatted.length} eventi importati da Google Calendar.`);
       }
     } catch (err) {
-      alert("Errore nel caricamento del calendario Google.");
+      console.error("Errore fetch Google Calendar:", err);
+      if (showAlert) alert("Errore durante il recupero degli eventi da Google Calendar.");
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -84,7 +200,7 @@ function Calendar({ data, updateData, setActiveTab }) {
         },
         body: JSON.stringify(event)
       });
-      fetchGoogleEvents(googleToken);
+      fetchGoogleEvents(googleToken, false);
     } catch (e) {
       console.error("Errore salvataggio su Google", e);
     }
@@ -130,7 +246,7 @@ function Calendar({ data, updateData, setActiveTab }) {
   return (
     <div className="module-section active">
       
-      {/* 🎨 STILI CSS PER TRASFORMARE IL CALENDARIO IN DARK MODE 🎨 */}
+      {/* 🎨 STILI CSS PER TRASFORMARE IL CALENDARIO IN DARK / HIGH-CONTRAST MODE 🎨 */}
       <style>{`
         .rbc-calendar { color: var(--text-primary); font-family: inherit; }
         .rbc-month-view { border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-primary); overflow: hidden; }
@@ -140,17 +256,12 @@ function Calendar({ data, updateData, setActiveTab }) {
         .rbc-day-bg + .rbc-day-bg { border-left: 1px solid var(--border-color) !important; }
         .rbc-month-row + .rbc-month-row { border-top: 1px solid var(--border-color) !important; }
         
-        /* Sistema i riquadri bianchi dei mesi precedenti/successivi */
         .rbc-off-range-bg { background-color: var(--bg-secondary) !important; opacity: 0.6; }
+        .rbc-today { background-color: var(--category-chip-bg) !important; border: 1px solid var(--border-highlight) !important; }
         
-        /* Colora il giorno di oggi con un tocco di viola */
-        .rbc-today { background-color: rgba(139, 92, 246, 0.15) !important; }
-        
-        /* Stile per i numeri dei giorni */
         .rbc-date-cell { padding: 4px 8px; font-weight: 600; font-size: 0.9rem; }
         .rbc-off-range { color: var(--text-muted); }
         
-        /* Sistema i bottoni in alto (Oggi, Indietro, Avanti, Mese, Agenda) */
         .rbc-toolbar button { 
           color: var(--text-primary); 
           background: var(--bg-secondary); 
@@ -162,42 +273,76 @@ function Calendar({ data, updateData, setActiveTab }) {
           transition: all 0.2s ease;
           font-weight: 600;
         }
-        .rbc-toolbar button:hover { background: rgba(139, 92, 246, 0.2); }
+        .rbc-toolbar button:hover { background: var(--btn-sub-hover); }
         .rbc-toolbar button.rbc-active { 
-          background: var(--accent-primary); 
+          background: var(--accent-gradient); 
           color: white; 
-          border-color: var(--accent-primary); 
-          box-shadow: none;
+          border-color: transparent; 
+          box-shadow: 0 2px 8px var(--accent-glow);
         }
         .rbc-toolbar .rbc-toolbar-label { font-weight: 800; font-size: 1.2rem; text-transform: capitalize; }
       `}</style>
 
       <div className="card-header" style={{ marginBottom: '1rem' }}>
         <div className="card-title">📅 Agenda & Calendario</div>
-        <button className="btn btn-sm" onClick={() => setActiveTab('hub')}>← Hub</button>
+        <button className="btn btn-sm btn-secondary-custom" onClick={() => setActiveTab('hub')}>← Hub</button>
       </div>
 
       <div className="bento-grid">
         
         <div className="bento-card col-span-12" style={{ background: 'var(--bg-secondary)', padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div className="card-title" style={{ fontSize: '1rem' }}>🗓️ Il Tuo Mese</div>
-            <button 
-              className="btn btn-sm" 
-              onClick={handleGoogleSync}
-              style={{ 
-                background: isGoogleSynced ? 'var(--success)' : 'white', 
-                color: isGoogleSynced ? 'white' : '#0f172a', 
-                fontWeight: 700,
-                border: 'none',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-              }}
-            >
-              {isGoogleSynced ? '🔄 Google Calendar Connesso' : '🔗 Sincronizza Google Calendar'}
-            </button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.65rem' }}>
+            <div>
+              <div className="card-title" style={{ fontSize: '1.05rem' }}>🗓️ Il Tuo Mese</div>
+              {syncStatusMsg && (
+                <div style={{ fontSize: '0.75rem', color: 'var(--success)', fontWeight: 600, marginTop: '2px' }}>
+                  {syncStatusMsg}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <button 
+                type="button"
+                className="btn btn-sm" 
+                onClick={handleGoogleSync}
+                disabled={isSyncing}
+                style={{ 
+                  background: isGoogleSynced ? 'var(--success)' : '#ffffff', 
+                  color: isGoogleSynced ? '#ffffff' : '#0f172a', 
+                  fontWeight: 700,
+                  border: isGoogleSynced ? 'none' : '1px solid #cbd5e1',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                <span>{isSyncing ? '⏳' : isGoogleSynced ? '🔄' : '🔗'}</span>
+                <span>
+                  {isSyncing 
+                    ? 'Connessione...' 
+                    : isGoogleSynced 
+                    ? 'Google Calendar Sincronizzato' 
+                    : 'Sincronizza Google Calendar'}
+                </span>
+              </button>
+
+              {isGoogleSynced && (
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={handleDisconnectGoogle}
+                  style={{ padding: '0.4rem 0.6rem' }}
+                  title="Disconnetti Google Calendar"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
           
-          <div style={{ height: '450px', background: 'var(--bg-primary)', borderRadius: '12px', padding: '1rem' }}>
+          <div style={{ height: '480px', background: 'var(--bg-primary)', borderRadius: '14px', padding: '1rem', border: '1px solid var(--border-color)' }}>
             <BigCalendar
               localizer={localizer}
               events={[...localEvents, ...googleEvents]}
@@ -205,10 +350,17 @@ function Calendar({ data, updateData, setActiveTab }) {
               endAccessor="end"
               views={['month', 'agenda']}
               defaultView="month"
-              messages={{ next: "▶", previous: "◀", today: "Oggi", month: "Mese", agenda: "Agenda", noEventsInRange: "Nessun evento in questo periodo." }}
+              messages={{ 
+                next: "▶", 
+                previous: "◀", 
+                today: "Oggi", 
+                month: "Mese", 
+                agenda: "Agenda", 
+                noEventsInRange: "Nessun evento in questo periodo." 
+              }}
               eventPropGetter={(event) => ({
                 style: {
-                  backgroundColor: event.isGoogle ? '#4285F4' : (event.resource?.status === 'done' ? 'var(--success)' : 'var(--accent-primary)'),
+                  backgroundColor: event.isGoogle ? '#2563eb' : (event.resource?.status === 'done' ? 'var(--success)' : 'var(--accent-primary)'),
                   borderRadius: '6px',
                   opacity: 0.95,
                   color: 'white',
@@ -224,18 +376,46 @@ function Calendar({ data, updateData, setActiveTab }) {
 
         <div className="bento-card col-span-12">
           <form onSubmit={handleAdd} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-            <input type="text" className="input" style={{ flex: '1 1 100%' }} placeholder="Nuovo Task o Appuntamento..." value={title} onChange={e => setTitle(e.target.value)} required />
-            <input type="date" className="input" style={{ flex: 1 }} value={date} onChange={e => setDate(e.target.value)} required />
-            <select className="input" style={{ flex: 1 }} value={category} onChange={e => setCategory(e.target.value)}>
+            <input 
+              type="text" 
+              className="input" 
+              style={{ flex: '1 1 100%' }} 
+              placeholder="Nuovo Task o Appuntamento..." 
+              value={title} 
+              onChange={e => setTitle(e.target.value)} 
+              required 
+            />
+            <input 
+              type="date" 
+              className="input" 
+              style={{ flex: 1 }} 
+              value={date} 
+              onChange={e => setDate(e.target.value)} 
+              required 
+            />
+            <select 
+              className="input" 
+              style={{ flex: 1 }} 
+              value={category} 
+              onChange={e => setCategory(e.target.value)}
+            >
               <option value="Lavoro">Lavoro</option>
               <option value="Personale">Personale</option>
               <option value="Casa">Casa</option>
               <option value="Compleanno">Compleanno</option>
             </select>
-            <button type="submit" className="btn btn-primary" style={{ background: 'var(--accent-primary)', border: 'none', padding: '0 1.5rem', fontSize: '1.2rem' }}>+</button>
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              style={{ padding: '0 1.5rem', fontSize: '1.2rem' }}
+            >
+              +
+            </button>
           </form>
 
-          <div className="card-title" style={{ fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-muted)' }}>DA FARE (SCORRI PER COMPLETARE)</div>
+          <div className="card-title" style={{ fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-muted)' }}>
+            DA FARE (SCORRI PER COMPLETARE)
+          </div>
           <div className="item-list" style={{ maxHeight: '40vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
             {filteredTasks.length === 0 ? (
               <div className="stat-label" style={{ textAlign: 'center', padding: '1rem' }}>Nessun task in agenda.</div>
