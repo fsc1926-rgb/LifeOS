@@ -1,60 +1,55 @@
 import React, { useState } from 'react';
-
-const CATEGORIES = {
-  'Elettronica': ['Smartphone & Tablet', 'PC & Accessori', 'Audio & TV', 'Fotografia', 'Domotica'],
-  'Casa & Arredo': ['Elettrodomestici', 'Mobili', 'Cucina', 'Illuminazione', 'Fai da te'],
-  'Abbigliamento': ['Giacche & Cappotti', 'Scarpe', 'Accessori & Orologi', 'Sportivo'],
-  'Documenti & Valori': ['Contratti', 'Certificati', 'Gioielli', 'Collezionismo'],
-  'Altro': ['Generico', 'Sport & Tempo Libero', 'Viaggi']
-};
+import SwipeableRow from './SwipeableRow';
 
 function Inventory({ data, updateData, setActiveTab }) {
   if (!data) return <div>Caricamento...</div>;
 
   const inventory = data.inventory || [];
-  
-  const [tab, setTab] = useState('archivio');
-  
-  // Form State
-  const [type, setType] = useState('Archivio');
+  const customCategories = data.settings?.inventoryCategories || ['Elettronica', 'Elettrodomestici', 'Mobili', 'Hobby/Sport', 'Documenti', 'Altro'];
+
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('Elettronica');
-  const [subcategory, setSubcategory] = useState(CATEGORIES['Elettronica'][0]);
-  const [buyDate, setBuyDate] = useState(new Date().toISOString().split('T')[0]);
-  const [warrantyDate, setWarrantyDate] = useState('');
+  const [category, setCategory] = useState(customCategories[0]);
+  const [purchaseDate, setPurchaseDate] = useState('');
+  const [warrantyMonths, setWarrantyMonths] = useState(24);
   const [price, setPrice] = useState('');
   const [notes, setNotes] = useState('');
+  const [search, setSearch] = useState('');
 
-  const uid = () => 'inv_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  const formatCurrency = (val) => (parseFloat(val) || 0).toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
+  const uid = () => 'inv_' + Date.now().toString(36);
 
   const handleCategoryChange = (e) => {
-    const cat = e.target.value;
-    setCategory(cat);
-    setSubcategory(CATEGORIES[cat][0]);
+    const val = e.target.value;
+    if (val === 'NEW') {
+      const newCat = window.prompt('Inserisci il nome della nuova categoria di oggetti:');
+      if (newCat && newCat.trim() !== '') {
+        const newData = { ...data };
+        if (!newData.settings) newData.settings = {};
+        newData.settings.inventoryCategories = [...customCategories, newCat.trim()];
+        updateData(newData);
+        setCategory(newCat.trim());
+      }
+    } else {
+      setCategory(val);
+    }
   };
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!name.trim()) return;
-
-    if (warrantyDate && buyDate && warrantyDate < buyDate) {
-      return alert('La fine garanzia è precedente alla data di acquisto!');
-    }
-
+    if (!name) return;
     const newData = { ...data };
+    if (!newData.inventory) newData.inventory = [];
+    
     newData.inventory.unshift({
-      id: uid(), type, name, category, subcategory, 
-      date: buyDate, warranty: warrantyDate, 
-      price: parseFloat(price) || 0, notes, photo: null
+      id: uid(),
+      name,
+      category,
+      purchaseDate,
+      warrantyMonths: parseInt(warrantyMonths) || 0,
+      price: parseFloat(price) || 0,
+      notes
     });
-
     updateData(newData);
-    setName('');
-    setPrice('');
-    setNotes('');
-    setWarrantyDate('');
-    alert('Oggetto salvato in Inventario!');
+    setName(''); setPrice(''); setNotes('');
   };
 
   const handleDelete = (id) => {
@@ -64,96 +59,80 @@ function Inventory({ data, updateData, setActiveTab }) {
     updateData(newData);
   };
 
-  const filteredItems = inventory.filter(item => {
-    if (tab === 'garanzie' && item.type !== 'Garanzia' && !item.warranty) return false;
-    return true;
-  });
+  // Calcolo scadenza garanzia
+  const getWarrantyStatus = (dateStr, months) => {
+    if (!dateStr || !months) return { text: 'N/A', color: 'var(--text-muted)' };
+    const pDate = new Date(dateStr);
+    const expDate = new Date(pDate.setMonth(pDate.getMonth() + months));
+    const now = new Date();
+    const diffDays = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return { text: `Scaduta (${expDate.toLocaleDateString()})`, color: 'var(--danger)' };
+    if (diffDays < 30) return { text: `In scadenza (${expDate.toLocaleDateString()})`, color: 'var(--warning)' };
+    return { text: `Attiva fino al ${expDate.toLocaleDateString()}`, color: 'var(--success)' };
+  };
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const filteredItems = inventory.filter(i => i.name.toLowerCase().includes(search.toLowerCase()) || i.category.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="module-section active">
       <div className="card-header" style={{ marginBottom: '1rem' }}>
         <div className="card-title">📦 Inventario & Garanzie</div>
-        <button className="btn btn-sm" onClick={() => setActiveTab('hub')}>← Torna all'Hub</button>
+        <button className="btn btn-sm" onClick={() => setActiveTab('hub')}>← Hub</button>
       </div>
 
       <div className="bento-grid">
-        
-        {/* FORM */}
-        <div className="bento-card col-span-4">
-          <div className="card-header"><div className="card-title">➕ Registra Oggetto</div></div>
+        <div className="bento-card col-span-5">
+          <div className="card-header"><div className="card-title">➕ Aggiungi Oggetto</div></div>
           <form onSubmit={handleAdd}>
-            <select className="input" value={type} onChange={e => setType(e.target.value)} style={{ borderColor: 'var(--accent-primary)' }}>
-              <option value="Archivio">📦 Archivio Generale</option>
-              <option value="Garanzia">🛡️ Registro Garanzie</option>
+            <input type="text" className="input" placeholder="Nome Oggetto *" value={name} onChange={e => setName(e.target.value)} required style={{ marginBottom: '0.5rem' }} />
+            
+            <select className="input" value={category} onChange={handleCategoryChange} style={{ marginBottom: '0.5rem' }}>
+              {customCategories.map(c => <option key={c} value={c}>{c}</option>)}
+              <option value="NEW" style={{ fontWeight: 'bold', color: 'var(--accent-primary)' }}>➕ Aggiungi Nuova Categoria...</option>
             </select>
-            <input type="text" className="input" placeholder="Nome o Barcode *" value={name} onChange={e => setName(e.target.value)} required />
-            
-            <div className="form-row">
-              <select className="input" value={category} onChange={handleCategoryChange} required>
-                {Object.keys(CATEGORIES).map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <select className="input" value={subcategory} onChange={e => setSubcategory(e.target.value)} required>
-                {CATEGORIES[category].map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-            
-            <div className="form-row">
-              <div>
-                <label className="stat-label">Acquisto</label>
-                <input type="date" className="input" value={buyDate} onChange={e => setBuyDate(e.target.value)} />
-              </div>
-              <div>
-                <label className="stat-label">Fine Garanzia</label>
-                <input type="date" className="input" value={warrantyDate} onChange={e => setWarrantyDate(e.target.value)} />
-              </div>
-            </div>
 
-            <input type="number" className="input" step="0.01" min="0" placeholder="Valore (€)" value={price} onChange={e => setPrice(e.target.value)} />
-            <input type="text" className="input" placeholder="Seriale, modello, note..." value={notes} onChange={e => setNotes(e.target.value)} />
+            <div className="form-row">
+              <div style={{ flex: 1 }}>
+                <div className="stat-label">Data Acquisto</div>
+                <input type="date" className="input" value={purchaseDate} onChange={e => setPurchaseDate(e.target.value)} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className="stat-label">Garanzia (Mesi)</div>
+                <input type="number" className="input" value={warrantyMonths} onChange={e => setWarrantyMonths(e.target.value)} min="0" />
+              </div>
+            </div>
             
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>💾 Salva Bene</button>
+            <input type="number" className="input" step="0.01" placeholder="Valore € (Opzionale)" value={price} onChange={e => setPrice(e.target.value)} style={{ marginBottom: '0.5rem' }} />
+            <input type="text" className="input" placeholder="Note / Seriale" value={notes} onChange={e => setNotes(e.target.value)} style={{ marginBottom: '1rem' }} />
+            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Salva in Inventario</button>
           </form>
         </div>
 
-        {/* LISTA E TAB */}
-        <div className="bento-card col-span-8">
-          <div className="inner-tabs">
-            <button className={`inner-tab ${tab === 'archivio' ? 'active' : ''}`} onClick={() => setTab('archivio')}>📦 Archivio Oggetti</button>
-            <button className={`inner-tab ${tab === 'garanzie' ? 'active' : ''}`} onClick={() => setTab('garanzie')}>🛡️ Garanzie</button>
-          </div>
+        <div className="bento-card col-span-7">
+          <div className="card-header"><div className="card-title">📋 I Tuoi Beni</div></div>
+          <input type="text" className="input" placeholder="🔍 Cerca per nome o categoria..." value={search} onChange={e => setSearch(e.target.value)} style={{ marginBottom: '1rem', borderRadius: '20px' }} />
           
-          <div className="item-list" style={{ maxHeight: '480px' }}>
-            {filteredItems.length === 0 ? (
-              <div className="stat-label" style={{ textAlign: 'center', padding: '1.5rem' }}>Nessun oggetto trovato.</div>
-            ) : (
+          <div className="item-list" style={{ maxHeight: '400px' }}>
+            {filteredItems.length === 0 ? <div className="stat-label" style={{textAlign:'center', padding:'1rem'}}>Nessun oggetto trovato.</div> :
               filteredItems.map(i => {
-                let isExpired = i.warranty && i.warranty < todayStr;
+                const wStatus = getWarrantyStatus(i.purchaseDate, i.warrantyMonths);
                 return (
-                  <div key={i.id} className="list-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span>{i.name}</span>
-                        {i.warranty && (
-                          <span className={`badge ${isExpired ? 'badge-danger' : 'badge-success'}`}>
-                            {isExpired ? 'Scaduta' : 'Fino al ' + i.warranty.split('-').reverse().join('/')}
-                          </span>
-                        )}
+                  <SwipeableRow key={i.id} onDelete={() => handleDelete(i.id)}>
+                    <div className="list-row" style={{ margin: 0, border: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{i.name} {i.price ? `(€${i.price})` : ''}</div>
+                        <div className="stat-label" style={{ marginTop: '0.2rem' }}>{i.category} {i.notes ? `• ${i.notes}` : ''}</div>
+                        <div style={{ fontSize: '0.75rem', marginTop: '0.3rem', color: wStatus.color, fontWeight: 600 }}>🛡️ Garanzia: {wStatus.text}</div>
                       </div>
-                      <div className="stat-label">{i.category} • {i.subcategory} {i.notes ? `• ${i.notes}` : ''}</div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <div style={{ fontWeight: 800 }}>{i.price ? formatCurrency(i.price) : ''}</div>
                       <button className="btn btn-sm btn-danger" onClick={() => handleDelete(i.id)}>🗑️</button>
                     </div>
-                  </div>
+                  </SwipeableRow>
                 );
               })
-            )}
+            }
           </div>
         </div>
-
       </div>
     </div>
   );

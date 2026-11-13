@@ -1,184 +1,214 @@
 import React, { useState } from 'react';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 function Wallet({ data, updateData }) {
-  if (!data || !data.accounts) return <div>Caricamento dati...</div>;
+  if (!data) return <div>Caricamento...</div>;
 
-  const accounts = data.accounts;
+  // Controlli di sicurezza estremi per evitare crash
+  const accounts = data.accounts || [];
   const transactions = data.transactions || [];
+  const customCategories = (data.settings && data.settings.walletCategories) ? data.settings.walletCategories : ['Rifornimento', 'Spesa', 'Farmaci', 'Svago', 'Stipendio/Entrate', 'Bollette'];
+
+  // Stati Form Transazione
+  const [amount, setAmount] = useState('');
+  const [type, setType] = useState('Uscita');
+  const [category, setCategory] = useState(customCategories[0] || 'Spesa');
+  const [desc, setDesc] = useState('');
+  const [accId, setAccId] = useState(accounts.length > 0 ? accounts[0].id : '');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Stati Form Conti
+  const [showAccForm, setShowAccForm] = useState(false);
+  const [newAccName, setNewAccName] = useState('');
+  const [newAccBal, setNewAccBal] = useState('');
+  const [selectedAccFilter, setSelectedAccFilter] = useState(null);
+
+  const uid = () => 'trx_' + Date.now().toString(36);
+  const formatCurrency = (val) => (parseFloat(val) || 0).toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
   const totalBalance = accounts.reduce((sum, acc) => sum + (parseFloat(acc.balance) || 0), 0);
 
-  const [selectedAccount, setSelectedAccount] = useState('ALL');
-  
-  // Stati per il Form della nuova transazione
-  const [txType, setTxType] = useState('EXPENSE');
-  const [txAmount, setTxAmount] = useState('');
-  const [txDesc, setTxDesc] = useState('');
-  const [txCategory, setTxCategory] = useState('');
-  const [txAccountId, setTxAccountId] = useState(accounts[0]?.id || '');
-  const [txDate, setTxDate] = useState(new Date().toISOString().split('T')[0]);
-
-  const formatCurrency = (val) => {
-    return (parseFloat(val) || 0).toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
-  };
-
-  // Funzione per generare un ID univoco
-  const uid = () => 'tx_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-
-  // Aggiunge una transazione
-  const handleAddTransaction = (e) => {
-    e.preventDefault();
-    const amountNum = parseFloat(txAmount);
-    if (isNaN(amountNum) || amountNum <= 0) return alert('Inserisci un importo valido');
-
-    const newData = { ...data };
-    
-    // Aggiorna il saldo del conto
-    const accountIndex = newData.accounts.findIndex(a => a.id === txAccountId);
-    if (accountIndex === -1) return;
-    
-    if (txType === 'INCOME') {
-      newData.accounts[accountIndex].balance += amountNum;
-    } else {
-      newData.accounts[accountIndex].balance -= amountNum;
-    }
-
-    // Aggiunge la transazione in cima alla lista
-    const newTx = {
-      id: uid(),
-      type: txType,
-      amount: amountNum,
-      accountId: txAccountId,
-      desc: txDesc,
-      category: txCategory || 'Generale',
-      date: txDate
-    };
-    newData.transactions.unshift(newTx);
-
-    // Salva e resetta il form
-    updateData(newData);
-    setTxAmount('');
-    setTxDesc('');
-    setTxCategory('');
-  };
-
-  // Elimina e storna una transazione
-  const handleDeleteTransaction = (id) => {
-    if (!window.confirm('Eliminare il movimento e stornare il saldo?')) return;
-    
-    const newData = { ...data };
-    const txIndex = newData.transactions.findIndex(t => t.id === id);
-    if (txIndex === -1) return;
-    
-    const tx = newData.transactions[txIndex];
-    const accountIndex = newData.accounts.findIndex(a => a.id === tx.accountId);
-    
-    // Storna il saldo
-    if (accountIndex !== -1) {
-      if (tx.type === 'INCOME') {
-        newData.accounts[accountIndex].balance -= tx.amount;
-      } else {
-        newData.accounts[accountIndex].balance += tx.amount;
+  const handleCategoryChange = (e) => {
+    const val = e.target.value;
+    if (val === 'NEW') {
+      const newCat = window.prompt('Inserisci il nome della nuova categoria:');
+      if (newCat && newCat.trim() !== '') {
+        const newData = { ...data };
+        if (!newData.settings) newData.settings = {};
+        newData.settings.walletCategories = [...customCategories, newCat.trim()];
+        updateData(newData);
+        setCategory(newCat.trim());
       }
+    } else {
+      setCategory(val);
     }
+  };
 
-    // Rimuovi dalla lista
-    newData.transactions.splice(txIndex, 1);
+  const handleAddTrx = (e) => {
+    e.preventDefault();
+    if (!amount || !accId) return;
+    const newData = { ...data };
+    const val = parseFloat(amount);
+    const finalVal = type === 'Uscita' ? -Math.abs(val) : Math.abs(val);
+
+    if (!newData.accounts) newData.accounts = [];
+    const aIdx = newData.accounts.findIndex(a => a.id === accId);
+    if (aIdx > -1) newData.accounts[aIdx].balance += finalVal;
+
+    if (!newData.transactions) newData.transactions = [];
+    newData.transactions.unshift({ 
+      id: uid(), accountId: accId, amount: finalVal, type, category, 
+      description: desc || category, 
+      date 
+    });
+    updateData(newData);
+    setAmount(''); setDesc('');
+  };
+
+  const handleAddAccount = (e) => {
+    e.preventDefault();
+    if (!newAccName) return;
+    const newData = { ...data };
+    if (!newData.accounts) newData.accounts = [];
+    newData.accounts.push({ id: 'acc_' + Date.now(), name: newAccName, balance: parseFloat(newAccBal) || 0 });
+    updateData(newData);
+    setNewAccName(''); setNewAccBal(''); setShowAccForm(false);
+  };
+
+  const deleteTrx = (id, accIdForTrx, trxAmount) => {
+    if (!window.confirm("Eliminare questa transazione?")) return;
+    const newData = { ...data };
+    const aIdx = newData.accounts.findIndex(a => a.id === accIdForTrx);
+    if (aIdx > -1) newData.accounts[aIdx].balance -= trxAmount;
+    newData.transactions = newData.transactions.filter(t => t.id !== id);
     updateData(newData);
   };
 
-  // Filtra i movimenti in base al conto selezionato
-  const filteredTransactions = transactions.filter(t => 
-    selectedAccount === 'ALL' || t.accountId === selectedAccount
-  );
+  // Dati PieChart - Protetto dai null
+  const expenseData = {};
+  transactions.forEach(t => {
+    if (t.type === 'Uscita') {
+      const cat = t.category || 'Altro';
+      expenseData[cat] = (expenseData[cat] || 0) + Math.abs(t.amount);
+    }
+  });
+  const pieData = Object.keys(expenseData).map(key => ({ name: key, value: expenseData[key] })).sort((a, b) => b.value - a.value);
+  const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+  const displayedTrx = selectedAccFilter ? transactions.filter(t => t.accountId === selectedAccFilter) : transactions;
 
   return (
     <div className="module-section active">
-      <div className="bento-grid">
-        <div className="bento-card col-span-12">
-          
-          <div className="card-header">
-            <div>
-              <h2 className="card-title">💳 Il Mio Wallet Digitale</h2>
-            </div>
-            <span className="badge badge-success sensitive" style={{ fontSize: '0.95rem', padding: '0.35rem 0.85rem' }}>
-              {formatCurrency(totalBalance)}
-            </span>
-          </div>
-          
-          {/* CAROSELLO CONTI */}
-          <div className="wallet-carousel">
-            <div className={`wallet-card wallet-card-all ${selectedAccount === 'ALL' ? 'selected' : ''}`} onClick={() => setSelectedAccount('ALL')}>
-              <div style={{ fontSize: '0.75rem', opacity: 0.8, fontWeight: 700 }}>PATRIMONIO TOTALE</div>
-              <div style={{ fontSize: '1.35rem', fontWeight: 900, marginTop: '0.25rem' }}>{formatCurrency(totalBalance)}</div>
-            </div>
-            {accounts.map((acc, index) => (
-              <div key={acc.id} className={`wallet-card wallet-card-${index % 5} ${selectedAccount === acc.id ? 'selected' : ''}`} onClick={() => setSelectedAccount(acc.id)}>
-                <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>{acc.name}</div>
-                <div style={{ fontSize: '1.35rem', fontWeight: 900, marginTop: 'auto', fontFamily: "'JetBrains Mono', monospace" }}>{formatCurrency(acc.balance)}</div>
-              </div>
-            ))}
-          </div>
-
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '1rem 0' }} />
-
-          {/* FORM INSERIMENTO */}
-          <div className="card-header"><div className="card-title">💸 Registra Transazione</div></div>
-          <form onSubmit={handleAddTransaction} style={{ marginBottom: '1.25rem' }}>
-            <div className="form-row">
-              <select className="input" value={txType} onChange={e => setTxType(e.target.value)} required>
-                <option value="EXPENSE">📉 Uscita / Spesa</option>
-                <option value="INCOME">📈 Entrata / Stipendio</option>
-              </select>
-              <input type="number" className="input" step="0.01" min="0.01" placeholder="Importo € *" value={txAmount} onChange={e => setTxAmount(e.target.value)} required />
-            </div>
-            <div className="form-row">
-              <select className="input" value={txAccountId} onChange={e => setTxAccountId(e.target.value)} required>
-                {accounts.map(acc => (
-                  <option key={acc.id} value={acc.id}>{acc.name} ({formatCurrency(acc.balance)})</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-row">
-              <input type="text" className="input" placeholder="Causale *" value={txDesc} onChange={e => setTxDesc(e.target.value)} required />
-              <input type="text" className="input" placeholder="Categoria (es. Svago)" value={txCategory} onChange={e => setTxCategory(e.target.value)} />
-            </div>
-            <div className="form-row">
-              <input type="date" className="input" value={txDate} onChange={e => setTxDate(e.target.value)} required />
-            </div>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>💾 Registra nel Libro Mastro</button>
-          </form>
-
-          {/* LIBRO MASTRO (LISTA TRANSAZIONI) */}
-          <div className="card-header" style={{ marginBottom: '0.6rem' }}>
-            <div className="card-title">📜 Libro Mastro <span className="badge">{filteredTransactions.length}</span></div>
-          </div>
-          
-          <div className="item-list">
-            {filteredTransactions.length === 0 ? (
-              <div className="stat-label" style={{ textAlign: 'center', padding: '1.5rem' }}>Nessun movimento.</div>
-            ) : (
-              filteredTransactions.map(t => (
-                <div key={t.id} className="list-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{t.desc}</div>
-                    <div className="stat-label">{t.date.split('-').reverse().join('/')} • {t.category}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ 
-                      fontWeight: 800, 
-                      fontFamily: "'JetBrains Mono', monospace", 
-                      color: t.type === 'INCOME' ? 'var(--success)' : 'var(--danger)' 
-                    }}>
-                      {t.type === 'INCOME' ? '+' : '-'} {formatCurrency(t.amount)}
-                    </div>
-                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTransaction(t.id)}>🗑️</button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
+      <div className="card-header" style={{ marginBottom: '0.5rem' }}>
+        <div className="card-title" style={{ fontSize: '1.2rem' }}>💳 Il Mio Wallet Digitale</div>
+      </div>
+      
+      {/* CAROSELLO CARTE */}
+      <div style={{ display: 'flex', overflowX: 'auto', gap: '1rem', paddingBottom: '1rem', marginTop: '1rem', scrollbarWidth: 'none' }}>
+        <div onClick={() => setSelectedAccFilter(null)} style={{ minWidth: '260px', padding: '1.5rem', borderRadius: '20px', background: 'var(--bg-secondary)', border: selectedAccFilter === null ? '2px solid white' : '2px solid var(--border-color)', flexShrink: 0, cursor: 'pointer' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-muted)' }}>PATRIMONIO TOTALE</div>
+          <div style={{ fontSize: '2.2rem', fontWeight: 900, margin: '0.5rem 0' }}>{formatCurrency(totalBalance)}</div>
         </div>
+        {accounts.map(acc => (
+          <div key={acc.id} onClick={() => setSelectedAccFilter(acc.id)} style={{ minWidth: '220px', padding: '1.5rem', borderRadius: '20px', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', color: 'white', flexShrink: 0, cursor: 'pointer', border: selectedAccFilter === acc.id ? '2px solid white' : '2px solid transparent', opacity: selectedAccFilter !== null && selectedAccFilter !== acc.id ? 0.6 : 1 }}>
+            <div style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>{acc.name}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 900, marginTop: '1.5rem' }}>{formatCurrency(acc.balance)}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* GESTIONE CONTI */}
+      <div style={{ marginBottom: '1rem' }}>
+        {!showAccForm ? (
+          <button className="btn btn-sm" onClick={() => setShowAccForm(true)} style={{ background: 'var(--bg-secondary)' }}>+ Aggiungi Nuovo Conto</button>
+        ) : (
+          <form onSubmit={handleAddAccount} className="bento-card" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', padding: '1rem' }}>
+            <input type="text" className="input" style={{ flex: '1 1 100px' }} placeholder="Nome Conto" value={newAccName} onChange={e=>setNewAccName(e.target.value)} required />
+            <input type="number" className="input" style={{ flex: '1 1 100px' }} step="0.01" placeholder="Saldo Iniziale €" value={newAccBal} onChange={e=>setNewAccBal(e.target.value)} />
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(90deg, #8b5cf6, #ec4899)', border: 'none' }}>Salva</button>
+            <button type="button" className="btn" onClick={() => setShowAccForm(false)}>Annulla</button>
+          </form>
+        )}
+      </div>
+
+      <div className="bento-grid" style={{ marginTop: '0.5rem' }}>
+        
+        {/* FORM REGISTRAZIONE - PORTATO A COL-SPAN-12 */}
+        <div className="bento-card col-span-12">
+          <div className="card-header"><div className="card-title">💸 Registra Transazione</div></div>
+          <form onSubmit={handleAddTrx}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '8px' }}>
+              <div onClick={() => setType('Uscita')} style={{ flex: 1, textAlign: 'center', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, background: type === 'Uscita' ? 'var(--danger)' : 'transparent', color: type === 'Uscita' ? 'white' : 'var(--text-muted)' }}>📉 Uscita</div>
+              <div onClick={() => setType('Entrata')} style={{ flex: 1, textAlign: 'center', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, background: type === 'Entrata' ? 'var(--success)' : 'transparent', color: type === 'Entrata' ? 'white' : 'var(--text-muted)' }}>📈 Entrata</div>
+            </div>
+
+            <div className="form-row">
+              <input type="number" className="input" step="0.01" placeholder="Importo € *" value={amount} onChange={e => setAmount(e.target.value)} required />
+              <input type="date" className="input" value={date} onChange={e => setDate(e.target.value)} required />
+            </div>
+            
+            <select className="input" value={accId} onChange={e => setAccId(e.target.value)} required style={{ marginBottom: '0.5rem' }}>
+              {accounts.map(a => <option key={a.id} value={a.id}>{a.name} ({formatCurrency(a.balance)})</option>)}
+            </select>
+            
+            <select className="input" value={category} onChange={handleCategoryChange} style={{ marginBottom: '0.5rem' }}>
+              {customCategories.map(c => <option key={c} value={c}>{c}</option>)}
+              <option value="NEW" style={{ fontWeight: 'bold', color: 'var(--accent-primary)' }}>➕ Aggiungi Nuova Categoria...</option>
+            </select>
+            
+            <input type="text" className="input" placeholder="Causale (Facoltativa)" value={desc} onChange={e => setDesc(e.target.value)} style={{ marginBottom: '1rem' }} />
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', background: 'linear-gradient(90deg, #8b5cf6, #3b82f6)', border: 'none', padding: '0.75rem', fontSize: '1rem' }}>Registra Movimento</button>
+          </form>
+        </div>
+
+        {/* LISTA E GRAFICO - PORTATO A COL-SPAN-12 */}
+        <div className="bento-card col-span-12">
+          {pieData.length > 0 && selectedAccFilter === null && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem', background: 'var(--bg-secondary)', padding: '1rem', borderRadius: '12px' }}>
+              <div className="card-title" style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>📊 Analisi Spese Totali</div>
+              <div style={{ width: '100%', height: '180px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={5} dataKey="value" stroke="none">
+                      {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                    </Pie>
+                    <RechartsTooltip formatter={(value) => formatCurrency(value)} contentStyle={{ backgroundColor: 'var(--bg-primary)', border: 'none' }}/>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+
+          <div className="card-header"><div className="card-title">📜 Ultimi Movimenti</div></div>
+          <div className="item-list" style={{ maxHeight: '400px' }}>
+            {displayedTrx.length === 0 ? <div className="stat-label" style={{textAlign:'center', padding:'2rem'}}>Nessun movimento.</div> :
+              displayedTrx.map(t => {
+                const acc = accounts.find(a => a.id === t.accountId);
+                const catStr = t.category || '';
+                const descStr = t.description || '';
+                const isGarage = catStr.toLowerCase() === 'rifornimento' || descStr.includes('🚗');
+                
+                return (
+                  <div key={t.id} className="list-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {isGarage && <span title="Collegato al Garage">⛽</span>}
+                        {descStr}
+                      </div>
+                      <div className="stat-label">{t.date ? t.date.split('-').reverse().join('/') : 'Data assente'} • {catStr} • {acc ? acc.name : 'Conto eliminato'}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <strong style={{ color: t.type === 'Entrata' ? 'var(--success)' : 'var(--text-primary)' }}>
+                        {t.type === 'Entrata' ? '+' : ''}{formatCurrency(t.amount)}
+                      </strong>
+                      <button className="btn btn-sm btn-danger" onClick={() => deleteTrx(t.id, t.accountId, t.amount)}>🗑️</button>
+                    </div>
+                  </div>
+                );
+              })
+            }
+          </div>
+        </div>
+
       </div>
     </div>
   );
