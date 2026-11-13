@@ -24,8 +24,18 @@ function Hub({ theme, toggleTheme, data, updateData, setActiveTab }) {
     }
   };
 
-  const handleSync = () => {
-    alert("Sincronizzazione forzata col Cloud completata!");
+  const handleSync = async () => {
+    try {
+      const { doc, setDoc } = await import('firebase/firestore');
+      const { db } = await import('../firebase');
+      const DOC_REF = doc(db, 'lifeos', 'user_data');
+      await setDoc(DOC_REF, data, { merge: true });
+      localStorage.setItem('LIFEOS_DATA_BACKUP', JSON.stringify(data));
+      alert('✅ Sincronizzazione completata con successo!');
+    } catch (err) {
+      console.warn('Errore sync:', err);
+      alert('⚠️ Sincronizzazione fallita. Controlla la connessione.');
+    }
   };
 
   const handleExportJSON = () => {

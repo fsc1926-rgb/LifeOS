@@ -1,18 +1,14 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// La tua configurazione ufficiale di LifeOS
 const firebaseConfig = {
-  apiKey: "AIzaSyAyK2bg-deBo7X0PQC0tv4GnVf29F_Uty0",
-  authDomain: "lifeos-fef8d.firebaseapp.com",
-  projectId: "lifeos-fef8d",
-  storageBucket: "lifeos-fef8d.firebasestorage.app",
-  messagingSenderId: "935696409557",
-  appId: "1:935696409557:web:4da686e46959988c11135c"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Inizializza Firebase
 const app = initializeApp(firebaseConfig);
-
-// Esporta il database (Firestore) per poterlo usare negli altri componenti
 export const db = getFirestore(app);

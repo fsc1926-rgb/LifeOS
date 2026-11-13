@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SwipeableRow from './SwipeableRow';
 
-function Garage({ data, updateData, setActiveTab, onNavigate }) {
+function Garage({ data, updateData, setActiveTab }) {
   if (!data) return <div>Caricamento...</div>;
 
   const garage = Array.isArray(data.garage) ? data.garage : [];
@@ -31,20 +31,7 @@ function Garage({ data, updateData, setActiveTab, onNavigate }) {
 
   const uid = () => 'gar_' + Date.now().toString(36);
 
-  // Funzione sicura per tornare all'Hub
-  const handleBackToHub = () => {
-    if (typeof setActiveTab === 'function') {
-      setActiveTab('hub');
-    } else if (typeof onNavigate === 'function') {
-      onNavigate('hub');
-    } else {
-      // Fallback universale: simula il click sul tab Hub nella navbar in basso
-      const hubBtn = Array.from(document.querySelectorAll('button, div, a')).find(
-        el => el.textContent && el.textContent.includes('Hub Extra')
-      );
-      if (hubBtn) hubBtn.click();
-    }
-  };
+  const handleBackToHub = () => setActiveTab('hub');
 
   // Calcolo stato semaforo per ogni scadenza
   const getTrafficLight = (dateStr) => {

@@ -55,9 +55,9 @@ function Maintenance({ data, updateData, setActiveTab }) {
     e.preventDefault();
     if (!title || !dueDate) return;
 
-    const newData = { ...data };
     const m = { id: uid(), title, category, dueDate, cost: parseFloat(cost) || 0, recurrence, status, notes };
-    newData.maintenances.push(m);
+    const newMaintenances = [...(data.maintenances || []), m];
+    const newData = { ...data, maintenances: newMaintenances };
     spawnNextMaintenance(m, newData);
 
     updateData(newData);

@@ -8,7 +8,7 @@ import SwipeableRow from './SwipeableRow';
 moment.locale('it');
 const localizer = momentLocalizer(moment);
 
-const CLIENT_ID = '134105903978-iijbk09d809e80vsjheolfrgka1jqlis.apps.googleusercontent.com';
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
 
 function Calendar({ data, updateData, setActiveTab }) {
@@ -93,31 +93,27 @@ function Calendar({ data, updateData, setActiveTab }) {
   const handleAdd = (e) => {
     e.preventDefault();
     if (!title) return;
-    const newData = { ...data };
-    if (!newData.tasks) newData.tasks = [];
     
     const newTask = { id: uid(), title, date, category, status: 'todo' };
-    newData.tasks.unshift(newTask);
-    updateData(newData);
+    const newTasks = [newTask, ...(data.tasks || [])];
+    updateData({ ...data, tasks: newTasks });
     setTitle('');
     
     if (isGoogleSynced) pushToGoogleCalendar(newTask);
   };
 
   const toggleTaskStatus = (id) => {
-    const newData = { ...data };
-    const tIndex = newData.tasks.findIndex(t => t.id === id);
-    if (tIndex > -1) {
-      newData.tasks[tIndex].status = newData.tasks[tIndex].status === 'done' ? 'todo' : 'done';
-      updateData(newData);
-    }
+    const newTasks = (data.tasks || []).map(t => {
+      if (t.id !== id) return t;
+      return { ...t, status: t.status === 'done' ? 'todo' : 'done' };
+    });
+    updateData({ ...data, tasks: newTasks });
   };
 
   const handleDelete = (id) => {
     if (!window.confirm("Eliminare definitivamente questo task locale? (Non eliminerà l'evento su Google se già sincronizzato)")) return;
-    const newData = { ...data };
-    newData.tasks = newData.tasks.filter(t => t.id !== id);
-    updateData(newData);
+    const newTasks = (data.tasks || []).filter(t => t.id !== id);
+    updateData({ ...data, tasks: newTasks });
   };
 
   const localEvents = tasks.map(t => ({
@@ -129,7 +125,7 @@ function Calendar({ data, updateData, setActiveTab }) {
     resource: t
   }));
 
-  const filteredTasks = tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const filteredTasks = [...tasks].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <div className="module-section active">

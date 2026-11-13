@@ -1,50 +1,38 @@
 import React from 'react';
 
 function Dashboard({ data, updateData }) {
-  // Se i dati non sono ancora stati caricati, mostriamo un avviso
   if (!data) return <div style={{ padding: '2rem', textAlign: 'center' }}>Caricamento...</div>;
 
   const { accounts = [], habits = [], tasks = [] } = data;
   
-  // Calcola il Patrimonio Liquido sommando i conti
   const totalBalance = accounts.reduce((sum, acc) => sum + (parseFloat(acc.balance) || 0), 0);
   const formatCurrency = (val) => (parseFloat(val) || 0).toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
 
-  // Calcola il saluto dinamico in base all'ora
   const hr = new Date().getHours();
   const greeting = hr >= 13 && hr < 18 ? 'Buon pomeriggio ☀️' : hr >= 18 || hr < 5 ? 'Buonasera 🌙' : 'Buongiorno ✨';
   
   const todayStr = new Date().toISOString().split('T')[0];
   const formattedDate = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
 
-  // Funzione temporanea per aggiungere una nuova abitudine
   const handleAddHabit = () => {
     const title = window.prompt('Nome della nuova abitudine quotidiana:');
     if (!title || !title.trim()) return;
     
-    const newData = { ...data };
-    newData.habits.push({ 
-      id: 'hab_' + Date.now(), 
-      title: title.trim(), 
-      streak: 0, 
-      lastDone: null 
-    });
-    updateData(newData);
+    const newHabits = [...(data.habits || []), {
+      id: 'hab_' + Date.now(),
+      title: title.trim(),
+      streak: 0,
+      lastDone: null
+    }];
+    updateData({ ...data, habits: newHabits });
   };
 
-  // Funzione per completare/deselezionare un'abitudine
   const toggleHabit = (id) => {
-    const newData = { ...data };
-    const habit = newData.habits.find(h => h.id === id);
-    if (!habit) return;
-    
-    // Se era già completata oggi, la togliamo, altrimenti la segniamo completata
-    if (habit.lastDone === todayStr) {
-      habit.lastDone = null; 
-    } else {
-      habit.lastDone = todayStr;
-    }
-    updateData(newData);
+    const newHabits = (data.habits || []).map(h => {
+      if (h.id !== id) return h;
+      return { ...h, lastDone: h.lastDone === todayStr ? null : todayStr };
+    });
+    updateData({ ...data, habits: newHabits });
   };
 
   return (

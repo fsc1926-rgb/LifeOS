@@ -114,10 +114,8 @@ function Vault({ data, updateData, setActiveTab }) {
         ct: enc.ct
       };
       
-      const newData = { ...data };
-      if (!newData.vault) newData.vault = [];
-      newData.vault.unshift(newSecret);
-      await updateData(newData);
+      const newVault = [newSecret, ...(data.vault || [])];
+      await updateData({ ...data, vault: newVault });
       
       setDecryptedList([{ ...newSecret, decryptedText: newText }, ...decryptedList]);
       setNewTitle('');
@@ -129,9 +127,8 @@ function Vault({ data, updateData, setActiveTab }) {
 
   const handleDelete = async (id) => {
     if(!window.confirm('Eliminare definitivamente questo segreto? (Azione irreversibile)')) return;
-    const newData = { ...data };
-    newData.vault = newData.vault.filter(v => v.id !== id);
-    await updateData(newData);
+    const newVault = (data.vault || []).filter(v => v.id !== id);
+    await updateData({ ...data, vault: newVault });
     setDecryptedList(decryptedList.filter(v => v.id !== id));
   };
 
