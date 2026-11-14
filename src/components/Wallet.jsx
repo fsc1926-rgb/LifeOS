@@ -37,6 +37,11 @@ function Wallet({ data, updateData }) {
   const [newAccBal, setNewAccBal] = useState('');
   const [newAccColor, setNewAccColor] = useState(BANK_COLOR_PRESETS[0].bg);
 
+  // Stati Allineamento Saldo
+  const [showReconcile, setShowReconcile] = useState(false);
+  const [reconcileAccId, setReconcileAccId] = useState(accounts.length > 0 ? accounts[0].id : '');
+  const [reconcileTarget, setReconcileTarget] = useState('');
+
   // Stato Modifica Colore Conto Esistente
   const [editingColorAccId, setEditingColorAccId] = useState(null);
 
@@ -114,6 +119,50 @@ function Wallet({ data, updateData }) {
       updateData(newData);
     }
     setEditingColorAccId(null);
+  };
+
+  const handleReconcileBalance = (e) => {
+    e.preventDefault();
+    const effectiveAccId = reconcileAccId || (accounts[0] ? accounts[0].id : '');
+    if (!effectiveAccId || reconcileTarget === '') return;
+    const targetVal = parseFloat(reconcileTarget);
+    if (isNaN(targetVal)) {
+      alert("Inserisci un saldo reale valido.");
+      return;
+    }
+
+    const newData = { ...data };
+    if (!newData.accounts) newData.accounts = [];
+    const acc = newData.accounts.find(a => a.id === effectiveAccId);
+    if (!acc) return;
+
+    const currentBal = parseFloat(acc.balance) || 0;
+    const diff = targetVal - currentBal;
+
+    if (Math.abs(diff) < 0.01) {
+      alert("Il saldo di questo conto è già perfettamente allineato!");
+      return;
+    }
+
+    // Aggiorna il saldo del conto
+    acc.balance = targetVal;
+
+    // Registra la transazione di rettifica
+    if (!newData.transactions) newData.transactions = [];
+    newData.transactions.unshift({
+      id: uid(),
+      accountId: acc.id,
+      amount: diff,
+      type: diff > 0 ? 'Entrata' : 'Uscita',
+      category: 'Rettifica Saldo',
+      description: `Rettifica / Allineamento Saldo: ${acc.name}`,
+      date: new Date().toISOString().split('T')[0]
+    });
+
+    updateData(newData);
+    setReconcileTarget('');
+    setShowReconcile(false);
+    alert(`Saldo del conto "${acc.name}" allineato con successo a ${targetVal.toLocaleString('it-IT', { style: 'currency', currency: 'EUR' })}!`);
   };
 
   const handleDeleteAccount = (targetAccId, accName) => {
@@ -209,6 +258,33 @@ function Wallet({ data, updateData }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>{acc.name}</div>
                 <div style={{ display: 'flex', gap: '4px' }}>
+                  {/* Tasto Allinea Saldo Carta */}
+                  <button
+                    type="button"
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setReconcileAccId(acc.id); 
+                      setShowReconcile(true); 
+                      setShowAccForm(false); 
+                    }}
+                    style={{
+                      background: 'rgba(0,0,0,0.3)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '28px',
+                      height: '28px',
+                      cursor: 'pointer',
+                      fontSize: '0.82rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backdropFilter: 'blur(4px)'
+                    }}
+                    title="Allinea saldo reale di questo conto"
+                  >
+                    ⚖️
+                  </button>
                   {/* Tasto Cambio Colore Carta */}
                   <button
                     type="button"
@@ -303,18 +379,145 @@ function Wallet({ data, updateData }) {
         </div>
       )}
 
-      {/* GESTIONE AGGIUNGI NUOVO CONTO (CON SELETTORE COLORI BANCHE) */}
+      {/* GESTIONE AGGIUNGI NUOVO CONTO & ALLINEA SALDO */}
+      <div style={{ display: 'flex', gap: '0.65rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        <button 
+          type="button"
+          className="btn btn-sm btn-secondary-custom" 
+          onClick={() => { setShowAccForm(!showAccForm); setShowReconcile(false); }} 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+        >
+          <span>➕</span>
+          <span>Nuovo Conto (es. ING, Revolut, Intesa)</span>
+        </button>
+
+        <button 
+          type="button"
+          className="btn btn-sm" 
+          onClick={() => { setShowReconcile(!showReconcile); setShowAccForm(false); }} 
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            background: showReconcile ? 'var(--accent-primary)' : 'var(--btn-sub-bg, #0e1526)',
+            color: showReconcile ? '#ffffff' : 'var(--accent-primary)',
+            border: '1px solid var(--btn-sub-border, rgba(59, 130, 246, 0.3))',
+            fontWeight: 700,
+            cursor: 'pointer'
+          }}
+        >
+          <span>⚖️</span>
+          <span>Allinea Saldo Conti</span>
+        </button>
+      </div>
+
+      {/* FORM ALLINEAMENTO / RICONCILIAZIONE SALDO CONTO */}
+      {showReconcile && (
+        <form 
+          onSubmit={handleReconcileBalance}
+          className="bento-card"
+          style={{
+            padding: '1.25rem',
+            marginBottom: '1rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--accent-primary)',
+            boxShadow: 'var(--shadow-lg)'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div className="card-title" style={{ fontSize: '0.98rem' }}>
+              ⚖️ Allinea Saldo Reale del Conto (Rettifica Automatica)
+            </div>
+            <button type="button" className="btn btn-sm" onClick={() => setShowReconcile(false)}>✕ Chiudi</button>
+          </div>
+
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.85rem' }}>
+            Inserisci il saldo effettivo reale visibile nell'app della tua banca. LifeOS calcolerà la differenza e registrerà una transazione di rettifica automatica per pareggiare i conti.
+          </p>
+
+          <div className="form-row">
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                Seleziona Conto:
+              </label>
+              <select 
+                className="input" 
+                value={reconcileAccId || (accounts[0] ? accounts[0].id : '')} 
+                onChange={e => setReconcileAccId(e.target.value)}
+                required
+                style={{ margin: 0 }}
+              >
+                {accounts.map(a => (
+                  <option key={a.id} value={a.id}>
+                    {a.name} (Attuale: {formatCurrency(a.balance)})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                Saldo Reale Effettivo in Banca (€):
+              </label>
+              <input 
+                type="number" 
+                step="0.01" 
+                className="input" 
+                placeholder="es. 1250.50" 
+                value={reconcileTarget} 
+                onChange={e => setReconcileTarget(e.target.value)} 
+                required
+                style={{ margin: 0 }}
+              />
+            </div>
+          </div>
+
+          {/* Calcolo differenza live */}
+          {reconcileTarget !== '' && !isNaN(parseFloat(reconcileTarget)) && (
+            <div style={{
+              background: 'var(--bg-secondary)',
+              padding: '0.65rem 0.85rem',
+              borderRadius: '10px',
+              border: '1px solid var(--border-color)',
+              fontSize: '0.84rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: '0.65rem'
+            }}>
+              <span>Differenza calcolata:</span>
+              {(() => {
+                const targetVal = parseFloat(reconcileTarget);
+                const currentAcc = accounts.find(a => a.id === (reconcileAccId || (accounts[0] ? accounts[0].id : '')));
+                const currentVal = parseFloat(currentAcc?.balance) || 0;
+                const diff = targetVal - currentVal;
+                if (Math.abs(diff) < 0.01) {
+                  return <span style={{ color: 'var(--success)' }}>I saldi sono già perfettamente allineati!</span>;
+                }
+                return (
+                  <span style={{ color: diff > 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 800 }}>
+                    {diff > 0 ? `+${formatCurrency(diff)} (Entrata di rettifica)` : `-${formatCurrency(Math.abs(diff))} (Uscita di rettifica)`}
+                  </span>
+                );
+              })()}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+            <button type="submit" className="btn btn-primary" style={{ padding: '0.65rem 1.25rem', fontWeight: 700 }}>
+              ⚖️ Salva e Allinea Saldo
+            </button>
+            <button type="button" className="btn btn-secondary-custom" onClick={() => setShowReconcile(false)}>
+              Annulla
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* FORM AGGIUNGI NUOVO CONTO (CON SELETTORE COLORI BANCHE) */}
       <div style={{ marginBottom: '1rem' }}>
-        {!showAccForm ? (
-          <button 
-            className="btn btn-sm btn-secondary-custom" 
-            onClick={() => setShowAccForm(true)} 
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-          >
-            <span>➕</span>
-            <span>Aggiungi Nuovo Conto (es. ING, Revolut, Intesa)</span>
-          </button>
-        ) : (
+        {showAccForm && (
           <form 
             onSubmit={handleAddAccount} 
             className="bento-card" 
