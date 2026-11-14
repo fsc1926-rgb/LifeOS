@@ -89,6 +89,14 @@ function Calendar({ data, updateData, setActiveTab }) {
     } catch (firebaseErr) {
       console.warn("Metodo Firebase non riuscito, provo Google Identity Services:", firebaseErr);
 
+      if (firebaseErr.code === 'auth/unauthorized-domain') {
+        const msg = `Dominio non autorizzato (${window.location.hostname}). Aggiungilo in Firebase Console -> Authentication -> Impostazioni -> Domini autorizzati.`;
+        setSyncStatusMsg(msg);
+        alert(msg);
+        setIsSyncing(false);
+        return;
+      }
+
       // METODO 2: Google Identity Services (GSI)
       if (window.google?.accounts?.oauth2 && CLIENT_ID) {
         try {
@@ -104,13 +112,14 @@ function Calendar({ data, updateData, setActiveTab }) {
                 setIsGoogleSynced(true);
                 await fetchGoogleEvents(token, true);
               } else if (tokenResponse.error) {
-                alert(`Errore autorizzazione Google: ${tokenResponse.error_description || tokenResponse.error}`);
+                const errDetail = tokenResponse.error_description || tokenResponse.error;
+                alert(`Errore autorizzazione Google: ${errDetail}\nVerifica che gli URI di reindirizzamento e le origini JavaScript siano autorizzati nella Google Cloud Console.`);
               }
               setIsSyncing(false);
             },
             error_callback: (err) => {
               console.error("GSI Error:", err);
-              alert("Errore Google Identity: assicurati che i popup non siano bloccati.");
+              alert("Errore Google Identity: assicurati che i popup non siano bloccati e che l'origine JavaScript sia configurata su Google Cloud Console.");
               setIsSyncing(false);
             }
           });
@@ -121,7 +130,9 @@ function Calendar({ data, updateData, setActiveTab }) {
         }
       }
 
-      alert(`Connessione Google fallita: ${firebaseErr.message || firebaseErr.code}`);
+      const errMsg = `Connessione Google fallita: ${firebaseErr.message || firebaseErr.code}`;
+      setSyncStatusMsg(errMsg);
+      alert(errMsg);
       setIsSyncing(false);
     }
   };

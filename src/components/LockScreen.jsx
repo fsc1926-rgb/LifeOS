@@ -192,9 +192,13 @@ function LockScreen({ onUnlock }) {
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Accesso Google annullato.');
       } else if (err.code === 'auth/popup-blocked') {
-        setError('Il browser ha bloccato il popup di Google. Abilita i popup.');
+        setError('Il browser ha bloccato il popup di Google. Abilita i popup nelle impostazioni del browser.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError(`Dominio non autorizzato (${window.location.hostname}). Va aggiunto su Firebase Console -> Authentication -> Impostazioni -> Domini autorizzati.`);
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError('Provider Google non abilitato su Firebase Console -> Authentication -> Sign-in method.');
       } else {
-        setError(`Errore Google: ${err.message || err.code}`);
+        setError(`Errore Google (${err.code || 'sconosciuto'}): ${err.message}`);
       }
     } finally {
       setIsProcessing(false);
