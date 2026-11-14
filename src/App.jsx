@@ -145,7 +145,7 @@ function App() {
     changeTheme(nextTheme);
   };
 
-  const isHubSection = ['hub', 'garage', 'maintenance', 'inventory', 'health', 'vault'].includes(activeTab);
+  const isHubSection = ['hub', 'garage', 'inventory', 'health', 'vault'].includes(activeTab);
 
   // Lock screen
   if (isLocked) {

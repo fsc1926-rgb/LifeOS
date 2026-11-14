@@ -35,7 +35,7 @@ function SearchModal({ data, setActiveTab }) {
     });
     // Cerca nelle Manutenzioni
     data.maintenances?.forEach(m => {
-      if (m.title.toLowerCase().includes(q)) searchResults.push({ type: 'Manutenzione', text: m.title, icon: '🔧', tab: 'maintenance' });
+      if (m.title.toLowerCase().includes(q)) searchResults.push({ type: 'Manutenzione', text: m.title, icon: '🔧', tab: 'inventory' });
     });
     // Cerca nella Cartella Clinica
     data.medical?.forEach(m => {

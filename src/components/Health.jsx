@@ -8,12 +8,11 @@ function Health({ data, updateData, setActiveTab }) {
   const weights = data.weights || [];
   const medical = data.medical || [];
   const medications = data.medications || [];
-  const vitals = data.vitals || [];
   const healthSettings = data.healthSettings || { userHeight: 175, weightTarget: 70 };
   const todayStr = new Date().toISOString().split('T')[0];
   const todayHydration = (data.hydration && data.hydration.date === todayStr) ? data.hydration.ml : 0;
 
-  // Sottomodulo attivo: null (Hub Salute OS) | 'medical' | 'weight' | 'medications' | 'hydration' | 'vitals'
+  // Sottomodulo attivo: null (Hub Salute OS) | 'medical' | 'weight' | 'medications' | 'hydration'
   const [activeSubModule, setActiveSubModule] = useState(null);
 
   // Stati Form Peso
@@ -33,14 +32,6 @@ function Health({ data, updateData, setActiveTab }) {
   const [medDosage, setMedDosage] = useState('');
   const [medTime, setMedTime] = useState('Mattina (Dopo Colazione)');
   const [medInstructions, setMedInstructions] = useState('');
-
-  // Stati Form Parametri Vitali
-  const [vDate, setVDate] = useState(todayStr);
-  const [systolic, setSystolic] = useState('');
-  const [diastolic, setDiastolic] = useState('');
-  const [heartRate, setHeartRate] = useState('');
-  const [sleepHours, setSleepHours] = useState('');
-  const [stressLevel, setStressLevel] = useState('Basso');
 
   // Stato Altezza per Calcolo BMI
   const [heightInput, setHeightInput] = useState(healthSettings.userHeight || 175);
@@ -164,30 +155,6 @@ function Health({ data, updateData, setActiveTab }) {
     const nextVal = Math.max(0, current + amountMl);
     newData.hydration = { date: todayStr, ml: nextVal };
     updateData(newData);
-  };
-
-  // ----------------------------------------------------
-  // GESTIONE PARAMETRI VITALI & SONNO
-  // ----------------------------------------------------
-  const handleAddVitals = (e) => {
-    e.preventDefault();
-    const newData = { ...data };
-    if (!newData.vitals) newData.vitals = [];
-    newData.vitals.unshift({
-      id: uid('vit'),
-      date: vDate,
-      systolic: systolic ? parseInt(systolic) : null,
-      diastolic: diastolic ? parseInt(diastolic) : null,
-      heartRate: heartRate ? parseInt(heartRate) : null,
-      sleepHours: sleepHours ? parseFloat(sleepHours) : null,
-      stressLevel
-    });
-    updateData(newData);
-    setSystolic('');
-    setDiastolic('');
-    setHeartRate('');
-    setSleepHours('');
-    alert('✅ Parametri vitali registrati!');
   };
 
   // Eliminazione generica
@@ -776,114 +743,6 @@ function Health({ data, updateData, setActiveTab }) {
   }
 
   // =========================================================================
-  // VISTA 5: SOTTOMODULO PARAMETRI VITALI & SONNO
-  // =========================================================================
-  if (activeSubModule === 'vitals') {
-    return (
-      <div className="module-section active">
-        <div className="card-header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', fontWeight: 700, textTransform: 'uppercase' }}>
-              ❤️ Salute OS / Sottomodulo
-            </div>
-            <div className="card-title" style={{ fontSize: '1.25rem', marginTop: '2px' }}>
-              🫀 Parametri Vitali, Pressione & Sonno
-            </div>
-          </div>
-          <button className="btn btn-sm btn-secondary-custom" onClick={() => setActiveSubModule(null)}>
-            ← Torna a Salute OS
-          </button>
-        </div>
-
-        <div className="bento-grid">
-          {/* FORM INSERIMENTO PARAMETRI */}
-          <div className="bento-card col-span-12">
-            <div className="card-title" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>➕ Nuova Misurazione Parametri</div>
-            <form onSubmit={handleAddVitals}>
-              <div className="form-row">
-                <input 
-                  type="date" 
-                  className="input" 
-                  value={vDate} 
-                  onChange={e => setVDate(e.target.value)} 
-                  required 
-                />
-                <input 
-                  type="number" 
-                  className="input" 
-                  placeholder="Pressione Massima (Sistolica) es. 120" 
-                  value={systolic} 
-                  onChange={e => setSystolic(e.target.value)} 
-                />
-                <input 
-                  type="number" 
-                  className="input" 
-                  placeholder="Pressione Minima (Diastolica) es. 80" 
-                  value={diastolic} 
-                  onChange={e => setDiastolic(e.target.value)} 
-                />
-              </div>
-
-              <div className="form-row">
-                <input 
-                  type="number" 
-                  className="input" 
-                  placeholder="Battiti a riposo (BPM) es. 65" 
-                  value={heartRate} 
-                  onChange={e => setHeartRate(e.target.value)} 
-                />
-                <input 
-                  type="number" 
-                  step="0.5" 
-                  className="input" 
-                  placeholder="Ore di Sonno (h) es. 7.5" 
-                  value={sleepHours} 
-                  onChange={e => setSleepHours(e.target.value)} 
-                />
-                <select className="input" value={stressLevel} onChange={e => setStressLevel(e.target.value)}>
-                  <option value="Basso">🟢 Stress: Basso / Rilassato</option>
-                  <option value="Medio">🟡 Stress: Medio / Ordinario</option>
-                  <option value="Alto">🔴 Stress: Alto / Intenso</option>
-                </select>
-              </div>
-
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.7rem', fontWeight: 700 }}>
-                💾 Salva Misurazione
-              </button>
-            </form>
-          </div>
-
-          {/* CRONOLOGIA PARAMETRI VITALI */}
-          <div className="bento-card col-span-12">
-            <div className="card-title" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>📜 Storico Misurazioni ({vitals.length})</div>
-            <div className="item-list" style={{ maxHeight: '45vh', overflowY: 'auto' }}>
-              {vitals.length === 0 ? (
-                <div className="stat-label" style={{ textAlign: 'center', padding: '1.5rem' }}>Nessuna misurazione registrata.</div>
-              ) : (
-                vitals.map(v => (
-                  <div key={v.id} className="list-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.85rem' }}>
-                    <div>
-                      <div style={{ fontWeight: 800, fontSize: '0.98rem' }}>
-                        {v.systolic && v.diastolic ? `🩸 ${v.systolic}/${v.diastolic} mmHg` : ''}
-                        {v.heartRate ? ` • 🫀 ${v.heartRate} BPM` : ''}
-                        {v.sleepHours ? ` • 😴 ${v.sleepHours}h sonno` : ''}
-                      </div>
-                      <div className="stat-label" style={{ marginTop: '0.2rem' }}>
-                        🗓️ {v.date.split('-').reverse().join('/')} • Livello Stress: {v.stressLevel}
-                      </div>
-                    </div>
-                    <button className="btn btn-sm btn-danger" onClick={() => deleteRecord('vitals', v.id)}>🗑️</button>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // =========================================================================
   // VISTA PRINCIPALE: HUB MODULARE SALUTE OS ("STILE DATA BOY")
   // =========================================================================
   return (
@@ -893,7 +752,7 @@ function Health({ data, updateData, setActiveTab }) {
         <div>
           <div className="card-title" style={{ fontSize: '1.4rem' }}>❤️ Salute OS</div>
           <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Hub Medico, Parametri Vitali & Benessere Personale
+            Cartella Clinica, Peso Corporeo, Terapie & Idratazione
           </div>
         </div>
         <button className="btn btn-sm btn-secondary-custom" onClick={() => setActiveTab('hub')}>
@@ -1259,82 +1118,6 @@ function Health({ data, updateData, setActiveTab }) {
             color: 'var(--accent-primary)'
           }}>
             <span>Entra in Idratazione</span>
-            <span>➔</span>
-          </div>
-        </div>
-
-        {/* MODULO 5: PARAMETRI VITALI & SONNO */}
-        <div
-          onClick={() => setActiveSubModule('vitals')}
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '20px',
-            padding: '1.4rem',
-            cursor: 'pointer',
-            boxShadow: 'var(--shadow-sm)',
-            transition: 'all 0.2s ease',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '1rem'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--accent-primary)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-color)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <span style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '14px',
-                background: 'rgba(234, 88, 12, 0.12)',
-                color: '#ea580c',
-                fontSize: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                🫀
-              </span>
-              <span style={{
-                background: 'var(--btn-sub-bg, #0e1526)',
-                color: 'var(--text-secondary)',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                padding: '0.25rem 0.65rem',
-                borderRadius: '999px',
-                border: '1px solid var(--border-color)'
-              }}>
-                {vitals.length} misurazioni
-              </span>
-            </div>
-
-            <div style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
-              Parametri Vitali & Sonno
-            </div>
-            <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
-              Pressione arteriosa (sistolica/diastolica), battiti a riposo (BPM), ore di sonno e indice di stress.
-            </p>
-          </div>
-
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderTop: '1px solid var(--border-color)',
-            paddingTop: '0.85rem',
-            fontSize: '0.85rem',
-            fontWeight: 800,
-            color: 'var(--accent-primary)'
-          }}>
-            <span>Entra in Parametri Vitali</span>
             <span>➔</span>
           </div>
         </div>

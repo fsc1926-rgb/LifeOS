@@ -23,10 +23,6 @@ function Hub({ theme, onOpenSettings, setActiveTab }) {
               <div className="hub-icon">🚗</div>
               <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>Garage</div>
             </div>
-            <div className="hub-card" onClick={() => setActiveTab('maintenance')}>
-              <div className="hub-icon">🔧</div>
-              <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>Casa</div>
-            </div>
             <div className="hub-card" onClick={() => setActiveTab('inventory')}>
               <div className="hub-icon">📦</div>
               <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>Inventario</div>
