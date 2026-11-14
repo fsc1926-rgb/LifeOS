@@ -25,7 +25,7 @@ function LockScreen({ onUnlock }) {
   const autoPromptTriggered = useRef(false);
 
   // ----------------------------------------------------
-  // UTILITY WEBAUTHN PER S25
+  // UTILITY WEBAUTHN PER S25 ULTRA
   // ----------------------------------------------------
   const generateRandomBuffer = () => {
     const arr = new Uint8Array(32);
@@ -33,49 +33,97 @@ function LockScreen({ onUnlock }) {
     return arr;
   };
 
-  // Rilevamento implicito e richiesta automatica impronta per Samsung S25
+  const bufferToBase64 = (buffer) => {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  };
+
+  const base64ToBuffer = (base64) => {
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  };
+
+  // Rilevamento implicito e richiesta impronta per Samsung S25
   const triggerS25Fingerprint = async (isAuto = false) => {
-    if (!window.PublicKeyCredential) return;
+    if (!window.PublicKeyCredential) {
+      if (!isAuto) setError("Il browser non supporta WebAuthn (richiede connessione sicura HTTPS).");
+      return;
+    }
+
     try {
       const isRegistered = localStorage.getItem('lifeos_bio_setup');
-      if (isRegistered) {
+      const savedCredId = localStorage.getItem('lifeos_bio_cred_id');
+
+      if (isRegistered && savedCredId) {
+        // 1. Verifica impronta già registrata su S25
         const publicKey = {
           challenge: generateRandomBuffer(),
           timeout: 60000,
           userVerification: "required",
-          rpId: window.location.hostname
+          rpId: window.location.hostname,
+          allowCredentials: [{
+            id: base64ToBuffer(savedCredId),
+            type: "public-key",
+            transports: ["internal"]
+          }]
         };
-        await navigator.credentials.get({ publicKey });
-        onUnlock();
+        const assertion = await navigator.credentials.get({ publicKey });
+        if (assertion) {
+          setSuccessMsg("Impronta S25 verificata con successo!");
+          setTimeout(() => onUnlock(), 250);
+        }
       } else if (!isAuto) {
-        // Se non ancora registrato e invocato manualmente:
+        // 2. Prima registrazione dell'impronta su S25
         const publicKey = {
           challenge: generateRandomBuffer(),
-          rp: { name: "LifeOS Galaxy S25", id: window.location.hostname },
+          rp: { name: "LifeOS S25 Ultra", id: window.location.hostname },
           user: {
             id: generateRandomBuffer(),
             name: "s25ultra@lifeos.local",
             displayName: "Samsung Galaxy S25 Ultra"
           },
           pubKeyCredParams: [
-            { alg: -7, type: "public-key" },
-            { alg: -257, type: "public-key" }
+            { alg: -7, type: "public-key" }, // ES256 (standard Android Knox)
+            { alg: -257, type: "public-key" } // RS256
           ],
           authenticatorSelection: {
             authenticatorAttachment: "platform",
-            userVerification: "required"
+            userVerification: "required",
+            residentKey: "preferred"
           },
           timeout: 60000,
           attestation: "none"
         };
-        await navigator.credentials.create({ publicKey });
-        localStorage.setItem('lifeos_bio_setup', 'true');
-        onUnlock();
+        const cred = await navigator.credentials.create({ publicKey });
+        if (cred && cred.rawId) {
+          const credIdBase64 = bufferToBase64(cred.rawId);
+          localStorage.setItem('lifeos_bio_cred_id', credIdBase64);
+          localStorage.setItem('lifeos_bio_setup', 'true');
+          setSuccessMsg("Impronta S25 configurata con successo!");
+          setTimeout(() => onUnlock(), 300);
+        }
       }
     } catch (err) {
-      console.log("Rilevamento biometrico S25:", err.name);
-      // Se era un tentativo automatico e l'utente ha toccato annulla,
-      // rimane pulito sulla schermata PIN senza bloccare nulla.
+      console.warn("Rilevamento biometrico S25:", err);
+      if (!isAuto) {
+        if (err.name === 'NotAllowedError') {
+          setError("Scansione impronta annullata. Tocca di nuovo l'icona o usa il PIN.");
+        } else if (err.name === 'InvalidStateError') {
+          localStorage.removeItem('lifeos_bio_setup');
+          localStorage.removeItem('lifeos_bio_cred_id');
+          setError("Credenziale desincronizzata. Tocca di nuovo l'icona per riconfigurarla.");
+        } else {
+          setError(`Errore sensore impronta: ${err.message || err.name}`);
+        }
+      }
     }
   };
 
@@ -85,7 +133,7 @@ function LockScreen({ onUnlock }) {
       try {
         const publicKey = {
           challenge: generateRandomBuffer(),
-          rp: { name: "LifeOS Galaxy S25", id: window.location.hostname },
+          rp: { name: "LifeOS S25 Ultra", id: window.location.hostname },
           user: {
             id: generateRandomBuffer(),
             name: "s25ultra@lifeos.local",
@@ -97,13 +145,18 @@ function LockScreen({ onUnlock }) {
           ],
           authenticatorSelection: {
             authenticatorAttachment: "platform",
-            userVerification: "required"
+            userVerification: "required",
+            residentKey: "preferred"
           },
           timeout: 60000,
           attestation: "none"
         };
-        await navigator.credentials.create({ publicKey });
-        localStorage.setItem('lifeos_bio_setup', 'true');
+        const cred = await navigator.credentials.create({ publicKey });
+        if (cred && cred.rawId) {
+          const credIdBase64 = bufferToBase64(cred.rawId);
+          localStorage.setItem('lifeos_bio_cred_id', credIdBase64);
+          localStorage.setItem('lifeos_bio_setup', 'true');
+        }
       } catch (e) {
         // Ignora silenziosamente se rifiutato
       }
@@ -142,7 +195,7 @@ function LockScreen({ onUnlock }) {
       setError('');
 
       if (newPin.length === 6) {
-        setTimeout(() => verifyPin(newPin), 150);
+        verifyPin(newPin);
       }
     }
   };
@@ -470,20 +523,24 @@ function LockScreen({ onUnlock }) {
               <button
                 type="button"
                 onClick={() => triggerS25Fingerprint(false)}
-                title="Tocca per verificare l'impronta"
+                title={localStorage.getItem('lifeos_bio_setup') ? "Sblocca con Impronta S25" : "Configura Impronta S25"}
                 style={{
                   width: '70px',
                   height: '70px',
                   borderRadius: '50%',
-                  background: 'transparent',
-                  border: 'none',
+                  background: 'var(--btn-sub-bg, #0e1526)',
+                  border: '1px solid var(--accent-primary, #3b82f6)',
                   color: 'var(--accent-primary, #3b82f6)',
                   fontSize: '1.8rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  boxShadow: '0 0 15px var(--accent-glow, rgba(59, 130, 246, 0.3))',
+                  transition: 'transform 0.1s ease'
                 }}
+                onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.92)')}
+                onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
                 👆
               </button>

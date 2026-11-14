@@ -166,20 +166,41 @@ function Calendar({ data, updateData, setActiveTab }) {
           if (showAlert) alert("Sessione Google scaduta. Clicca di nuovo per riconnettere.");
           return;
         }
-        throw new Error(`Errore API Google (${res.status})`);
+
+        let detailMsg = `HTTP ${res.status}`;
+        try {
+          const errData = await res.json();
+          if (errData?.error?.message) {
+            detailMsg = errData.error.message;
+          }
+        } catch (_) {}
+
+        if (res.status === 403) {
+          throw new Error(`Google Calendar API non abilitata nel progetto (lifeos-fef8d). Dettaglio: ${detailMsg}`);
+        }
+        throw new Error(`Errore API Google (${detailMsg})`);
       }
 
       const result = await res.json();
       
-      if (result.items) {
-        const formatted = result.items.map(item => ({
-          id: item.id,
-          title: `🔵 ${item.summary || 'Senza Titolo'}`,
-          start: new Date(item.start.dateTime || item.start.date),
-          end: new Date(item.end.dateTime || item.end.date),
-          allDay: !item.start.dateTime,
-          isGoogle: true
-        }));
+      if (result.items && Array.isArray(result.items)) {
+        const formatted = result.items
+          .filter(item => item && item.status !== 'cancelled' && (item.start?.dateTime || item.start?.date))
+          .map(item => {
+            const startStr = item.start?.dateTime || item.start?.date;
+            const endStr = item.end?.dateTime || item.end?.date || startStr;
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+
+            return {
+              id: item.id || ('gcal_' + Math.random().toString(36).substring(2, 9)),
+              title: `🔵 ${item.summary || 'Senza Titolo'}`,
+              start: isNaN(startDate.getTime()) ? new Date() : startDate,
+              end: isNaN(endDate.getTime()) ? new Date() : endDate,
+              allDay: !item.start?.dateTime,
+              isGoogle: true
+            };
+          });
 
         setGoogleEvents(formatted);
         localStorage.setItem('lifeos_gcal_events', JSON.stringify(formatted));
@@ -188,7 +209,11 @@ function Calendar({ data, updateData, setActiveTab }) {
       }
     } catch (err) {
       console.error("Errore fetch Google Calendar:", err);
-      if (showAlert) alert("Errore durante il recupero degli eventi da Google Calendar.");
+      const userMessage = err.message || "Errore sconosciuto";
+      setSyncStatusMsg(`Errore sincronizzazione: ${userMessage}`);
+      if (showAlert) {
+        alert(`Impossibile sincronizzare Google Calendar:\n\n${userMessage}`);
+      }
     } finally {
       setIsSyncing(false);
     }
